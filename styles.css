@@ -1,68 +1,78 @@
-/* styles.css */
+/* styles.css - Versi Premium */
 
 /* --- RESET & FONDASI --- */
 :root {
-    --primary-color: #007bff; /* Biru terang untuk aksi */
-    --accent-color: #ff9800; /* Kuning/Oranye untuk warning/tunggakan */
-    --bg-color: #f4f7f6;
+    --primary-color: #1a73e8; /* Biru Google/Premium */
+    --accent-color: #ffc107; /* Emas/Kuning untuk Warning */
+    --bg-color: #f8f9fa; /* Latar Belakang Sangat Terang */
     --card-bg: #ffffff;
-    --dark-text: #212529;
+    --dark-text: #343a40;
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
     background-color: var(--bg-color);
+    line-height: 1.6;
 }
 
 .app-container {
-    max-width: 450px; /* Lebar khas layar mobile */
+    max-width: 450px;
     margin: 0 auto;
-    background-color: #ffffff;
+    background-color: var(--card-bg);
     min-height: 100vh;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    padding-bottom: 70px; /* Ruang untuk bottom-nav */
+    box-shadow: var(--shadow-deep);
+    padding-bottom: 80px; 
 }
 
 /* --- HEADER & STATUS --- */
 .header {
-    background-color: var(--primary-color);
+    /* Gradien untuk kesan premium */
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
     color: white;
-    padding: 20px;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
+    padding: 30px 20px;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.user-info h1 {
+    font-size: 1.8em;
+    font-weight: 700;
 }
 
 .status-box {
-    margin-top: 15px;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 10px 15px;
-    border-radius: 8px;
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 12px 15px;
+    border-radius: 10px;
     text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .status-box span {
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 1.1em;
     display: block;
 }
 
 /* --- SECTIONS UMUM --- */
 section {
-    padding: 15px;
-    margin-bottom: 10px;
+    padding: 20px;
 }
 
 h2 {
     color: var(--dark-text);
-    font-size: 1.1em;
+    font-size: 1.3em;
+    font-weight: 600;
     margin-bottom: 15px;
-    border-bottom: 2px solid var(--bg-color);
-    padding-bottom: 5px;
 }
 
 /* --- REKAP KEUANGAN --- */
@@ -74,45 +84,58 @@ h2 {
 
 .metric-card {
     background: var(--card-bg);
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: var(--shadow-light);
+    transition: transform 0.2s;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
 }
 
 .metric-card h3 {
-    font-size: 0.9em;
-    color: var(--dark-text);
-    margin-bottom: 5px;
+    font-size: 0.95em;
+    color: #6c757d;
+    margin-bottom: 8px;
+    text-transform: uppercase;
 }
 
 .tunggakan-card p {
-    font-size: 1.6em;
-    font-weight: bold;
-    color: var(--accent-color); /* Warna merah/oranye untuk tunggakan */
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #dc3545; /* Merah untuk tunggakan */
 }
 
 /* --- TOMBOL AKSI --- */
 .button-grid {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    flex-wrap: wrap;
 }
 
 .action-btn {
-    flex-grow: 1;
-    min-width: 100px;
-    padding: 15px 10px;
+    padding: 18px 10px;
     border: none;
-    border-radius: 10px;
-    font-weight: bold;
+    border-radius: 12px;
+    font-weight: 600;
     color: var(--dark-text);
     background-color: var(--bg-color);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: background-color 0.2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.2s, transform 0.1s;
 }
 
-.action-btn:hover {
-    background-color: #e0e4e7;
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+.sos-btn {
+    background-color: #f8d7da; /* Latar belakang soft untuk SOS */
+    color: #721c24; /* Teks merah tua */
+}
+.charging-btn {
+    background-color: #e2f0ff; /* Latar belakang soft biru */
+    color: #004085;
 }
 
 /* --- BOTTOM NAVIGASI --- */
@@ -124,21 +147,23 @@ h2 {
     bottom: 0;
     width: 100%;
     max-width: 450px;
-    height: 60px;
+    height: 70px;
     background-color: var(--card-bg);
     border-top: 1px solid #eee;
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+    z-index: 100;
 }
 
 .bottom-nav a {
     text-decoration: none;
     color: #6c757d;
-    font-size: 0.8em;
+    font-size: 0.85em;
     text-align: center;
     padding: 5px;
+    transition: color 0.2s;
 }
 
 .bottom-nav a.active {
     color: var(--primary-color);
-    font-weight: bold;
+    font-weight: 700;
 }
