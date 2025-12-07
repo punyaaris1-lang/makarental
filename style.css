@@ -1,0 +1,144 @@
+/* styles.css */
+
+/* --- RESET & FONDASI --- */
+:root {
+    --primary-color: #007bff; /* Biru terang untuk aksi */
+    --accent-color: #ff9800; /* Kuning/Oranye untuk warning/tunggakan */
+    --bg-color: #f4f7f6;
+    --card-bg: #ffffff;
+    --dark-text: #212529;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+}
+
+.app-container {
+    max-width: 450px; /* Lebar khas layar mobile */
+    margin: 0 auto;
+    background-color: #ffffff;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    padding-bottom: 70px; /* Ruang untuk bottom-nav */
+}
+
+/* --- HEADER & STATUS --- */
+.header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 20px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.status-box {
+    margin-top: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.status-box span {
+    font-weight: bold;
+    display: block;
+}
+
+/* --- SECTIONS UMUM --- */
+section {
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    color: var(--dark-text);
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--bg-color);
+    padding-bottom: 5px;
+}
+
+/* --- REKAP KEUANGAN --- */
+.metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.metric-card {
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.metric-card h3 {
+    font-size: 0.9em;
+    color: var(--dark-text);
+    margin-bottom: 5px;
+}
+
+.tunggakan-card p {
+    font-size: 1.6em;
+    font-weight: bold;
+    color: var(--accent-color); /* Warna merah/oranye untuk tunggakan */
+}
+
+/* --- TOMBOL AKSI --- */
+.button-grid {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    flex-grow: 1;
+    min-width: 100px;
+    padding: 15px 10px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    color: var(--dark-text);
+    background-color: var(--bg-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: background-color 0.2s;
+}
+
+.action-btn:hover {
+    background-color: #e0e4e7;
+}
+
+/* --- BOTTOM NAVIGASI --- */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 450px;
+    height: 60px;
+    background-color: var(--card-bg);
+    border-top: 1px solid #eee;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+}
+
+.bottom-nav a {
+    text-decoration: none;
+    color: #6c757d;
+    font-size: 0.8em;
+    text-align: center;
+    padding: 5px;
+}
+
+.bottom-nav a.active {
+    color: var(--primary-color);
+    font-weight: bold;
+}
