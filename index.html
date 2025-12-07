@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAKA Rental App Dashboard</title>
+    <link rel="stylesheet" href="styles.css"> </head>
+<body>
+    <div class="app-container">
+        
+        <header class="header">
+            <div class="user-info">
+                <h1>Halo, Adi Wijaya!</h1>
+                <p>Plat Motor: **B 4004 MA**</p>
+            </div>
+            <div class="status-box">
+                <span id="current-status" class="status-hwb">
+                    WAJIB BAYAR (Rp 80.000)
+                </span>
+            </div>
+        </header>
+
+        <section class="recap-section">
+            <h2>💰 Rekap Pembayaran</h2>
+            <div class="metric-grid">
+                <div class="metric-card tunggakan-card">
+                    <h3>Total Tunggakan</h3>
+                    <p id="tunggakan-nominal">Rp 320.000</p>
+                    <small id="tunggakan-hari">4 Hari Tertunggak</small>
+                </div>
+                <div class="metric-card progress-card">
+                    <h3>Progress Sewa</h3>
+                    <p id="hari-progress">20 / 1009 Hari</p>
+                    <progress value="20" max="1009"></progress>
+                </div>
+            </div>
+        </section>
+
+        <section class="action-section">
+            <h2>Aksi Cepat</h2>
+            <div class="button-grid">
+                <button class="action-btn charging-btn">
+                    ⚡ Titik Fast Charging
+                </button>
+                <button class="action-btn sos-btn">
+                    🆘 SOS Chat CS
+                </button>
+                <button class="action-btn etle-btn">
+                    🚨 Cek ETLE
+                </button>
+            </div>
+        </section>
+
+        <footer class="bottom-nav">
+            <a href="#" class="nav-item active">🏠 Dashboard</a>
+            <a href="#" class="nav-item">📅 Kalender</a>
+            <a href="#" class="nav-item">🗒️ Riwayat</a>
+            <a href="#" class="nav-item">⚙️ Pengaturan</a>
+        </footer>
+    </div>
+    
+    </body>
+</html>
