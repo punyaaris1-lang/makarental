@@ -247,3 +247,12 @@ input:focus {
     font-weight: 700;
     box-shadow: 0 4px 15px rgba(0, 191, 255, 0.4);
 }
+
+/* FIX FINAL untuk Z-INDEX dan CLICK AREA */
+div, button, a {
+    position: relative; 
+    z-index: 1; /* Pastikan semua elemen memiliki z-index dasar */
+}
+.modal-overlay {
+    z-index: 1000 !important; /* Memastikan modal selalu di atas */
+}
