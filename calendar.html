@@ -83,10 +83,9 @@
         let savedPayments = JSON.parse(localStorage.getItem('maka_payments')) || {};
 
         function getDayStatus(date) {
-            const D = new Date(date);
-            const dayOfMonth = D.getDate();
-            const year = D.getFullYear();
-            const month = D.getMonth();
+            const dayOfMonth = date.getDate();
+            const year = date.getFullYear();
+            const month = date.getMonth();
 
             if (dayOfMonth === 31) return 'HLB';
 
@@ -131,17 +130,19 @@
                 let isPayable = false;
 
                 if (status === 'HLB') {
-                    statusClass = 'holiday'; // <-- MERAH
+                    statusClass = 'holiday'; 
                 } else if (status === 'CDP') {
-                    statusClass = 'cicilan-dp'; // <-- UNGU
+                    statusClass = 'cicilan-dp'; 
                     isPayable = true;
                 } else if (status === 'HWB') {
-                    statusClass = 'wajib-bayar'; // <-- BIRU
+                    statusClass = 'wajib-bayar'; 
                     isPayable = true;
                 }
 
                 const isPaid = savedPayments[dateKey] === true;
-                const paidClass = isPaid ? 'paid' : '';
+                // FIX: paidClass hanya ditambahkan jika isPaid TRUE
+                const paidClass = isPaid ? 'paid' : ''; 
+                
                 const isFuture = date.getTime() > new Date().getTime();
                 const disabledAttr = isFuture ? 'disabled' : '';
 
