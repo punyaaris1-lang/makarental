@@ -87,6 +87,7 @@
             const year = date.getFullYear();
             const month = date.getMonth();
 
+            // FIX 1: Tgl 31 selalu HLB
             if (dayOfMonth === 31) return 'HLB';
 
             const dateCheck = new Date(year, month, dayOfMonth);
@@ -140,14 +141,13 @@
                 }
 
                 const isPaid = savedPayments[dateKey] === true;
-                // FIX: paidClass hanya ditambahkan jika isPaid TRUE
-                const paidClass = isPaid ? 'paid' : ''; 
-                
+                const paidClass = isPaid ? 'paid' : '';
                 const isFuture = date.getTime() > new Date().getTime();
                 const disabledAttr = isFuture ? 'disabled' : '';
 
 
                 if (isPayable) {
+                    // Hanya hari yang bisa dibayar yang punya checkbox
                     grid.innerHTML += `
                         <div class="day ${statusClass} ${paidClass}">
                             <input type="checkbox" id="check-${dateKey}" data-date="${dateKey}" ${isPaid ? 'checked' : ''} ${disabledAttr}>
@@ -157,6 +157,7 @@
                         </div>
                     `;
                 } else {
+                    // Hari Libur (Tidak ada checkbox)
                     grid.innerHTML += `
                         <div class="day ${statusClass}">
                             <span class="day-number">${day}</span>
