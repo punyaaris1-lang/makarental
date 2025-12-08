@@ -45,11 +45,11 @@
             }, 1500); // Tunggu 1.5 detik
         }
         
-        // --- Konten Form Login ---
+        // --- Konten Form LOGIN (Hanya Plat dan Password) ---
         const loginContent = `
             <form id="login-form" onsubmit="redirectToDashboard(event)">
-                <label for="login-email">Email / No. HP</label>
-                <input type="text" id="login-email" placeholder="Masukkan Email atau No. HP" required>
+                <label for="login-plat">Nomor Plat Motor</label>
+                <input type="text" id="login-plat" placeholder="Contoh: B 4004 MA" required>
                 
                 <label for="login-password">Kata Sandi</label>
                 <input type="password" id="login-password" placeholder="Masukkan Kata Sandi" required>
@@ -59,17 +59,23 @@
             </form>
         `;
 
-        // --- Konten Form Pendaftaran (Daftar) - MAKA+ SUDAH DIHILANGKAN ---
+        // --- Konten Form PENDAFTARAN (Data Sesuai Permintaan + Password) ---
         const registerContent = `
             <form id="register-form" onsubmit="redirectToDashboard(event)">
                 <label for="reg-name">Nama Lengkap</label>
                 <input type="text" id="reg-name" required>
-
-                <label for="reg-start-date">Tgl Mulai Sewa (Ambil Motor)</label>
-                <input type="date" id="reg-start-date" required>
                 
+                <label for="reg-plat">Nomor Plat Motor (ID Login Anda)</label>
+                <input type="text" id="reg-plat" required>
+
+                <label for="reg-password">Buat Kata Sandi</label>
+                <input type="password" id="reg-password" required>
+
                 <hr class="divider">
 
+                <label for="reg-start-date">Tanggal Mulai Sewa</label>
+                <input type="date" id="reg-start-date" required>
+                
                 <label>Opsi DP</label>
                 <div class="radio-group">
                     <input type="radio" id="dp355" name="dp-option" value="355" checked>
@@ -77,7 +83,6 @@
                     <input type="radio" id="dp755" name="dp-option" value="755">
                     <label for="dp755">DP 755rb (Langsung Libur Tgl 14 & 28)</label>
                 </div>
-                
                 
                 <button type="submit" class="primary-btn register-btn">DAFTAR & HITUNG JADWAL</button>
             </form>
