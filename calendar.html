@@ -130,17 +130,17 @@
                 let isPayable = false;
 
                 if (status === 'HLB') {
-                    statusClass = 'holiday';
+                    statusClass = 'holiday'; 
                 } else if (status === 'CDP') {
-                    statusClass = 'cicilan-dp';
+                    statusClass = 'cicilan-dp'; 
                     isPayable = true;
                 } else if (status === 'HWB') {
-                    statusClass = 'wajib-bayar';
+                    statusClass = 'wajib-bayar'; 
                     isPayable = true;
                 }
 
                 const isPaid = savedPayments[dateKey] === true;
-                const paidClass = isPaid ? 'paid' : ''; // Hanya tambahkan 'paid' jika benar-benar dibayar
+                const paidClass = isPaid ? 'paid' : '';
                 
                 const isFuture = date.getTime() > new Date().getTime();
                 const disabledAttr = isFuture ? 'disabled' : '';
@@ -156,6 +156,7 @@
                         </div>
                     `;
                 } else {
+                    // Hari Libur (Tidak ada checkbox)
                     grid.innerHTML += `
                         <div class="day ${statusClass}">
                             <span class="day-number">${day}</span>
