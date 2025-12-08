@@ -1,5 +1,5 @@
 /* ===============================
-   MAKA PREMIUM UI – LEVEL PRO
+   MAKA PREMIUM UI – LEVEL PRO (FIXED)
 ================================ */
 
 :root {
@@ -30,11 +30,11 @@ body {
   color: var(--text-main);
 }
 
-/* APP CONTAINER */
+/* APP */
 .app-container {
   max-width: 420px;
   margin: auto;
-  padding-bottom: 100px;
+  padding-bottom: 130px; /* ruang navbar */
 }
 
 /* ================= HEADER ================= */
@@ -45,7 +45,14 @@ body {
 
 .user-info h1 {
   font-size: 1.25em;
+  font-weight: 700;
   margin: 0;
+}
+
+.user-info h1::after {
+  content: " ✓";
+  color: var(--dp-color);
+  font-size: .75em;
 }
 
 .user-info p {
@@ -54,13 +61,13 @@ body {
   color: var(--text-secondary);
 }
 
-/* ================= HERO CARD ================= */
+/* ================= HERO ================= */
 .hero-tunggakan {
   margin-top: 18px;
   backdrop-filter: blur(16px);
   background: linear-gradient(
     135deg,
-    rgba(0,234,255,.15),
+    rgba(0,234,255,.18),
     rgba(18,26,44,.7)
   );
   border-radius: 18px;
@@ -68,17 +75,15 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   box-shadow:
     0 0 25px rgba(0,234,255,.15),
     inset 0 0 0 1px var(--glass-border);
 }
 
 .hero-tunggakan h3 {
-  margin: 0;
   font-size: .75em;
-  letter-spacing: 1px;
   color: var(--primary-neon);
+  margin: 0;
 }
 
 .hero-tunggakan p {
@@ -99,7 +104,7 @@ body {
   color: var(--text-secondary);
 }
 
-/* NEON DIVIDER */
+/* DIVIDER */
 .futuristic-divider {
   height: 1px;
   margin: 22px 0;
@@ -134,12 +139,10 @@ body {
   border-radius: 16px;
   padding: 16px 10px;
   text-align: center;
-  text-decoration: none;
-
   border: 1px solid var(--glass-border);
   color: var(--text-main);
-
-  transition: all .25s ease;
+  text-decoration: none;
+  transition: transform .25s ease, box-shadow .25s ease;
 }
 
 .icon-item span {
@@ -156,21 +159,35 @@ body {
 }
 
 .icon-item:hover {
-  transform: translateY(-4px) scale(1.02);
-  box-shadow:
-    0 12px 30px rgba(0,234,255,.25);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,234,255,.25);
 }
 
-/* =========================
-   PREMIUM BOTTOM NAV FIX
-========================= */
+.icon-item:active {
+  transform: scale(.96);
+}
+
+/* ================= SOS CARD ================= */
+.sos-card {
+  border: 1px solid rgba(255,70,70,.6);
+}
+
+.sos-card span {
+  color: #ff4d4d;
+}
+
+.sos-card:hover {
+  box-shadow: 0 0 30px rgba(255,70,70,.6);
+}
+
+/* ================= NAVBAR PREMIUM ================= */
 .bottom-nav {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
 
-  height: 74px;
+  height: 82px;
   padding-bottom: env(safe-area-inset-bottom);
 
   display: flex;
@@ -179,194 +196,57 @@ body {
 
   background: linear-gradient(
     to top,
-    rgba(5, 8, 20, 0.95),
-    rgba(5, 8, 20, 0.80)
+    rgba(5,8,20,.98),
+    rgba(5,8,20,.85)
   );
-
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  border-top: 1px solid rgba(255,255,255,0.08);
-
-  z-index: 9999;
+  backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(255,255,255,.08);
+  z-index: 999;
 }
 
-/* ITEM */
-.bottom-nav a {
-  text-decoration: none;
+.nav-item {
   flex: 1;
   text-align: center;
-  color: #7c8399;
-  font-size: 11px;
-  font-weight: 500;
-
+  color: #8f9bb8;
+  text-decoration: none;
+  font-size: 12px;
   display: flex;
   flex-direction: column;
+  gap: 6px;
   align-items: center;
   justify-content: center;
-
-  height: 100%;
-  gap: 4px;
-
-  transition: all .25s ease;
+  transition: transform .2s ease, color .2s ease;
 }
 
-/* ICON */
-.bottom-nav a i,
-.bottom-nav a img {
-  font-size: 20px;
-  line-height: 1;
+.nav-item span {
+  font-size: 28px;
 }
 
 /* ACTIVE */
-.bottom-nav a.active {
-  color: #00ffe1;
-}
-
-.bottom-nav a.active i {
-  filter: drop-shadow(0 0 8px rgba(0,255,225,.7));
-}
-
-/* REMOVE GLOBAL EFFECT LEAK */
-.bottom-nav *,
-.bottom-nav *::before,
-.bottom-nav *::after {
-  filter: none !important;
-  box-shadow: none !important;
-}
-
-/* =================================================
-   UI LEVEL 3 – MICRO INTERACTION & DEPTH
-================================================= */
-
-/* GLOBAL MOTION */
-* {
-  transition:
-    background .25s ease,
-    color .25s ease,
-    transform .25s ease,
-    box-shadow .25s ease;
-}
-
-/* ================= HEADER POLISH ================= */
-.header {
-  padding-bottom: 24px;
-}
-
-.user-info h1 {
-  font-weight: 700;
-  letter-spacing: .3px;
-}
-
-.user-info h1::after {
-  content: "✓";
-  margin-left: 6px;
-  font-size: .75em;
-  color: var(--dp-color);
-}
-
-/* ================= HERO CARD – MORE DEPTH ================= */
-.hero-tunggakan {
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-tunggakan::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      120deg,
-      transparent 30%,
-      rgba(255,255,255,.25),
-      transparent 70%
-    );
-  opacity: .08;
-  pointer-events: none;
-}
-
-/* ================= ICON CARD LEVEL 3 ================= */
-.icon-item {
-  position: relative;
-  overflow: hidden;
-}
-
-.icon-item::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(
-      circle at top,
-      rgba(0,234,255,.25),
-      transparent 60%
-    );
-  opacity: 0;
-}
-
-.icon-item:hover::after {
-  opacity: 1;
-}
-
-.icon-item:active {
-  transform: scale(.96);
-}
-
-/* ================= ICON GRID FADE IN ================= */
-.icon-grid {
-  animation: gridIn .6s ease both;
-}
-
-@keyframes gridIn {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ================= BOTTOM NAV FEEL ================= */
-.bottom-nav {
-  z-index: 50;
+.nav-item.active {
+  color: var(--primary-neon);
 }
 
 .nav-item.active span {
-  animation: navPulse 1.8s ease-in-out infinite;
-}
-
-@keyframes navPulse {
-  0%,100% {
-    text-shadow: 0 0 6px rgba(0,234,255,.7);
-  }
-  50% {
-    text-shadow: 0 0 14px rgba(0,234,255,1);
-  }
-}
-
-/* ================= PREMIUM TOUCH FEEL ================= */
-a, button {
-  -webkit-tap-highlight-color: transparent;
-}
-/* ==================
-   SOS CARD – EMERGENCY
-================== */
-
-.sos-card {
-  border: 1px solid rgba(255,70,70,.6);
+  background: radial-gradient(circle,
+    #00eaff,
+    #0077ff);
+  color: #000;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-22px);
   box-shadow:
-    0 0 20px rgba(255,70,70,.25);
+    0 0 20px rgba(0,234,255,.8);
 }
 
-.sos-card span {
-  color: #ff4d4d;
+/* TAP */
+.nav-item:active {
+  transform: scale(.93);
 }
 
-.sos-card:hover {
-  box-shadow:
-    0 0 30px rgba(255,70,70,.6);
-}
-
+/* SAFE TOUCH */
+a { -webkit-tap-highlight-color: transparent; }
