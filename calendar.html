@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles.css"> 
     
     <style>
-        /* Ambil Variabel dari styles.css */
+        /* Ambil Variabel dari styles.css (Asumsi variables di styles.css ada) */
         :root {
             --primary-neon: #00dfff; 
             --secondary-neon: #39ff14; 
@@ -20,13 +20,36 @@
             --bg-hlb: #3a2222; /* Dark Red */
         }
         
-        /* Struktur dasar Kalender */
+        /* Struktur dasar Kalender (FIX Tampilan Rusak) */
         .calendar-controls { padding: 20px 20px 10px; }
-        /* ... (Struktur visual kalender lainnya tetap di sini, dipersingkat di respons ini) ... */
+        .month-selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--primary-neon);
+        }
+        .nav-month-btn {
+            background: none;
+            border: none;
+            color: var(--primary-neon);
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        .calendar-display { padding: 0 20px 20px; }
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #999;
+            font-size: 0.85em;
+        }
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
+            gap: 5px; /* FIX: Grid gap */
         }
         .day {
             display: flex;
@@ -87,7 +110,14 @@
             border: 1px solid var(--secondary-neon) !important;
             font-weight: bold !important;
         }
-        
+        /* Style untuk hari yang ditandai paid (penting untuk menang melawan prioritas lain) */
+        .day.paid.wajib-bayar label,
+        .day.paid.cicilan-dp label {
+            background-color: var(--secondary-neon) !important;
+            color: var(--bg-dark) !important;
+            border: 1px solid var(--secondary-neon) !important;
+        }
+
         /* Hari yang dinonaktifkan */
         .day input[disabled] + label {
             background-color: #1a1a1a !important;
@@ -164,9 +194,9 @@
     <script>
         let currentDate = new Date(2026, 2); 
         
-        // Asumsi Ambil Motor 15 Sept 2025 (Sesuai Contoh Anda)
         const userData = {
-            tglAmbilMotor: new Date('2025-09-15'),
+            // Asumsi Ambil Motor 15 Sept 2025
+            tglAmbilMotor: new Date('2025-09-15'), 
             opsiDp: '355', 
             tarifNormal: 70000,
             tarifMakaPlus: 10000
@@ -190,10 +220,11 @@
             const dateCheck = new Date(year, month, dayOfMonth);
 
             // 2. ATURAN CDP (Cicilan DP - Tgl 14 & 28)
-            // Cek apakah tanggal berada dalam periode cicilan (3 bulan setelah ambil motor)
-            if (userData.opsiDp === '355' && dateCheck >= DP_START_DATE && dateCheck < DP_END_DATE) {
-                if (dayOfMonth === 14 || dayOfMonth === 28) {
-                    return 'CDP'; // Cicilan DP (Bayar 70K)
+            if (userData.opsiDp === '355') {
+                if (dateCheck >= DP_START_DATE && dateCheck < DP_END_DATE) {
+                    if (dayOfMonth === 14 || dayOfMonth === 28) {
+                        return 'CDP'; // Cicilan DP (Bayar 70K)
+                    }
                 }
             }
             
@@ -202,7 +233,6 @@
         }
         
         function renderCalendar() {
-            // ... (Kode render Kalender tetap sama) ...
             const grid = document.getElementById('calendar-grid');
             const monthYearDisplay = document.getElementById('current-month-year');
             
@@ -245,12 +275,14 @@
                 
                 const disabledAttr = ''; 
 
+                // Khusus tanggal 31 di bulan yang tidak punya 31 hari
                 if (day === 31 && daysInMonth < 31) {
                      grid.innerHTML += `<div class="day empty"></div>`;
                      continue;
                 }
                 
                 if (status === 'HLB') {
+                    // Hari Libur (Tidak ada checkbox)
                     grid.innerHTML += `
                         <div class="day ${statusClass}">
                             <label>
@@ -259,7 +291,8 @@
                         </div>
                     `;
                 } else {
-                    grid.innerHTML += `
+                    // Hari yang Wajib Bayar (HWB atau CDP)
+                     grid.innerHTML += `
                         <div class="day ${statusClass} ${paidClass}">
                             <input type="checkbox" id="check-${dateKey}" data-date="${dateKey}" ${isPaid ? 'checked' : ''} ${disabledAttr}>
                             <label for="check-${dateKey}">
