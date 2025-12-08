@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAKA Pelacakan Part Gratis</title>
+    <link rel="stylesheet" href="styles.css"> 
+    
+    <style>
+        .setting-group {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+        }
+        .setting-group h3 {
+            color: var(--paid-gold); /* Gold untuk fitur eksklusif */
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+        .part-tracker-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .part-card {
+            background: var(--input-bg);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 193, 7, 0.3); /* Border Soft Gold */
+        }
+        .part-card p {
+            font-size: 0.9em;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        .part-card small {
+            display: block;
+            font-size: 0.7em;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #2a2a2a;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: var(--paid-gold);
+            width: 0%; 
+            transition: width 0.5s;
+        }
+        .action-button {
+            padding: 12px;
+            margin-top: 15px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            background: var(--paid-gold);
+            color: var(--bg-dark);
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .last-used {
+            color: var(--secondary-neon);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <header class="header" style="border-bottom: 2px solid var(--paid-gold);">
+            <div class="user-info">
+                <h1>🏆 Cek Gratisan (Part Log)</h1>
+                <p>Lacak sisa jatah penggantian suku cadang gratis.</p>
+            </div>
+        </header>
+
+        <section class="settings-content">
+            
+            <div class="setting-group">
+                <h3>🛠️ Status Suku Cadang (3 Tahun Kontrak)</h3>
+                <div id="part-tracker" class="part-tracker-grid">
+                    </div>
+                
+                <button class="action-button" onclick="openMarkUsageModal()">CATAT PENGGUNAAN BARU</button>
+            </div>
+        </section>
+
+
+        <footer class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span>🏠</span>
+                Dashboard
+            </a>
+            <a href="calendar.html" class="nav-item">
+                <span>📅</span>
+                Kalender
+            </a>
+            <a href="history.html" class="nav-item">
+                <span>🗒️</span>
+                Riwayat
+            </a>
+            <a href="settings.html" class="nav-item active">
+                <span>⚙️</span>
+                Pengaturan
+            </a>
+        </footer>
+    </div>
+    
+    <div id="markUsageModal" class="modal-overlay">
+        <div class="modal-content" style="border-color: var(--paid-gold);">
+            <h3 style="color: var(--paid-gold);">Catat Penggunaan Part</h3>
+            <p style="margin-bottom: 15px;">Pilih part yang diganti hari ini:</p>
+            
+            <form id="usage-form">
+                <select id="part-select" class="action-button" style="margin-top: 0; background: var(--input-bg); color: var(--text-light); border: 1px solid var(--paid-gold);">
+                    <option value="">-- Pilih Suku Cadang --</option>
+                    <option value="ban_depan">Ban Depan (1/tahun)</option>
+                    <option value="ban_belakang">Ban Belakang (1/tahun)</option>
+                    <option value="kampas_depan">Kampas Rem Depan (3/total)</option>
+                    <option value="kampas_belakang">Kampas Rem Belakang (3/total)</option>
+                </select>
+                
+                <button type="submit" class="action-button" style="background: var(--paid-gold); color: var(--bg-dark);">KONFIRMASI PENGGANTIAN</button>
+            </form>
+            <button class="modal-btn secondary-btn" onclick="closeMarkUsageModal()">BATAL</button>
+        </div>
+    </div>
+
+
+    <script>
+        // Jatah Suku Cadang per Kontrak (3 Tahun)
+        const PART_LIMITS = {
+            ban_depan: 3, 
+            ban_belakang: 3, 
+            kampas_depan: 3,
+            kampas_belakang: 3
+        };
+
+        let partUsage = JSON.parse(localStorage.getItem('maka_part_usage')) || {
+            ban_depan: 0,
+            ban_belakang: 0,
+            kampas_depan: 0,
+            kampas_belakang: 0,
+            last_used: {} 
+        };
+
+        function renderPartTracker() {
+            const container = document.getElementById('part-tracker');
+            container.innerHTML = '';
+
+            const parts = [
+                { key: 'ban_depan', name: 'Ban Depan', yearly: true },
+                { key: 'ban_belakang', name: 'Ban Belakang', yearly: true },
+                { key: 'kampas_depan', name: 'Kampas Depan', yearly: false },
+                { key: 'kampas_belakang', name: 'Kampas Belakang', yearly: false },
+            ];
+            
+            parts.forEach(part => {
+                const totalUsed = partUsage[part.key] || 0;
+                const limit = PART_LIMITS[part.key];
+                const remaining = limit - totalUsed;
+                const percentage = (totalUsed / limit) * 100;
+                const lastDate = partUsage.last_used[part.key] || 'Belum pernah';
+                const statusColor = remaining > 0 ? 'var(--secondary-neon)' : 'var(--holiday-color)';
+
+                container.innerHTML += `
+                    <div class="part-card">
+                        <p>${part.name}</p>
+                        <small>Sisa Jatah: <strong style="color: ${statusColor};">${remaining}</strong> / ${limit} (${part.yearly ? 'Total 3 Tahun' : 'Total'})</small>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentage}%; background-color: ${remaining > 0 ? 'var(--paid-gold)' : 'var(--holiday-color)'};"></div>
+                        </div>
+                        <small class="last-used" style="color: var(--text-secondary);">Terakhir: <strong style="color: var(--secondary-neon);">${lastDate}</strong></small>
+                    </div>
+                `;
+            });
+        }
+
+        // Logic Catat Penggunaan (Modal Submit)
+        document.getElementById('usage-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const partKey = document.getElementById('part-select').value;
+            
+            if (!partKey) {
+                alert('Pilih suku cadang yang diganti.');
+                return;
+            }
+
+            if (partUsage[partKey] >= PART_LIMITS[partKey]) {
+                alert('Jatah suku cadang ini sudah habis. Total penggunaan: ' + PART_LIMITS[partKey]);
+                return;
+            }
+
+            partUsage[partKey] = (partUsage[partKey] || 0) + 1;
+            partUsage.last_used[partKey] = new Date().toLocaleDateString('id-ID');
+            
+            localStorage.setItem('maka_part_usage', JSON.stringify(partUsage));
+
+            alert(`Sukses! ${partKey} berhasil dicatat. Sisa jatah: ${PART_LIMITS[partKey] - partUsage[partKey]}`);
+            
+            closeMarkUsageModal();
+            renderPartTracker(); 
+        });
+
+        // Modal Controls
+        function openMarkUsageModal() {
+            document.getElementById('markUsageModal').style.display = 'flex';
+        }
+
+        function closeMarkUsageModal() {
+            document.getElementById('markUsageModal').style.display = 'none';
+        }
+        
+        document.addEventListener('DOMContentLoaded', renderPartTracker);
+    </script>
+</body>
+</html>
