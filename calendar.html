@@ -54,7 +54,7 @@
             <h3>Konfirmasi Pembayaran</h3>
             <p>Anda yakin ingin menyimpan perubahan pembayaran untuk bulan ini? Tunggakan Anda akan dihitung ulang.</p>
             <button class="modal-btn primary-btn" style="background-color: #39ff14;" onclick="savePayments()">YA, SIMPAN</button>
-            <button class="modal-btn secondary-btn" onclick="document.getElementById('confirmModal').style.display='none'">BATAL</button>
+            <button class="modal-btn secondary-btn" style="background-color: #555; color: white;" onclick="document.getElementById('confirmModal').style.display='none'">BATAL</button>
         </div>
     </div>
     
@@ -130,10 +130,10 @@
                 if (status === 'HLB') {
                     statusClass = 'holiday';
                 } else if (status === 'CDP') {
-                    statusClass = 'cicilan-dp';
+                    statusClass = 'cicilan-dp'; // <-- UNGU
                     isPayable = true;
                 } else if (status === 'HWB') {
-                    statusClass = 'wajib-bayar';
+                    statusClass = 'wajib-bayar'; // <-- BIRU
                     isPayable = true;
                 }
 
@@ -177,9 +177,8 @@
 
             localStorage.setItem('maka_payments', JSON.stringify(savedPayments));
             
-            // Tutup modal konfirmasi dan tampilkan modal sukses
             document.getElementById('confirmModal').style.display='none';
-            document.getElementById('successModal').style.display='flex';
+            document.getElementById('successModal').style.display='flex'; // Tampilkan modal sukses
             
             renderCalendar();
         }
@@ -188,8 +187,6 @@
             document.getElementById('successModal').style.display='none';
         }
 
-
-        // Event Listener: Buka modal konfirmasi saat checkbox dicentang
         document.getElementById('calendar-grid').addEventListener('change', (e) => {
             if (e.target.type === 'checkbox') {
                 document.getElementById('confirmModal').style.display = 'flex';
