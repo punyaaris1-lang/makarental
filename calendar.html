@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAKA Rental App Kalender Sewa</title>
+    
     <link rel="stylesheet" href="styles.css"> 
+    
+    <link rel="stylesheet" href="calendar-styles.css"> 
 </head>
 <body>
     <div class="app-container">
@@ -156,13 +159,18 @@
                         </div>
                     `;
                 } else {
-                    // Hari Libur (Tidak ada checkbox)
                     grid.innerHTML += `
                         <div class="day ${statusClass}">
                             <span class="day-number">${day}</span>
                         </div>
                     `;
                 }
+            }
+            
+            const totalCells = startDay + daysInMonth;
+            const remainingCells = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
+            for (let i = 0; i < remainingCells; i++) {
+                grid.innerHTML += '<div class="day empty"></div>';
             }
         }
 
