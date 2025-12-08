@@ -5,6 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAKA Dashboard Premium</title>
     <link rel="stylesheet" href="styles.css"> 
+    
+    <style>
+        /* Gaya khusus untuk Icon Grid di Dashboard */
+        .icon-grid-section {
+            padding-top: 5px;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 kolom */
+            gap: 15px;
+            text-align: center;
+        }
+        .icon-item {
+            display: block;
+            background: var(--card-bg);
+            padding: 15px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .icon-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 223, 255, 0.4);
+        }
+        .icon-item span {
+            font-size: 1.8em;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .icon-item p {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -25,37 +62,45 @@
                     <small>5 Hari Tertunggak</small>
                 </div>
             </div>
-        </header>
-
-        <section class="metrics-section">
-            <h2>💰 Ringkasan Keuangan</h2>
-            <div class="metric-grid">
-                <div class="metric-card">
-                    <h3>Sewa Harian (HWB)</h3>
-                    <p style="color: var(--primary-neon);">Rp 400.000</p>
-                    <small>5 Hari Belum Lunas</small>
-                </div>
-                <div class="metric-card">
-                    <h3>Cicilan DP (CDP)</h3>
-                    <p style="color: var(--paid-gold);">Rp 0</p>
-                    <small>0 Kali Tertunggak</small>
-                </div>
-            </div>
             
             <div class="futuristic-divider"></div>
 
-            <h2>⚙️ Status Kontrak</h2>
-            <div class="metric-grid">
-                <div class="metric-card">
-                    <h3>Masa Sewa</h3>
-                    <p style="color: var(--secondary-neon);">Berjalan</p>
-                    <small>Sejak 20 Sept 2025</small>
-                </div>
-                <div class="metric-card">
-                    <h3>Maka+</h3>
-                    <p style="color: var(--paid-gold);">Aktif</p>
-                    <small>Tambahan Rp 10.000/hari</small>
-                </div>
+        </header>
+
+        <section class="icon-grid-section">
+            <h2>✨ Akses Fitur Premium</h2>
+            <div class="icon-grid">
+                
+                <a href="part_tracker.html" class="icon-item">
+                    <span style="color: var(--paid-gold);">🎁</span>
+                    <p>Cek Gratisan</p>
+                </a>
+
+                <a href="calendar.html" class="icon-item">
+                    <span style="color: var(--primary-neon);">📅</span>
+                    <p>Bayar & Kalender</p>
+                </a>
+                
+                <a href="history.html" class="icon-item">
+                    <span style="color: var(--secondary-neon);">🗒️</span>
+                    <p>Log Riwayat</p>
+                </a>
+                
+                <a href="#" class="icon-item" onclick="alert('Status Maka+ Aktif, Tambahan Rp 10.000/hari.')">
+                    <span style="color: var(--primary-neon);">⚡</span>
+                    <p>Pengaturan Maka+</p>
+                </a>
+
+                <a href="#" class="icon-item" onclick="window.open('https://etle-pmj.info/', '_blank')">
+                    <span style="color: var(--holiday-color);">🚨</span>
+                    <p>Cek ETLE</p>
+                </a>
+                
+                <a href="settings.html" class="icon-item">
+                    <span style="color: var(--dp-color);">⚙️</span>
+                    <p>Pengaturan Akun</p>
+                </a>
+
             </div>
         </section>
 
@@ -72,7 +117,7 @@
                 <span>🗒️</span>
                 Riwayat
             </a>
-            <a href="#" class="nav-item">
+            <a href="settings.html" class="nav-item">
                 <span>⚙️</span>
                 Pengaturan
             </a>
