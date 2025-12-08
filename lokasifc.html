@@ -1,33 +1,396 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAKA Lokasi FC</title>
-    <link rel="stylesheet" href="styles.css"> 
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>MAKA FastCharging</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
+    <style>
+        /* --- Definisi Variabel Warna --- */
+        :root {
+            --bg: #050505;
+            --card: #111;
+            --card-border: #222;
+            --accent: #CCFF00; /* Kuning Stabilo */
+            --cyan: #00d2ff;
+            --danger: #FF3B30;
+            --text: #ffffff;
+            --text-mute: #888;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+
+        /* HEADER */
+        .header { padding: 20px 25px 10px; display: flex; justify-content: space-between; align-items: flex-start; flex-shrink: 0; position: relative; z-index: 50; background: linear-gradient(180deg, #050505 90%, transparent); }
+        .header-text { display: flex; flex-direction: column; max-width: 55%; }
+        .label-top { font-size: 0.7rem; color: var(--text-mute); letter-spacing: 1px; font-weight: 700; margin-bottom: 5px; }
+        .header h1 { font-family: 'Inter', sans-serif; font-size: 10vw; margin: 0; line-height: 0.9; font-weight: 900; letter-spacing: -1px; color: #fff; }
+        .label-bottom { font-size: 0.75rem; color: var(--accent); letter-spacing: 1px; font-weight: 700; margin-top: 8px; }
+
+        /* KONTROL KANAN ATAS (TOGGLE MAP/LIST) */
+        .top-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; position: absolute; right: 25px; top: 25px; }
+        .toggle-mode { background: #222; border: 1px solid #444; border-radius: 20px; display: flex; padding: 2px; }
+        .t-btn { padding: 6px 12px; font-size: 0.65rem; font-weight: 800; color: #888; cursor: pointer; border-radius: 18px; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
+        .t-btn.active { background: var(--accent); color: #000; }
+        .menu-row { display: flex; gap: 8px; }
+        /* Tombol menu (Info/SOS) DIBUANG dari header */
+
+        /* CONTAINER UTAMA */
+        #view-list { display: flex; flex-direction: column; flex: 1; overflow: hidden; width: 100%; }
+        #view-map { display: none; flex: 1; width: 100%; height: 100%; position: relative; }
+        #fullMap { width: 100%; height: 100%; }
+
+        /* HERO SECTION (Kartu Lokasi Terdekat) */
+        .hero-section { padding: 10px 25px; margin-bottom: 20px; flex-shrink: 0; }
+        .hero-card { background: var(--card); border: 1px solid var(--card-border); border-radius: 24px; padding: 20px; position: relative; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; min-height: 180px; justify-content: center; transition: 0.3s; }
+        .hero-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .radar-status { 
+            display: flex; align-items: center; gap: 8px; 
+            font-size: 0.65rem; font-weight: 800; color: var(--accent); 
+            letter-spacing: 1px; text-transform: uppercase;
+            background: rgba(204,255,0,0.1); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(204,255,0,0.3);
+        }
+        .gps-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; box-shadow: 0 0 10px var(--accent); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% {opacity:1} 50% {opacity:0.3} 100% {opacity:1} }
+
+        .hero-dist { background: rgba(0,0,0,0.6); border: 1px solid var(--accent); padding: 4px 10px; border-radius: 8px; font-family: 'Syne'; font-size: 0.9rem; font-weight: 700; color: var(--accent); }
+        .hero-name { font-family: 'Inter', sans-serif; font-size: clamp(1.8rem, 8vw, 2.2rem); font-weight: 800; color: #fff; line-height: 1.1; margin-bottom: 5px; }
+        .hero-info { font-size: 0.85rem; color: #aaa; margin-bottom: 20px; padding-left: 12px; border-left: 3px solid var(--accent); line-height: 1.5; }
+        .btn-nav-hero { display: block; width: 100%; padding: 14px; background: var(--accent); color: #000; text-align: center; text-decoration: none; font-weight: 800; border-radius: 12px; font-size: 0.9rem; letter-spacing: 0.5px; box-shadow: 0 4px 20px rgba(204, 255, 0, 0.2); cursor: pointer; border: none; }
+
+        /* LIST SECTION */
+        .list-section { flex: 1; overflow-y: auto; padding-bottom: 50px; }
+        .city-group { margin-bottom: 30px; }
+        .city-header { padding: 0 25px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .city-title { color: var(--text); font-family: 'Syne'; font-weight: 700; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .city-line { height: 1px; background: #333; flex-grow: 1; }
+        .h-scroll { 
+            display: flex; gap: 15px; overflow-x: auto; 
+            padding: 0 25px; scroll-snap-type: x mandatory; 
+            scrollbar-width: none; 
+        }
+        .h-scroll::-webkit-scrollbar { display: none; }
+
+        .mini-card { 
+            min-width: 160px; width: 160px; height: 190px; 
+            border-radius: 18px; padding: 15px; 
+            display: flex; flex-direction: column; justify-content: space-between; 
+            scroll-snap-align: start; flex-shrink: 0; text-decoration: none; position: relative; overflow: hidden; 
+            transition: transform 0.2s; cursor: pointer; 
+        }
+        .mini-card:active { transform: scale(0.95); }
+        .style-1 { background: linear-gradient(145deg, #111, #1a1a1a); border: 1px solid #333; color: white; }
+        .style-2 { background: linear-gradient(145deg, #022c22, #064e3b); border: 1px solid #065f46; color: #d1fae5; }
+        .style-3 { background: linear-gradient(145deg, #0f172a, #1e293b); border: 1px solid #1e3a8a; color: #bfdbfe; }
+        .bg-bolt { position: absolute; right: -10px; bottom: -20px; font-size: 5rem; opacity: 0.1; transform: rotate(-15deg); pointer-events: none; color: #fff; }
+        
+        .mini-top h3 { margin: 0 0 8px 0; font-size: 0.9rem; line-height: 1.3; font-weight: 700; color: inherit; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .mini-info { font-size: 0.7rem; opacity: 0.8; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 5px; line-height: 1.4; z-index: 2; color: inherit; }
+        .mini-dist { font-size: 0.85rem; color: var(--accent); font-weight: 800; z-index: 2; text-align: right; margin-top: 5px; }
+
+        /* MAP OVERLAY (NAVIGASI DALAM APLIKASI) */
+        .map-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; }
+        .map-overlay.active { transform: translateY(0); }
+        .map-container { flex: 1; width: 100%; background: #111; position: relative; }
+        
+        .map-controls { 
+            background: #111; padding: 25px; border-top: 1px solid #333; 
+            display: flex; flex-direction: column; gap: 15px; 
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5); position: relative; z-index: 10000;
+        }
+        .map-title { font-family: 'Inter'; font-weight: 800; font-size: 1.4rem; color: #fff; margin: 0; }
+        .map-subtitle { font-size: 0.9rem; color: #888; margin: 0 0 10px 0; border-left: 3px solid var(--accent); padding-left: 10px; }
+        
+        .btn-gmaps-start { 
+            width: 100%; padding: 16px; background: var(--accent); color: #000; 
+            border: none; border-radius: 12px; font-weight: 800; text-transform: uppercase; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; 
+            text-decoration: none; font-size: 0.95rem;
+        }
+        .btn-map-close { 
+            position: absolute; top: 20px; left: 20px; 
+            background: rgba(0,0,0,0.8); color: #fff; border: 1px solid #333;
+            width: 40px; height: 40px; border-radius: 50%; font-weight: 700; 
+            display: flex; align-items: center; justify-content: center; cursor: pointer; 
+            z-index: 10001; font-size: 1.2rem;
+        }
+
+        /* Leaflet Custom */
+        .leaflet-control-attribution { display: none !important; }
+        .leaflet-routing-container { display: none !important; } 
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <header class="header"><h1>⚡ Lokasi Fast Charging</h1></header>
-        <section style="text-align: center; padding-top: 50px;">
-            <p style="font-size: 1.1em; color: var(--primary-neon);">Fungsi Peta & Lokasi Terdekat</p>
-            <p style="color: var(--text-secondary); margin-top: 15px;">Integrasi dengan Google Maps/API akan dilakukan di sini. Klik tombol Home untuk kembali.</p>
-        </section>
-        
-        <footer class="bottom-nav">
-            <a href="lokasi_fc.html" class="nav-item active">
-                <span style="color: var(--primary-neon);">⚡</span>
-                Lokasi FC
-            </a>
-            <a href="dashboard.html" class="nav-item">
-                <span>🏠</span>
-                Home
-            </a>
-            <a href="daftar_antrian.html" class="nav-item">
-                <span style="color: var(--paid-gold);">🎫</span>
-                Antrian
-            </a>
-        </footer>
+
+    <div class="header">
+        <div class="header-text">
+            <div class="label-top">LOKASI</div>
+            <h1>FAST<br>CHARGING</h1>
+            <div class="label-bottom">MAKA LINTAS UTARA</div>
+        </div>
+        <div class="top-controls">
+            <div class="toggle-mode">
+                <div id="btnList" class="t-btn active" onclick="switchView('list')">☰ LIST</div>
+                <div id="btnMap" class="t-btn" onclick="switchView('map')">🗺️ PETA</div>
+            </div>
+            </div>
     </div>
+
+    <div id="view-list">
+        <div class="hero-section">
+            <div id="heroContainer">
+                <div id="scanState" class="hero-card" style="align-items:center; text-align:center;">
+                    <div class="gps-dot" style="width:20px; height:20px; margin-bottom:15px;"></div>
+                    <h2 style="opacity:0.5; font-size:1.2rem; margin-top:0;">Mencari Sinyal GPS...</h2>
+                    <p style="color:#666; font-size:0.8rem; margin:0;">Pastikan Lokasi/GPS HP Aktif</p>
+                </div>
+                <div id="foundState" class="hero-card" style="display:none;">
+                    <div class="hero-header">
+                        <div class="radar-status"><div class="gps-dot"></div> FC TERDEKAT</div>
+                        <div class="hero-dist" id="heroDist">-- KM</div>
+                    </div>
+                    <h2 class="hero-name" id="heroName">Nama Lokasi</h2>
+                    <div class="hero-info" id="heroInfo">Info Loading...</div>
+                    <button id="btnHeroNav" class="btn-nav-hero" onclick="openMapModal()">LIHAT DI PETA 📍</button>
+                </div>
+            </div>
+        </div>
+        <div class="list-section" id="mainListContainer"></div>
+    </div>
+
+    <div id="view-map">
+        <div id="fullMap"></div>
+    </div>
+
+    <div id="mapOverlay" class="map-overlay">
+        <button class="btn-map-close" onclick="closeMapModal()">✕</button>
+        <div id="map" class="map-container"></div>
+        <div class="map-controls">
+            <div><h3 id="mapTitle" class="map-title">Nama Lokasi</h3><p id="mapSub" class="map-subtitle">Jarak: -- KM</p></div>
+            <a href="#" id="btnGmaps" target="_blank" class="btn-gmaps-start">MULAI JALAN (GOOGLE MAPS) ↗</a>
+        </div>
+    </div>
+
+    <footer class="bottom-nav">
+        <a href="lokasi_fc.html" class="nav-item active">
+            <span style="color: var(--primary-neon);">⚡</span>
+            Lokasi FC
+        </a>
+        <a href="dashboard.html" class="nav-item">
+            <span>🏠</span>
+            Home
+        </a>
+        <a href="daftar_antrian.html" class="nav-item">
+            <span style="color: var(--paid-gold);">🎫</span>
+            Antrian
+        </a>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+    <script>
+        // --- CONFIG API & DATABASE (Berita Dihapus) ---
+        const JAWG_API = "l1PdBwk1arfZcY7wECff2jE2Ts7qpJyMqGGqHK8cjCxcLb6m0FPHm1sExB5NvLyA"; 
+        const URL_LOKASI = "https://docs.google.com/spreadsheets/d/1EJOTMMfGpBMFPqR0LzbMbh7tZUcTCZld4x387OO9aJM/export?format=csv"; 
+
+        let chargers = [];
+        let userLat = null; let userLng = null;
+        let map = null; let mapFull = null; let currentMapTarget = null;
+        
+        // Fungsi utama untuk memuat data dan GPS
+        async function loadDataBackground() {
+            try {
+                // Hanya memuat data lokasi (URL Berita telah dihapus)
+                const txtLoc = await fetch(URL_LOKASI).then(r=>r.text());
+
+                chargers = txtLoc.split('\n').slice(1).map((r, i) => {
+                    const c = r.split(',');
+                    let latStr = c[4] ? c[4].replace(',', '.') : '';
+                    let lngStr = c[5] ? c[5].replace(',', '.') : '';
+                    let latVal = parseFloat(latStr);
+                    let lngVal = parseFloat(lngStr);
+                    if(c.length < 5 || isNaN(latVal) || isNaN(lngVal)) return null;
+                    return { 
+                        id: i, name:c[0], city:c[1], type:c[2], status:c[3], 
+                        lat:latVal, lng:lngVal, link:c[6]||'',
+                        nozzle: c[7] || '-', cost: c[8] || '-'
+                    };
+                }).filter(i=>i);
+
+                renderList(); 
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.watchPosition(
+                        (p) => { 
+                            userLat=p.coords.latitude; 
+                            userLng=p.coords.longitude; 
+                            processData(); 
+                        },
+                        (err) => { processData(); }, // Fallback jika gagal dapat GPS
+                        { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+                    );
+                } else {
+                     processData(); 
+                }
+            } catch(e) { /* Error handling */ }
+        }
+
+        function switchView(mode) {
+            const listBtn = document.getElementById('btnList');
+            const mapBtn = document.getElementById('btnMap');
+            const listView = document.getElementById('view-list');
+            const mapView = document.getElementById('view-map');
+
+            if(mode === 'list') {
+                listBtn.classList.add('active'); mapBtn.classList.remove('active');
+                listView.style.display = 'flex'; mapView.style.display = 'none';
+            } else {
+                mapBtn.classList.add('active'); listBtn.classList.remove('active');
+                listView.style.display = 'none'; mapView.style.display = 'block';
+                initFullMap();
+            }
+        }
+
+        function initFullMap() {
+            if(!mapFull) {
+                mapFull = L.map('fullMap', {zoomControl:false}).setView([-6.200000, 106.816666], 11);
+                L.tileLayer(`https://tile.jawg.io/jawg-matrix/{z}/{x}/{y}{r}.png?access-token=${JAWG_API}`, {}).addTo(mapFull);
+            }
+            setTimeout(() => { mapFull.invalidateSize(); }, 200);
+            
+            if(userLat) {
+                const userIcon = L.divIcon({className: 'gps-dot', iconSize: [15,15]});
+                L.marker([userLat, userLng], {icon: userIcon}).addTo(mapFull);
+                mapFull.setView([userLat, userLng], 12);
+            }
+            
+            chargers.forEach(item => {
+                L.marker([item.lat, item.lng]).addTo(mapFull)
+                 .bindPopup(`<b>${item.name}</b><br>${item.nozzle} Nozzle<br><a href="#" onclick="openMapModalFromCluster(${item.id})" style="color:#00d2ff; font-weight:bold; margin-top:5px; display:block;">LIHAT DETAIL</a>`);
+            });
+        }
+        
+        function openMapModalFromCluster(id) {
+            const item = chargers.find(c => c.id === id);
+            if(item) openMapModal(item);
+        }
+
+        // NAVIGASI DALAM (MAP + ROUTING)
+        function openMapModal(item) {
+            if (!item) item = currentMapTarget;
+            currentMapTarget = item;
+
+            document.getElementById('mapOverlay').classList.add('active');
+            document.getElementById('mapTitle').innerText = item.name;
+            document.getElementById('mapSub').innerText = `Jarak: ${item.dist ? item.dist.toFixed(1) : '--'} KM`;
+            
+            const realLink = (item.link && item.link.length > 10) ? item.link : `https://www.google.com/maps/search/?api=1&query=$${item.lat},${item.lng}`;
+            document.getElementById('btnGmaps').href = realLink;
+
+            setTimeout(() => {
+                if(map) { map.remove(); map = null; }
+                
+                map = L.map('map', {zoomControl: false}).setView([item.lat, item.lng], 14);
+                L.tileLayer(`https://tile.jawg.io/jawg-matrix/{z}/{x}/{y}{r}.png?access-token=${JAWG_API}`, {}).addTo(map);
+
+                if(userLat) {
+                    const userIcon = L.divIcon({className: 'gps-dot', iconSize: [15,15]});
+                    L.marker([userLat, userLng], {icon: userIcon}).addTo(map).bindPopup("Lokasi Anda");
+
+                    L.Routing.control({
+                        waypoints: [
+                            L.latLng(userLat, userLng),
+                            L.latLng(item.lat, item.lng)
+                        ],
+                        lineOptions: { styles: [{color: '#00d2ff', opacity: 0.8, weight: 5}] },
+                        createMarker: function() { return null; },
+                        addWaypoints: false, draggableWaypoints: false, fitSelectedRoutes: true, show: false
+                    }).addTo(map);
+                }
+
+                L.marker([item.lat, item.lng]).addTo(map).bindPopup(item.name).openPopup();
+
+            }, 300);
+        }
+
+        function closeMapModal() { document.getElementById('mapOverlay').classList.remove('active'); }
+
+        function getDist(lat1, lon1, lat2, lon2) {
+            const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
+            const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+            return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(1);
+        }
+
+        function processData() {
+            if(userLat) { 
+                chargers.forEach(c => c.dist=parseFloat(getDist(userLat,userLng,c.lat,c.lng))); 
+                chargers.sort((a,b)=> { if(isNaN(a.dist)) return 1; if(isNaN(b.dist)) return -1; return a.dist-b.dist; });
+            } else {
+                 // Jika GPS tidak ada, urutkan berdasarkan nama
+                 chargers.sort((a, b) => a.city.localeCompare(b.city) || a.name.localeCompare(b.name));
+            }
+            
+            if(chargers.length > 0) {
+                const n = chargers[0];
+                currentMapTarget = n;
+                document.getElementById('scanState').style.display = 'none';
+                document.getElementById('foundState').style.display = 'flex';
+                document.getElementById('heroName').innerText = n.name;
+                document.getElementById('heroDist').innerText = n.dist ? n.dist + ' KM' : 'N/A';
+                document.getElementById('heroInfo').innerText = `${n.city} • ${n.type}\n${n.nozzle} Nozzle • ${n.cost}`;
+                document.getElementById('btnHeroNav').onclick = function() { openMapModal(n); };
+                renderList();
+            }
+        }
+
+        function renderList() {
+            const listCont = document.getElementById('mainListContainer');
+            // Simpan scroll state sebelum render ulang
+            let scrollState = {};
+            document.querySelectorAll('.city-group').forEach(group => {
+                const title = group.querySelector('.city-title').innerText;
+                scrollState[title] = group.querySelector('.h-scroll').scrollLeft;
+            });
+            listCont.innerHTML = ''; 
+            let grouped = {};
+            for(let i=0; i<chargers.length; i++) {
+                let item = chargers[i];
+                let city = item.city || 'Lainnya';
+                if(!grouped[city]) grouped[city] = [];
+                grouped[city].push(item);
+            }
+            let colorIdx = 0;
+            Object.keys(grouped).forEach(city => {
+                let groupHTML = `<div class="city-group"><div class="city-header"><div class="city-title">${city}</div><div class="city-line"></div></div><div class="h-scroll">`;
+                grouped[city].forEach(item => {
+                    let styleClass = `style-${(colorIdx % 3) + 1}`;
+                    colorIdx++;
+                    let itemJson = JSON.stringify(item).replace(/'/g, "\\'");
+                    groupHTML += `
+                    <div onclick='openMapModal(${itemJson})' class="mini-card ${styleClass}">
+                        <div class="bg-bolt">⚡</div>
+                        <div class="mini-top"><h3>${item.name}</h3><div class="mini-info">${item.type}<br>${item.nozzle} Nozzle • ${item.cost}</div></div>
+                        <div class="mini-bot"><div class="mini-dist">${item.dist ? item.dist.toFixed(1)+' KM' : ''}</div></div>
+                    </div>`;
+                });
+                groupHTML += `</div></div>`;
+                listCont.innerHTML += groupHTML;
+            });
+            // Terapkan scroll state setelah render
+            document.querySelectorAll('.city-group').forEach(group => {
+                const title = group.querySelector('.city-title').innerText;
+                if(scrollState[title]) group.querySelector('.h-scroll').scrollLeft = scrollState[title];
+            });
+        }
+
+        // FUNGSI INI MENGGANTIKAN runIntro()
+        document.addEventListener('DOMContentLoaded', loadDataBackground);
+    </script>
 </body>
 </html>
