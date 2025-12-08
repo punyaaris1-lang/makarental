@@ -1,4 +1,4 @@
-/* login.css - TEMA FUTURISTIK DARK MODE */
+/* login.css - TEMA FUTURISTIK DARK MODE (Revisi Final Tombol) */
 
 :root {
     --primary-neon: #00dfff; 
@@ -79,7 +79,7 @@ input:focus {
     outline: none;
 }
 
-/* --- Tombol Aksi --- */
+/* --- Tombol Aksi (Fix Alignment) --- */
 .primary-btn {
     padding: 16px;
     margin-top: 35px;
@@ -93,12 +93,11 @@ input:focus {
     box-shadow: 0 4px 15px rgba(0, 191, 255, 0.4);
     transition: background-color 0.2s;
     
-    /* PERBAIKAN: Memastikan tombol di tengah jika lebar form tidak full */
+    /* FIX: Membuat tombol center dan proporsional */
     display: block; 
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%; /* Lebar penuh */
-    max-width: 300px; /* Batasi lebar agar tidak terlalu besar */
+    margin: 35px auto 0 auto; /* Margin top 35px, Auto untuk horizontal center */
+    width: 90%; 
+    max-width: 350px; 
 }
 
 .primary-btn:hover {
