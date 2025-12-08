@@ -16,39 +16,57 @@
             </div>
             
             <div class="hero-tunggakan">
-                <h3>TOTAL TAGIHAN</h3>
-                <span id="hero-tunggakan-nominal">Rp 400.000</span>
-                <p style="font-size: 0.8em; color: #ff9999;">5 Hari Belum Dibayar</p>
+                <div>
+                    <h3>TOTAL TUNGGAKAN</h3>
+                    <p style="font-size: 0.8em; color: var(--text-secondary);">Perlu dibayar sebelum 2025-12-10</p>
+                </div>
+                <div class="hero-tunggakan-value">
+                    <span id="hero-tunggakan-nominal">Rp 400.000</span>
+                    <small>5 Hari Tertunggak</small>
+                </div>
             </div>
-            
-            <div style="height: 2px; background: linear-gradient(90deg, transparent, var(--primary-neon), transparent); margin-top: 20px;"></div>
-
         </header>
 
         <section class="metrics-section">
-            <h2 style="margin-bottom: 20px;">ℹ️ Status Kontrak</h2>
+            <h2>💰 Ringkasan Keuangan</h2>
             <div class="metric-grid">
                 <div class="metric-card">
-                    <h3>Cicilan DP (355K)</h3>
-                    <p style="font-size: 1.2em; color: var(--secondary-neon);">Lunas</p>
-                    <small style="font-size: 0.75em; color: #aaa;">0/3 Bulan</small>
+                    <h3>Sewa Harian (HWB)</h3>
+                    <p style="color: var(--primary-neon);">Rp 400.000</p>
+                    <small>5 Hari Belum Lunas</small>
                 </div>
                 <div class="metric-card">
-                    <h3>Tanggal Ambil</h3>
-                    <p style="font-size: 1.2em; color: var(--text-light);">20 Sept 2025</p>
-                    <small style="font-size: 0.75em; color: #aaa;">Sewa Berjalan</small>
+                    <h3>Cicilan DP (CDP)</h3>
+                    <p style="color: var(--paid-gold);">Rp 0</p>
+                    <small>0 Kali Tertunggak</small>
+                </div>
+            </div>
+            
+            <div class="futuristic-divider"></div>
+
+            <h2>⚙️ Status Kontrak</h2>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <h3>Masa Sewa</h3>
+                    <p style="color: var(--secondary-neon);">Berjalan</p>
+                    <small>Sejak 20 Sept 2025</small>
+                </div>
+                <div class="metric-card">
+                    <h3>Maka+</h3>
+                    <p style="color: var(--paid-gold);">Aktif</p>
+                    <small>Tambahan Rp 10.000/hari</small>
                 </div>
             </div>
         </section>
 
         <footer class="bottom-nav">
-            <a href="#" class="nav-item">
-                <span style="color: #ff9800;">SOS</span>
-                Bantuan
+            <a href="#" class="nav-item" onclick="alert('Hubungi CS SOS: +62 877 2228 5445')">
+                <span style="color: #ff9800;">🔥</span>
+                SOS
             </a>
             
             <a href="dashboard.html" class="nav-item active">
-                <span style="font-size: 1.8em;">🏠</span>
+                <span>🏠</span>
                 Home
             </a>
             
