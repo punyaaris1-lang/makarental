@@ -3,85 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login & Daftar - MAKA Rental App</title>
-    <link rel="stylesheet" href="styles.css"> <link rel="stylesheet" href="login.css"> </head>
+    <title>MAKA Login & Register</title>
+    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="login.css"> </head>
 <body>
-    <div class="auth-container">
-        
-        <header class="auth-header">
-            <h2>MAKA Customer App</h2>
-            <p>Kelola Sewa & Pembayaran Anda</p>
-        </header>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            
+            <header class="auth-header">
+                <h2>MAKA MOTORS</h2>
+                <p id="auth-subtitle">Selamat Datang Kembali</p>
+            </header>
 
-        <div class="tab-selector">
-            <button class="tab-btn active" onclick="showForm('login')">Masuk</button>
-            <button class="tab-btn" onclick="showForm('register')">Daftar Baru</button>
+            <div id="form-container">
+                
+                </div>
+
+            <footer class="auth-footer">
+                <button id="switch-mode-btn" onclick="toggleMode()">Belum punya akun? Daftar</button>
+            </footer>
         </div>
-
-        <form id="login-form" class="auth-form visible">
-            <h3>Login</h3>
-            <label for="login-email">Email / No. HP</label>
-            <input type="text" id="login-email" placeholder="Masukkan Email atau No. HP" required>
-            
-            <label for="login-password">Kata Sandi</label>
-            <input type="password" id="login-password" placeholder="Masukkan Kata Sandi" required>
-            
-            <button type="submit" class="primary-btn">LOGIN</button>
-            <a href="#" class="forgot-link">Lupa Kata Sandi?</a>
-        </form>
-
-        <form id="register-form" class="auth-form hidden">
-            <h3>Data Diri dan Sewa Awal</h3>
-            
-            <label for="reg-name">Nama Lengkap</label>
-            <input type="text" id="reg-name" required>
-
-            <label for="reg-email">Email</label>
-            <input type="email" id="reg-email" required>
-            
-            <label for="reg-plat">Nomor Plat Motor</label>
-            <input type="text" id="reg-plat" required>
-
-            <label for="reg-password">Buat Kata Sandi</label>
-            <input type="password" id="reg-password" required>
-
-            <hr class="divider">
-
-            <label for="reg-start-date">Tanggal Mulai Sewa (Ambil Motor)</label>
-            <input type="date" id="reg-start-date" required>
-
-            <label>Opsi DP (Menentukan Hari Libur Bayar)</label>
-            <div class="radio-group">
-                <input type="radio" id="dp355" name="dp-option" value="355" checked>
-                <label for="dp355">Rp 355rb (Cicilan DP 3 Bulan)</label><br>
-                <input type="radio" id="dp755" name="dp-option" value="755">
-                <label for="dp755">Rp 755rb (Langsung Libur Tgl 14 & 28)</label>
-            </div>
-            
-            <label class="toggle-label">Opsi Maka+ (Rp 10rb/hari)</label>
-            <div class="toggle-switch">
-                <input type="checkbox" id="maka-plus">
-                <label for="maka-plus"></label>
-            </div>
-            
-            <button type="submit" class="primary-btn register-btn">DAFTAR & HITUNG JADWAL</button>
-        </form>
-
     </div>
 
     <script>
-        function showForm(formId) {
-            document.getElementById('login-form').classList.remove('visible');
-            document.getElementById('register-form').classList.remove('visible');
-            document.getElementById('login-form').classList.add('hidden');
-            document.getElementById('register-form').classList.add('hidden');
+        let currentMode = 'login';
+        
+        // --- 1. Konten Form Login ---
+        const loginContent = `
+            <form id="login-form">
+                <label for="login-email">Email / No. HP</label>
+                <input type="text" id="login-email" placeholder="Masukkan Email atau No. HP" required>
+                
+                <label for="login-password">Kata Sandi</label>
+                <input type="password" id="login-password" placeholder="Masukkan Kata Sandi" required>
+                
+                <button type="submit" class="primary-btn">MASUK KE AKUN</button>
+                <a href="#" class="forgot-link">Lupa Kata Sandi?</a>
+            </form>
+        `;
 
-            document.getElementById(formId + '-form').classList.add('visible');
-            document.getElementById(formId + '-form').classList.remove('hidden');
+        // --- 2. Konten Form Pendaftaran (Daftar) ---
+        const registerContent = `
+            <form id="register-form">
+                <label for="reg-name">Nama Lengkap</label>
+                <input type="text" id="reg-name" required>
 
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.tab-btn[onclick*="${formId}"]`).classList.add('active');
+                <label for="reg-start-date">Tgl Mulai Sewa (Ambil Motor)</label>
+                <input type="date" id="reg-start-date" required>
+                
+                <hr class="divider">
+
+                <label>Opsi DP</label>
+                <div class="radio-group">
+                    <input type="radio" id="dp355" name="dp-option" value="355" checked>
+                    <label for="dp355">DP 355rb (Cicilan DP 3 Bulan)</label><br>
+                    <input type="radio" id="dp755" name="dp-option" value="755">
+                    <label for="dp755">DP 755rb (Langsung Libur Tgl 14 & 28)</label>
+                </div>
+                
+                <label class="toggle-label">Opsi Maka+ (Rp 10rb/hari)</label>
+                <div class="toggle-switch-container">
+                    <input type="checkbox" id="maka-plus">
+                    <label for="maka-plus" class="toggle-label-switch"></label>
+                </div>
+                
+                <button type="submit" class="primary-btn register-btn">DAFTAR & HITUNG JADWAL</button>
+            </form>
+        `;
+
+        // --- 3. Fungsi Penggantian Form ---
+        function loadForm(mode) {
+            const container = document.getElementById('form-container');
+            const subtitle = document.getElementById('auth-subtitle');
+            const switchBtn = document.getElementById('switch-mode-btn');
+
+            if (mode === 'register') {
+                container.innerHTML = registerContent;
+                subtitle.textContent = 'Daftar Akun Baru';
+                switchBtn.textContent = 'Sudah punya akun? Masuk';
+                currentMode = 'register';
+            } else {
+                container.innerHTML = loginContent;
+                subtitle.textContent = 'Selamat Datang Kembali';
+                switchBtn.textContent = 'Belum punya akun? Daftar';
+                currentMode = 'login';
+            }
         }
+
+        function toggleMode() {
+            if (currentMode === 'login') {
+                loadForm('register');
+            } else {
+                loadForm('login');
+            }
+        }
+
+        // Muat formulir Login saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', () => loadForm('login'));
     </script>
 </body>
 </html>
