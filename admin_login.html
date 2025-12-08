@@ -85,30 +85,67 @@
                     <button type="button" onclick="saveFinance()">SIMPAN KEUNGAN</button>
                 </form>
             </div>
-
+            
             <div class="admin-section">
-                <h3>🛠️ Pengaturan Part Gratis</h3>
-                <p style="font-size: 0.9em; color: var(--text-secondary);">Edit Jatah Total per 3 Tahun Kontrak</p>
-                <form id="part-form" class="admin-form">
-                    <label for="ban_depan">Jatah Ban Depan:</label>
-                    <input type="number" id="ban_depan" value="3">
-                    
-                    <label for="ban_belakang">Jatah Ban Belakang:</label>
-                    <input type="number" id="ban_belakang" value="3">
-                    
-                    <label for="kampas_depan">Jatah Kampas Rem Depan:</label>
-                    <input type="number" id="kampas_depan" value="3">
-                    
-                    <label for="kampas_belakang">Jatah Kampas Rem Belakang:</label>
-                    <input type="number" id="kampas_belakang" value="3">
-                    
-                    <button type="button" onclick="saveParts()">SIMPAN PART</button>
+                <h3>🛠️ Kelola Jatah Part (Default)</h3>
+                <form id="part-limit-form" class="admin-form">
+                    <label for="ban_depan">Jatah Ban Depan (Total Kontrak):</label>
+                    <input type="number" id="ban_depan_limit" value="3">
+                    <label for="ban_belakang">Jatah Ban Belakang (Total Kontrak):</label>
+                    <input type="number" id="ban_belakang_limit" value="3">
+                    <label for="kampas_depan">Jatah Kampas Rem Depan (Total Kontrak):</label>
+                    <input type="number" id="kampas_depan_limit" value="3">
+                    <label for="kampas_belakang">Jatah Kampas Rem Belakang (Total Kontrak):</label>
+                    <input type="number" id="kampas_belakang_limit" value="3">
+                    <button type="button" onclick="savePartLimits()">SIMPAN JATAH PART</button>
+                </form>
+            </div>
+            
+            <div class="admin-section">
+                <h3>🆕 Tambah Jenis Part Baru</h3>
+                <form id="new-part-form" class="admin-form">
+                    <label for="new-part-key">Key Part (Contoh: ban_baru):</label>
+                    <input type="text" id="new-part-key">
+                    <label for="new-part-name">Nama Part:</label>
+                    <input type="text" id="new-part-name">
+                    <label for="new-part-limit">Jatah Total Kontrak:</label>
+                    <input type="number" id="new-part-limit">
+                    <button type="button" onclick="addNewPart()">TAMBAH PART BARU</button>
                 </form>
             </div>
 
+
+            <div class="admin-section">
+                <h3>📰 Kelola Artikel MLU Info</h3>
+                <form id="mlu-article-form" class="admin-form">
+                    <label for="mlu-title">Judul Artikel:</label>
+                    <input type="text" id="mlu-title">
+                    <label for="mlu-content">Isi Konten:</label>
+                    <textarea id="mlu-content" rows="5"></textarea>
+                    <label for="mlu-photos">Photo URLs (Pisahkan dengan koma untuk slideshow):</label>
+                    <input type="text" id="mlu-photos">
+                    <button type="button" onclick="saveArticle('mlu_info')">POST ARTIKEL MLU</button>
+                    <p style="margin-top: 10px; font-size: 0.8em; color: var(--text-secondary);">Articles: <span id="mlu-count">0</span></p>
+                </form>
+            </div>
+
+             <div class="admin-section">
+                <h3>💡 Kelola Artikel MAKA Tips</h3>
+                <form id="tips-article-form" class="admin-form">
+                    <label for="tips-title">Judul Artikel:</label>
+                    <input type="text" id="tips-title">
+                    <label for="tips-content">Isi Konten:</label>
+                    <textarea id="tips-content" rows="5"></textarea>
+                    <label for="tips-photos">Photo URLs (Pisahkan dengan koma untuk slideshow):</label>
+                    <input type="text" id="tips-photos">
+                    <button type="button" onclick="saveArticle('maka_tips')">POST ARTIKEL TIPS</button>
+                    <p style="margin-top: 10px; font-size: 0.8em; color: var(--text-secondary);">Articles: <span id="tips-count">0</span></p>
+                </form>
+            </div>
+
+
             <div class="admin-section">
                 <h3>🚫 Daftar Banned Member</h3>
-                <p style="font-size: 0.9em; color: var(--text-secondary);">Masukkan Plat Motor yang Diblokir (Pisahkan dengan koma)</p>
                 <form id="banned-form" class="admin-form">
                     <textarea id="banned-list" rows="5">B 1000 ABC, B 2000 XYZ</textarea>
                     <button type="button" onclick="saveBanned()">SIMPAN DAFTAR BANNED</button>
@@ -135,7 +172,7 @@
     </div>
     
     <script>
-        const ADMIN_PASS = '090815';
+        const ADMIN_PASS = 'MAKAadmin2025';
 
         function loginAdmin() {
             const password = document.getElementById('admin-password').value;
@@ -143,6 +180,7 @@
                 document.getElementById('login-panel').style.display = 'none';
                 document.getElementById('settings-panel').style.display = 'block';
                 loadSettings();
+                updateArticleCounts();
             } else {
                 alert('Password Salah!');
             }
@@ -156,12 +194,19 @@
             document.getElementById('hwb-rate').value = finance.hwb_rate;
             document.getElementById('cdp-rate').value = finance.cdp_rate;
             
-            document.getElementById('ban_depan').value = parts.ban_depan;
-            document.getElementById('ban_belakang').value = parts.ban_belakang;
-            document.getElementById('kampas_depan').value = parts.kampas_depan;
-            document.getElementById('kampas_belakang').value = parts.kampas_belakang;
+            document.getElementById('ban_depan_limit').value = parts.ban_depan;
+            document.getElementById('ban_belakang_limit').value = parts.ban_belakang;
+            document.getElementById('kampas_depan_limit').value = parts.kampas_depan;
+            document.getElementById('kampas_belakang_limit').value = parts.kampas_belakang;
             
             document.getElementById('banned-list').value = banned;
+        }
+        
+        function updateArticleCounts() {
+            const mluArticles = JSON.parse(localStorage.getItem('mlu_info_articles')) || [];
+            const tipsArticles = JSON.parse(localStorage.getItem('maka_tips_articles')) || [];
+            document.getElementById('mlu-count').textContent = mluArticles.length;
+            document.getElementById('tips-count').textContent = tipsArticles.length;
         }
 
         function saveFinance() {
@@ -173,15 +218,15 @@
             alert('Pengaturan Keuangan Berhasil Disimpan! HARAP MUAT ULANG SEMUA HALAMAN.');
         }
 
-        function saveParts() {
-            const newParts = {
-                ban_depan: parseInt(document.getElementById('ban_depan').value),
-                ban_belakang: parseInt(document.getElementById('ban_belakang').value),
-                kampas_depan: parseInt(document.getElementById('kampas_depan').value),
-                kampas_belakang: parseInt(document.getElementById('kampas_belakang').value)
+        function savePartLimits() {
+            const newLimits = {
+                ban_depan: parseInt(document.getElementById('ban_depan_limit').value),
+                ban_belakang: parseInt(document.getElementById('ban_belakang_limit').value),
+                kampas_depan: parseInt(document.getElementById('kampas_depan_limit').value),
+                kampas_belakang: parseInt(document.getElementById('kampas_belakang_limit').value)
             };
-            localStorage.setItem('maka_part_limits', JSON.stringify(newParts));
-            alert('Pengaturan Part Gratis Berhasil Disimpan! HARAP MUAT ULANG SEMUA HALAMAN.');
+            localStorage.setItem('maka_part_limits', JSON.stringify(newLimits));
+            alert('Pengaturan Jatah Part Berhasil Disimpan! HARAP MUAT ULANG SEMUA HALAMAN.');
         }
 
         function saveBanned() {
@@ -189,6 +234,68 @@
             localStorage.setItem('maka_banned_list', bannedList);
             alert('Daftar Banned Berhasil Disimpan!');
         }
+
+        function addNewPart() {
+            const key = document.getElementById('new-part-key').value.toLowerCase().replace(/\s/g, '_');
+            const name = document.getElementById('new-part-name').value;
+            const limit = parseInt(document.getElementById('new-part-limit').value);
+            
+            if (!key || !name || isNaN(limit) || limit <= 0) {
+                alert('Mohon isi semua kolom dengan benar.');
+                return;
+            }
+
+            // Simpan jatah limit baru
+            let limits = JSON.parse(localStorage.getItem('maka_part_limits')) || {};
+            limits[key] = limit;
+            localStorage.setItem('maka_part_limits', JSON.stringify(limits));
+
+            // Simpan nama part baru untuk daftar (dropdown)
+            let adminParts = JSON.parse(localStorage.getItem('maka_admin_parts')) || [];
+            if (!adminParts.some(p => p.key === key)) {
+                adminParts.push({ key: key, name: name });
+                localStorage.setItem('maka_admin_parts', JSON.stringify(adminParts));
+            }
+
+            alert(`Part '${name}' (Key: ${key}) dengan jatah ${limit} Berhasil Ditambahkan!`);
+            document.getElementById('new-part-key').value = '';
+            document.getElementById('new-part-name').value = '';
+            document.getElementById('new-part-limit').value = '';
+        }
+
+        function saveArticle(type) {
+            const titleId = `${type === 'mlu_info' ? 'mlu' : 'tips'}-title`;
+            const contentId = `${type === 'mlu_info' ? 'mlu' : 'tips'}-content`;
+            const photosId = `${type === 'mlu_info' ? 'mlu' : 'tips'}-photos`;
+
+            const title = document.getElementById(titleId).value;
+            const content = document.getElementById(contentId).value;
+            const photoUrls = document.getElementById(photosId).value.split(',').map(url => url.trim()).filter(url => url !== '');
+
+            if (!title || !content) {
+                alert('Judul dan Konten tidak boleh kosong.');
+                return;
+            }
+
+            const article = {
+                title: title,
+                content: content,
+                photos: photoUrls,
+                date: new Date().toLocaleDateString('id-ID')
+            };
+
+            const key = `${type}_articles`;
+            let articles = JSON.parse(localStorage.getItem(key)) || [];
+            articles.unshift(article); // Tambah di depan
+            localStorage.setItem(key, JSON.stringify(articles));
+
+            alert(`Artikel ${type === 'mlu_info' ? 'MLU Info' : 'MAKA Tips'} Berhasil Diposting!`);
+            document.getElementById(titleId).value = '';
+            document.getElementById(contentId).value = '';
+            document.getElementById(photosId).value = '';
+            updateArticleCounts();
+        }
+
 
         document.addEventListener('DOMContentLoaded', () => {
              // Cek jika sudah login (opsional)
