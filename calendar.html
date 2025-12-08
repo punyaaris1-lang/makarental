@@ -11,7 +11,7 @@
         /* Ambil Variabel dari styles.css */
         :root {
             --primary-neon: #00dfff; 
-            --secondary-neon: #39ff14; 
+            --secondary-neon: #39ff14; /* HIJAU NEON UNTUK PAID */
             --holiday-color: #ff4545;
             --dp-color: #cc99ff;
             --bg-dark: #121212;
@@ -70,6 +70,7 @@
             font-weight: normal;
             cursor: pointer;
         }
+        /* Hapus tampilan input checkbox secara total */
         .day input[type="checkbox"] {
             position: absolute;
             opacity: 0;
@@ -82,14 +83,14 @@
         /* --- LOGIKA WARNA HARI (Warna Dasar - FIX MUTLAK) --- */
         
         /* 1. HWB - Hari Wajib Bayar (Neon Biru) */
-        .day.wajib-bayar:not(.paid) label {
+        .day.wajib-bayar label {
             background-color: var(--bg-hwb) !important;
             border: 1px solid var(--primary-neon) !important;
             color: var(--primary-neon) !important;
         }
         
         /* 2. CDP - Cicilan DP (Ungu) */
-        .day.cicilan-dp:not(.paid) label {
+        .day.cicilan-dp label {
             background-color: var(--bg-cdp) !important;
             color: var(--dp-color) !important; 
             border: 1px solid rgba(204, 153, 255, 0.3) !important;
@@ -102,8 +103,19 @@
             border: 1px solid rgba(255, 69, 69, 0.2) !important;
         }
         
-        /* 4. PAID - Hari Sudah Dibayar (Hijau Neon) */
-        .day.paid input[type="checkbox"]:checked + label {
+        /* 4. PAID - Hari Sudah Dibayar (HIJAU NEON) */
+        /* Ini adalah style hari yang sudah dibayar, entah itu HWB atau CDP */
+        .day.paid label {
+            background-color: var(--secondary-neon) !important; 
+            color: var(--bg-dark) !important; 
+            box-shadow: 0 0 8px rgba(57, 255, 20, 0.5) !important;
+            border: 1px solid var(--secondary-neon) !important;
+            font-weight: bold !important;
+        }
+
+        /* Karena kita tidak bisa menggunakan :checked pada elemen non-paid lagi,
+           kita gunakan kelas "temp-checked" dari JS saat user mengklik */
+        .day.temp-checked label {
             background-color: var(--secondary-neon) !important; 
             color: var(--bg-dark) !important; 
             box-shadow: 0 0 8px rgba(57, 255, 20, 0.5) !important;
@@ -111,8 +123,9 @@
             font-weight: bold !important;
         }
         
-        /* Hari yang dinonaktifkan (diperlukan karena cache) */
-        .day input[disabled] + label {
+        /* Hari yang dinonaktifkan */
+        .day input[disabled] + label,
+        .day.disabled label { /* Tambahan kelas disabled untuk label */
             background-color: #1a1a1a !important;
             color: #555 !important;
             border: 1px solid #333 !important;
@@ -266,24 +279,20 @@
 
                 const status = getDayStatus(date);
                 let statusClass = '';
-                let isPayable = false;
 
                 if (status === 'HLB') {
                     statusClass = 'holiday'; 
                 } else if (status === 'CDP') {
                     statusClass = 'cicilan-dp'; 
-                    isPayable = true;
                 } else if (status === 'HWB') {
                     statusClass = 'wajib-bayar'; 
-                    isPayable = true;
                 }
 
                 const isPaid = savedPayments[dateKey] === true;
                 const paidClass = isPaid ? 'paid' : '';
                 
-                // Tolak bayar untuk hari sebelum ambil motor
                 const isBeforePickup = date < userData.tglAmbilMotor;
-                const disabledAttr = isBeforePickup ? 'disabled' : '';
+                const disabledClass = isBeforePickup ? 'disabled' : '';
                 
                 // Khusus tanggal 31 di bulan yang tidak punya 31 hari
                 if (day === 31 && daysInMonth < 31) {
@@ -291,13 +300,14 @@
                      continue;
                 }
                 
-                if (status === 'HLB') {
-                    grid.innerHTML += `<div class="day ${statusClass}"><label><span class="day-number">${day}</span></label></div>`;
+                if (status === 'HLB' || isBeforePickup) {
+                    // Hari Libur atau sebelum ambil motor (Non-interaktif)
+                    grid.innerHTML += `<div class="day ${statusClass} ${disabledClass}"><label><span class="day-number">${day}</span></label></div>`;
                 } else {
-                    // Hari yang Wajib Bayar (HWB atau CDP)
+                    // Hari yang Wajib Bayar (HWB atau CDP) - Selalu punya checkbox
                     grid.innerHTML += `
                         <div class="day ${statusClass} ${paidClass}">
-                            <input type="checkbox" id="check-${dateKey}" data-date="${dateKey}" ${isPaid ? 'checked' : ''} ${disabledAttr}>
+                            <input type="checkbox" id="check-${dateKey}" data-date="${dateKey}" ${isPaid ? 'checked' : ''}>
                             <label for="check-${dateKey}">
                                 <span class="day-number">${day}</span>
                             </label>
@@ -322,9 +332,22 @@
             // (Logika Simpan Pembayaran)
             const checkboxes = document.querySelectorAll('#calendar-grid input[type="checkbox"]');
             
+            // Hapus semua kelas temp-checked sebelum menyimpan
+            document.querySelectorAll('.day.temp-checked').forEach(dayDiv => {
+                 dayDiv.classList.remove('temp-checked');
+            });
+
             checkboxes.forEach(checkbox => {
+                const dayDiv = checkbox.closest('.day');
                 const dateKey = checkbox.getAttribute('data-date');
                 savedPayments[dateKey] = checkbox.checked;
+
+                // Update paid class setelah menyimpan
+                if (checkbox.checked) {
+                    dayDiv.classList.add('paid');
+                } else {
+                    dayDiv.classList.remove('paid');
+                }
             });
 
             localStorage.setItem('maka_payments', JSON.stringify(savedPayments));
@@ -332,7 +355,7 @@
             document.getElementById('confirmModal').style.display='none';
             document.getElementById('successModal').style.display='flex';
             
-            renderCalendar();
+            // Tidak perlu renderCalendar() lagi, update DOM sudah dilakukan di atas.
         }
 
         function closeSuccessModal() {
@@ -340,22 +363,29 @@
         }
 
         document.getElementById('calendar-grid').addEventListener('change', (e) => {
-            const clickedDateStr = e.target.getAttribute('data-date');
-            const clickedDate = new Date(clickedDateStr);
-            
-            // LOGIKA TOLAK BAYAR SEBELUM AMBIL MOTOR
-            if (e.target.type === 'checkbox' && clickedDate < userData.tglAmbilMotor) {
-                // Batalkan centang yang baru saja dilakukan
-                e.target.checked = false; 
-                
-                // Tampilkan modal tolak bayar
-                document.getElementById('rejectModal').style.display = 'flex';
-                
-                // Hentikan proses simpan/konfirmasi
-                return;
-            }
+            const checkbox = e.target;
+            if (checkbox.type === 'checkbox') {
+                const dayDiv = checkbox.closest('.day');
 
-            if (e.target.type === 'checkbox') {
+                // LOGIKA TOLAK BAYAR SEBELUM AMBIL MOTOR
+                const clickedDateStr = checkbox.getAttribute('data-date');
+                const clickedDate = new Date(clickedDateStr);
+
+                if (clickedDate < userData.tglAmbilMotor) {
+                    // Tolak dan tampilkan modal (walaupun sudah didisable di render, ini jaga-jaga)
+                    checkbox.checked = false; 
+                    document.getElementById('rejectModal').style.display = 'flex';
+                    return;
+                }
+
+                // NUCLEAR FIX: Terapkan kelas sementara untuk warna saat diklik
+                if (checkbox.checked) {
+                    dayDiv.classList.add('temp-checked');
+                } else {
+                    dayDiv.classList.remove('temp-checked');
+                }
+
+                // Tampilkan konfirmasi
                 document.getElementById('confirmModal').style.display = 'flex';
             }
         });
