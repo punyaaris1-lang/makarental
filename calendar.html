@@ -1,197 +1,314 @@
-/* styles.css - DASHBOARD, MODAL, RIWAYAT FUTURISTIK (Final Fix Warna) */
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAKA Rental App Kalender Sewa</title>
+    
+    <link rel="stylesheet" href="styles.css"> 
+    
+    <style>
+        /* Ambil Variabel dari styles.css */
+        :root {
+            --primary-neon: #00dfff; 
+            --secondary-neon: #39ff14; 
+            --holiday-color: #ff4545;
+            --dp-color: #cc99ff;
+            --bg-dark: #121212;
+            --bg-hwb: #1a3a4a; /* Dark Blue */
+            --bg-cdp: #4a3a5e; /* Dark Purple */
+            --bg-hlb: #3a2222; /* Dark Red */
+        }
+        
+        /* Struktur dasar Kalender */
+        .calendar-controls { padding: 20px 20px 10px; }
+        /* ... (Struktur visual kalender lainnya tetap di sini, dipersingkat di respons ini) ... */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .day {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 45px;
+            padding: 5px;
+            position: relative;
+        }
+        .day label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .day input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 3;
+        }
+        
+        /* --- LOGIKA WARNA HARI (Warna Dasar - FIX MUTLAK) --- */
+        
+        /* 1. HWB - Hari Wajib Bayar (Neon Biru) */
+        .day.wajib-bayar:not(.paid) label {
+            background-color: var(--bg-hwb) !important;
+            border: 1px solid var(--primary-neon) !important;
+            color: var(--primary-neon) !important;
+        }
+        
+        /* 2. CDP - Cicilan DP (Ungu) */
+        .day.cicilan-dp:not(.paid) label {
+            background-color: var(--bg-cdp) !important;
+            color: var(--dp-color) !important; 
+            border: 1px solid rgba(204, 153, 255, 0.3) !important;
+        }
+        
+        /* 3. HLB - Hari Libur (Merah) */
+        .day.holiday label {
+            background-color: var(--bg-hlb) !important;
+            color: var(--holiday-color) !important;
+            border: 1px solid rgba(255, 69, 69, 0.2) !important;
+        }
+        
+        /* 4. PAID - Hari Sudah Dibayar (Hijau Neon) */
+        .day.paid input[type="checkbox"]:checked + label {
+            background-color: var(--secondary-neon) !important; 
+            color: var(--bg-dark) !important; 
+            box-shadow: 0 0 8px rgba(57, 255, 20, 0.5) !important;
+            border: 1px solid var(--secondary-neon) !important;
+            font-weight: bold !important;
+        }
+        
+        /* Hari yang dinonaktifkan */
+        .day input[disabled] + label {
+            background-color: #1a1a1a !important;
+            color: #555 !important;
+            border: 1px solid #333 !important;
+            cursor: not-allowed !important;
+        }
+        
+        .day .day-number { font-size: 0.9em; z-index: 2; }
+        .day.empty { background-color: transparent !important; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <header class="header" style="padding-bottom: 20px;">
+            <div class="user-info">
+                <h1>📅 Kalender Sewa</h1>
+                <p>Status: <strong style="color: #39ff14;">DP 355rb (Cicilan)</strong></p>
+            </div>
+        </header>
 
-:root {
-    --primary-neon: #00dfff; /* Neon Biru Cyan (HWB Color) */
-    --secondary-neon: #39ff14; /* Neon Hijau (Paid/Success Color) */
-    --holiday-color: #ff4545; /* Merah (HLB Text Color) */
-    --dp-color: #cc99ff; /* Ungu/Lilac (CDP Text Color) */
-    --bg-dark: #121212; 
-    --card-bg: #1e1e1e; 
-    --text-light: #e0e0e0;
-    --input-bg: #2d2d2d;
-    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.4);
-    --shadow-neon: 0 0 8px rgba(0, 223, 255, 0.3);
-    /* CALENDAR SPECIFIC VARIABLES */
-    --bg-hwb: #1a3a4a; /* Dark Blue */
-    --bg-cdp: #4a3a5e; /* Dark Purple */
-    --bg-hlb: #3a2222; /* Dark Red */
-}
+        <section class="info-section" style="padding: 20px 20px 10px; border-bottom: 1px solid #1e1e1e;">
+            <p style="font-size: 0.9em; color: #bbb;">Centang tanggal di bawah yang **SUDAH ANDA BAYAR**.</p>
+            <div style="margin-top: 10px; font-size: 0.9em;">
+                <span style="color: #00dfff;">⚫ Hari Sewa (80K)</span> | 
+                <span style="color: #cc99ff;">🟣 Cicilan DP (70K)</span> |
+                <span style="color: #ff4545;">🔴 Hari Libur (0K)</span>
+            </div>
+        </section>
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--text-light);
-}
+        <section class="calendar-controls">
+            <div class="month-selector">
+                <button class="nav-month-btn" onclick="changeMonth(-1)">&#9664;</button>
+                <h2 id="current-month-year" style="margin: 0;">Maret 2026</h2>
+                <button class="nav-month-btn" onclick="changeMonth(1)">&#9654;</button>
+            </div>
+        </section>
 
-body {
-    background-color: var(--bg-dark);
-}
+        <section class="calendar-display">
+            <div class="weekdays">
+                <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
+            </div>
+            <div id="calendar-grid" class="calendar-grid">
+                </div>
+        </section>
 
-.app-container {
-    max-width: 450px;
-    margin: 0 auto;
-    background-color: var(--bg-dark);
-    min-height: 100vh;
-    padding-bottom: 80px; 
-}
+        <footer class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">🏠 Dashboard</a>
+            <a href="calendar.html" class="nav-item active">📅 Kalender</a>
+            <a href="#" class="nav-item">🗒️ Riwayat</a>
+            <a href="#" class="nav-item">⚙️ Pengaturan</a>
+        </footer>
+    </div>
 
-/* --- HEADER & STATUS --- */
-.header {
-    background-color: var(--card-bg); 
-    padding: 30px 20px;
-    border-bottom: 2px solid var(--primary-neon);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-}
-
-.user-info h1 {
-    font-size: 1.8em;
-    color: var(--primary-neon);
-}
-
-.status-box {
-    margin-top: 20px;
-    background: var(--input-bg);
-    border: 1px solid var(--primary-neon);
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: var(--shadow-neon);
-}
-
-.status-box span {
-    font-weight: 700;
-    font-size: 1.1em;
-    color: var(--secondary-neon);
-}
-
-/* --- SECTIONS UMUM & JUDUL --- */
-section {
-    padding: 20px;
-}
-
-h2 {
-    color: var(--primary-neon);
-    font-size: 1.3em;
-    font-weight: 600;
-    margin-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 5px;
-}
-
-/* --- REKAP KEUANGAN (Dashboard) --- */
-.metric-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.metric-card {
-    background: var(--card-bg);
-    padding: 20px;
-    border-radius: 15px;
-    box-shadow: var(--shadow-light);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.tunggakan-card p {
-    font-size: 1.8em;
-    font-weight: 700;
-    color: var(--holiday-color);
-}
-
-/* --- TOMBOL AKSI CEPAT --- */
-.button-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); 
-    gap: 10px;
-}
-
-.action-btn {
-    padding: 18px 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    font-weight: 600;
-    background-color: var(--input-bg);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    color: var(--text-light);
-    transition: all 0.2s;
-    text-align: center;
-}
-
-.maka-plus-btn { color: var(--secondary-neon); }
-.charging-btn { color: var(--primary-neon); }
-.sos-btn { color: #ff9800; }
-.etle-btn { color: var(--holiday-color); }
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content" style="border-color: #00dfff;">
+            <h3 style="color: #00dfff;">Konfirmasi Pembayaran</h3>
+            <p>Anda yakin ingin menyimpan perubahan pembayaran untuk bulan ini? Tunggakan Anda akan dihitung ulang.</p>
+            <button class="modal-btn primary-btn" onclick="savePayments()">YA, SIMPAN</button>
+            <button class="modal-btn secondary-btn" onclick="document.getElementById('confirmModal').style.display='none'">BATAL</button>
+        </div>
+    </div>
+    
+    <div id="successModal" class="modal-overlay">
+        <div class="modal-content" style="border-color: #39ff14;">
+            <h3 style="color: #39ff14;">✅ Berhasil Disimpan</h3>
+            <p>Data pembayaran berhasil disimpan. Dashboard akan menghitung ulang tunggakan Anda.</p>
+            <button class="modal-btn primary-btn" onclick="closeSuccessModal()">OK</button>
+        </div>
+    </div>
 
 
-/* --- BOTTOM NAVIGASI --- */
-.bottom-nav {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    max-width: 450px;
-    height: 70px;
-    background-color: #212121;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
-    z-index: 100;
-}
+    <script>
+        let currentDate = new Date(2026, 2); 
+        
+        // Asumsi Ambil Motor 15 Sept 2025 (Sesuai Contoh Anda)
+        const userData = {
+            tglAmbilMotor: new Date('2025-09-15'),
+            opsiDp: '355', 
+            tarifNormal: 70000,
+            tarifMakaPlus: 10000
+        };
 
-.bottom-nav a {
-    text-decoration: none;
-    color: #6c757d;
-}
+        // Periode Cicilan DP 3 bulan setelah ambil motor: Okt 2025 s/d Des 2025 (bulan +1, +2, +3)
+        const DP_START_DATE = new Date(userData.tglAmbilMotor.getFullYear(), userData.tglAmbilMotor.getMonth() + 1, 1); 
+        const DP_END_DATE = new Date(DP_START_DATE.getFullYear(), DP_START_DATE.getMonth() + 3, 1); // Berakhir 1 Jan 2026
+        
+        let savedPayments = JSON.parse(localStorage.getItem('maka_payments')) || {};
 
-.bottom-nav a.active {
-    color: var(--primary-neon);
-    font-weight: 700;
-}
+        // FUNGSI LOGIKA FINAL: Minggu Bayar, CDP Mulai Bulan Berikutnya
+        function getDayStatus(date) {
+            const dayOfMonth = date.getDate();
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            
+            // 1. ATURAN 31: Tgl 31 adalah HLB (Hari Libur)
+            if (dayOfMonth === 31) return 'HLB';
 
-/* --- MODAL MAKA+ DAN KONFIRMASI --- */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: none; 
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
+            const dateCheck = new Date(year, month, dayOfMonth);
 
-.modal-content {
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 350px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), 0 0 10px var(--primary-neon);
-    border: 1px solid rgba(0, 223, 255, 0.2);
-    text-align: center;
-}
-.modal-btn {
-    padding: 12px;
-    margin-top: 15px;
-    width: 80%;
-    max-width: 250px;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.primary-btn { 
-    background: var(--secondary-neon);
-    color: var(--bg-dark);
-}
-.secondary-btn { 
-    background: #555;
-    color: white;
-}
+            // 2. ATURAN CDP (Cicilan DP - Tgl 14 & 28)
+            // Cek apakah tanggal berada dalam periode cicilan (3 bulan setelah ambil motor)
+            if (userData.opsiDp === '355' && dateCheck >= DP_START_DATE && dateCheck < DP_END_DATE) {
+                if (dayOfMonth === 14 || dayOfMonth === 28) {
+                    return 'CDP'; // Cicilan DP (Bayar 70K)
+                }
+            }
+            
+            // 3. ATURAN DEFAULT: HWB (Sewa Harian, termasuk Minggu)
+            return 'HWB'; 
+        }
+        
+        function renderCalendar() {
+            // ... (Kode render Kalender tetap sama) ...
+            const grid = document.getElementById('calendar-grid');
+            const monthYearDisplay = document.getElementById('current-month-year');
+            
+            const monthName = currentDate.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
+            monthYearDisplay.textContent = monthName;
+
+            grid.innerHTML = '';
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth(); 
+            
+            const firstDayOfMonth = new Date(year, month, 1);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            const startDay = firstDayOfMonth.getDay(); 
+            for (let i = 0; i < startDay; i++) {
+                grid.innerHTML += '<div class="day empty"></div>';
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateKey = `${year}-${month + 1}-${day}`; 
+
+                const status = getDayStatus(date);
+                let statusClass = '';
+                let isPayable = false;
+
+                if (status === 'HLB') {
+                    statusClass = 'holiday'; 
+                } else if (status === 'CDP') {
+                    statusClass = 'cicilan-dp'; 
+                    isPayable = true;
+                } else if (status === 'HWB') {
+                    statusClass = 'wajib-bayar'; 
+                    isPayable = true;
+                }
+
+                const isPaid = savedPayments[dateKey] === true;
+                const paidClass = isPaid ? 'paid' : '';
+                
+                const disabledAttr = ''; 
+
+                if (day === 31 && daysInMonth < 31) {
+                     grid.innerHTML += `<div class="day empty"></div>`;
+                     continue;
+                }
+                
+                if (status === 'HLB') {
+                    grid.innerHTML += `
+                        <div class="day ${statusClass}">
+                            <label>
+                                <span class="day-number">${day}</span>
+                            </label>
+                        </div>
+                    `;
+                } else {
+                    grid.innerHTML += `
+                        <div class="day ${statusClass} ${paidClass}">
+                            <input type="checkbox" id="check-${dateKey}" data-date="${dateKey}" ${isPaid ? 'checked' : ''} ${disabledAttr}>
+                            <label for="check-${dateKey}">
+                                <span class="day-number">${day}</span>
+                            </label>
+                        </div>
+                    `;
+                }
+            }
+            
+            const totalCells = startDay + daysInMonth;
+            const remainingCells = (totalCells % 7 === 0) ? 0 : 7 - (totalCells % 7);
+            for (let i = 0; i < remainingCells; i++) {
+                grid.innerHTML += '<div class="day empty"></div>';
+            }
+        }
+
+        function changeMonth(delta) {
+            currentDate.setMonth(currentDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function savePayments() {
+            const checkboxes = document.querySelectorAll('#calendar-grid input[type="checkbox"]');
+            
+            checkboxes.forEach(checkbox => {
+                const dateKey = checkbox.getAttribute('data-date');
+                savedPayments[dateKey] = checkbox.checked;
+            });
+
+            localStorage.setItem('maka_payments', JSON.stringify(savedPayments));
+            
+            document.getElementById('confirmModal').style.display='none';
+            document.getElementById('successModal').style.display='flex';
+            
+            renderCalendar();
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').style.display='none';
+        }
+
+        document.getElementById('calendar-grid').addEventListener('change', (e) => {
+            if (e.target.type === 'checkbox') {
+                document.getElementById('confirmModal').style.display = 'flex';
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', renderCalendar);
+    </script>
+</body>
+</html>
