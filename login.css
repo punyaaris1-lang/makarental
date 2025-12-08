@@ -7,7 +7,11 @@
     --card-bg: #1e1e1e; /* Warna card lebih terang dari background */
     --text-light: #e0e0e0;
     --input-bg: #2d2d2d;
-    --shadow-deep: 0 8px 25px rgba(0, 0, 0, 0.7);
+}
+
+* {
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* --- Container Utama dan Background --- */
@@ -16,7 +20,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Gradien Gelap Mendalam */
     background: linear-gradient(135deg, var(--bg-dark) 0%, #080808 100%);
     padding: 20px;
 }
@@ -28,9 +31,8 @@
     background: var(--card-bg);
     padding: 35px 30px;
     border-radius: 18px;
-    /* Bayangan Futuristik dengan aksen neon */
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 5px var(--primary-neon);
-    border: 1px solid rgba(0, 223, 255, 0.1); /* Garis luar halus */
+    border: 1px solid rgba(0, 223, 255, 0.1);
 }
 
 /* --- Header --- */
@@ -43,7 +45,7 @@
     color: var(--primary-neon);
     font-size: 2.2em;
     font-weight: 800;
-    text-shadow: 0 0 8px rgba(0, 223, 255, 0.5); /* Efek neon ringan */
+    text-shadow: 0 0 8px rgba(0, 223, 255, 0.5);
     margin-bottom: 5px;
 }
 
@@ -52,14 +54,14 @@
     font-size: 1em;
 }
 
-/* --- Form Konten --- */
+/* --- Input dan Label --- */
 label {
     margin-top: 18px;
     margin-bottom: 8px;
     font-size: 0.95em;
     font-weight: 600;
     color: var(--text-light);
-    display: block; /* Agar label tampil di baris baru */
+    display: block;
 }
 
 input[type="text"],
@@ -87,18 +89,25 @@ input:focus {
     margin-top: 35px;
     border: none;
     border-radius: 10px;
-    /* Gradien cerah di latar belakang gelap */
     background: linear-gradient(90deg, #00bfff 0%, var(--primary-neon) 100%);
-    color: var(--bg-dark); /* Teks gelap di tombol cerah */
+    color: var(--bg-dark);
     font-size: 1.1em;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0, 191, 255, 0.4);
+    transition: all 0.2s;
 }
 
-.primary-btn:hover {
+.primary-btn:hover:not(:disabled) {
     background: linear-gradient(90deg, #0099e5 0%, #00bfff 100%);
     box-shadow: 0 4px 20px rgba(0, 191, 255, 0.6);
+}
+
+.primary-btn:disabled {
+    background: #444;
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
 .forgot-link {
@@ -133,7 +142,7 @@ input:focus {
     color: var(--secondary-neon);
 }
 
-/* --- Opsi DP & Toggle (Diatur ulang untuk Dark Mode) --- */
+/* --- Pendaftaran Khusus --- */
 .divider {
     border: 0;
     height: 1px;
@@ -157,9 +166,50 @@ input:focus {
     margin-top: 0;
 }
 
-/* Toggle Switch Styling - (Dipertahankan agar tetap fungsional dengan warna neon) */
+/* --- Toggle Switch Styling --- */
+.toggle-switch-container {
+    margin: 10px 0 20px 0;
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-switch-container input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-label-switch {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #555;
+    transition: .4s;
+    border-radius: 26px;
+}
+
+.toggle-label-switch:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
 
 input:checked + .toggle-label-switch {
     background-color: var(--secondary-neon);
     box-shadow: 0 0 5px var(--secondary-neon);
+}
+
+input:checked + .toggle-label-switch:before {
+    transform: translateX(24px);
 }
