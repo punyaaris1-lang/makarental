@@ -1,327 +1,76 @@
-/* styles.css - Desain Cyberpunk Lux (Final Integration) */
-
-:root {
-    /* MENGGUNAKAN TEMA CYBERPUNK DARI SCRIPT ANTRIAN ANDA */
-    --primary-neon: #00e5ff; /* Cyan Terang (Dominan) */
-    --secondary-neon: #ff6b6b; /* Soft Red (Alarm/Danger) */
-    --paid-gold: #CCFF00; /* Kuning Stabilo (Paid/Accent) */
-    --holiday-color: #ff6b6b; /* Merah Muda (Tunggakan/Error) */
-    --bg-dark: #0b101a; /* Biru Gelap / Navy Cyber */
-    --card-bg: rgba(255, 255, 255, 0.05); /* Glass Effect / Background Kartu */
-    --text-light: #ffffff;
-    --text-muted: #8899a6;
-    --input-bg: rgba(0, 0, 0, 0.4);
-    
-    /* Efek Mewah */
-    --shadow-deep: 0 10px 30px rgba(0,0,0,0.5);
-    --glow-cyan: 0 0 15px rgba(0, 229, 255, 0.4);
-    --border-lux: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    /* Menggunakan font yang seragam dan futuristik */
-    font-family: 'Rajdhani', 'Orbitron', sans-serif;
-    color: var(--text-light);
-    font-size: 15px; 
-}
-
-body {
-    background-color: var(--bg-dark);
-}
-
-.app-container {
-    max-width: 450px;
-    margin: 0 auto;
-    background-color: var(--bg-dark);
-    min-height: 100vh;
-    padding-bottom: 70px; /* Jarak untuk Footer */
-}
-
-/* ------------------- HEADER & STATUS ------------------- */
-.header {
-    background: linear-gradient(180deg, #0b101a 90%, transparent); /* Sedikit gradasi */
-    padding: 30px 20px 20px;
-    border-bottom: 2px solid var(--primary-neon);
-    box-shadow: 0 5px 20px rgba(0, 229, 255, 0.2);
-    position: relative;
-}
-
-.user-info h1 {
-    font-family: 'Orbitron', sans-serif; /* Font khusus untuk Judul */
-    font-size: 1.6em; 
-    color: var(--primary-neon);
-    text-shadow: var(--glow-cyan);
-}
-
-.user-info p {
-    font-size: 0.9em;
-    color: var(--text-muted);
-}
-
-/* Hero Tunggakan - Menggunakan gaya Card */
-.hero-tunggakan {
-    background: var(--card-bg);
-    border: var(--border-lux);
-    padding: 15px 20px;
-    border-radius: 12px;
-    box-shadow: var(--shadow-deep);
-    margin-top: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.hero-tunggakan h3 {
-    font-size: 0.8em;
-    color: var(--text-muted);
-    text-transform: uppercase;
-}
-.hero-tunggakan-value span {
-    font-size: 1.6em;
-    font-weight: 900;
-    color: var(--holiday-color); /* Soft Red untuk Tunggakan */
-}
-.futuristic-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--primary-neon), transparent);
-    margin: 25px 0 15px 0;
-    box-shadow: 0 0 8px var(--primary-neon);
-}
-
-
-/* ------------------- METRICS & SECTIONS ------------------- */
-section {
-    padding: 20px;
-}
-h2 {
-    font-family: 'Orbitron', sans-serif;
-    color: var(--primary-neon);
-    font-size: 1.2em;
-    font-weight: 700;
-    margin-bottom: 20px;
-    border-left: 3px solid var(--primary-neon);
-    padding-left: 10px;
-}
-
-.icon-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); 
-    gap: 15px;
-    text-align: center;
-}
-.icon-item {
-    background: var(--card-bg); /* Glassy Background */
-    border: var(--border-lux);
-    box-shadow: var(--shadow-deep);
-    border-radius: 15px;
-    padding: 15px 10px;
-    text-decoration: none;
-    transition: all 0.3s;
-}
-.icon-item:hover {
-    box-shadow: var(--glow-cyan);
-}
-.icon-item span { font-size: 1.8em; display: block; margin-bottom: 5px; }
-.icon-item p { font-size: 0.75em; color: var(--text-muted); font-weight: 600; }
-
-
-/* ------------------- BOTTOM NAVIGASI ------------------- */
-.bottom-nav {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    max-width: 450px;
-    height: 65px;
-    background-color: var(--bg-dark);
-    border-top: 1px solid var(--primary-neon);
-    box-shadow: 0 -5px 25px rgba(0, 229, 255, 0.3); 
-    z-index: 100;
-}
-.nav-item {
-    text-decoration: none;
-    color: var(--text-muted);
-    text-align: center;
-    font-size: 0.8em;
-    padding: 5px 0;
-    transition: color 0.3s;
-}
-.nav-item.active {
-    color: var(--primary-neon);
-    font-weight: 700;
-    text-shadow: 0 0 5px var(--primary-neon);
-}
-.nav-item span { display: block; font-size: 1.5em; margin-bottom: 2px; }
-
-
-/* --- MODAL SYSTEM (WAJIB) --- */
-.modal-overlay {
-    display: none;              
-    position: fixed;            
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.85); /* Lebih gelap untuk tema cyberpunk */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-.modal-overlay.active {
-    display: flex !important;
-}
-.modal-content {
-    background: var(--card-bg);
-    border: 1px solid var(--primary-neon);
-    padding: 25px;
-    border-radius: 12px;
-    max-width: 90%;
-    width: 400px;
-    box-shadow: 0 0 20px var(--glow-cyan);
-}
-.modal-content h3 {
-    font-family: 'Orbitron', sans-serif;
-    color: var(--primary-neon);
-    margin-bottom: 15px;
-}
-.modal-btn {
-    padding: 12px;
-    margin-top: 15px;
-    width: 80%;
-    max-width: 250px;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.primary-btn { 
-    background: var(--primary-neon);
-    color: var(--bg-dark);
-}
-.secondary-btn { 
-    background: #555;
-    color: white;
-}
-
-/* =========================
-   DASHBOARD PAGE FIX
-   ========================= */
-
-.app-header {
-  padding: 26px 20px 20px;
-  border-bottom: 1px solid rgba(0,223,255,.2);
-}
-
-.app-title {
-  font-size: 1.6rem;
-  color: var(--primary-neon);
-  text-shadow: 0 0 10px rgba(0,223,255,.5);
-}
-
-.app-subtitle {
-  margin-top: 4px;
-  font-size: .9rem;
-  color: var(--text-secondary);
-}
-
-/* DASHBOARD SUMMARY */
-.dashboard-summary {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  padding: 20px;
-}
-
-.dashboard-summary .card {
-  background: var(--card-bg);
-  border-radius: 14px;
-  padding: 18px;
-  box-shadow: var(--shadow-deep);
-  border: var(--border-lux);
-}
-
-.label {
-  font-size: .75rem;
-  color: var(--text-secondary);
-}
-
-.value {
-  margin-top: 8px;
-  font-size: 1.3rem;
-}
-
-.value.gold {
-  color: var(--paid-gold);
-  text-shadow: 0 0 8px rgba(255,193,7,.6);
-}
-
-/* DASHBOARD BUTTON */
-.dashboard-actions {
-  padding: 10px 20px 30px;
-  display: grid;
-  gap: 12px;
-}
-
-.dashboard-actions .btn {
-  height: 48px;
-  border-radius: 12px;
-  border: none;
-  font-weight: 600;
-  font-size: .95rem;
-}
-
-.dashboard-actions .btn-primary {
-  background: linear-gradient(90deg,#00bfff,var(--primary-neon));
-  color: #000;
-}
-
-.dashboard-actions .btn-outline {
-  background: transparent;
-  border: 1px solid var(--primary-neon);
-  color: var(--primary-neon);
-}
 /* ==================================================
-   DASHBOARD – ULTRA PREMIUM (LEVEL APK NATIVE)
+   MAKARENTAL – FUTURISTIC PREMIUM UI
+   FULL CSS REWRITE (STABLE VERSION)
    ================================================== */
 
-/* SMOOTH APP FEEL */
+/* ---------------- ROOT THEME ---------------- */
+:root {
+  --neon-cyan: #00e5ff;
+  --neon-red: #ff6b6b;
+  --neon-gold: #ccff00;
+
+  --bg-main: #0b101a;
+  --bg-card: rgba(255,255,255,.06);
+  --bg-glass: rgba(255,255,255,.08);
+
+  --text-main: #ffffff;
+  --text-muted: #8b9bb4;
+
+  --border-soft: 1px solid rgba(255,255,255,.1);
+  --shadow-deep: 0 12px 35px rgba(0,0,0,.65);
+  --glow-cyan: 0 0 14px rgba(0,229,255,.45);
+}
+
+/* ---------------- RESET ---------------- */
 * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* BACKGROUND MOVING GLOW */
+body {
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-family: "Rajdhani", "Orbitron", system-ui, sans-serif;
+  font-size: 15px;
+}
+
+/* ---------------- APP CONTAINER ---------------- */
+.app-container {
+  max-width: 450px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding-bottom: 80px;
+  position: relative;
+  z-index: 1;
+}
+
+/* BACKGROUND AMBIENT GLOW */
 .app-container::before {
   content: "";
   position: fixed;
-  top: -40%;
-  left: -40%;
-  width: 180%;
-  height: 180%;
-  background:
-    radial-gradient(circle,
-      rgba(0,223,255,.08) 0%,
-      transparent 60%);
-  animation: bgFloat 16s linear infinite;
+  inset: -40%;
+  background: radial-gradient(circle, rgba(0,229,255,.08), transparent 60%);
+  animation: spinBG 18s linear infinite;
   z-index: -1;
+  pointer-events: none;
 }
 
-@keyframes bgFloat {
+@keyframes spinBG {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
 
-/* HEADER SHINE LINE */
-.app-header {
+/* ---------------- HEADER ---------------- */
+.header {
+  padding: 28px 20px 22px;
+  border-bottom: 1px solid rgba(0,229,255,.3);
   position: relative;
   overflow: hidden;
 }
 
-.app-header::after {
+.header::after {
   content: "";
   position: absolute;
   top: 0;
@@ -331,94 +80,210 @@ h2 {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(0,223,255,.8),
+    rgba(0,229,255,.9),
     transparent
   );
-  animation: scanline 4s linear infinite;
+  animation: scanline 3.5s linear infinite;
 }
 
 @keyframes scanline {
   to { left: 100%; }
 }
 
-/* CARD FLOAT ANIMATION */
-.dashboard-summary .card {
-  animation: cardEnter .6s ease forwards;
+.user-info h1 {
+  font-family: "Orbitron", sans-serif;
+  font-size: 1.55rem;
+  color: var(--neon-cyan);
+  text-shadow: var(--glow-cyan);
 }
 
-.dashboard-summary .card:nth-child(1) { animation-delay: .1s; }
-.dashboard-summary .card:nth-child(2) { animation-delay: .25s; }
-
-@keyframes cardEnter {
-  from {
-    opacity: 0;
-    transform: translateY(25px) scale(.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+.user-info p {
+  margin-top: 4px;
+  font-size: .85rem;
+  color: var(--text-muted);
 }
 
-/* CARD ACTIVE TOUCH */
-.dashboard-summary .card:active {
-  transform: scale(.97);
+/* ---------------- HERO TUNGGAKAN ---------------- */
+.hero-tunggakan {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: var(--bg-card);
+  border: var(--border-soft);
+  box-shadow: var(--shadow-deep);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hero-tunggakan h3 {
+  font-size: .7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+}
+
+.hero-tunggakan span {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--neon-red);
+  text-shadow: 0 0 10px rgba(255,107,107,.6);
+}
+
+/* ---------------- SECTION TITLE ---------------- */
+section {
+  padding: 22px 20px;
+}
+
+section h2 {
+  font-family: "Orbitron", sans-serif;
+  color: var(--neon-cyan);
+  font-size: 1.1rem;
+  margin-bottom: 18px;
+  border-left: 3px solid var(--neon-cyan);
+  padding-left: 10px;
+}
+
+/* ---------------- DASHBOARD GRID ---------------- */
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.icon-item {
+  background: var(--bg-glass);
+  border: var(--border-soft);
+  border-radius: 16px;
+  padding: 16px 10px;
+  text-align: center;
+  box-shadow: var(--shadow-deep);
+  text-decoration: none;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.icon-item span {
+  font-size: 1.8rem;
+  display: block;
+}
+
+.icon-item p {
+  margin-top: 6px;
+  font-size: .72rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.icon-item:active {
+  transform: scale(.95);
   box-shadow:
-    0 10px 25px rgba(0,223,255,.25),
-    inset 0 0 25px rgba(0,223,255,.2);
+    0 10px 30px rgba(0,229,255,.35),
+    inset 0 0 18px rgba(0,229,255,.25);
 }
 
-/* STATUS GLOW PULSE */
+/* ---------------- DASHBOARD SUMMARY ---------------- */
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.dashboard-summary .card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 18px;
+  border: var(--border-soft);
+  box-shadow: var(--shadow-deep);
+  animation: fadeIn .5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.label {
+  font-size: .7rem;
+  color: var(--text-muted);
+  letter-spacing: .6px;
+}
+
+.value {
+  margin-top: 8px;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
 .value.gold {
-  animation: goldPulse 2s ease-in-out infinite;
+  color: var(--neon-gold);
+  animation: glowGold 2s ease-in-out infinite;
 }
 
-@keyframes goldPulse {
-  0%,100% {
-    text-shadow:
-      0 0 10px rgba(255,193,7,.9),
-      0 0 24px rgba(255,193,7,.4);
-  }
-  50% {
-    text-shadow:
-      0 0 18px rgba(255,193,7,1),
-      0 0 40px rgba(255,193,7,.8);
-  }
+@keyframes glowGold {
+  0%,100% { text-shadow: 0 0 12px rgba(204,255,0,.7); }
+  50% { text-shadow: 0 0 28px rgba(204,255,0,1); }
 }
 
-/* BUTTON PRESS FEEL */
-.dashboard-actions .btn {
-  transition: transform .15s ease, box-shadow .15s ease;
+/* ---------------- ACTION BUTTONS ---------------- */
+.dashboard-actions {
+  padding: 20px;
+  display: grid;
+  gap: 12px;
 }
 
-.dashboard-actions .btn:active {
-  transform: translateY(2px) scale(.98);
+.btn {
+  height: 48px;
+  border-radius: 14px;
+  border: none;
+  font-weight: 700;
+  font-size: .95rem;
+  cursor: pointer;
 }
 
-/* PRIMARY BUTTON ENERGY */
-.dashboard-actions .btn-primary {
-  position: relative;
-  overflow: hidden;
+.btn-primary {
+  background: linear-gradient(90deg,#00bfff,var(--neon-cyan));
+  color: #000;
 }
 
-.dashboard-actions .btn-primary::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    transparent 30%,
-    rgba(255,255,255,.6),
-    transparent 70%
-  );
-  opacity: 0;
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--neon-cyan);
+  color: var(--neon-cyan);
 }
 
-.dashboard-actions .btn-primary:active::after {
-  animation: btnFlash .4s ease;
+.btn:active {
+  transform: scale(.97);
 }
 
-@keyframes btnFlash {
-  from { opacity: 1; transform: translateX(-100%); }
-  to   { opacity: 0; transform: translateX(100%); }
+/* ---------------- BOTTOM NAV ---------------- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  max-width: 450px;
+  height: 68px;
+  display: flex;
+  background: var(--bg-main);
+  border-top: 1px solid rgba(0,229,255,.35);
+  box-shadow: 0 -10px 30px rgba(0,229,255,.25);
+  z-index: 100;
+}
+
+.nav-item {
+  flex: 1;
+  text-align: center;
+  text-decoration: none;
+  font-size: .75rem;
+  color: var(--text-muted);
+  padding-top: 10px;
+}
+
+.nav-item span {
+  display: block;
+  font-size: 1.45rem;
+}
+
+.nav-item.active {
+  color: var(--neon-cyan);
+  text-shadow: var(--glow-cyan);
 }
