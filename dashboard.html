@@ -3,57 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAKA Rental App Dashboard</title>
+    <title>MAKA Dashboard Premium</title>
     <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
     <div class="app-container">
+        
         <header class="header">
             <div class="user-info">
-                <h1>Halo, M RIZKY FIRDAU!</h1>
-                <p>Plat Motor: **B 4248 SWF**</p>
-                <div class="status-box">
-                    <span>HARI INI: WAJIB BAYAR (Rp 80.000)</span>
-                </div>
-            </div>
-        </header>
-
-        <section class="rekap-keuangan-section">
-            <h2>💰 Rekap Keuangan</h2>
-            <div class="metric-grid">
-                <div class="metric-card tunggakan-card">
-                    <h3>TOTAL TUNGGAKAN</h3>
-                    <p>Rp 400.000</p>
-                    <span style="font-size: 0.9em; color: #aaa;">5 Hari Tertunggak</span>
-                </div>
-                <div class="metric-card">
-                    <h3>CICILAN DP (355K)</h3>
-                    <p style="font-size: 1.8em; font-weight: 700; color: var(--primary-neon);">Rp 0</p>
-                    <span style="font-size: 0.9em; color: #aaa;">0 Hari Tertunggak</span>
-                </div>
+                <h1>Halo, M Rizky Firdaus!</h1>
+                <p>Plat Motor: B 4248 SWF</p>
             </div>
             
-            <h2 style="text-align: center; margin-top: 20px;">TOTAL KESELURUHAN</h2>
-            <p style="text-align: center; font-size: 2.2em; font-weight: bold; color: var(--holiday-color); margin-bottom: 30px;">
-                Rp 400.000
-            </p>
-        </section>
+            <div class="hero-tunggakan">
+                <h3>TOTAL TAGIHAN</h3>
+                <span id="hero-tunggakan-nominal">Rp 400.000</span>
+                <p style="font-size: 0.8em; color: #ff9999;">5 Hari Belum Dibayar</p>
+            </div>
+            
+            <div style="height: 2px; background: linear-gradient(90deg, transparent, var(--primary-neon), transparent); margin-top: 20px;"></div>
 
-        <section class="aksi-cepat-section">
-            <h2>⚡ Aksi Cepat</h2>
-            <div class="button-grid">
-                <button class="action-btn maka-plus-btn">⭐ Tambah Maka+</button>
-                <button class="action-btn charging-btn">⚡ Titik Fast Charging</button>
-                <button class="action-btn sos-btn">🆘 SOS Chat CS</button>
-                <button class="action-btn etle-btn">📸 Cek ETLE</button>
+        </header>
+
+        <section class="metrics-section">
+            <h2 style="margin-bottom: 20px;">ℹ️ Status Kontrak</h2>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <h3>Cicilan DP (355K)</h3>
+                    <p style="font-size: 1.2em; color: var(--secondary-neon);">Lunas</p>
+                    <small style="font-size: 0.75em; color: #aaa;">0/3 Bulan</small>
+                </div>
+                <div class="metric-card">
+                    <h3>Tanggal Ambil</h3>
+                    <p style="font-size: 1.2em; color: var(--text-light);">20 Sept 2025</p>
+                    <small style="font-size: 0.75em; color: #aaa;">Sewa Berjalan</small>
+                </div>
             </div>
         </section>
 
         <footer class="bottom-nav">
-            <a href="dashboard.html" class="nav-item active">🏠 Dashboard</a>
-            <a href="calendar.html" class="nav-item">📅 Kalender</a>
-            <a href="#" class="nav-item">🗒️ Riwayat</a>
-            <a href="#" class="nav-item">⚙️ Pengaturan</a>
+            <a href="#" class="nav-item">
+                <span style="color: #ff9800;">SOS</span>
+                Bantuan
+            </a>
+            
+            <a href="dashboard.html" class="nav-item active">
+                <span style="font-size: 1.8em;">🏠</span>
+                Home
+            </a>
+            
+            <a href="#" class="nav-item">
+                <span style="color: var(--primary-neon);">⚡</span>
+                Lokasi FC
+            </a>
         </footer>
     </div>
 </body>
