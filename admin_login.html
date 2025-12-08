@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAKA Admin Panel</title>
+    <link rel="stylesheet" href="styles.css"> 
+    
+    <style>
+        /* Admin Styles */
+        .admin-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(0, 223, 255, 0.1);
+        }
+        .admin-section h3 {
+            color: var(--paid-gold);
+            border-bottom: 1px solid rgba(0, 223, 255, 0.2);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .admin-form label {
+            display: block;
+            margin-top: 10px;
+            color: var(--text-light);
+            font-size: 0.9em;
+        }
+        .admin-form input[type="text"], 
+        .admin-form input[type="number"],
+        .admin-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background: var(--input-bg);
+            color: var(--text-light);
+            box-sizing: border-box;
+        }
+        .admin-form button {
+            background: var(--primary-neon);
+            color: var(--bg-dark);
+            font-weight: bold;
+            padding: 12px;
+            margin-top: 20px;
+            width: 100%;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        #login-panel { text-align: center; padding: 50px 20px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <header class="header" style="border-bottom: 2px solid var(--paid-gold);">
+            <div class="user-info">
+                <h1>🔒 Admin Dashboard</h1>
+                <p>Pengaturan Inti Sistem (Hanya Admin)</p>
+            </div>
+        </header>
+
+        <section id="login-panel">
+            <h2 style="color: var(--holiday-color);">Akses Terbatas</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">Masukkan Kode Akses Admin:</p>
+            <input type="password" id="admin-password" placeholder="Password..." style="width: 80%; padding: 10px;">
+            <button onclick="loginAdmin()" style="width: 80%;">MASUK SEBAGAI ADMIN</button>
+            <small style="display: block; margin-top: 10px; color: var(--dp-color);">Password Sim: MAKAadmin2025</small>
+        </section>
+
+        <section id="settings-panel" style="display: none; padding: 20px;">
+            
+            <div class="admin-section">
+                <h3>💰 Pengaturan Keuangan</h3>
+                <form id="finance-form" class="admin-form">
+                    <label for="hwb-rate">Tarif Sewa Harian (Rp):</label>
+                    <input type="number" id="hwb-rate" value="80000">
+                    
+                    <label for="cdp-rate">Cicilan DP (Rp):</label>
+                    <input type="number" id="cdp-rate" value="70000">
+                    
+                    <button type="button" onclick="saveFinance()">SIMPAN KEUNGAN</button>
+                </form>
+            </div>
+
+            <div class="admin-section">
+                <h3>🛠️ Pengaturan Part Gratis</h3>
+                <p style="font-size: 0.9em; color: var(--text-secondary);">Edit Jatah Total per 3 Tahun Kontrak</p>
+                <form id="part-form" class="admin-form">
+                    <label for="ban_depan">Jatah Ban Depan:</label>
+                    <input type="number" id="ban_depan" value="3">
+                    
+                    <label for="ban_belakang">Jatah Ban Belakang:</label>
+                    <input type="number" id="ban_belakang" value="3">
+                    
+                    <label for="kampas_depan">Jatah Kampas Rem Depan:</label>
+                    <input type="number" id="kampas_depan" value="3">
+                    
+                    <label for="kampas_belakang">Jatah Kampas Rem Belakang:</label>
+                    <input type="number" id="kampas_belakang" value="3">
+                    
+                    <button type="button" onclick="saveParts()">SIMPAN PART</button>
+                </form>
+            </div>
+
+            <div class="admin-section">
+                <h3>🚫 Daftar Banned Member</h3>
+                <p style="font-size: 0.9em; color: var(--text-secondary);">Masukkan Plat Motor yang Diblokir (Pisahkan dengan koma)</p>
+                <form id="banned-form" class="admin-form">
+                    <textarea id="banned-list" rows="5">B 1000 ABC, B 2000 XYZ</textarea>
+                    <button type="button" onclick="saveBanned()">SIMPAN DAFTAR BANNED</button>
+                </form>
+            </div>
+
+        </section>
+
+
+        <footer class="bottom-nav">
+            <a href="lokasi_fc.html" class="nav-item">
+                <span style="color: var(--primary-neon);">⚡</span>
+                Lokasi FC
+            </a>
+            <a href="dashboard.html" class="nav-item">
+                <span>🏠</span>
+                Home
+            </a>
+            <a href="daftar_antrian.html" class="nav-item">
+                <span style="color: var(--paid-gold);">🎫</span>
+                Antrian
+            </a>
+        </footer>
+    </div>
+    
+    <script>
+        const ADMIN_PASS = '090815';
+
+        function loginAdmin() {
+            const password = document.getElementById('admin-password').value;
+            if (password === ADMIN_PASS) {
+                document.getElementById('login-panel').style.display = 'none';
+                document.getElementById('settings-panel').style.display = 'block';
+                loadSettings();
+            } else {
+                alert('Password Salah!');
+            }
+        }
+
+        function loadSettings() {
+            const finance = JSON.parse(localStorage.getItem('maka_finance_settings')) || { hwb_rate: 80000, cdp_rate: 70000 };
+            const parts = JSON.parse(localStorage.getItem('maka_part_limits')) || { ban_depan: 3, ban_belakang: 3, kampas_depan: 3, kampas_belakang: 3 };
+            const banned = localStorage.getItem('maka_banned_list') || 'B 1000 ABC, B 2000 XYZ';
+
+            document.getElementById('hwb-rate').value = finance.hwb_rate;
+            document.getElementById('cdp-rate').value = finance.cdp_rate;
+            
+            document.getElementById('ban_depan').value = parts.ban_depan;
+            document.getElementById('ban_belakang').value = parts.ban_belakang;
+            document.getElementById('kampas_depan').value = parts.kampas_depan;
+            document.getElementById('kampas_belakang').value = parts.kampas_belakang;
+            
+            document.getElementById('banned-list').value = banned;
+        }
+
+        function saveFinance() {
+            const hwbRate = document.getElementById('hwb-rate').value;
+            const cdpRate = document.getElementById('cdp-rate').value;
+            
+            const newFinance = { hwb_rate: parseInt(hwbRate), cdp_rate: parseInt(cdpRate) };
+            localStorage.setItem('maka_finance_settings', JSON.stringify(newFinance));
+            alert('Pengaturan Keuangan Berhasil Disimpan! HARAP MUAT ULANG SEMUA HALAMAN.');
+        }
+
+        function saveParts() {
+            const newParts = {
+                ban_depan: parseInt(document.getElementById('ban_depan').value),
+                ban_belakang: parseInt(document.getElementById('ban_belakang').value),
+                kampas_depan: parseInt(document.getElementById('kampas_depan').value),
+                kampas_belakang: parseInt(document.getElementById('kampas_belakang').value)
+            };
+            localStorage.setItem('maka_part_limits', JSON.stringify(newParts));
+            alert('Pengaturan Part Gratis Berhasil Disimpan! HARAP MUAT ULANG SEMUA HALAMAN.');
+        }
+
+        function saveBanned() {
+            const bannedList = document.getElementById('banned-list').value;
+            localStorage.setItem('maka_banned_list', bannedList);
+            alert('Daftar Banned Berhasil Disimpan!');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+             // Cek jika sudah login (opsional)
+        });
+    </script>
+</body>
+</html>
