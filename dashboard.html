@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MAKA Rental App Dashboard</title>
-    <link rel="stylesheet" href="styles.css"> </head>
+    <link rel="stylesheet" href="styles.css"> 
+</head>
 <body>
     <div class="app-container">
         
@@ -39,6 +40,9 @@
         <section class="action-section">
             <h2>Aksi Cepat</h2>
             <div class="button-grid">
+                <button class="action-btn maka-plus-btn" onclick="openMakaPlusModal()">
+                    🌟 Tambah Maka+
+                </button>
                 <button class="action-btn charging-btn">
                     ⚡ Titik Fast Charging
                 </button>
@@ -58,5 +62,41 @@
             <a href="#" class="nav-item">⚙️ Pengaturan</a>
         </footer>
     </div>
+
+    <div id="makaPlusModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Aktifkan Maka+</h3>
+            <p>Maka+ (Rp 10.000/hari) akan aktif **H+1** dari tanggal pengambilan motor. Total biaya sewa menjadi Rp 80.000/hari.</p>
+            
+            <form id="maka-plus-form">
+                <label for="maka-plus-date">Tanggal Mulai Berlaku (Ambil Motor)</label>
+                <input type="date" id="maka-plus-date" required>
+                
+                <button type="submit" class="modal-btn primary-btn">AKTIFKAN SEKARANG</button>
+                <button type="button" class="modal-btn secondary-btn" onclick="closeMakaPlusModal()">BATAL</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openMakaPlusModal() {
+            document.getElementById('makaPlusModal').style.display = 'flex';
+        }
+
+        function closeMakaPlusModal() {
+            document.getElementById('makaPlusModal').style.display = 'none';
+        }
+
+        // Logic simulasi setelah form Maka+ disubmit
+        document.getElementById('maka-plus-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const date = document.getElementById('maka-plus-date').value;
+            
+            // Di aplikasi nyata, Anda akan mengirim 'date' ke database di sini.
+            alert('Maka+ berhasil diaktifkan! Tambahan biaya Rp 10.000/hari akan berlaku mulai besok. Tanggal Aktivasi (Ambil Motor): ' + date);
+            closeMakaPlusModal();
+            
+        });
+    </script>
 </body>
 </html>
