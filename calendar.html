@@ -270,9 +270,13 @@
                      continue;
                 }
                 
-                // Render elemen hari
+                // Render elemen hari (tanpa checkbox)
                 grid.innerHTML += `
-                    <div class="day ${statusClass} ${paidClass} ${disabledClass}" data-date-key="${dateKey}" data-is-payable="${isPayable && !isBeforePickup}">
+                    <div 
+                        class="day ${statusClass} ${paidClass} ${disabledClass}" 
+                        data-date-key="${dateKey}" 
+                        data-is-payable="${isPayable && !isBeforePickup}"
+                    >
                         <span class="day-number">${day}</span>
                     </div>
                 `;
@@ -286,7 +290,6 @@
         }
         
         function closeConfirmModal() {
-            // Hapus kelas sementara dan tutup modal
             if (clickedDayElement) {
                 clickedDayElement.classList.remove('temp-checked');
             }
@@ -302,20 +305,17 @@
             
             const dateKey = clickedDayElement.getAttribute('data-date-key');
             
-            // Toggle status pembayaran
             const isCurrentlyPaid = clickedDayElement.classList.contains('paid');
             
             if (isCurrentlyPaid) {
-                // Tandai sebagai belum bayar
                 savedPayments[dateKey] = false;
                 clickedDayElement.classList.remove('paid');
-                clickedDayElement.classList.remove('temp-checked');
             } else {
-                // Tandai sebagai sudah bayar
                 savedPayments[dateKey] = true;
                 clickedDayElement.classList.add('paid');
-                clickedDayElement.classList.remove('temp-checked');
             }
+            
+            clickedDayElement.classList.remove('temp-checked');
 
             localStorage.setItem('maka_payments', JSON.stringify(savedPayments));
             
@@ -331,11 +331,8 @@
             if (!targetDiv) return;
 
             const isPayable = targetDiv.getAttribute('data-is-payable') === 'true';
-            const dateKey = targetDiv.getAttribute('data-date-key');
-            const date = new Date(dateKey);
             
             if (!isPayable) {
-                // Tampilkan reject modal jika sebelum ambil motor
                 if (targetDiv.classList.contains('disabled')) {
                     document.getElementById('rejectModal').style.display = 'flex';
                 }
@@ -345,12 +342,10 @@
             clickedDayElement = targetDiv;
             const isCurrentlyPaid = targetDiv.classList.contains('paid');
             
-            // Terapkan kelas sementara (kuning stabilo) sebelum konfirmasi
             if (!isCurrentlyPaid) {
                 targetDiv.classList.add('temp-checked');
             }
             
-            // Tampilkan Modal Konfirmasi
             document.getElementById('confirmModal').style.display = 'flex';
         });
 
