@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="styles.css"> 
     
     <style>
-        /* Ambil Variabel dari styles.css (Asumsi variables di styles.css ada) */
+        /* Ambil Variabel dari styles.css */
         :root {
             --primary-neon: #00dfff; 
             --secondary-neon: #39ff14; 
@@ -49,7 +49,7 @@
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 5px; /* FIX: Grid gap */
+            gap: 5px; 
         }
         .day {
             display: flex;
@@ -110,15 +110,8 @@
             border: 1px solid var(--secondary-neon) !important;
             font-weight: bold !important;
         }
-        /* Style untuk hari yang ditandai paid (penting untuk menang melawan prioritas lain) */
-        .day.paid.wajib-bayar label,
-        .day.paid.cicilan-dp label {
-            background-color: var(--secondary-neon) !important;
-            color: var(--bg-dark) !important;
-            border: 1px solid var(--secondary-neon) !important;
-        }
-
-        /* Hari yang dinonaktifkan */
+        
+        /* Hari yang dinonaktifkan (diperlukan karena cache) */
         .day input[disabled] + label {
             background-color: #1a1a1a !important;
             color: #555 !important;
@@ -145,7 +138,7 @@
             <div style="margin-top: 10px; font-size: 0.9em;">
                 <span style="color: #00dfff;">⚫ Hari Sewa (80K)</span> | 
                 <span style="color: #cc99ff;">🟣 Cicilan DP (70K)</span> |
-                <span style="color: #ff4545;">🔴 Hari Libur (0K)</span>
+                <span style="color: var(--holiday-color);">🔴 Hari Libur (0K)</span>
             </div>
         </section>
 
@@ -190,19 +183,28 @@
         </div>
     </div>
 
+    <div id="rejectModal" class="modal-overlay">
+        <div class="modal-content" style="border-color: var(--holiday-color);">
+            <h3 style="color: var(--holiday-color);">🚫 Transaksi Ditolak</h3>
+            <p>Pembayaran ditolak. Anda belum dapat mencatat pembayaran sebelum tanggal pengambilan motor (20 Sept 2025).</p>
+            <button class="modal-btn secondary-btn" onclick="document.getElementById('rejectModal').style.display='none'">TUTUP</button>
+        </div>
+    </div>
+
 
     <script>
         let currentDate = new Date(2026, 2); 
         
         const userData = {
-            // Asumsi Ambil Motor 15 Sept 2025
-            tglAmbilMotor: new Date('2025-09-15'), 
+            // Kita gunakan 20 Sept 2025 sesuai permintaan Anda
+            tglAmbilMotor: new Date('2025-09-20'), 
             opsiDp: '355', 
             tarifNormal: 70000,
             tarifMakaPlus: 10000
         };
 
         // Periode Cicilan DP 3 bulan setelah ambil motor: Okt 2025 s/d Des 2025 (bulan +1, +2, +3)
+        // CDP dimulai BUKAN di bulan ambil, tapi bulan berikutnya.
         const DP_START_DATE = new Date(userData.tglAmbilMotor.getFullYear(), userData.tglAmbilMotor.getMonth() + 1, 1); 
         const DP_END_DATE = new Date(DP_START_DATE.getFullYear(), DP_START_DATE.getMonth() + 3, 1); // Berakhir 1 Jan 2026
         
@@ -214,16 +216,22 @@
             const year = date.getFullYear();
             const month = date.getMonth();
             
+            const dateCheck = new Date(year, month, dayOfMonth);
+
             // 1. ATURAN 31: Tgl 31 adalah HLB (Hari Libur)
             if (dayOfMonth === 31) return 'HLB';
-
-            const dateCheck = new Date(year, month, dayOfMonth);
 
             // 2. ATURAN CDP (Cicilan DP - Tgl 14 & 28)
             if (userData.opsiDp === '355') {
                 if (dateCheck >= DP_START_DATE && dateCheck < DP_END_DATE) {
+                    // Selama masa 3 bulan DP: 14 & 28 adalah CDP
                     if (dayOfMonth === 14 || dayOfMonth === 28) {
-                        return 'CDP'; // Cicilan DP (Bayar 70K)
+                        return 'CDP'; 
+                    }
+                } else if (dateCheck >= DP_END_DATE) {
+                    // Setelah masa 3 bulan DP selesai: 14 & 28 adalah HLB (Libur)
+                    if (dayOfMonth === 14 || dayOfMonth === 28) {
+                        return 'HLB'; 
                     }
                 }
             }
@@ -273,8 +281,10 @@
                 const isPaid = savedPayments[dateKey] === true;
                 const paidClass = isPaid ? 'paid' : '';
                 
-                const disabledAttr = ''; 
-
+                // Tolak bayar untuk hari sebelum ambil motor
+                const isBeforePickup = date < userData.tglAmbilMotor;
+                const disabledAttr = isBeforePickup ? 'disabled' : '';
+                
                 // Khusus tanggal 31 di bulan yang tidak punya 31 hari
                 if (day === 31 && daysInMonth < 31) {
                      grid.innerHTML += `<div class="day empty"></div>`;
@@ -282,17 +292,10 @@
                 }
                 
                 if (status === 'HLB') {
-                    // Hari Libur (Tidak ada checkbox)
-                    grid.innerHTML += `
-                        <div class="day ${statusClass}">
-                            <label>
-                                <span class="day-number">${day}</span>
-                            </label>
-                        </div>
-                    `;
+                    grid.innerHTML += `<div class="day ${statusClass}"><label><span class="day-number">${day}</span></label></div>`;
                 } else {
                     // Hari yang Wajib Bayar (HWB atau CDP)
-                     grid.innerHTML += `
+                    grid.innerHTML += `
                         <div class="day ${statusClass} ${paidClass}">
                             <input type="checkbox" id="check-${dateKey}" data-date="${dateKey}" ${isPaid ? 'checked' : ''} ${disabledAttr}>
                             <label for="check-${dateKey}">
@@ -316,6 +319,7 @@
         }
 
         function savePayments() {
+            // (Logika Simpan Pembayaran)
             const checkboxes = document.querySelectorAll('#calendar-grid input[type="checkbox"]');
             
             checkboxes.forEach(checkbox => {
@@ -336,6 +340,21 @@
         }
 
         document.getElementById('calendar-grid').addEventListener('change', (e) => {
+            const clickedDateStr = e.target.getAttribute('data-date');
+            const clickedDate = new Date(clickedDateStr);
+            
+            // LOGIKA TOLAK BAYAR SEBELUM AMBIL MOTOR
+            if (e.target.type === 'checkbox' && clickedDate < userData.tglAmbilMotor) {
+                // Batalkan centang yang baru saja dilakukan
+                e.target.checked = false; 
+                
+                // Tampilkan modal tolak bayar
+                document.getElementById('rejectModal').style.display = 'flex';
+                
+                // Hentikan proses simpan/konfirmasi
+                return;
+            }
+
             if (e.target.type === 'checkbox') {
                 document.getElementById('confirmModal').style.display = 'flex';
             }
