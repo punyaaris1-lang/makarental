@@ -22,30 +22,7 @@
         
         /* Struktur dasar Kalender */
         .calendar-controls { padding: 20px 20px 10px; }
-        .month-selector {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--primary-neon);
-        }
-        .nav-month-btn {
-            background: none;
-            border: none;
-            color: var(--primary-neon);
-            font-size: 1.5em;
-            cursor: pointer;
-            padding: 5px 10px;
-        }
-        .calendar-display { padding: 0 20px 20px; }
-        .weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: #999;
-            font-size: 0.85em;
-        }
+        /* ... (Struktur Kalender lainnya) ... */
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -58,7 +35,7 @@
             height: 45px;
             padding: 5px;
             position: relative;
-            cursor: pointer; /* FIX: Seluruh div dapat diklik */
+            cursor: pointer; 
         }
         
         /* Hapus semua style input/label lama */
@@ -76,32 +53,19 @@
             font-weight: normal;
         }
         
-        /* --- LOGIKA WARNA HARI (Warna Dasar - FIX MUTLAK) --- */
-        
-        /* 1. HWB - Hari Wajib Bayar (Neon Biru) */
+        /* --- LOGIKA WARNA HARI --- */
         .day.wajib-bayar:not(.paid) { background-color: var(--bg-hwb) !important; border: 1px solid var(--primary-neon) !important; color: var(--primary-neon) !important; }
         .day.wajib-bayar:not(.paid) span { color: var(--primary-neon); }
-
-        /* 2. CDP - Cicilan DP (Ungu) */
         .day.cicilan-dp:not(.paid) { background-color: var(--bg-cdp) !important; border: 1px solid rgba(204, 153, 255, 0.3) !important; color: var(--dp-color) !important; }
         .day.cicilan-dp:not(.paid) span { color: var(--dp-color); }
-        
-        /* 3. HLB - Hari Libur (Merah) */
         .day.holiday { background-color: var(--bg-hlb) !important; border: 1px solid rgba(255, 69, 69, 0.2) !important; color: var(--holiday-color) !important; cursor: default; }
         .day.holiday span { color: var(--holiday-color); }
-        
-        /* 4. PAID - Hari Sudah Dibayar (KUNING STABILO) */
         .day.paid { background-color: var(--secondary-neon) !important; box-shadow: 0 0 8px rgba(255, 255, 0, 0.7) !important; border: 1px solid var(--secondary-neon) !important; font-weight: bold !important; }
         .day.paid span { color: var(--bg-dark) !important; }
-        
-        /* 5. TEMP CHECKED - Saat user klik tapi belum disimpan */
         .day.temp-checked { background-color: var(--secondary-neon) !important; box-shadow: 0 0 8px rgba(255, 255, 0, 0.7) !important; border: 1px solid var(--secondary-neon) !important; font-weight: bold !important; }
         .day.temp-checked span { color: var(--bg-dark) !important; }
-
-        /* Hari yang dinonaktifkan */
         .day.disabled { background-color: #1a1a1a !important; color: #555 !important; border: 1px solid #333 !important; cursor: not-allowed !important; }
         .day.disabled span { color: #555 !important; }
-        
         .day .day-number { font-size: 0.9em; z-index: 2; }
         .day.empty { background-color: transparent !important; }
     </style>
@@ -160,7 +124,7 @@
     <div id="confirmModal" class="modal-overlay">
         <div class="modal-content" style="border-color: var(--primary-neon);">
             <h3 style="color: var(--primary-neon);">Konfirmasi Pembayaran</h3>
-            <p>Anda yakin ingin menyimpan perubahan pembayaran untuk bulan ini? Tunggakan Anda akan dihitung ulang.</p>
+            <p>Anda yakin ingin menyimpan perubahan pembayaran untuk bulan ini?</p>
             <button class="modal-btn primary-btn" id="confirm-save-btn" onclick="savePayments()">YA, SIMPAN</button>
             <button class="modal-btn secondary-btn" onclick="closeConfirmModal()">BATAL</button>
         </div>
@@ -185,7 +149,7 @@
 
     <script>
         let currentDate = new Date(2026, 2); 
-        let clickedDayElement = null; // Menyimpan elemen yang terakhir diklik
+        let clickedDayElement = null;
         
         const userData = {
             tglAmbilMotor: new Date('2025-09-20'), 
@@ -217,10 +181,30 @@
                     }
                 }
             }
-            
             return 'HWB'; 
         }
         
+        // PENTING: Fungsi ini dipanggil dari event listener inline di HTML
+        window.handleDayClick = function(element) {
+            const isPayable = element.getAttribute('data-is-payable') === 'true';
+            
+            if (!isPayable) {
+                if (element.classList.contains('disabled')) {
+                    document.getElementById('rejectModal').style.display = 'flex';
+                }
+                return;
+            }
+
+            clickedDayElement = element;
+            const isCurrentlyPaid = element.classList.contains('paid');
+            
+            if (!isCurrentlyPaid) {
+                element.classList.add('temp-checked');
+            }
+            
+            document.getElementById('confirmModal').style.display = 'flex';
+        }
+
         function renderCalendar() {
             const grid = document.getElementById('calendar-grid');
             const monthYearDisplay = document.getElementById('current-month-year');
@@ -270,12 +254,13 @@
                      continue;
                 }
                 
-                // Render elemen hari (tanpa checkbox)
+                // Render elemen hari (dengan onclick inline)
                 grid.innerHTML += `
                     <div 
                         class="day ${statusClass} ${paidClass} ${disabledClass}" 
                         data-date-key="${dateKey}" 
                         data-is-payable="${isPayable && !isBeforePickup}"
+                        onclick="handleDayClick(this)" 
                     >
                         <span class="day-number">${day}</span>
                     </div>
@@ -322,32 +307,8 @@
             document.getElementById('confirmModal').style.display='none';
             document.getElementById('successModal').style.display='flex';
             
-            clickedDayElement = null; // Reset
+            clickedDayElement = null; 
         }
-
-        document.getElementById('calendar-grid').addEventListener('click', (e) => {
-            let targetDiv = e.target.closest('.day');
-
-            if (!targetDiv) return;
-
-            const isPayable = targetDiv.getAttribute('data-is-payable') === 'true';
-            
-            if (!isPayable) {
-                if (targetDiv.classList.contains('disabled')) {
-                    document.getElementById('rejectModal').style.display = 'flex';
-                }
-                return;
-            }
-
-            clickedDayElement = targetDiv;
-            const isCurrentlyPaid = targetDiv.classList.contains('paid');
-            
-            if (!isCurrentlyPaid) {
-                targetDiv.classList.add('temp-checked');
-            }
-            
-            document.getElementById('confirmModal').style.display = 'flex';
-        });
 
         function changeMonth(delta) {
             currentDate.setMonth(currentDate.getMonth() + delta);
