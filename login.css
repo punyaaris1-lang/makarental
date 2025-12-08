@@ -1,12 +1,13 @@
-/* login.css - Konsep Premium Minimalis */
+/* login.css - TEMA FUTURISTIK DARK MODE */
 
-/* --- Variable Override (untuk latar belakang gelap) --- */
 :root {
-    --primary-color: #1a73e8; 
-    --bg-color-dark: #34495e; /* Warna gelap untuk latar belakang */
-    --card-bg: #ffffff;
-    --input-bg: #f5f5f5;
-    --shadow-input: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --primary-neon: #00dfff; /* Neon Biru Cyan untuk Aksen */
+    --secondary-neon: #39ff14; /* Neon Hijau untuk Keberhasilan */
+    --bg-dark: #121212; /* Warna dasar gelap */
+    --card-bg: #1e1e1e; /* Warna card lebih terang dari background */
+    --text-light: #e0e0e0;
+    --input-bg: #2d2d2d;
+    --shadow-deep: 0 8px 25px rgba(0, 0, 0, 0.7);
 }
 
 /* --- Container Utama dan Background --- */
@@ -15,52 +16,50 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Gradien Gelap untuk kesan mewah */
-    background: linear-gradient(135deg, var(--bg-color-dark) 0%, #1c2833 100%);
+    /* Gradien Gelap Mendalam */
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #080808 100%);
     padding: 20px;
 }
 
 /* --- Kartu Utama (Form) --- */
 .auth-card {
     width: 100%;
-    max-width: 420px;
+    max-width: 450px;
     background: var(--card-bg);
-    padding: 30px;
+    padding: 35px 30px;
     border-radius: 18px;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-    transition: height 0.4s ease; /* Transisi saat form berganti */
+    /* Bayangan Futuristik dengan aksen neon */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), 0 0 5px var(--primary-neon);
+    border: 1px solid rgba(0, 223, 255, 0.1); /* Garis luar halus */
 }
 
 /* --- Header --- */
 .auth-header {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 30px;
 }
 
 .auth-header h2 {
-    color: var(--dark-text);
-    font-size: 2em;
-    font-weight: 700;
+    color: var(--primary-neon);
+    font-size: 2.2em;
+    font-weight: 800;
+    text-shadow: 0 0 8px rgba(0, 223, 255, 0.5); /* Efek neon ringan */
     margin-bottom: 5px;
 }
 
 .auth-header p {
-    color: #6c757d;
+    color: var(--text-light);
     font-size: 1em;
 }
 
 /* --- Form Konten --- */
-#form-container form {
-    display: flex;
-    flex-direction: column;
-}
-
 label {
-    margin-top: 15px;
-    margin-bottom: 6px;
-    font-size: 0.9em;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-size: 0.95em;
     font-weight: 600;
-    color: var(--dark-text);
+    color: var(--text-light);
+    display: block; /* Agar label tampil di baris baru */
 }
 
 input[type="text"],
@@ -68,66 +67,77 @@ input[type="email"],
 input[type="password"],
 input[type="date"] {
     padding: 14px;
-    border: none;
+    border: 1px solid var(--primary-neon);
     background: var(--input-bg);
-    border-radius: 10px;
+    color: var(--text-light);
+    border-radius: 8px;
     font-size: 1em;
-    box-shadow: var(--shadow-input);
-    transition: border-color 0.2s;
+    transition: all 0.3s;
 }
 
 input:focus {
-    background: white;
-    border: 1px solid var(--primary-color);
+    border-color: var(--secondary-neon);
+    box-shadow: 0 0 10px var(--secondary-neon);
     outline: none;
 }
 
+/* --- Tombol Aksi --- */
 .primary-btn {
-    padding: 15px;
-    margin-top: 30px;
+    padding: 16px;
+    margin-top: 35px;
     border: none;
     border-radius: 10px;
-    background-color: var(--primary-color);
-    color: white;
+    /* Gradien cerah di latar belakang gelap */
+    background: linear-gradient(90deg, #00bfff 0%, var(--primary-neon) 100%);
+    color: var(--bg-dark); /* Teks gelap di tombol cerah */
     font-size: 1.1em;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s;
+    box-shadow: 0 4px 15px rgba(0, 191, 255, 0.4);
 }
 
 .primary-btn:hover {
-    background-color: #0056b3;
+    background: linear-gradient(90deg, #0099e5 0%, #00bfff 100%);
+    box-shadow: 0 4px 20px rgba(0, 191, 255, 0.6);
 }
 
 .forgot-link {
     text-align: center;
     margin-top: 15px;
-    font-size: 0.9em;
-    color: #6c757d;
+    font-size: 0.95em;
+    color: var(--primary-neon);
     text-decoration: none;
+    display: block;
 }
 
-/* --- Footer Navigasi --- */
+/* --- Footer Navigasi (Switch Mode) --- */
 .auth-footer {
     text-align: center;
-    margin-top: 25px;
+    margin-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
 }
 
 #switch-mode-btn {
     background: none;
     border: none;
-    color: var(--primary-color);
-    font-weight: 600;
+    color: var(--text-light);
+    font-weight: 500;
     cursor: pointer;
     padding: 10px;
-    font-size: 1em;
+    font-size: 0.9em;
+    transition: color 0.3s;
 }
 
-/* --- Pendaftaran Khusus --- */
+#switch-mode-btn:hover {
+    color: var(--secondary-neon);
+}
+
+/* --- Opsi DP & Toggle (Diatur ulang untuk Dark Mode) --- */
 .divider {
     border: 0;
     height: 1px;
-    background: #e0e0e0;
+    background: rgba(255, 255, 255, 0.1);
     margin: 25px 0 20px 0;
 }
 
@@ -135,61 +145,21 @@ input:focus {
     padding: 15px;
     background: var(--input-bg);
     border-radius: 10px;
-    margin-bottom: 15px;
-    font-size: 0.95em;
-    box-shadow: var(--shadow-input);
+    margin-bottom: 20px;
+    color: var(--text-light);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 
 .radio-group label {
+    color: var(--text-light);
     font-weight: normal;
-    margin-left: 5px;
-    color: var(--dark-text);
+    margin-left: 8px;
+    margin-top: 0;
 }
 
-/* --- Toggle Switch Maka+ --- */
-.toggle-switch-container {
-    margin: 10px 0 20px 0;
-    /* Styling standar toggle untuk kesan bersih */
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 26px;
-}
-
-.toggle-switch-container input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-label-switch {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    transition: .4s;
-    border-radius: 26px;
-}
-
-.toggle-label-switch:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-}
+/* Toggle Switch Styling - (Dipertahankan agar tetap fungsional dengan warna neon) */
 
 input:checked + .toggle-label-switch {
-    background-color: #4CAF50;
-}
-
-input:checked + .toggle-label-switch:before {
-    transform: translateX(24px);
+    background-color: var(--secondary-neon);
+    box-shadow: 0 0 5px var(--secondary-neon);
 }
