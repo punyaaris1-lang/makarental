@@ -11,7 +11,7 @@
         /* Ambil Variabel dari styles.css */
         :root {
             --primary-neon: #00dfff; 
-            --secondary-neon: #39ff14; /* HIJAU NEON UNTUK PAID */
+            --secondary-neon: #FFFF00; /* KUNING STABILO */
             --holiday-color: #ff4545;
             --dp-color: #cc99ff;
             --bg-dark: #121212;
@@ -70,7 +70,6 @@
             font-weight: normal;
             cursor: pointer;
         }
-        /* Hapus tampilan input checkbox secara total */
         .day input[type="checkbox"] {
             position: absolute;
             opacity: 0;
@@ -83,14 +82,14 @@
         /* --- LOGIKA WARNA HARI (Warna Dasar - FIX MUTLAK) --- */
         
         /* 1. HWB - Hari Wajib Bayar (Neon Biru) */
-        .day.wajib-bayar label {
+        .day.wajib-bayar:not(.paid) label {
             background-color: var(--bg-hwb) !important;
             border: 1px solid var(--primary-neon) !important;
             color: var(--primary-neon) !important;
         }
         
         /* 2. CDP - Cicilan DP (Ungu) */
-        .day.cicilan-dp label {
+        .day.cicilan-dp:not(.paid) label {
             background-color: var(--bg-cdp) !important;
             color: var(--dp-color) !important; 
             border: 1px solid rgba(204, 153, 255, 0.3) !important;
@@ -103,29 +102,27 @@
             border: 1px solid rgba(255, 69, 69, 0.2) !important;
         }
         
-        /* 4. PAID - Hari Sudah Dibayar (HIJAU NEON) */
-        /* Ini adalah style hari yang sudah dibayar, entah itu HWB atau CDP */
+        /* 4. PAID - Hari Sudah Dibayar (KUNING STABILO) */
         .day.paid label {
             background-color: var(--secondary-neon) !important; 
             color: var(--bg-dark) !important; 
-            box-shadow: 0 0 8px rgba(57, 255, 20, 0.5) !important;
-            border: 1px solid var(--secondary-neon) !important;
-            font-weight: bold !important;
-        }
-
-        /* Karena kita tidak bisa menggunakan :checked pada elemen non-paid lagi,
-           kita gunakan kelas "temp-checked" dari JS saat user mengklik */
-        .day.temp-checked label {
-            background-color: var(--secondary-neon) !important; 
-            color: var(--bg-dark) !important; 
-            box-shadow: 0 0 8px rgba(57, 255, 20, 0.5) !important;
+            box-shadow: 0 0 8px rgba(255, 255, 0, 0.7) !important;
             border: 1px solid var(--secondary-neon) !important;
             font-weight: bold !important;
         }
         
+        /* 5. TEMP CHECKED - Saat user klik tapi belum disimpan */
+        .day.temp-checked label {
+            background-color: var(--secondary-neon) !important; 
+            color: var(--bg-dark) !important; 
+            box-shadow: 0 0 8px rgba(255, 255, 0, 0.7) !important;
+            border: 1px solid var(--secondary-neon) !important;
+            font-weight: bold !important;
+        }
+
         /* Hari yang dinonaktifkan */
         .day input[disabled] + label,
-        .day.disabled label { /* Tambahan kelas disabled untuk label */
+        .day.disabled label { 
             background-color: #1a1a1a !important;
             color: #555 !important;
             border: 1px solid #333 !important;
@@ -142,15 +139,15 @@
         <header class="header" style="padding-bottom: 20px;">
             <div class="user-info">
                 <h1>📅 Kalender Sewa</h1>
-                <p>Status: <strong style="color: #39ff14;">DP 355rb (Cicilan)</strong></p>
+                <p>Status: <strong style="color: var(--secondary-neon);">DP 355rb (Cicilan)</strong></p>
             </div>
         </header>
 
         <section class="info-section" style="padding: 20px 20px 10px; border-bottom: 1px solid #1e1e1e;">
             <p style="font-size: 0.9em; color: #bbb;">Centang tanggal di bawah yang **SUDAH ANDA BAYAR**.</p>
             <div style="margin-top: 10px; font-size: 0.9em;">
-                <span style="color: #00dfff;">⚫ Hari Sewa (80K)</span> | 
-                <span style="color: #cc99ff;">🟣 Cicilan DP (70K)</span> |
+                <span style="color: var(--primary-neon);">⚫ Hari Sewa (80K)</span> | 
+                <span style="color: var(--dp-color);">🟣 Cicilan DP (70K)</span> |
                 <span style="color: var(--holiday-color);">🔴 Hari Libur (0K)</span>
             </div>
         </section>
@@ -180,8 +177,8 @@
     </div>
 
     <div id="confirmModal" class="modal-overlay">
-        <div class="modal-content" style="border-color: #00dfff;">
-            <h3 style="color: #00dfff;">Konfirmasi Pembayaran</h3>
+        <div class="modal-content" style="border-color: var(--primary-neon);">
+            <h3 style="color: var(--primary-neon);">Konfirmasi Pembayaran</h3>
             <p>Anda yakin ingin menyimpan perubahan pembayaran untuk bulan ini? Tunggakan Anda akan dihitung ulang.</p>
             <button class="modal-btn primary-btn" onclick="savePayments()">YA, SIMPAN</button>
             <button class="modal-btn secondary-btn" onclick="document.getElementById('confirmModal').style.display='none'">BATAL</button>
@@ -189,8 +186,8 @@
     </div>
     
     <div id="successModal" class="modal-overlay">
-        <div class="modal-content" style="border-color: #39ff14;">
-            <h3 style="color: #39ff14;">✅ Berhasil Disimpan</h3>
+        <div class="modal-content" style="border-color: var(--secondary-neon);">
+            <h3 style="color: var(--secondary-neon);">✅ Berhasil Disimpan</h3>
             <p>Data pembayaran berhasil disimpan. Dashboard akan menghitung ulang tunggakan Anda.</p>
             <button class="modal-btn primary-btn" onclick="closeSuccessModal()">OK</button>
         </div>
@@ -209,47 +206,38 @@
         let currentDate = new Date(2026, 2); 
         
         const userData = {
-            // Kita gunakan 20 Sept 2025 sesuai permintaan Anda
             tglAmbilMotor: new Date('2025-09-20'), 
             opsiDp: '355', 
             tarifNormal: 70000,
             tarifMakaPlus: 10000
         };
 
-        // Periode Cicilan DP 3 bulan setelah ambil motor: Okt 2025 s/d Des 2025 (bulan +1, +2, +3)
-        // CDP dimulai BUKAN di bulan ambil, tapi bulan berikutnya.
         const DP_START_DATE = new Date(userData.tglAmbilMotor.getFullYear(), userData.tglAmbilMotor.getMonth() + 1, 1); 
-        const DP_END_DATE = new Date(DP_START_DATE.getFullYear(), DP_START_DATE.getMonth() + 3, 1); // Berakhir 1 Jan 2026
+        const DP_END_DATE = new Date(DP_START_DATE.getFullYear(), DP_START_DATE.getMonth() + 3, 1); 
         
         let savedPayments = JSON.parse(localStorage.getItem('maka_payments')) || {};
 
-        // FUNGSI LOGIKA FINAL: Minggu Bayar, CDP Mulai Bulan Berikutnya
         function getDayStatus(date) {
             const dayOfMonth = date.getDate();
             const year = date.getFullYear();
             const month = date.getMonth();
             
-            const dateCheck = new Date(year, month, dayOfMonth);
-
-            // 1. ATURAN 31: Tgl 31 adalah HLB (Hari Libur)
             if (dayOfMonth === 31) return 'HLB';
 
-            // 2. ATURAN CDP (Cicilan DP - Tgl 14 & 28)
+            const dateCheck = new Date(year, month, dayOfMonth);
+
             if (userData.opsiDp === '355') {
                 if (dateCheck >= DP_START_DATE && dateCheck < DP_END_DATE) {
-                    // Selama masa 3 bulan DP: 14 & 28 adalah CDP
                     if (dayOfMonth === 14 || dayOfMonth === 28) {
                         return 'CDP'; 
                     }
                 } else if (dateCheck >= DP_END_DATE) {
-                    // Setelah masa 3 bulan DP selesai: 14 & 28 adalah HLB (Libur)
                     if (dayOfMonth === 14 || dayOfMonth === 28) {
                         return 'HLB'; 
                     }
                 }
             }
             
-            // 3. ATURAN DEFAULT: HWB (Sewa Harian, termasuk Minggu)
             return 'HWB'; 
         }
         
@@ -279,13 +267,16 @@
 
                 const status = getDayStatus(date);
                 let statusClass = '';
+                let isPayable = false;
 
                 if (status === 'HLB') {
                     statusClass = 'holiday'; 
                 } else if (status === 'CDP') {
                     statusClass = 'cicilan-dp'; 
+                    isPayable = true;
                 } else if (status === 'HWB') {
                     statusClass = 'wajib-bayar'; 
+                    isPayable = true;
                 }
 
                 const isPaid = savedPayments[dateKey] === true;
@@ -293,18 +284,17 @@
                 
                 const isBeforePickup = date < userData.tglAmbilMotor;
                 const disabledClass = isBeforePickup ? 'disabled' : '';
-                
-                // Khusus tanggal 31 di bulan yang tidak punya 31 hari
+
                 if (day === 31 && daysInMonth < 31) {
                      grid.innerHTML += `<div class="day empty"></div>`;
                      continue;
                 }
                 
                 if (status === 'HLB' || isBeforePickup) {
-                    // Hari Libur atau sebelum ambil motor (Non-interaktif)
+                    // Non-interaktif: Hari Libur atau sebelum ambil motor
                     grid.innerHTML += `<div class="day ${statusClass} ${disabledClass}"><label><span class="day-number">${day}</span></label></div>`;
                 } else {
-                    // Hari yang Wajib Bayar (HWB atau CDP) - Selalu punya checkbox
+                    // Wajib Bayar (HWB atau CDP)
                     grid.innerHTML += `
                         <div class="day ${statusClass} ${paidClass}">
                             <input type="checkbox" id="check-${dateKey}" data-date="${dateKey}" ${isPaid ? 'checked' : ''}>
@@ -342,7 +332,7 @@
                 const dateKey = checkbox.getAttribute('data-date');
                 savedPayments[dateKey] = checkbox.checked;
 
-                // Update paid class setelah menyimpan
+                // Update paid class
                 if (checkbox.checked) {
                     dayDiv.classList.add('paid');
                 } else {
@@ -355,7 +345,8 @@
             document.getElementById('confirmModal').style.display='none';
             document.getElementById('successModal').style.display='flex';
             
-            // Tidak perlu renderCalendar() lagi, update DOM sudah dilakukan di atas.
+            // Render ulang untuk memastikan warna permanen
+            renderCalendar(); 
         }
 
         function closeSuccessModal() {
@@ -367,12 +358,11 @@
             if (checkbox.type === 'checkbox') {
                 const dayDiv = checkbox.closest('.day');
 
-                // LOGIKA TOLAK BAYAR SEBELUM AMBIL MOTOR
                 const clickedDateStr = checkbox.getAttribute('data-date');
                 const clickedDate = new Date(clickedDateStr);
 
+                // LOGIKA TOLAK BAYAR SEBELUM AMBIL MOTOR
                 if (clickedDate < userData.tglAmbilMotor) {
-                    // Tolak dan tampilkan modal (walaupun sudah didisable di render, ini jaga-jaga)
                     checkbox.checked = false; 
                     document.getElementById('rejectModal').style.display = 'flex';
                     return;
@@ -385,7 +375,6 @@
                     dayDiv.classList.remove('temp-checked');
                 }
 
-                // Tampilkan konfirmasi
                 document.getElementById('confirmModal').style.display = 'flex';
             }
         });
