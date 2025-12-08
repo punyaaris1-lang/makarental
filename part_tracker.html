@@ -70,13 +70,6 @@
             cursor: pointer;
             z-index: 10; 
         }
-        /* FIX: Tambahkan style khusus untuk modal agar tidak memblokir */
-        #markUsageModal .modal-content {
-            z-index: 1001;
-        }
-        #markUsageModal .modal-overlay {
-            z-index: 1000;
-        }
     </style>
 </head>
 <body>
@@ -127,10 +120,6 @@
             <form id="usage-form">
                 <select id="part-select" class="action-button" style="margin-top: 0; background: var(--input-bg); color: var(--text-light); border: 1px solid var(--paid-gold);">
                     <option value="">-- Pilih Suku Cadang --</option>
-                    <option value="ban_depan">Ban Depan</option>
-                    <option value="ban_belakang">Ban Belakang</option>
-                    <option value="kampas_depan">Kampas Rem Depan</option>
-                    <option value="kampas_belakang">Kampas Rem Belakang</option>
                 </select>
                 
                 <button type="submit" class="action-button" style="background: var(--paid-gold); color: var(--bg-dark);">KONFIRMASI PENGGANTIAN</button>
@@ -156,8 +145,7 @@
             kampas_belakang: 0,
             last_used: {} 
         };
-
-        // Fungsi untuk mengambil daftar part yang tersedia di Admin
+        
         function getAvailableParts() {
             const defaultParts = [
                 { key: 'ban_depan', name: 'Ban Depan' },
@@ -168,20 +156,22 @@
             
             const adminPartList = JSON.parse(localStorage.getItem('maka_admin_parts')) || [];
             
-            // Gabungkan default part dengan part baru dari admin
-            const currentParts = defaultParts.map(p => p.key);
-            
+            const finalParts = [...defaultParts];
+            const existingKeys = defaultParts.map(p => p.key);
+
             adminPartList.forEach(p => {
-                if (!currentParts.includes(p.key)) {
-                    defaultParts.push(p);
-                    currentParts.push(p.key); // Tambahkan key baru
+                if (!existingKeys.includes(p.key)) {
+                    finalParts.push(p);
+                    existingKeys.push(p.key);
                 }
             });
 
-            return defaultParts;
+            return finalParts;
         }
 
         function renderPartTracker() {
+            PART_LIMITS = JSON.parse(localStorage.getItem('maka_part_limits')) || PART_LIMITS; // Refresh limits
+            
             const container = document.getElementById('part-tracker');
             const selectElement = document.getElementById('part-select');
             container.innerHTML = '';
@@ -190,7 +180,7 @@
             const parts = getAvailableParts();
             
             parts.forEach(part => {
-                const limit = PART_LIMITS[part.key] || 3; // Gunakan limit admin atau default 3
+                const limit = PART_LIMITS[part.key] || 3; 
                 const totalUsed = partUsage[part.key] || 0;
                 
                 const remaining = limit - totalUsed;
@@ -201,7 +191,7 @@
                 container.innerHTML += `
                     <div class="part-card">
                         <p>${part.name}</p>
-                        <small>Sisa Jatah: <strong style="color: ${statusColor};">${remaining}</strong> / ${limit}</small>
+                        <small>Sisa Jatah: <strong style="color: ${statusColor};">${remaining}</strong> / ${limit} (Total 3 Tahun)</small>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${percentage}%; background-color: ${remaining > 0 ? 'var(--paid-gold)' : 'var(--holiday-color)'};"></div>
                         </div>
