@@ -161,39 +161,28 @@ body {
     0 12px 30px rgba(0,234,255,.25);
 }
 
-/* ================= BOTTOM NAV ================= */
+/* ===================
+   BOTTOM NAV – PREMIUM SIZE
+=================== */
+
 .bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-
-  backdrop-filter: blur(14px);
-  background: rgba(10,14,25,.85);
-
-  border-top: 1px solid var(--glass-border);
-  display: flex;
-  justify-content: space-around;
-  padding: 10px 0 12px;
+  height: 78px;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .nav-item {
-  font-size: .7em;
-  text-decoration: none;
-  color: var(--text-secondary);
-  text-align: center;
+  font-size: .9em;
+  gap: 4px;
 }
 
 .nav-item span {
-  display: block;
-  font-size: 1.4em;
-  margin-bottom: 2px;
+  font-size: 1.9em;
 }
 
-.nav-item.active {
-  color: var(--primary-neon);
-  text-shadow: 0 0 12px rgba(0,234,255,.5);
+.nav-item.active span {
+  transform: scale(1.15);
 }
+
 /* =================================================
    UI LEVEL 3 – MICRO INTERACTION & DEPTH
 ================================================= */
@@ -309,5 +298,23 @@ body {
 /* ================= PREMIUM TOUCH FEEL ================= */
 a, button {
   -webkit-tap-highlight-color: transparent;
+}
+/* ==================
+   SOS CARD – EMERGENCY
+================== */
+
+.sos-card {
+  border: 1px solid rgba(255,70,70,.6);
+  box-shadow:
+    0 0 20px rgba(255,70,70,.25);
+}
+
+.sos-card span {
+  color: #ff4d4d;
+}
+
+.sos-card:hover {
+  box-shadow:
+    0 0 30px rgba(255,70,70,.6);
 }
 
