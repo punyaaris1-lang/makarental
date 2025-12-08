@@ -1,8 +1,8 @@
-/* styles.css - DASHBOARD, MODAL, RIWAYAT FUTURISTIK (Final Fix Warna) */
+/* styles.css - DASHBOARD, MODAL, RIWAYAT FUTURISTIK (Final Fix Warna Kuning Stabilo) */
 
 :root {
     --primary-neon: #00dfff; /* Neon Biru Cyan (HWB Color) */
-    --secondary-neon: #39ff14; /* Neon Hijau (Paid/Success Color) */
+    --secondary-neon: #FFFF00; /* KUNING STABILO / LEMON YELLOW (Paid/Success Color) */
     --holiday-color: #ff4545; /* Merah (HLB Text Color) */
     --dp-color: #cc99ff; /* Ungu/Lilac (CDP Text Color) */
     --bg-dark: #121212; 
@@ -176,6 +176,10 @@ h2 {
     border: 1px solid rgba(0, 223, 255, 0.2);
     text-align: center;
 }
+.modal-content h3 {
+    color: var(--primary-neon);
+    margin-bottom: 15px;
+}
 .modal-btn {
     padding: 12px;
     margin-top: 15px;
@@ -188,8 +192,8 @@ h2 {
     transition: all 0.2s;
 }
 .primary-btn { 
-    background: var(--secondary-neon);
-    color: var(--bg-dark);
+    background: var(--secondary-neon); /* KUNING STABILO */
+    color: var(--bg-dark); /* Font Gelap */
 }
 .secondary-btn { 
     background: #555;
