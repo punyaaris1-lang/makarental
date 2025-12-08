@@ -8,55 +8,44 @@
 </head>
 <body>
     <div class="app-container">
-        
         <header class="header">
             <div class="user-info">
-                <h1 id="user-name">Halo, Pengguna MAKA!</h1>
-                <p>Plat Motor: <strong id="user-plat">PLAT ANDA</strong></p>
-            </div>
-            <div class="status-box">
-                <span id="current-status">
-                    HARI INI: WAJIB BAYAR (Rp 80.000)
-                </span>
+                <h1>Halo, M RIZKY FIRDAU!</h1>
+                <p>Plat Motor: **B 4248 SWF**</p>
+                <div class="status-box">
+                    <span>HARI INI: WAJIB BAYAR (Rp 80.000)</span>
+                </div>
             </div>
         </header>
 
-        <section class="recap-section">
-            <h2>💰 Rekap Tunggakan</h2>
+        <section class="rekap-keuangan-section">
+            <h2>💰 Rekap Keuangan</h2>
             <div class="metric-grid">
                 <div class="metric-card tunggakan-card">
-                    <h3>Sewa Harian (HWB)</h3>
-                    <p id="tunggakan-sewa">Rp 0</p>
-                    <small id="hari-sewa">0 Hari Tertunggak</small>
+                    <h3>TOTAL TUNGGAKAN</h3>
+                    <p>Rp 400.000</p>
+                    <span style="font-size: 0.9em; color: #aaa;">5 Hari Tertunggak</span>
                 </div>
-                <div class="metric-card tunggakan-dp-card">
-                    <h3>Cicilan DP (CDP)</h3>
-                    <p id="tunggakan-dp">Rp 0</p>
-                    <small id="hari-dp">0 Hari Tertunggak</small>
+                <div class="metric-card">
+                    <h3>CICILAN DP (355K)</h3>
+                    <p style="font-size: 1.8em; font-weight: 700; color: var(--primary-neon);">Rp 0</p>
+                    <span style="font-size: 0.9em; color: #aaa;">0 Hari Tertunggak</span>
                 </div>
             </div>
             
-            <div style="margin-top: 20px; text-align: center; border-top: 1px solid #2a2a2a; padding-top: 15px;">
-                <h3 style="color: #ff4545; font-size: 1.2em;">TOTAL KESELURUHAN</h3>
-                <p id="total-keseluruhan-nominal" style="font-size: 2.2em; font-weight: bold; color: #ff4545;">Rp 0</p>
-            </div>
+            <h2 style="text-align: center; margin-top: 20px;">TOTAL KESELURUHAN</h2>
+            <p style="text-align: center; font-size: 2.2em; font-weight: bold; color: var(--holiday-color); margin-bottom: 30px;">
+                Rp 400.000
+            </p>
         </section>
 
-        <section class="action-section">
-            <h2>Aksi Cepat</h2>
+        <section class="aksi-cepat-section">
+            <h2>⚡ Aksi Cepat</h2>
             <div class="button-grid">
-                <button class="action-btn maka-plus-btn" onclick="openMakaPlusModal()">
-                    🌟 Tambah Maka+
-                </button>
-                <button class="action-btn charging-btn">
-                    ⚡ Titik Fast Charging
-                </button>
-                <button class="action-btn sos-btn" onclick="openExternalURL('whatsapp://send?phone=6287722285445')">
-                    🆘 SOS Chat CS
-                </button>
-                <button class="action-btn etle-btn" onclick="openExternalURL('https://etle-pmj.info/')">
-                    🚨 Cek ETLE
-                </button>
+                <button class="action-btn maka-plus-btn">⭐ Tambah Maka+</button>
+                <button class="action-btn charging-btn">⚡ Titik Fast Charging</button>
+                <button class="action-btn sos-btn">🆘 SOS Chat CS</button>
+                <button class="action-btn etle-btn">📸 Cek ETLE</button>
             </div>
         </section>
 
@@ -67,134 +56,5 @@
             <a href="#" class="nav-item">⚙️ Pengaturan</a>
         </footer>
     </div>
-
-    <div id="makaPlusModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3>Aktifkan Maka+</h3>
-            <p>Maka+ (Rp 10.000/hari) akan aktif **H+1** dari tanggal pengambilan motor. Total biaya sewa menjadi Rp 80.000/hari.</p>
-            
-            <form id="maka-plus-form">
-                <label for="maka-plus-date">Tanggal Mulai Berlaku (Ambil Motor)</label>
-                <input type="date" id="maka-plus-date" required>
-                
-                <button type="submit" class="modal-btn primary-btn">AKTIFKAN SEKARANG</button>
-                <button type="button" class="modal-btn secondary-btn" onclick="closeMakaPlusModal()">BATAL</button>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // --- Data Kunci untuk Perhitungan (Simulasi dari database) ---
-        const USER_TARIF_HARIAN = 80000; // Sewa + Maka+
-        const USER_TARIF_CICILAN_DP = 70000; // Sesuai permintaan: CDP selalu 70rb
-        const USER_TGL_MULAI_SEWA = '2025-11-18'; 
-        const USER_OPSI_DP = '355'; 
-
-        // Fungsi Helper untuk menentukan status hari (HWB, CDP, HLB)
-        function getDayStatus(date) {
-            const D = new Date(date);
-            const dayOfMonth = D.getDate();
-
-            if (dayOfMonth === 31) return 'HLB'; 
-            
-            // Asumsi Periode DP 355rb: 1 Des 2025 s/d 28 Feb 2026
-            const dpStart = new Date('2025-12-01');
-            const dpEnd = new Date('2026-02-28');
-
-            if (USER_OPSI_DP === '355') {
-                if (D >= dpStart && D <= dpEnd) {
-                    if (dayOfMonth === 14 || dayOfMonth === 28) {
-                        return 'CDP'; 
-                    }
-                }
-            }
-            return 'HWB'; 
-        }
-
-        // --- FUNGSI UTAMA: MENGHITUNG DUA JENIS TUNGGAKAN ---
-        function calculateOutstandingSeparately() {
-            const today = new Date();
-            const start = new Date(USER_TGL_MULAI_SEWA);
-            let tunggakanSewa = 0;
-            let hariTunggakSewa = 0;
-            let tunggakanDP = 0;
-            let hariTunggakDP = 0;
-            
-            // Ambil data pembayaran yang dicentang user dari Local Storage
-            const savedPayments = JSON.parse(localStorage.getItem('maka_payments')) || {};
-            
-            let currentDate = new Date(start); 
-            
-            while (currentDate <= today) {
-                const dateKey = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
-                const status = getDayStatus(currentDate);
-                const isPaid = savedPayments[dateKey] === true;
-                
-                if (!isPaid) {
-                    if (status === 'HWB') {
-                        tunggakanSewa += USER_TARIF_HARIAN;
-                        hariTunggakSewa += 1;
-                    } else if (status === 'CDP') {
-                        tunggakanDP += USER_TARIF_CICILAN_DP;
-                        hariTunggakDP += 1;
-                    }
-                }
-                
-                // Maju satu hari
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-            
-            return { tunggakanSewa, hariTunggakSewa, tunggakanDP, hariTunggakDP };
-        }
-
-        // --- LOGIKA UTAMA (Diaktifkan Saat Halaman Terbuka) ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedName = localStorage.getItem('maka_user_name') || "PENGGUNA MAKA";
-            const savedPlat = localStorage.getItem('maka_user_plat') || "PLAT ANDA (Disimpan di DB)";
-            
-            // 1. Hitung ulang tunggakan berdasarkan Kalender
-            const rekap = calculateOutstandingSeparately();
-
-            // 2. Tampilkan data user
-            document.getElementById('user-name').textContent = `Halo, ${savedName}!`;
-            document.getElementById('user-plat').textContent = savedPlat;
-            
-            // 3. Tampilkan hasil perhitungan tunggakan SEWA
-            document.getElementById('tunggakan-sewa').textContent = `Rp ${rekap.tunggakanSewa.toLocaleString('id-ID')}`;
-            document.getElementById('hari-sewa').textContent = `${rekap.hariTunggakSewa} Hari Tertunggak`;
-            
-            // 4. Tampilkan hasil perhitungan tunggakan DP
-            document.getElementById('tunggakan-dp').textContent = `Rp ${rekap.tunggakanDP.toLocaleString('id-ID')}`;
-            document.getElementById('hari-dp').textContent = `${rekap.hariTunggakDP} Hari Tertunggak`;
-
-            // 5. Tampilkan TOTAL KESELURUHAN
-            const totalKeseluruhan = rekap.tunggakanSewa + rekap.tunggakanDP;
-            document.getElementById('total-keseluruhan-nominal').textContent = `Rp ${totalKeseluruhan.toLocaleString('id-ID')}`;
-            
-            // 6. Status Hari Ini
-            document.getElementById('current-status').textContent = `HARI INI: WAJIB BAYAR (Rp ${USER_TARIF_HARIAN.toLocaleString('id-ID')})`;
-        });
-
-        // --- FUNGSIONALITAS MODAL MAKA+ & EKSTERNAL ---
-        function openExternalURL(url) {
-            window.location.href = url;
-        }
-        
-        function openMakaPlusModal() {
-            document.getElementById('makaPlusModal').style.display = 'flex';
-        }
-
-        function closeMakaPlusModal() {
-            document.getElementById('makaPlusModal').style.display = 'none';
-        }
-
-        document.getElementById('maka-plus-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const date = document.getElementById('maka-plus-date').value;
-            
-            alert('Maka+ berhasil diaktifkan! Tambahan biaya Rp 10.000/hari akan berlaku mulai besok. Tanggal Aktivasi: ' + date);
-            closeMakaPlusModal();
-        });
-    </script>
 </body>
 </html>
