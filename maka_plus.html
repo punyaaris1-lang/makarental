@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAKA+ Premium</title>
+
+  <!-- GLOBAL STYLE -->
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    .maka-plus-header {
+      padding: 30px 20px 20px;
+      text-align: left;
+    }
+
+    .maka-plus-header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8em;
+      color: var(--paid-gold);
+      text-shadow: 0 0 12px rgba(204,255,0,.6);
+    }
+
+    .maka-plus-header p {
+      margin-top: 6px;
+      font-size: .95em;
+      color: var(--text-muted);
+    }
+
+    .plus-card {
+      margin: 20px;
+      padding: 22px;
+      border-radius: 18px;
+      background: linear-gradient(
+        160deg,
+        rgba(204,255,0,.08),
+        rgba(0,223,255,.04)
+      );
+      border: 1px solid rgba(204,255,0,.4);
+      box-shadow:
+        0 0 35px rgba(204,255,0,.25);
+    }
+
+    .plus-status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .plus-status span {
+      font-size: .8em;
+      color: var(--text-muted);
+    }
+
+    .plus-status strong {
+      color: var(--paid-gold);
+      font-size: 1.1em;
+    }
+
+    .benefit-list {
+      margin-top: 15px;
+    }
+
+    .benefit-list li {
+      list-style: none;
+      margin-bottom: 10px;
+      font-size: .9em;
+    }
+
+    .benefit-list li::before {
+      content: "✔";
+      color: var(--paid-gold);
+      margin-right: 10px;
+    }
+
+    .price-info {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.08);
+      font-size: .85em;
+      color: var(--text-muted);
+    }
+
+    .activate-btn {
+      margin: 25px 20px;
+      width: calc(100% - 40px);
+      height: 52px;
+      border: none;
+      border-radius: 16px;
+      font-weight: bold;
+      font-size: 1em;
+      cursor: pointer;
+      background: linear-gradient(
+        90deg,
+        var(--paid-gold),
+        #d4ff00
+      );
+      color: #000;
+      box-shadow:
+        0 5px 25px rgba(204,255,0,.55);
+    }
+
+    .activate-btn:disabled {
+      background: #444;
+      color: #999;
+      box-shadow: none;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <header class="maka-plus-header">
+    <h1>⭐ MAKA+</h1>
+    <p>Layanan premium bantuan & toleransi khusus MAKA Rental</p>
+  </header>
+
+  <div class="plus-card">
+    <div class="plus-status">
+      <span>Status Langganan</span>
+      <strong id="plus-status-text">BELUM AKTIF</strong>
+    </div>
+
+    <ul class="benefit-list">
+      <li>Prioritas bantuan darurat (SOS)</li>
+      <li>Toleransi keterlambatan tertentu</li>
+      <li>Akses layanan khusus FC</li>
+      <li>Gratis benefit dari event MAKA</li>
+    </ul>
+
+    <div class="price-info">
+      📌 Biaya MAKA+:
+      <br>• Aktif mulai <b>H+1</b> setelah konfirmasi
+      <br>• Tambahan <b>Rp 10.000 / hari</b>
+      <br>• Otomatis masuk ke perhitungan tunggakan
+    </div>
+  </div>
+
+  <button
+    id="activatePlusBtn"
+    class="activate-btn"
+    onclick="activateMakaPlus()">
+    AKTIFKAN MAKA+
+  </button>
+
+</div>
+
+<script>
+  const MAKA_PLUS_KEY = 'maka_plus_data';
+
+  function loadMakaPlus() {
+    const data = JSON.parse(localStorage.getItem(MAKA_PLUS_KEY));
+    const statusText = document.getElementById('plus-status-text');
+    const btn = document.getElementById('activatePlusBtn');
+
+    if (data && data.active) {
+      const activeDate = new Date(data.activatedAt);
+      statusText.textContent =
+        'AKTIF sejak ' + activeDate.toLocaleDateString('id-ID');
+
+      btn.disabled = true;
+      btn.textContent = 'MAKA+ AKTIF';
+    }
+  }
+
+  function activateMakaPlus() {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const makaPlusData = {
+      active: true,
+      activatedAt: today.toISOString()
+    };
+
+    localStorage.setItem(MAKA_PLUS_KEY, JSON.stringify(makaPlusData));
+    loadMakaPlus();
+
+    alert('✅ MAKA+ berhasil diaktifkan.\nTagihan +10rb mulai BESOK (H+1).');
+  }
+
+  document.addEventListener('DOMContentLoaded', loadMakaPlus);
+</script>
+
+</body>
+</html>
