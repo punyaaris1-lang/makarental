@@ -81,8 +81,6 @@
     <script>
         // Helper untuk membuka URL Eksternal
         function openExternalURL(url) {
-            console.log("Mengarahkan ke: " + url);
-            // Di aplikasi nyata, ini adalah window.open atau menggunakan library Linking
             window.location.href = url;
         }
         
@@ -104,22 +102,23 @@
         });
 
 
-        // --- LOGIKA MENAMPILKAN DATA DINAMIS (Anti-Budi Santoso Fix) ---
+        // --- LOGIKA MENAMPILKAN DATA DINAMIS DARI PENDAFTARAN (Local Storage) ---
         document.addEventListener('DOMContentLoaded', () => {
-            // DATA SIMULASI AMAN YANG AKAN DITAMPILKAN DI PREVIEW
-            // Di aplikasi nyata, data ini diambil dari database SQLite Anda.
-            const dynamicUserData = { 
-                nama: "PENGGUNA MAKA", 
-                plat: "PLAT ANDA (Disimpan di DB)",   
+            // Coba ambil data yang disimpan saat DAFTAR/LOGIN di index.html
+            const savedName = localStorage.getItem('maka_user_name') || "PENGGUNA MAKA";
+            const savedPlat = localStorage.getItem('maka_user_plat') || "PLAT ANDA (Disimpan di DB)";
+            
+            // Data Simulasi Rekap (Ini akan diambil dari file Logika Backend/SQLite yang sesungguhnya)
+            const rekapData = {
                 tunggakan: "Rp 150.000",
                 hari_tunggak: "2 Hari"
-            }; 
+            };
             
-            // Mengganti teks di HTML menggunakan data simulasi:
-            document.getElementById('user-name').textContent = `Halo, ${dynamicUserData.nama}!`;
-            document.getElementById('user-plat').textContent = dynamicUserData.plat;
-            document.getElementById('tunggakan-nominal').textContent = dynamicUserData.tunggakan;
-            document.getElementById('tunggakan-hari').textContent = `${dynamicUserData.hari_tunggak} Tertunggak`;
+            // Mengganti teks di HTML:
+            document.getElementById('user-name').textContent = `Halo, ${savedName}!`;
+            document.getElementById('user-plat').textContent = savedPlat;
+            document.getElementById('tunggakan-nominal').textContent = rekapData.tunggakan;
+            document.getElementById('tunggakan-hari').textContent = `${rekapData.hari_tunggak} Tertunggak`;
             
             // Logika Status Hari Ini
             document.getElementById('current-status').textContent = `HARI INI: WAJIB BAYAR (Rp 80.000)`;
