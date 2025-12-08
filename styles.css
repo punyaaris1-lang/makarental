@@ -1,229 +1,278 @@
-/* =========================================================
-   MAKA – ULTRA LUX FUTURISTIC STYLE (CLEAN & FIXED)
-   ========================================================= */
+/* styles.css
+   Modern · Futuristic · Ultra-Lux
+   Ganti file styles.css di repo dengan isi ini.
+*/
 
-/* ===================== ROOT VARIABLES ===================== */
-:root {
-    --primary-neon: #00dfff;
-    --secondary-neon: #39ff14;
-    --paid-gold: #ffc107;
-    --holiday-color: #ff4545;
-
-    --bg-dark: #000;
-    --card-bg: #101010;
-    --input-bg: #1f1f1f;
-
-    --text-light: #e0e0e0;
-    --text-secondary: #999;
-
-    --shadow-deep: 0 8px 18px rgba(0,0,0,0.9);
-    --glow-soft: 0 0 10px rgba(0,223,255,.6);
-    --border-lux: 1px solid rgba(0,223,255,.4);
+:root{
+  --primary-neon: #00dfff;
+  --accent-neon: #39ff14;
+  --paid-gold: #FFC107;
+  --muted-red: #ff4545;
+  --bg-900: #070708;
+  --card-900: #0f1112;
+  --input-800: #141617;
+  --glass: rgba(255,255,255,0.035);
+  --glass-strong: rgba(255,255,255,0.05);
+  --text: #e6eef6;
+  --text-dim: #9aa6b2;
+  --shadow-deep: 0 8px 30px rgba(0,0,0,0.75);
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --gap: 14px;
+  --max-width: 460px;
 }
 
-/* ===================== RESET ===================== */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto Mono', 'Segoe UI', monospace, sans-serif;
-    color: var(--text-light);
+/* Reset */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: radial-gradient(1200px 600px at 10% 10%, rgba(0,223,255,0.03), transparent 12%),
+              radial-gradient(800px 400px at 90% 90%, rgba(255,193,7,0.02), transparent 8%),
+              linear-gradient(180deg, var(--bg-900) 0%, #060607 100%);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.25;
+  padding:20px 12px 100px;
+  display:flex;
+  justify-content:center;
 }
 
-body {
-    background: radial-gradient(circle at top left, #1a1a1a, var(--bg-dark));
-    font-size: 14px;
+/* App container */
+.app-container{
+  width:100%;
+  max-width:var(--max-width);
+  margin:0 auto;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  border-radius:18px;
+  box-shadow:var(--shadow-deep);
+  overflow:hidden;
+  border: 1px solid rgba(255,255,255,0.03);
 }
 
-/* ===================== LAYOUT ===================== */
-.app-container {
-    max-width: 450px;
-    min-height: 100vh;
-    margin: 0 auto;
-    background: var(--bg-dark);
-    padding-bottom: 80px;
+/* Header */
+.header{
+  padding:22px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-bottom: 1px solid rgba(0,223,255,0.04);
+}
+.user-info h1{
+  font-size:1.2rem;
+  color:var(--primary-neon);
+  letter-spacing:0.6px;
+  margin-bottom:4px;
+}
+.user-info p{
+  font-size:0.82rem;
+  color:var(--text-dim);
 }
 
-/* ===================== HEADER ===================== */
-.header {
-    background: var(--card-bg);
-    padding: 28px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    box-shadow: var(--shadow-deep);
-    border-bottom: 2px solid var(--primary-neon);
+/* Content sections */
+section{padding:18px}
+.setting-group{background:linear-gradient(180deg, rgba(255,255,255,0.012), transparent); padding:16px; border-radius:12px; border:1px solid rgba(255,255,255,0.02); box-shadow:0 6px 16px rgba(0,0,0,0.6)}
+.setting-group h3{color:var(--paid-gold); font-size:0.98rem; margin-bottom:12px}
+
+/* Part tracker grid */
+.part-tracker-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+.part-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(0,0,0,0.12));
+  padding:12px;
+  border-radius:10px;
+  border:1px solid rgba(255,193,7,0.06);
+  min-height:72px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:6px;
+}
+.part-card p{font-weight:600; font-size:0.92rem}
+.part-card small{color:var(--text-dim); font-size:0.8rem}
+
+/* Progress bar */
+.progress-bar{height:8px;background:rgba(255,255,255,0.02); border-radius:999px; overflow:hidden}
+.progress-fill{height:100%; width:0%; transition:width .45s ease, background-color .25s ease;}
+
+/* Buttons / anchors */
+.action-button{
+  display:inline-block;
+  width:100%;
+  padding:12px 14px;
+  border-radius:12px;
+  text-align:center;
+  text-decoration:none;
+  font-weight:700;
+  letter-spacing:0.6px;
+  background: linear-gradient(90deg,var(--paid-gold), #FFD54A 60%);
+  color:#081014;
+  border:none;
+  box-shadow: 0 6px 18px rgba(255,193,7,0.12), 0 1px 0 rgba(255,255,255,0.02) inset;
+  cursor:pointer;
+  transition:transform .12s ease;
+}
+.action-button:active{transform:translateY(1px)}
+.action-button.ghost{
+  background:transparent;
+  color:var(--text);
+  border:1px solid rgba(255,255,255,0.04);
+  box-shadow:none;
 }
 
-.user-info h1 {
-    font-size: 1.4em;
-    color: var(--primary-neon);
-    font-weight: 700;
+/* Calendar specific (modern) */
+.calendar-controls{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 18px;
+}
+.month-selector{display:flex; align-items:center; gap:12px}
+.nav-month-btn{
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.04);
+  padding:8px 10px;
+  border-radius:10px;
+  cursor:pointer;
+  color:var(--text);
+  font-weight:700;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.6);
 }
 
-.user-info p {
-    font-size: 0.9em;
-    color: var(--text-secondary);
+/* Weekdays bar */
+.weekdays{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+  padding:10px 18px 6px;
+  font-size:0.78rem;
+  color:var(--text-dim);
+  align-items:center;
+  z-index:1;
 }
 
-/* ===================== SECTION ===================== */
-section {
-    padding: 20px;
+/* Calendar grid */
+.calendar-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+  padding:12px 18px 22px;
+  z-index:2; /* ensure calendar cells are above background */
 }
 
-.setting-group {
-    background: var(--card-bg);
-    padding: 18px;
-    border-radius: 12px;
-    border: var(--border-lux);
-    box-shadow: var(--shadow-deep);
+/* Day cell */
+.day{
+  min-height:52px;
+  height:52px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease, background-color .12s ease;
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.03));
+  border:1px solid rgba(255,255,255,0.02);
+  overflow:hidden;
+  pointer-events:auto;
+}
+.day.empty{
+  background:transparent;
+  border:0;
+  cursor:default;
 }
 
-.setting-group h3 {
-    color: var(--paid-gold);
-    margin-bottom: 16px;
-    border-bottom: 1px solid rgba(255,255,255,.1);
-    padding-bottom: 6px;
+/* Day number */
+.day-number{font-size:0.95rem; font-weight:600; z-index:5}
+
+/* States */
+.day.wajib-bayar:not(.paid){
+  background: linear-gradient(180deg, rgba(0,119,136,0.06), rgba(0,0,0,0.02));
+  border:1px solid rgba(0,223,255,0.08);
+  color:var(--primary-neon);
+}
+.day.cicilan-dp:not(.paid){
+  background: linear-gradient(180deg, rgba(102,51,153,0.05), rgba(0,0,0,0.02));
+  border:1px solid rgba(204,153,255,0.08);
+  color:#cc99ff;
+}
+.day.holiday{
+  background: linear-gradient(180deg, rgba(255,69,69,0.04), rgba(0,0,0,0.02));
+  border:1px solid rgba(255,69,69,0.06);
+  color:var(--muted-red);
+  cursor:default;
+}
+.day.paid{
+  background: linear-gradient(180deg, rgba(57,255,20,0.12), rgba(0,0,0,0.02));
+  box-shadow: 0 6px 18px rgba(57,255,20,0.06);
+  border:1px solid rgba(57,255,20,0.12);
+  color:#071008;
+  transform:translateY(-2px);
+}
+.day.temp-checked{
+  background: linear-gradient(180deg, rgba(255,193,7,0.15), rgba(0,0,0,0.02));
+  box-shadow: 0 8px 30px rgba(255,193,7,0.06);
+  border:1px solid rgba(255,193,7,0.12);
+  color:#061015;
+  transform:translateY(-2px);
+}
+.day.disabled{
+  background:linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.12));
+  color:#5a6066;
+  border:1px solid rgba(255,255,255,0.02);
+  cursor:not-allowed;
+  opacity:0.6;
 }
 
-/* ===================== PART TRACKER ===================== */
-.part-tracker-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
+/* Modal system (centered) */
+.modal-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+  padding:20px;
+}
+.modal-content{
+  width:min(420px,96%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  border-radius:12px;
+  padding:18px;
+  border:1px solid rgba(255,255,255,0.03);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.75);
+}
+.modal-btn{padding:10px 14px; border-radius:10px; border:0; cursor:pointer; font-weight:700}
+.modal-btn.primary-btn{background:linear-gradient(90deg,var(--primary-neon), #00b4ff); color:#001118}
+.modal-btn.secondary-btn{background:transparent; border:1px solid rgba(255,255,255,0.03); color:var(--text)}
+
+/* Bottom nav */
+.bottom-nav{
+  display:flex; justify-content:space-around; gap:6px;
+  position:fixed; bottom:12px; left:50%; transform:translateX(-50%);
+  width:calc(100% - 42px); max-width:var(--max-width);
+  height:64px; align-items:center; background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.65));
+  border-radius:18px; padding:8px; border:1px solid rgba(0,223,255,0.04); z-index:1500;
+  box-shadow:0 20px 50px rgba(0,0,0,0.6);
+}
+.nav-item{ text-decoration:none; color:var(--text-dim); text-align:center; font-size:0.9rem; display:block}
+.nav-item span{display:block; font-size:1.2rem; margin-bottom:2px}
+
+/* Responsive */
+@media (max-width:420px){
+  .day{min-height:44px;height:44px}
+  .header{padding:16px}
+  .calendar-grid{gap:6px;padding-left:12px;padding-right:12px}
+  .weekdays{padding-left:12px;padding-right:12px}
 }
 
-.part-card {
-    background: var(--input-bg);
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,193,7,.35);
-}
-
-.progress-bar {
-    height: 6px;
-    background: #222;
-    border-radius: 4px;
-    margin: 8px 0;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    transition: width .3s ease;
-}
-
-/* ===================== BUTTON ===================== */
-.action-button {
-    display: block;
-    width: 100%;
-    margin-top: 14px;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    background: var(--paid-gold);
-    color: var(--bg-dark);
-    font-weight: 700;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-}
-
-/* ===================== BOTTOM NAV ===================== */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    max-width: 450px;
-    height: 65px;
-    background: #101010;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid var(--primary-neon);
-    box-shadow: 0 -5px 25px rgba(0,223,255,.35);
-    z-index: 100;
-}
-
-.nav-item {
-    text-decoration: none;
-    font-size: .9em;
-    color: var(--text-secondary);
-    text-align: center;
-}
-
-.nav-item span {
-    display: block;
-    font-size: 1.4em;
-}
-
-/* ===================== MODAL (FINAL FIX) ===================== */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0,0,0,.7);
-    z-index: 9999;
-}
-
-.modal-overlay.active {
-    display: flex;
-}
-
-.modal-content {
-    background: var(--card-bg);
-    padding: 22px;
-    border-radius: 14px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: var(--shadow-deep);
-    animation: modalIn .25s ease;
-}
-
-@keyframes modalIn {
-    from {
-        opacity: 0;
-        transform: scale(.94);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.modal-btn {
-    width: 100%;
-    padding: 12px;
-    margin-top: 12px;
-    border-radius: 8px;
-    border: none;
-    font-weight: 600;
-}
-
-.secondary-btn {
-    background: transparent;
-    border: 1px solid var(--text-secondary);
-    color: var(--text-secondary);
-}
-
-/* ================= CALENDAR CLICK FIX ================= */
-
-.calendar-display,
-.calendar-grid,
-.day {
-    position: relative;
-    z-index: 10; /* Memastikan Kalender di atas lapisan header/section/modal */
-}
-
-.day {
-    pointer-events: auto;
-    /* Cursor pointer sudah ada di CSS tertanam, ini hanya untuk memastikan */
-}
-
-/* FIX MODAL CLEANING */
-.modal-overlay.active {
-    display: flex !important; /* Paksa tampil ketika class 'active' ditambahkan */
-}
-
+/* Accessibility: Focus */
+.day:focus{outline:3px solid rgba(0,223,255,0.12); outline-offset:2px}
+.nav-month-btn:focus{outline:3px solid rgba(255,193,7,0.08)}
