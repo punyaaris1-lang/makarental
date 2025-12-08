@@ -68,7 +68,14 @@
             color: var(--bg-dark);
             font-weight: bold;
             cursor: pointer;
-            z-index: 10; /* FIX: Tambahkan Z-Index untuk memastikan klik tidak terhalang */
+            z-index: 10; 
+        }
+        /* FIX: Tambahkan style khusus untuk modal agar tidak memblokir */
+        #markUsageModal .modal-content {
+            z-index: 1001;
+        }
+        #markUsageModal .modal-overlay {
+            z-index: 1000;
         }
     </style>
 </head>
@@ -99,10 +106,12 @@
                 <span style="color: var(--primary-neon);">⚡</span>
                 Lokasi FC
             </a>
+            
             <a href="dashboard.html" class="nav-item">
                 <span>🏠</span>
                 Home
             </a>
+            
             <a href="daftar_antrian.html" class="nav-item">
                 <span style="color: var(--paid-gold);">🎫</span>
                 Antrian
@@ -148,19 +157,40 @@
             last_used: {} 
         };
 
-        function renderPartTracker() {
-            const container = document.getElementById('part-tracker');
-            container.innerHTML = '';
-
-            const parts = [
+        // Fungsi untuk mengambil daftar part yang tersedia di Admin
+        function getAvailableParts() {
+            const defaultParts = [
                 { key: 'ban_depan', name: 'Ban Depan' },
                 { key: 'ban_belakang', name: 'Ban Belakang' },
                 { key: 'kampas_depan', name: 'Kampas Depan' },
-                { key: 'kampas_belakang', name: 'Kampas Belakang' },
+                { key: 'kampas_belakang', name: 'Kampas Belakang' }
             ];
             
+            const adminPartList = JSON.parse(localStorage.getItem('maka_admin_parts')) || [];
+            
+            // Gabungkan default part dengan part baru dari admin
+            const currentParts = defaultParts.map(p => p.key);
+            
+            adminPartList.forEach(p => {
+                if (!currentParts.includes(p.key)) {
+                    defaultParts.push(p);
+                    currentParts.push(p.key); // Tambahkan key baru
+                }
+            });
+
+            return defaultParts;
+        }
+
+        function renderPartTracker() {
+            const container = document.getElementById('part-tracker');
+            const selectElement = document.getElementById('part-select');
+            container.innerHTML = '';
+            selectElement.innerHTML = '<option value="">-- Pilih Suku Cadang --</option>';
+
+            const parts = getAvailableParts();
+            
             parts.forEach(part => {
-                const limit = PART_LIMITS[part.key] || 3; 
+                const limit = PART_LIMITS[part.key] || 3; // Gunakan limit admin atau default 3
                 const totalUsed = partUsage[part.key] || 0;
                 
                 const remaining = limit - totalUsed;
@@ -171,13 +201,15 @@
                 container.innerHTML += `
                     <div class="part-card">
                         <p>${part.name}</p>
-                        <small>Sisa Jatah: <strong style="color: ${statusColor};">${remaining}</strong> / ${limit} (Total 3 Tahun)</small>
+                        <small>Sisa Jatah: <strong style="color: ${statusColor};">${remaining}</strong> / ${limit}</small>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${percentage}%; background-color: ${remaining > 0 ? 'var(--paid-gold)' : 'var(--holiday-color)'};"></div>
                         </div>
                         <small class="last-used" style="color: var(--text-secondary);">Terakhir: <strong style="color: var(--secondary-neon);">${lastDate}</strong></small>
                     </div>
                 `;
+                 // Isi Opsi Select Modal
+                 selectElement.innerHTML += `<option value="${part.key}">${part.name} (Jatah: ${limit})</option>`;
             });
         }
 
