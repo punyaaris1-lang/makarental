@@ -11,13 +11,13 @@
         /* Ambil Variabel dari styles.css */
         :root {
             --primary-neon: #00dfff; 
-            --secondary-neon: #FFFF00; /* KUNING STABILO */
+            --secondary-neon: #FFFF00; 
             --holiday-color: #ff4545;
             --dp-color: #cc99ff;
             --bg-dark: #121212;
-            --bg-hwb: #1a3a4a; /* Dark Blue */
-            --bg-cdp: #4a3a5e; /* Dark Purple */
-            --bg-hlb: #3a2222; /* Dark Red */
+            --bg-hwb: #1a3a4a; 
+            --bg-cdp: #4a3a5e; 
+            --bg-hlb: #3a2222; 
         }
         
         /* Struktur dasar Kalender */
@@ -59,6 +59,16 @@
             padding: 5px;
             position: relative;
         }
+        /* FIX: Z-INDEX PENTING UNTUK MENGATASI BLOK KLIK */
+        .day input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 999 !important; /* HARUS DI ATAS SEMUA */
+        }
+        
         .day label {
             display: flex;
             justify-content: center;
@@ -70,32 +80,21 @@
             font-weight: normal;
             cursor: pointer;
         }
-        .day input[type="checkbox"] {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-            z-index: 3;
-        }
         
         /* --- LOGIKA WARNA HARI (Warna Dasar - FIX MUTLAK) --- */
         
-        /* 1. HWB - Hari Wajib Bayar (Neon Biru) */
         .day.wajib-bayar:not(.paid) label {
             background-color: var(--bg-hwb) !important;
             border: 1px solid var(--primary-neon) !important;
             color: var(--primary-neon) !important;
         }
         
-        /* 2. CDP - Cicilan DP (Ungu) */
         .day.cicilan-dp:not(.paid) label {
             background-color: var(--bg-cdp) !important;
             color: var(--dp-color) !important; 
             border: 1px solid rgba(204, 153, 255, 0.3) !important;
         }
         
-        /* 3. HLB - Hari Libur (Merah) */
         .day.holiday label {
             background-color: var(--bg-hlb) !important;
             color: var(--holiday-color) !important;
@@ -173,12 +172,10 @@
                 <span style="color: var(--primary-neon);">⚡</span>
                 Lokasi FC
             </a>
-            
             <a href="dashboard.html" class="nav-item">
                 <span>🏠</span>
                 Home
             </a>
-            
             <a href="daftar_antrian.html" class="nav-item">
                 <span style="color: var(--paid-gold);">🎫</span>
                 Antrian
