@@ -7,7 +7,127 @@
     
     <link rel="stylesheet" href="styles.css"> 
     
-    <link rel="stylesheet" href="calendar-styles.css"> 
+    <style>
+        /* Ambil Variabel dari styles.css */
+        :root {
+            --primary-neon: #00dfff; 
+            --secondary-neon: #39ff14; 
+            --holiday-color: #ff4545;
+            --dp-color: #cc99ff;
+            --bg-dark: #121212;
+            --bg-hwb: #1a3a4a; /* Dark Blue */
+            --bg-cdp: #4a3a5e; /* Dark Purple */
+            --bg-hlb: #3a2222; /* Dark Red */
+        }
+        
+        .calendar-controls { padding: 20px 20px 10px; }
+        .month-selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--primary-neon);
+        }
+        .nav-month-btn {
+            background: none;
+            border: none;
+            color: var(--primary-neon);
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px 10px;
+        }
+        .calendar-display { padding: 0 20px 20px; }
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #999;
+            font-size: 0.85em;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        .day {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 45px;
+            padding: 5px;
+            position: relative;
+        }
+        .day label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .day input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            z-index: 3;
+        }
+        
+        /* --- LOGIKA WARNA HARI (Warna Dasar - FIX MUTLAK) --- */
+        
+        /* 1. HWB - Hari Wajib Bayar (Neon Biru) */
+        .day.wajib-bayar:not(.paid) label {
+            background-color: var(--bg-hwb) !important;
+            border: 1px solid var(--primary-neon) !important;
+            color: var(--primary-neon) !important;
+        }
+        
+        /* 2. CDP - Cicilan DP (Ungu) */
+        .day.cicilan-dp:not(.paid) label {
+            background-color: var(--bg-cdp) !important;
+            color: var(--dp-color) !important; 
+            border: 1px solid rgba(204, 153, 255, 0.3) !important;
+        }
+        
+        /* 3. HLB - Hari Libur (Merah) */
+        .day.holiday label {
+            background-color: var(--bg-hlb) !important;
+            color: var(--holiday-color) !important;
+            border: 1px solid rgba(255, 69, 69, 0.2) !important;
+        }
+        
+        /* 4. PAID - Hari Sudah Dibayar (Hijau Neon) */
+        .day.paid input[type="checkbox"]:checked + label {
+            background-color: var(--secondary-neon) !important; 
+            color: var(--bg-dark) !important; 
+            box-shadow: 0 0 8px rgba(57, 255, 20, 0.5) !important;
+            border: 1px solid var(--secondary-neon) !important;
+            font-weight: bold !important;
+        }
+        /* Style untuk hari yang ditandai paid (penting untuk menang melawan prioritas lain) */
+        .day.paid.wajib-bayar label,
+        .day.paid.cicilan-dp label {
+            background-color: var(--secondary-neon) !important;
+            color: var(--bg-dark) !important;
+            border: 1px solid var(--secondary-neon) !important;
+        }
+
+        /* Hari yang dinonaktifkan (masa depan atau HLB) */
+        .day input[disabled] + label {
+            background-color: #1a1a1a !important;
+            color: #555 !important;
+            border: 1px solid #333 !important;
+            cursor: not-allowed !important;
+        }
+        
+        .day .day-number { font-size: 0.9em; z-index: 2; }
+        .day.empty { background-color: transparent !important; }
+    </style>
 </head>
 <body>
     <div class="app-container">
@@ -89,11 +209,14 @@
             const dayOfMonth = date.getDate();
             const year = date.getFullYear();
             const month = date.getMonth();
-
+            const dayOfWeek = date.getDay(); // 0 = Minggu, 6 = Sabtu
+            
+            // Perbaikan: Pastikan 31 selalu HLB
             if (dayOfMonth === 31) return 'HLB';
 
             const dateCheck = new Date(year, month, dayOfMonth);
 
+            // Cek Cicilan DP (14 dan 28)
             if (userData.opsiDp === '355') {
                 if (dateCheck >= DP_START && dateCheck < DP_END) {
                     if (dayOfMonth === 14 || dayOfMonth === 28) {
@@ -101,6 +224,13 @@
                     }
                 }
             }
+            
+            // Cek Hari Libur (Minggu)
+            if (dayOfWeek === 0) { // Jika hari Minggu
+                 return 'HLB';
+            }
+            
+            // Hari Wajib Bayar
             return 'HWB'; 
         }
         
@@ -130,38 +260,43 @@
 
                 const status = getDayStatus(date);
                 let statusClass = '';
-                let isPayable = false;
-
+                
                 if (status === 'HLB') {
                     statusClass = 'holiday'; 
                 } else if (status === 'CDP') {
                     statusClass = 'cicilan-dp'; 
-                    isPayable = true;
                 } else if (status === 'HWB') {
                     statusClass = 'wajib-bayar'; 
-                    isPayable = true;
                 }
 
                 const isPaid = savedPayments[dateKey] === true;
                 const paidClass = isPaid ? 'paid' : '';
                 
-                const isFuture = date.getTime() > new Date().getTime();
-                const disabledAttr = isFuture ? 'disabled' : '';
+                const disabledAttr = ''; 
 
-
-                if (isPayable) {
+                // Khusus tanggal 31 di bulan yang tidak punya 31 hari
+                if (day === 31 && daysInMonth < 31) {
+                     grid.innerHTML += `<div class="day empty"></div>`;
+                     continue;
+                }
+                
+                // Khusus hari libur, kita ingin tetap menampilkan kotak, tapi tanpa checkbox
+                if (status === 'HLB') {
                     grid.innerHTML += `
-                        <div class="day ${statusClass} ${paidClass}">
-                            <input type="checkbox" id="check-${dateKey}" data-date="${dateKey}" ${isPaid ? 'checked' : ''} ${disabledAttr}>
-                            <label for="check-${dateKey}">
+                        <div class="day ${statusClass}">
+                            <label>
                                 <span class="day-number">${day}</span>
                             </label>
                         </div>
                     `;
                 } else {
-                    grid.innerHTML += `
-                        <div class="day ${statusClass}">
-                            <span class="day-number">${day}</span>
+                    // Hari yang Wajib Bayar (HWB atau CDP)
+                     grid.innerHTML += `
+                        <div class="day ${statusClass} ${paidClass}">
+                            <input type="checkbox" id="check-${dateKey}" data-date="${dateKey}" ${isPaid ? 'checked' : ''} ${disabledAttr}>
+                            <label for="check-${date-${dateKey}">
+                                <span class="day-number">${day}</span>
+                            </label>
                         </div>
                     `;
                 }
@@ -189,9 +324,9 @@
 
             localStorage.setItem('maka_payments', JSON.stringify(savedPayments));
             
-            document.getElementById('confirmModal').style.display='none';
-            document.getElementById('successModal').style.display='flex';
-            
+            // Ganti modal sukses dengan alert sederhana untuk menghindari masalah modal
+            alert('Data pembayaran berhasil disimpan. Dashboard akan menghitung ulang tunggakan Anda.');
+
             renderCalendar();
         }
 
@@ -201,6 +336,7 @@
 
         document.getElementById('calendar-grid').addEventListener('change', (e) => {
             if (e.target.type === 'checkbox') {
+                // Tampilkan modal konfirmasi saat checkbox diubah
                 document.getElementById('confirmModal').style.display = 'flex';
             }
         });
