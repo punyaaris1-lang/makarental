@@ -1,16 +1,20 @@
 /* styles.css - DASHBOARD, MODAL, RIWAYAT FUTURISTIK (Final Fix Warna) */
 
 :root {
-    --primary-neon: #00dfff; /* Neon Biru Cyan */
+    --primary-neon: #00dfff; /* Neon Biru Cyan (HWB Color) */
     --secondary-neon: #39ff14; /* Neon Hijau (Paid/Success Color) */
-    --holiday-color: #ff4545; /* Merah */
-    --dp-color: #cc99ff; /* Ungu/Lilac */
+    --holiday-color: #ff4545; /* Merah (HLB Text Color) */
+    --dp-color: #cc99ff; /* Ungu/Lilac (CDP Text Color) */
     --bg-dark: #121212; 
     --card-bg: #1e1e1e; 
     --text-light: #e0e0e0;
     --input-bg: #2d2d2d;
     --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.4);
     --shadow-neon: 0 0 8px rgba(0, 223, 255, 0.3);
+    /* CALENDAR SPECIFIC VARIABLES */
+    --bg-hwb: #1a3a4a; /* Dark Blue */
+    --bg-cdp: #4a3a5e; /* Dark Purple */
+    --bg-hlb: #3a2222; /* Dark Red */
 }
 
 * {
@@ -91,16 +95,10 @@ h2 {
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.metric-card h3 {
-    font-size: 0.95em;
-    color: #999;
-    text-transform: uppercase;
-}
-
 .tunggakan-card p {
     font-size: 1.8em;
     font-weight: 700;
-    color: #ff4545;
+    color: var(--holiday-color);
 }
 
 /* --- TOMBOL AKSI CEPAT --- */
@@ -125,7 +123,7 @@ h2 {
 .maka-plus-btn { color: var(--secondary-neon); }
 .charging-btn { color: var(--primary-neon); }
 .sos-btn { color: #ff9800; }
-.etle-btn { color: #ff4545; }
+.etle-btn { color: var(--holiday-color); }
 
 
 /* --- BOTTOM NAVIGASI --- */
