@@ -34,31 +34,9 @@
             border-radius: 8px;
             border: 1px solid rgba(255, 193, 7, 0.3); 
         }
-        .part-card p {
-            font-size: 0.9em;
-            color: var(--text-light);
-            font-weight: 600;
-        }
-        .part-card small {
-            display: block;
-            font-size: 0.7em;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-        .progress-bar {
-            height: 8px;
-            background: #2a2a2a;
-            border-radius: 4px;
-            margin-top: 5px;
-        }
-        .progress-fill {
-            height: 100%;
-            border-radius: 4px;
-            background: var(--paid-gold);
-            width: 0%; 
-            transition: width 0.5s;
-        }
-        /* FIX: Tambahkan Z-Index dan position relative untuk memastikan tombol dapat diklik */
+        /* ... (Style lainnya) ... */
+        
+        /* FIX: Ubah Button menjadi Link/Anchor untuk Stabilitas Klik */
         .action-button {
             padding: 12px;
             margin-top: 15px;
@@ -71,6 +49,9 @@
             cursor: pointer;
             z-index: 10; 
             position: relative; 
+            display: block; /* Agar anchor tag mengisi lebar */
+            text-align: center;
+            text-decoration: none;
         }
         #markUsageModal .modal-content {
             z-index: 1001;
@@ -97,7 +78,7 @@
                 <div id="part-tracker" class="part-tracker-grid">
                     </div>
                 
-                <button class="action-button" onclick="openMarkUsageModal()">CATAT PENGGUNAAN BARU</button>
+                <a href="#" class="action-button" onclick="openMarkUsageModal(); return false;">CATAT PENGGUNAAN BARU</a>
             </div>
         </section>
 
