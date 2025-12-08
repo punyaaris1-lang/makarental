@@ -58,6 +58,7 @@
             width: 0%; 
             transition: width 0.5s;
         }
+        /* FIX: Tambahkan Z-Index dan position relative untuk memastikan tombol dapat diklik */
         .action-button {
             padding: 12px;
             margin-top: 15px;
@@ -71,7 +72,6 @@
             z-index: 10; 
             position: relative; 
         }
-        /* FIX: Tambahkan style khusus untuk modal agar tidak memblokir */
         #markUsageModal .modal-content {
             z-index: 1001;
         }
