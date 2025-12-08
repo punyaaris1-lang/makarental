@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css"> 
     
     <style>
+        /* Gaya khusus untuk Icon Grid di Dashboard */
         .icon-grid-section {
             padding-top: 5px;
         }
@@ -49,8 +50,8 @@
             <a href="admin_login.html" style="position: absolute; top: 10px; right: 20px; font-size: 0.7em; color: #555; z-index: 200;">[ADMIN]</a>
             
             <div class="user-info">
-                <h1>Halo, M Rizky Firdaus!</h1>
-                <p>Plat Motor: B 4248 SWF</p>
+                <h1 id="user-name-display">Halo, M Rizky Firdaus!</h1>
+                <p>Plat Motor: <span id="user-plate-display">B 4248 SWF</span></p>
             </div>
             
             <div class="hero-tunggakan">
@@ -210,8 +211,24 @@
             return { tunggakanSewa, hariTunggakSewa, tunggakanDP, hariTunggakDP };
         }
         
-        // --- LOGIKA UTAMA: HOOK UP DATA ---
+        // --- LOGIKA UTAMA: HOOK UP DATA & USER INFO ---
         document.addEventListener('DOMContentLoaded', () => {
+            // 1. Dapatkan Data Pengguna dari Local Storage (Simulasi Login)
+            const userData = JSON.parse(localStorage.getItem('maka_user_data'));
+
+            if (!userData) {
+                 // Set data default jika belum ada (Misalnya setelah daftar pertama)
+                const defaultUser = { name: "M Rizky Firdaus", plate: "B 4248 SWF" };
+                localStorage.setItem('maka_user_data', JSON.stringify(defaultUser));
+                userData = defaultUser;
+            }
+            
+            // Injeksi data ke Header
+            document.getElementById('user-name-display').textContent = `Halo, ${userData.name}!`;
+            document.getElementById('user-plate-display').textContent = userData.plate;
+
+
+            // 2. Hitung & Update Tunggakan
             const rekap = calculateOutstandingSeparately();
             
             const totalKeseluruhan = rekap.tunggakanSewa + rekap.tunggakanDP;
@@ -220,9 +237,6 @@
             // Update Hero Area
             document.getElementById('hero-tunggakan-nominal').textContent = `Rp ${totalKeseluruhan.toLocaleString('id-ID')}`;
             document.getElementById('hero-tunggakan-days').textContent = `${totalHari} Hari Tertunggak`;
-
-            // Hapus data hardcode yang tidak perlu (Opsional)
-            // document.getElementById('hero-tunggakan-nominal').parentNode.querySelector('small').textContent = `${rekap.hariTunggakSewa} Hari Tertunggak`;
         });
     </script>
 </body>
