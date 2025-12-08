@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAKA Rental App Riwayat</title>
+    <link rel="stylesheet" href="styles.css"> 
+</head>
+<body>
+    <div class="app-container">
+        
+        <header class="header" style="padding-bottom: 20px;">
+            <div class="user-info">
+                <h1>🗒️ Riwayat Pembayaran</h1>
+                <p>Status: <strong style="color: #00dfff;">Total ${0} Transaksi</strong></p>
+            </div>
+        </header>
+
+        <section class="info-section" style="padding: 20px 20px 10px;">
+            <h2>Log Transaksi Tercatat</h2>
+            <p style="font-size: 0.9em; color: #999;">Ini adalah daftar pembayaran harian yang Anda centang di Kalender.</p>
+        </section>
+
+        <section class="transaction-history">
+            <table id="history-table">
+                <thead>
+                    <tr>
+                        <th>TANGGAL</th>
+                        <th>KETERANGAN</th>
+                        <th>TARIF</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    <tr><td colspan="4" style="text-align: center; color: #555;">Riwayat kosong. Silakan centang pembayaran di Kalender.</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <footer class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">🏠 Dashboard</a>
+            <a href="calendar.html" class="nav-item">📅 Kalender</a>
+            <a href="history.html" class="nav-item active">🗒️ Riwayat</a>
+            <a href="#" class="nav-item">⚙️ Pengaturan</a>
+        </footer>
+    </div>
+
+    <script>
+        // Data Kunci untuk Perhitungan
+        const USER_TARIF_NORMAL = 70000;
+        const USER_TARIF_MAKA_PLUS = 10000; 
+
+        // Fungsi Helper untuk memformat tanggal
+        function formatDate(dateKey) {
+            // dateKey: YYYY-M-D
+            const parts = dateKey.split('-');
+            const date = new Date(parts[0], parts[1] - 1, parts[2]);
+            return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        // Fungsi Utama untuk Mengisi Tabel
+        function renderHistory() {
+            const historyBody = document.getElementById('history-body');
+            const totalTransactionsElement = document.querySelector('.header p strong');
+            historyBody.innerHTML = '';
+            
+            // 1. Ambil data pembayaran yang dicentang dari Local Storage
+            const savedPayments = JSON.parse(localStorage.getItem('maka_payments')) || {};
+            const paymentKeys = Object.keys(savedPayments).filter(key => savedPayments[key] === true);
+            
+            if (paymentKeys.length === 0) {
+                historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #555; padding: 20px;">Riwayat kosong. Silakan centang pembayaran di Kalender.</td></tr>';
+                totalTransactionsElement.textContent = `Total 0 Transaksi`;
+                return;
+            }
+
+            let transactionCount = 0;
+
+            // 2. Loop dan buat baris tabel
+            paymentKeys.sort((a, b) => new Date(a) - new Date(b)); // Urutkan berdasarkan tanggal
+            
+            paymentKeys.forEach(dateKey => {
+                const tarif = USER_TARIF_NORMAL + USER_TARIF_MAKA_PLUS; // Asumsi Maka+ aktif
+                const tarifFormatted = `Rp ${tarif.toLocaleString('id-ID')}`;
+                
+                const newRow = historyBody.insertRow();
+                newRow.innerHTML = `
+                    <td>${formatDate(dateKey)}</td>
+                    <td>Pembayaran Harian</td>
+                    <td style="color: #39ff14; font-weight: bold;">${tarifFormatted}</td>
+                    <td>QRIS (Lunas)</td>
+                `;
+                transactionCount++;
+            });
+
+            totalTransactionsElement.textContent = `Total ${transactionCount} Transaksi`;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderHistory);
+    </script>
+
+    <style>
+        .transaction-history {
+            padding: 0 20px 20px;
+            overflow-x: auto;
+        }
+
+        #history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow-light);
+        }
+
+        #history-table th, #history-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        #history-table th {
+            background-color: #2c2c2c;
+            color: var(--primary-neon);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        #history-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        #history-table tbody tr:hover {
+            background-color: #212121;
+        }
+    </style>
+</body>
+</html>
