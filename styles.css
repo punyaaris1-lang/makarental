@@ -207,3 +207,23 @@ section {
     border: 1px solid var(--text-secondary);
     color: var(--text-secondary);
 }
+
+/* ================= CALENDAR CLICK FIX ================= */
+
+.calendar-display,
+.calendar-grid,
+.day {
+    position: relative;
+    z-index: 10; /* Memastikan Kalender di atas lapisan header/section/modal */
+}
+
+.day {
+    pointer-events: auto;
+    /* Cursor pointer sudah ada di CSS tertanam, ini hanya untuk memastikan */
+}
+
+/* FIX MODAL CLEANING */
+.modal-overlay.active {
+    display: flex !important; /* Paksa tampil ketika class 'active' ditambahkan */
+}
+
