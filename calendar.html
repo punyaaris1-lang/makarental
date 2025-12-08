@@ -11,8 +11,7 @@
         /* Ambil Variabel dari styles.css */
         :root {
             --primary-neon: #00dfff; 
-            --secondary-neon: #39ff14; 
-            --paid-gold: #FFC107; /* SOFT GOLD */
+            --secondary-neon: #FFFF00; /* KUNING STABILO */
             --holiday-color: #ff4545;
             --dp-color: #cc99ff;
             --bg-dark: #121212;
@@ -103,21 +102,21 @@
             border: 1px solid rgba(255, 69, 69, 0.2) !important;
         }
         
-        /* 4. PAID - Hari Sudah Dibayar (SOFT GOLD) */
+        /* 4. PAID - Hari Sudah Dibayar (KUNING STABILO) */
         .day.paid label {
-            background-color: var(--paid-gold) !important; 
+            background-color: var(--secondary-neon) !important; 
             color: var(--bg-dark) !important; 
-            box-shadow: 0 0 8px rgba(255, 193, 7, 0.7) !important;
-            border: 1px solid var(--paid-gold) !important;
+            box-shadow: 0 0 8px rgba(255, 255, 0, 0.7) !important;
+            border: 1px solid var(--secondary-neon) !important;
             font-weight: bold !important;
         }
         
         /* 5. TEMP CHECKED - Saat user klik tapi belum disimpan */
         .day.temp-checked label {
-            background-color: var(--paid-gold) !important; 
+            background-color: var(--secondary-neon) !important; 
             color: var(--bg-dark) !important; 
-            box-shadow: 0 0 8px rgba(255, 193, 7, 0.7) !important;
-            border: 1px solid var(--paid-gold) !important;
+            box-shadow: 0 0 8px rgba(255, 255, 0, 0.7) !important;
+            border: 1px solid var(--secondary-neon) !important;
             font-weight: bold !important;
         }
 
@@ -170,10 +169,20 @@
         </section>
 
         <footer class="bottom-nav">
-            <a href="dashboard.html" class="nav-item">🏠 Dashboard</a>
-            <a href="calendar.html" class="nav-item active">📅 Kalender</a>
-            <a href="#" class="nav-item">🗒️ Riwayat</a>
-            <a href="#" class="nav-item">⚙️ Pengaturan</a>
+            <a href="lokasi_fc.html" class="nav-item">
+                <span style="color: var(--primary-neon);">⚡</span>
+                Lokasi FC
+            </a>
+            
+            <a href="dashboard.html" class="nav-item">
+                <span>🏠</span>
+                Home
+            </a>
+            
+            <a href="daftar_antrian.html" class="nav-item">
+                <span style="color: var(--paid-gold);">🎫</span>
+                Antrian
+            </a>
         </footer>
     </div>
 
