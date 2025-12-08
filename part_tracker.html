@@ -68,6 +68,7 @@
             color: var(--bg-dark);
             font-weight: bold;
             cursor: pointer;
+            z-index: 10; /* FIX: Tambahkan Z-Index untuk memastikan klik tidak terhalang */
         }
     </style>
 </head>
@@ -77,7 +78,7 @@
         <header class="header" style="border-bottom: 2px solid var(--paid-gold);">
             <div class="user-info">
                 <h1>🏆 Cek Gratisan (Part Log)</h1>
-                <p>Lacak sisa jatah penggantian suku cadang gratis.</p>
+                <p>Lacak sisa jatah penggantian suku cadang gratis (Data diambil dari Admin).</p>
             </div>
         </header>
 
@@ -98,12 +99,10 @@
                 <span style="color: var(--primary-neon);">⚡</span>
                 Lokasi FC
             </a>
-            
             <a href="dashboard.html" class="nav-item">
                 <span>🏠</span>
                 Home
             </a>
-            
             <a href="daftar_antrian.html" class="nav-item">
                 <span style="color: var(--paid-gold);">🎫</span>
                 Antrian
@@ -119,10 +118,10 @@
             <form id="usage-form">
                 <select id="part-select" class="action-button" style="margin-top: 0; background: var(--input-bg); color: var(--text-light); border: 1px solid var(--paid-gold);">
                     <option value="">-- Pilih Suku Cadang --</option>
-                    <option value="ban_depan">Ban Depan (1/tahun)</option>
-                    <option value="ban_belakang">Ban Belakang (1/tahun)</option>
-                    <option value="kampas_depan">Kampas Rem Depan (3/total)</option>
-                    <option value="kampas_belakang">Kampas Rem Belakang (3/total)</option>
+                    <option value="ban_depan">Ban Depan</option>
+                    <option value="ban_belakang">Ban Belakang</option>
+                    <option value="kampas_depan">Kampas Rem Depan</option>
+                    <option value="kampas_belakang">Kampas Rem Belakang</option>
                 </select>
                 
                 <button type="submit" class="action-button" style="background: var(--paid-gold); color: var(--bg-dark);">KONFIRMASI PENGGANTIAN</button>
@@ -133,8 +132,8 @@
 
 
     <script>
-        // Jatah Suku Cadang per Kontrak (3 Tahun)
-        const PART_LIMITS = {
+        // Mengambil PART_LIMITS dari Admin Panel atau default
+        let PART_LIMITS = JSON.parse(localStorage.getItem('maka_part_limits')) || {
             ban_depan: 3, 
             ban_belakang: 3, 
             kampas_depan: 3,
@@ -154,15 +153,16 @@
             container.innerHTML = '';
 
             const parts = [
-                { key: 'ban_depan', name: 'Ban Depan', yearly: true },
-                { key: 'ban_belakang', name: 'Ban Belakang', yearly: true },
-                { key: 'kampas_depan', name: 'Kampas Depan', yearly: false },
-                { key: 'kampas_belakang', name: 'Kampas Belakang', yearly: false },
+                { key: 'ban_depan', name: 'Ban Depan' },
+                { key: 'ban_belakang', name: 'Ban Belakang' },
+                { key: 'kampas_depan', name: 'Kampas Depan' },
+                { key: 'kampas_belakang', name: 'Kampas Belakang' },
             ];
             
             parts.forEach(part => {
+                const limit = PART_LIMITS[part.key] || 3; 
                 const totalUsed = partUsage[part.key] || 0;
-                const limit = PART_LIMITS[part.key];
+                
                 const remaining = limit - totalUsed;
                 const percentage = (totalUsed / limit) * 100;
                 const lastDate = partUsage.last_used[part.key] || 'Belum pernah';
@@ -171,7 +171,7 @@
                 container.innerHTML += `
                     <div class="part-card">
                         <p>${part.name}</p>
-                        <small>Sisa Jatah: <strong style="color: ${statusColor};">${remaining}</strong> / ${limit} (${part.yearly ? 'Total 3 Tahun' : 'Total'})</small>
+                        <small>Sisa Jatah: <strong style="color: ${statusColor};">${remaining}</strong> / ${limit} (Total 3 Tahun)</small>
                         <div class="progress-bar">
                             <div class="progress-fill" style="width: ${percentage}%; background-color: ${remaining > 0 ? 'var(--paid-gold)' : 'var(--holiday-color)'};"></div>
                         </div>
@@ -184,14 +184,15 @@
         document.getElementById('usage-form').addEventListener('submit', function(event) {
             event.preventDefault();
             const partKey = document.getElementById('part-select').value;
+            const limit = PART_LIMITS[partKey] || 3;
             
             if (!partKey) {
                 alert('Pilih suku cadang yang diganti.');
                 return;
             }
 
-            if (partUsage[partKey] >= PART_LIMITS[partKey]) {
-                alert('Jatah suku cadang ini sudah habis. Total penggunaan: ' + PART_LIMITS[partKey]);
+            if (partUsage[partKey] >= limit) {
+                alert('Jatah suku cadang ini sudah habis. Total penggunaan: ' + limit);
                 return;
             }
 
@@ -200,7 +201,7 @@
             
             localStorage.setItem('maka_part_usage', JSON.stringify(partUsage));
 
-            alert(`Sukses! ${partKey} berhasil dicatat. Sisa jatah: ${PART_LIMITS[partKey] - partUsage[partKey]}`);
+            alert(`Sukses! ${partKey.replace('_', ' ')} berhasil dicatat. Sisa jatah: ${limit - partUsage[partKey]}`);
             
             closeMarkUsageModal();
             renderPartTracker(); 
