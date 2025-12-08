@@ -1,17 +1,16 @@
-/* styles.css - DASHBOARD, KALENDER, RIWAYAT FUTURISTIK (Final Fix Warna Kalender) */
+/* styles.css - DASHBOARD, MODAL, RIWAYAT FUTURISTIK (Final Fix Warna) */
 
 :root {
-    --primary-neon: #00dfff; /* Neon Biru Cyan (HWB Color) */
+    --primary-neon: #00dfff; /* Neon Biru Cyan */
     --secondary-neon: #39ff14; /* Neon Hijau (Paid/Success Color) */
-    --holiday-color: #ff4545; /* Merah (HLB Text Color) */
-    --dp-color: #cc99ff; /* Ungu/Lilac (CDP Text Color) */
+    --holiday-color: #ff4545; /* Merah */
+    --dp-color: #cc99ff; /* Ungu/Lilac */
     --bg-dark: #121212; 
     --card-bg: #1e1e1e; 
     --text-light: #e0e0e0;
     --input-bg: #2d2d2d;
-    --bg-hwb: #1a3a4a; /* Dark Blue */
-    --bg-cdp: #4a3a5e; /* Dark Purple */
-    --bg-hlb: #3a2222; /* Dark Red */
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-neon: 0 0 8px rgba(0, 223, 255, 0.3);
 }
 
 * {
@@ -34,7 +33,7 @@ body {
     padding-bottom: 80px; 
 }
 
-/* --- HEADER, MODAL, NAVIGASI (tetap sama) --- */
+/* --- HEADER & STATUS --- */
 .header {
     background-color: var(--card-bg); 
     padding: 30px 20px;
@@ -42,52 +41,187 @@ body {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
-/* ... (Kode CSS Header, Rekap, Tombol Aksi, Bottom Nav, dan Modal tetap sama) ... */
+.user-info h1 {
+    font-size: 1.8em;
+    color: var(--primary-neon);
+}
+
+.status-box {
+    margin-top: 20px;
+    background: var(--input-bg);
+    border: 1px solid var(--primary-neon);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: var(--shadow-neon);
+}
+
+.status-box span {
+    font-weight: 700;
+    font-size: 1.1em;
+    color: var(--secondary-neon);
+}
+
+/* --- SECTIONS UMUM & JUDUL --- */
+section {
+    padding: 20px;
+}
+
+h2 {
+    color: var(--primary-neon);
+    font-size: 1.3em;
+    font-weight: 600;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+/* --- REKAP KEUANGAN (Dashboard) --- */
+.metric-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.metric-card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: var(--shadow-light);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.metric-card h3 {
+    font-size: 0.95em;
+    color: #999;
+    text-transform: uppercase;
+}
+
+.tunggakan-card p {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #ff4545;
+}
+
+/* --- TOMBOL AKSI CEPAT --- */
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 10px;
+}
+
+.action-btn {
+    padding: 18px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    font-weight: 600;
+    background-color: var(--input-bg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    color: var(--text-light);
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.maka-plus-btn { color: var(--secondary-neon); }
+.charging-btn { color: var(--primary-neon); }
+.sos-btn { color: #ff9800; }
+.etle-btn { color: #ff4545; }
 
 
-/* --- CSS UTAMA KALENDER (calendar.html) --- */
-
-/* LOGIKA KOTAK HARI (Umum) */
-.day label {
+/* --- BOTTOM NAVIGASI --- */
+.bottom-nav {
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 450px;
+    height: 70px;
+    background-color: #212121;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
+    z-index: 100;
+}
+
+.bottom-nav a {
+    text-decoration: none;
+    color: #6c757d;
+}
+
+.bottom-nav a.active {
+    color: var(--primary-neon);
+    font-weight: 700;
+}
+
+/* --- MODAL MAKA+ DAN KONFIRMASI --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none; 
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 350px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), 0 0 10px var(--primary-neon);
+    border: 1px solid rgba(0, 223, 255, 0.2);
+    text-align: center;
+}
+.modal-btn {
+    padding: 12px;
+    margin-top: 15px;
+    width: 80%;
+    max-width: 250px;
+    border: none;
     border-radius: 8px;
-    transition: all 0.2s;
-    font-weight: normal !important;
+    font-weight: bold;
     cursor: pointer;
+    transition: all 0.2s;
+}
+.primary-btn { 
+    background: var(--secondary-neon);
+    color: var(--bg-dark);
+}
+.secondary-btn { 
+    background: #555;
+    color: white;
 }
 
-/* 1. HWB - Hari Wajib Bayar (Neon Biru) - Base */
-.day.wajib-bayar:not(.paid) label {
-    background-color: var(--bg-hwb) !important;
-    border: 1px solid var(--primary-neon) !important;
-    color: var(--primary-neon) !important;
+/* --- CSS UNTUK RIWAYAT TRANSAKSI (history.html) --- */
+.transaction-history {
+    padding: 0 20px 20px;
+    overflow-x: auto;
 }
 
-/* 2. CDP - Cicilan DP (Ungu) */
-.day.cicilan-dp:not(.paid) label {
-    background-color: var(--bg-cdp) !important;
-    color: var(--dp-color) !important; 
-    border: 1px solid rgba(204, 153, 255, 0.3) !important;
+#history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: var(--shadow-light);
 }
 
-/* 3. HLB - Hari Libur (Merah) */
-.day.holiday label {
-    background-color: var(--bg-hlb) !important;
-    color: var(--holiday-color) !important;
-    border: 1px solid rgba(255, 69, 69, 0.2) !important;
+#history-table th, #history-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #2a2a2a;
 }
 
-/* 4. PAID - Hari Sudah Dibayar (Hijau Neon) */
-.day.paid input[type="checkbox"]:checked + label {
-    background-color: var(--secondary-neon) !important; 
-    color: var(--bg-dark) !important; 
-    box-shadow: 0 0 8px rgba(57, 255, 20, 0.5) !important;
-    border: 1px solid var(--secondary-neon) !important;
-    font-weight: bold !important;
+#history-table th {
+    background-color: #2c2c2c;
+    color: var(--primary-neon);
+    font-weight: 600;
+    text-transform: uppercase;
 }
-
-/* --- (Sisanya dari styles.css harus ditambahkan ke atas, karena terlalu panjang untuk diulang) --- */
