@@ -11,8 +11,8 @@
         
         <header class="header">
             <div class="user-info">
-                <h1 id="user-name">Halo, Pengguna!</h1>
-                <p>Plat Motor: <strong id="user-plat">B 0000 XYZ</strong></p>
+                <h1 id="user-name">Halo, Pengguna MAKA!</h1>
+                <p>Plat Motor: <strong id="user-plat">PLAT ANDA</strong></p>
             </div>
             <div class="status-box">
                 <span id="current-status">
@@ -46,10 +46,10 @@
                 <button class="action-btn charging-btn">
                     ⚡ Titik Fast Charging
                 </button>
-                <button class="action-btn sos-btn">
+                <button class="action-btn sos-btn" onclick="openExternalURL('whatsapp://send?phone=6287722285445')">
                     🆘 SOS Chat CS
                 </button>
-                <button class="action-btn etle-btn">
+                <button class="action-btn etle-btn" onclick="openExternalURL('https://etle-pmj.info/')">
                     🚨 Cek ETLE
                 </button>
             </div>
@@ -79,7 +79,14 @@
     </div>
 
     <script>
-        // --- FUNGSIONALITAS MODAL ---
+        // Helper untuk membuka URL Eksternal
+        function openExternalURL(url) {
+            console.log("Mengarahkan ke: " + url);
+            // Di aplikasi nyata, ini adalah window.open atau menggunakan library Linking
+            window.location.href = url;
+        }
+        
+        // --- FUNGSIONALITAS MODAL MAKA+ ---
         function openMakaPlusModal() {
             document.getElementById('makaPlusModal').style.display = 'flex';
         }
@@ -97,12 +104,13 @@
         });
 
 
-        // --- LOGIKA MENAMPILKAN DATA DINAMIS (Dijalankan Saat Halaman Terbuka) ---
+        // --- LOGIKA MENAMPILKAN DATA DINAMIS (Anti-Budi Santoso Fix) ---
         document.addEventListener('DOMContentLoaded', () => {
-            // DATA SIMULASI (Ini akan diganti oleh kode backend/SQLite Anda)
+            // DATA SIMULASI AMAN YANG AKAN DITAMPILKAN DI PREVIEW
+            // Di aplikasi nyata, data ini diambil dari database SQLite Anda.
             const dynamicUserData = { 
-                nama: "BUDI SANTOSO", 
-                plat: "B 7777 ZYX",   
+                nama: "PENGGUNA MAKA", 
+                plat: "PLAT ANDA (Disimpan di DB)",   
                 tunggakan: "Rp 150.000",
                 hari_tunggak: "2 Hari"
             }; 
