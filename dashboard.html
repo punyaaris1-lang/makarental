@@ -7,13 +7,12 @@
     <link rel="stylesheet" href="styles.css"> 
     
     <style>
-        /* Gaya khusus untuk Icon Grid di Dashboard */
         .icon-grid-section {
             padding-top: 5px;
         }
         .icon-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 kolom */
+            grid-template-columns: repeat(3, 1fr); 
             gap: 15px;
             text-align: center;
         }
@@ -47,6 +46,8 @@
     <div class="app-container">
         
         <header class="header">
+            <a href="admin_login.html" style="position: absolute; top: 10px; right: 20px; font-size: 0.7em; color: #555; z-index: 200;">[ADMIN]</a>
+            
             <div class="user-info">
                 <h1>Halo, M Rizky Firdaus!</h1>
                 <p>Plat Motor: B 4248 SWF</p>
@@ -106,7 +107,7 @@
 
 
         <footer class="bottom-nav">
-            <a href="#" class="nav-item" onclick="alert('Membuka Peta Lokasi Fast Charging terdekat...')">
+            <a href="lokasi_fc.html" class="nav-item">
                 <span style="color: var(--primary-neon);">⚡</span>
                 Lokasi FC
             </a>
@@ -116,7 +117,7 @@
                 Home
             </a>
             
-            <a href="#" class="nav-item" onclick="alert('Membuka halaman Daftar Antrian Servis/Penggantian Part...')">
+            <a href="daftar_antrian.html" class="nav-item">
                 <span style="color: var(--paid-gold);">🎫</span>
                 Antrian
             </a>
