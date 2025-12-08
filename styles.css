@@ -1,30 +1,34 @@
-/* styles.css - Desain Lux Futuristik FINAL */
+/* styles.css - Desain Ultra-Lux Futuristik (Final Aesthetic) */
 
 :root {
     --primary-neon: #00dfff; /* Biru Cyan */
     --secondary-neon: #39ff14; /* Neon Hijau (Status OK) */
-    --paid-gold: #FFC107; /* Soft Gold/Amber (Paid Calendar Day) */
+    --paid-gold: #FFC107; /* Soft Gold/Amber */
     --holiday-color: #ff4545; /* Merah (Tunggakan/Error) */
-    --bg-dark: #080808; /* Lebih gelap untuk kesan mewah */
-    --card-bg: #151515; /* Background elemen */
-    --text-light: #e0e0e0;
+    --bg-dark: #000000; /* Hitam pekat untuk kontras mewah */
+    --card-bg: #101010; /* Background elemen */
     --input-bg: #1f1f1f;
-    --border-lux: 1px solid rgba(0, 223, 255, 0.2);
-    --shadow-neon: 0 0 10px rgba(0, 223, 255, 0.4);
+    --text-light: #e0e0e0;
+    --text-secondary: #999999;
+
+    /* Efek Mewah */
+    --shadow-deep: 0 8px 18px rgba(0, 0, 0, 0.9);
+    --glow-soft: 0 0 10px rgba(0, 223, 255, 0.6), inset 0 0 5px rgba(0, 223, 255, 0.2);
+    --border-lux: 1px solid rgba(0, 223, 255, 0.4);
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    /* Menggunakan font yang lebih standar dan mudah dibaca (proporsional) */
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Font yang lebih ramping dan profesional */
+    font-family: 'Roboto Mono', 'Segoe UI', monospace, sans-serif;
     color: var(--text-light);
-    font-size: 15px; /* Mengurangi ukuran font agar tidak terlalu besar */
+    font-size: 14px; /* Font dasar lebih kecil */
 }
 
 body {
-    background: linear-gradient(135deg, var(--bg-dark) 0%, #000000 100%);
+    background: radial-gradient(circle at top left, #1a1a1a, var(--bg-dark));
 }
 
 .app-container {
@@ -32,61 +36,79 @@ body {
     margin: 0 auto;
     background-color: var(--bg-dark);
     min-height: 100vh;
-    padding-bottom: 80px; 
+    padding-bottom: 70px; 
 }
 
-/* ------------------- HEADER & STATUS ------------------- */
+/* ------------------- HEADER/HERO (Zona A) ------------------- */
 .header {
-    background-color: var(--card-bg); 
-    padding: 30px 20px 20px;
+    background: var(--card-bg); 
+    padding: 30px 20px 25px;
+    box-shadow: var(--shadow-deep);
+    position: sticky;
+    top: 0;
+    z-index: 50;
     border-bottom: 2px solid var(--primary-neon);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    position: relative;
-}
-
-.user-info {
-    border-bottom: var(--border-lux);
-    padding-bottom: 15px;
-    margin-bottom: 15px;
 }
 
 .user-info h1 {
-    font-size: 1.6em; /* Lebih kecil */
+    font-size: 1.5em; /* Font lebih kecil */
     color: var(--primary-neon);
     font-weight: 700;
+    text-shadow: 0 0 5px rgba(0, 223, 255, 0.8);
+    margin-bottom: 4px;
 }
 .user-info p {
     font-size: 0.9em;
-    color: #999;
+    color: var(--text-secondary);
 }
 
 /* Hero Tunggakan - Gaya Baris Tunggal */
 .hero-tunggakan {
+    padding: 15px;
+    border-radius: 12px;
     background: var(--input-bg);
     border: 1px solid var(--holiday-color);
-    padding: 10px 15px;
-    border-radius: 8px;
-    text-align: center;
-    box-shadow: 0 0 10px rgba(255, 69, 69, 0.3);
-    margin-top: 15px;
+    box-shadow: 0 0 15px rgba(255, 69, 69, 0.4); /* Glow Merah */
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
-.hero-tunggakan span {
-    font-weight: 700;
-    font-size: 1.1em;
+.hero-tunggakan h3 {
+    font-size: 0.8em;
+    color: #ff9999;
+    text-transform: uppercase;
+}
+.hero-tunggakan-value {
+    text-align: right;
+}
+.hero-tunggakan-value span {
+    font-size: 1.5em;
+    font-weight: 800;
     color: var(--holiday-color);
+    display: block;
 }
 
-/* ------------------- METRICS & SECTIONS ------------------- */
+/* Divider Futuristik */
+.futuristic-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-neon), transparent);
+    margin: 25px 0 10px 0;
+    box-shadow: 0 0 10px var(--primary-neon);
+}
+
+
+/* ------------------- METRICS & SECTIONS (Zona B) ------------------- */
 section {
     padding: 20px;
 }
 h2 {
     color: var(--primary-neon);
-    font-size: 1.2em;
+    font-size: 1.1em;
     font-weight: 600;
-    margin-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding-bottom: 5px;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--primary-neon);
+    padding-left: 10px;
 }
 
 .metric-grid {
@@ -97,19 +119,37 @@ h2 {
 
 .metric-card {
     background: var(--card-bg);
-    padding: 15px; /* Lebih kompak */
+    padding: 15px;
     border-radius: 10px;
     border: var(--border-lux);
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
+    box-shadow: var(--shadow-deep);
+    transition: transform 0.2s;
+}
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(0, 223, 255, 0.4);
 }
 
 .metric-card h3 {
-    font-size: 0.85em; /* Font sangat kecil */
-    color: #999;
+    font-size: 0.8em;
+    color: var(--text-secondary); 
     text-transform: uppercase;
+    border: none;
+    padding: 0;
+    margin-bottom: 5px;
+}
+.metric-card p {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--text-light);
+}
+.metric-card small {
+    font-size: 0.7em;
+    color: var(--text-secondary);
 }
 
-/* ------------------- BOTTOM NAVIGASI (3 Tombol Baru) ------------------- */
+
+/* ------------------- BOTTOM NAVIGASI (3 Tombol - Zona C) ------------------- */
 .bottom-nav {
     display: flex;
     justify-content: space-around;
@@ -119,15 +159,15 @@ h2 {
     width: 100%;
     max-width: 450px;
     height: 65px;
-    background-color: #101010; /* Lebih gelap */
+    background-color: #101010;
     border-top: 1px solid var(--primary-neon);
-    box-shadow: 0 -5px 15px rgba(0,0,0,0.8);
+    box-shadow: 0 -5px 25px rgba(0, 223, 255, 0.3); /* Glow kuat di bawah */
     z-index: 100;
 }
 
 .nav-item {
     text-decoration: none;
-    color: #6c757d;
+    color: var(--text-secondary);
     text-align: center;
     font-size: 0.9em;
     padding: 5px 0;
@@ -137,46 +177,47 @@ h2 {
 .nav-item.active {
     color: var(--primary-neon);
     font-weight: 700;
+    text-shadow: 0 0 5px var(--primary-neon);
 }
 
-/* --- FIX: Mengatur Tombol Ikon (Gunakan Font Awesome atau Emoji) --- */
 .nav-item span {
     display: block;
-    font-size: 1.4em;
-    margin-bottom: 3px;
+    font-size: 1.5em;
+    margin-bottom: 2px;
 }
 
 
-/* ------------------- LOGIN/REGISTER STYLES (Mewah & Center) ------------------- */
+/* ------------------- LOGIN/REGISTER STYLES (Ultra-Lux) ------------------- */
 .auth-wrapper {
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(135deg, var(--bg-dark) 0%, #000000 100%);
+    background: radial-gradient(circle at bottom right, #1a1a1a, var(--bg-dark));
     padding: 20px;
 }
 
 .auth-card {
     width: 100%;
-    max-width: 400px; /* Lebih ramping */
+    max-width: 380px; 
     background: var(--card-bg);
     padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.7), var(--shadow-neon);
+    box-shadow: var(--shadow-deep);
     border: var(--border-lux); 
 }
 
 .auth-header h2 {
-    font-size: 2em;
-    letter-spacing: 2px;
+    font-size: 1.8em;
+    letter-spacing: 3px;
     color: var(--primary-neon);
-    text-shadow: var(--shadow-neon);
+    text-shadow: var(--glow-soft);
+    font-weight: 900;
 }
 
 label {
-    margin-top: 15px;
-    font-size: 0.9em;
+    margin-top: 18px;
+    font-size: 0.85em;
     color: var(--primary-neon);
 }
 
@@ -185,7 +226,13 @@ input[type="text"], input[type="password"], input[type="date"] {
     border: var(--border-lux);
     background: var(--input-bg);
     border-radius: 6px;
-    font-size: 1em;
+    font-size: 0.95em;
+}
+/* Focus Input Glow */
+input:focus {
+    border-color: var(--secondary-neon);
+    box-shadow: 0 0 10px var(--secondary-neon);
+    outline: none;
 }
 
 .primary-btn {
@@ -198,9 +245,5 @@ input[type="text"], input[type="password"], input[type="date"] {
     color: var(--bg-dark); 
     font-size: 1em;
     font-weight: 700;
-}
-
-.forgot-link {
-    font-size: 0.85em;
-    margin-top: 12px;
+    box-shadow: 0 4px 15px rgba(0, 191, 255, 0.4);
 }
