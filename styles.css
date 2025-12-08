@@ -285,3 +285,140 @@ h2 {
   border: 1px solid var(--primary-neon);
   color: var(--primary-neon);
 }
+/* ==================================================
+   DASHBOARD – ULTRA PREMIUM (LEVEL APK NATIVE)
+   ================================================== */
+
+/* SMOOTH APP FEEL */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* BACKGROUND MOVING GLOW */
+.app-container::before {
+  content: "";
+  position: fixed;
+  top: -40%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+  background:
+    radial-gradient(circle,
+      rgba(0,223,255,.08) 0%,
+      transparent 60%);
+  animation: bgFloat 16s linear infinite;
+  z-index: -1;
+}
+
+@keyframes bgFloat {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* HEADER SHINE LINE */
+.app-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.app-header::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0,223,255,.8),
+    transparent
+  );
+  animation: scanline 4s linear infinite;
+}
+
+@keyframes scanline {
+  to { left: 100%; }
+}
+
+/* CARD FLOAT ANIMATION */
+.dashboard-summary .card {
+  animation: cardEnter .6s ease forwards;
+}
+
+.dashboard-summary .card:nth-child(1) { animation-delay: .1s; }
+.dashboard-summary .card:nth-child(2) { animation-delay: .25s; }
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(25px) scale(.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* CARD ACTIVE TOUCH */
+.dashboard-summary .card:active {
+  transform: scale(.97);
+  box-shadow:
+    0 10px 25px rgba(0,223,255,.25),
+    inset 0 0 25px rgba(0,223,255,.2);
+}
+
+/* STATUS GLOW PULSE */
+.value.gold {
+  animation: goldPulse 2s ease-in-out infinite;
+}
+
+@keyframes goldPulse {
+  0%,100% {
+    text-shadow:
+      0 0 10px rgba(255,193,7,.9),
+      0 0 24px rgba(255,193,7,.4);
+  }
+  50% {
+    text-shadow:
+      0 0 18px rgba(255,193,7,1),
+      0 0 40px rgba(255,193,7,.8);
+  }
+}
+
+/* BUTTON PRESS FEEL */
+.dashboard-actions .btn {
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.dashboard-actions .btn:active {
+  transform: translateY(2px) scale(.98);
+}
+
+/* PRIMARY BUTTON ENERGY */
+.dashboard-actions .btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-actions .btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255,255,255,.6),
+    transparent 70%
+  );
+  opacity: 0;
+}
+
+.dashboard-actions .btn-primary:active::after {
+  animation: btnFlash .4s ease;
+}
+
+@keyframes btnFlash {
+  from { opacity: 1; transform: translateX(-100%); }
+  to   { opacity: 0; transform: translateX(100%); }
+}
