@@ -90,5 +90,48 @@
         
         // ... (Fungsi openMakaPlusModal, closeMakaPlusModal, dll.) ...
     </script>
+    <script>
+    // --- FUNGSIONALITAS MAKA+ MODAL ---
+    function openMakaPlusModal() {
+        document.getElementById('makaPlusModal').style.display = 'flex';
+    }
+
+    function closeMakaPlusModal() {
+        document.getElementById('makaPlusModal').style.display = 'none';
+    }
+
+    document.getElementById('maka-plus-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const date = document.getElementById('maka-plus-date').value;
+        
+        alert('Maka+ berhasil diaktifkan! Tambahan biaya Rp 10.000/hari akan berlaku mulai besok. Tanggal Aktivasi (Ambil Motor): ' + date);
+        closeMakaPlusModal();
+    });
+
+    // --- LOGIKA MENAMPILKAN DATA DINAMIS ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // DI APLIKASI NYATA (Setelah Login Berhasil):
+        // Anda akan mengambil data dari SQLite dan menaruhnya di sini.
+        
+        // Data Contoh yang Harusnya Diambil dari Database setelah Login:
+        const dynamicUserData = { 
+            nama: "BUDI SANTOSO", // <-- Diambil dari DB setelah login
+            plat: "B 7777 ZYX",   // <-- Diambil dari DB setelah login
+            tunggakan: "Rp 150.000",
+            hari_tunggak: "2 Hari"
+        }; 
+        
+        // 3. Mengganti teks di HTML menggunakan data dari database:
+        document.getElementById('user-name').textContent = `Halo, ${dynamicUserData.nama}!`;
+        document.getElementById('user-plat').textContent = dynamicUserData.plat;
+        document.getElementById('tunggakan-nominal').textContent = dynamicUserData.tunggakan;
+        document.getElementById('tunggakan-hari').textContent = `${dynamicUserData.hari_tunggak} Tertunggak`;
+        
+        // Logika Status Hari Ini (Wajib Bayar)
+        document.getElementById('current-status').textContent = `HARI INI: WAJIB BAYAR (Rp 80.000)`;
+
+    });
+    </script>
+    
 </body>
 </html>
