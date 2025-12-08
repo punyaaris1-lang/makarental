@@ -1,8 +1,9 @@
-/* styles.css - DASHBOARD, MODAL, RIWAYAT FUTURISTIK (Final Fix Warna Kuning Stabilo) */
+/* styles.css - DASHBOARD, MODAL, RIWAYAT FUTURISTIK (Final Warna Premium) */
 
 :root {
     --primary-neon: #00dfff; /* Neon Biru Cyan (HWB Color) */
-    --secondary-neon: #FFFF00; /* KUNING STABILO / LEMON YELLOW (Paid/Success Color) */
+    --secondary-neon: #39ff14; /* Neon Hijau (Status/Success Color) */
+    --paid-gold: #FFC107; /* SOFT GOLD/AMBER (Paid Calendar Day Color) */
     --holiday-color: #ff4545; /* Merah (HLB Text Color) */
     --dp-color: #cc99ff; /* Ungu/Lilac (CDP Text Color) */
     --bg-dark: #121212; 
@@ -63,7 +64,7 @@ body {
 .status-box span {
     font-weight: 700;
     font-size: 1.1em;
-    color: var(--secondary-neon);
+    color: var(--secondary-neon); /* Neon Hijau */
 }
 
 /* --- SECTIONS UMUM & JUDUL --- */
@@ -120,7 +121,7 @@ h2 {
     text-align: center;
 }
 
-.maka-plus-btn { color: var(--secondary-neon); }
+.maka-plus-btn { color: var(--paid-gold); } /* Pindah ke Soft Gold */
 .charging-btn { color: var(--primary-neon); }
 .sos-btn { color: #ff9800; }
 .etle-btn { color: var(--holiday-color); }
@@ -192,8 +193,8 @@ h2 {
     transition: all 0.2s;
 }
 .primary-btn { 
-    background: var(--secondary-neon); /* KUNING STABILO */
-    color: var(--bg-dark); /* Font Gelap */
+    background: var(--secondary-neon); /* Tetap Hijau untuk Tombol Aksi */
+    color: var(--bg-dark);
 }
 .secondary-btn { 
     background: #555;
