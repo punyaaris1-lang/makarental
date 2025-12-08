@@ -11,7 +11,8 @@
         /* Ambil Variabel dari styles.css */
         :root {
             --primary-neon: #00dfff; 
-            --secondary-neon: #FFFF00; /* KUNING STABILO */
+            --secondary-neon: #39ff14; 
+            --paid-gold: #FFC107; /* SOFT GOLD */
             --holiday-color: #ff4545;
             --dp-color: #cc99ff;
             --bg-dark: #121212;
@@ -20,7 +21,7 @@
             --bg-hlb: #3a2222; /* Dark Red */
         }
         
-        /* Struktur dasar Kalender (FIX Tampilan Rusak) */
+        /* Struktur dasar Kalender */
         .calendar-controls { padding: 20px 20px 10px; }
         .month-selector {
             display: flex;
@@ -102,21 +103,21 @@
             border: 1px solid rgba(255, 69, 69, 0.2) !important;
         }
         
-        /* 4. PAID - Hari Sudah Dibayar (KUNING STABILO) */
+        /* 4. PAID - Hari Sudah Dibayar (SOFT GOLD) */
         .day.paid label {
-            background-color: var(--secondary-neon) !important; 
+            background-color: var(--paid-gold) !important; 
             color: var(--bg-dark) !important; 
-            box-shadow: 0 0 8px rgba(255, 255, 0, 0.7) !important;
-            border: 1px solid var(--secondary-neon) !important;
+            box-shadow: 0 0 8px rgba(255, 193, 7, 0.7) !important;
+            border: 1px solid var(--paid-gold) !important;
             font-weight: bold !important;
         }
         
         /* 5. TEMP CHECKED - Saat user klik tapi belum disimpan */
         .day.temp-checked label {
-            background-color: var(--secondary-neon) !important; 
+            background-color: var(--paid-gold) !important; 
             color: var(--bg-dark) !important; 
-            box-shadow: 0 0 8px rgba(255, 255, 0, 0.7) !important;
-            border: 1px solid var(--secondary-neon) !important;
+            box-shadow: 0 0 8px rgba(255, 193, 7, 0.7) !important;
+            border: 1px solid var(--paid-gold) !important;
             font-weight: bold !important;
         }
 
@@ -291,10 +292,8 @@
                 }
                 
                 if (status === 'HLB' || isBeforePickup) {
-                    // Non-interaktif: Hari Libur atau sebelum ambil motor
                     grid.innerHTML += `<div class="day ${statusClass} ${disabledClass}"><label><span class="day-number">${day}</span></label></div>`;
                 } else {
-                    // Wajib Bayar (HWB atau CDP)
                     grid.innerHTML += `
                         <div class="day ${statusClass} ${paidClass}">
                             <input type="checkbox" id="check-${dateKey}" data-date="${dateKey}" ${isPaid ? 'checked' : ''}>
@@ -319,10 +318,8 @@
         }
 
         function savePayments() {
-            // (Logika Simpan Pembayaran)
             const checkboxes = document.querySelectorAll('#calendar-grid input[type="checkbox"]');
             
-            // Hapus semua kelas temp-checked sebelum menyimpan
             document.querySelectorAll('.day.temp-checked').forEach(dayDiv => {
                  dayDiv.classList.remove('temp-checked');
             });
@@ -332,7 +329,6 @@
                 const dateKey = checkbox.getAttribute('data-date');
                 savedPayments[dateKey] = checkbox.checked;
 
-                // Update paid class
                 if (checkbox.checked) {
                     dayDiv.classList.add('paid');
                 } else {
@@ -345,7 +341,6 @@
             document.getElementById('confirmModal').style.display='none';
             document.getElementById('successModal').style.display='flex';
             
-            // Render ulang untuk memastikan warna permanen
             renderCalendar(); 
         }
 
@@ -361,14 +356,13 @@
                 const clickedDateStr = checkbox.getAttribute('data-date');
                 const clickedDate = new Date(clickedDateStr);
 
-                // LOGIKA TOLAK BAYAR SEBELUM AMBIL MOTOR
                 if (clickedDate < userData.tglAmbilMotor) {
                     checkbox.checked = false; 
                     document.getElementById('rejectModal').style.display = 'flex';
                     return;
                 }
 
-                // NUCLEAR FIX: Terapkan kelas sementara untuk warna saat diklik
+                // FIX: Terapkan kelas sementara untuk warna saat diklik
                 if (checkbox.checked) {
                     dayDiv.classList.add('temp-checked');
                 } else {
