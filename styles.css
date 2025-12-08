@@ -207,3 +207,81 @@ h2 {
     background: #555;
     color: white;
 }
+
+/* =========================
+   DASHBOARD PAGE FIX
+   ========================= */
+
+.app-header {
+  padding: 26px 20px 20px;
+  border-bottom: 1px solid rgba(0,223,255,.2);
+}
+
+.app-title {
+  font-size: 1.6rem;
+  color: var(--primary-neon);
+  text-shadow: 0 0 10px rgba(0,223,255,.5);
+}
+
+.app-subtitle {
+  margin-top: 4px;
+  font-size: .9rem;
+  color: var(--text-secondary);
+}
+
+/* DASHBOARD SUMMARY */
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  padding: 20px;
+}
+
+.dashboard-summary .card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: var(--shadow-deep);
+  border: var(--border-lux);
+}
+
+.label {
+  font-size: .75rem;
+  color: var(--text-secondary);
+}
+
+.value {
+  margin-top: 8px;
+  font-size: 1.3rem;
+}
+
+.value.gold {
+  color: var(--paid-gold);
+  text-shadow: 0 0 8px rgba(255,193,7,.6);
+}
+
+/* DASHBOARD BUTTON */
+.dashboard-actions {
+  padding: 10px 20px 30px;
+  display: grid;
+  gap: 12px;
+}
+
+.dashboard-actions .btn {
+  height: 48px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  font-size: .95rem;
+}
+
+.dashboard-actions .btn-primary {
+  background: linear-gradient(90deg,#00bfff,var(--primary-neon));
+  color: #000;
+}
+
+.dashboard-actions .btn-outline {
+  background: transparent;
+  border: 1px solid var(--primary-neon);
+  color: var(--primary-neon);
+}
