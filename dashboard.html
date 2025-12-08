@@ -62,76 +62,60 @@
             <a href="#" class="nav-item">⚙️ Pengaturan</a>
         </footer>
     </div>
-    
+
     <div id="makaPlusModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>Aktifkan Maka+</h3>
+            <p>Maka+ (Rp 10.000/hari) akan aktif **H+1** dari tanggal pengambilan motor. Total biaya sewa menjadi Rp 80.000/hari.</p>
+            
+            <form id="maka-plus-form">
+                <label for="maka-plus-date">Tanggal Mulai Berlaku (Ambil Motor)</label>
+                <input type="date" id="maka-plus-date" required>
+                
+                <button type="submit" class="modal-btn primary-btn">AKTIFKAN SEKARANG</button>
+                <button type="button" class="modal-btn secondary-btn" onclick="closeMakaPlusModal()">BATAL</button>
+            </form>
         </div>
+    </div>
 
     <script>
-        // --- Ini adalah kode yang akan mengambil data dari DB dan menampilkannya ---
+        // --- FUNGSIONALITAS MODAL ---
+        function openMakaPlusModal() {
+            document.getElementById('makaPlusModal').style.display = 'flex';
+        }
+
+        function closeMakaPlusModal() {
+            document.getElementById('makaPlusModal').style.display = 'none';
+        }
+
+        document.getElementById('maka-plus-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const date = document.getElementById('maka-plus-date').value;
+            
+            alert('Maka+ berhasil diaktifkan! Tambahan biaya Rp 10.000/hari akan berlaku mulai besok. Tanggal Aktivasi (Ambil Motor): ' + date);
+            closeMakaPlusModal();
+        });
+
+
+        // --- LOGIKA MENAMPILKAN DATA DINAMIS (Dijalankan Saat Halaman Terbuka) ---
         document.addEventListener('DOMContentLoaded', () => {
-            // DI APLIKASI NYATA:
-            // 1. Ambil data user dari SQLite berdasarkan ID Plat yang login.
-            // 2. Data diambil, misalnya: 
+            // DATA SIMULASI (Ini akan diganti oleh kode backend/SQLite Anda)
             const dynamicUserData = { 
-                nama: "NAMA DARI DATABASE", // Misal: Budi Santoso
-                plat: "PLAT DARI DATABASE", // Misal: B 5555 XYZ
+                nama: "BUDI SANTOSO", 
+                plat: "B 7777 ZYX",   
                 tunggakan: "Rp 150.000",
                 hari_tunggak: "2 Hari"
             }; 
             
-            // 3. Ganti teks di HTML menggunakan data dari database:
+            // Mengganti teks di HTML menggunakan data simulasi:
             document.getElementById('user-name').textContent = `Halo, ${dynamicUserData.nama}!`;
             document.getElementById('user-plat').textContent = dynamicUserData.plat;
             document.getElementById('tunggakan-nominal').textContent = dynamicUserData.tunggakan;
             document.getElementById('tunggakan-hari').textContent = `${dynamicUserData.hari_tunggak} Tertunggak`;
             
-            // Note: Kode ini hanya simulasi, koneksi ke SQLite membutuhkan server/framework.
+            // Logika Status Hari Ini
+            document.getElementById('current-status').textContent = `HARI INI: WAJIB BAYAR (Rp 80.000)`;
         });
-        
-        // ... (Fungsi openMakaPlusModal, closeMakaPlusModal, dll.) ...
     </script>
-    <script>
-    // --- FUNGSIONALITAS MAKA+ MODAL ---
-    function openMakaPlusModal() {
-        document.getElementById('makaPlusModal').style.display = 'flex';
-    }
-
-    function closeMakaPlusModal() {
-        document.getElementById('makaPlusModal').style.display = 'none';
-    }
-
-    document.getElementById('maka-plus-form').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const date = document.getElementById('maka-plus-date').value;
-        
-        alert('Maka+ berhasil diaktifkan! Tambahan biaya Rp 10.000/hari akan berlaku mulai besok. Tanggal Aktivasi (Ambil Motor): ' + date);
-        closeMakaPlusModal();
-    });
-
-    // --- LOGIKA MENAMPILKAN DATA DINAMIS ---
-    document.addEventListener('DOMContentLoaded', () => {
-        // DI APLIKASI NYATA (Setelah Login Berhasil):
-        // Anda akan mengambil data dari SQLite dan menaruhnya di sini.
-        
-        // Data Contoh yang Harusnya Diambil dari Database setelah Login:
-        const dynamicUserData = { 
-            nama: "BUDI SANTOSO", // <-- Diambil dari DB setelah login
-            plat: "B 7777 ZYX",   // <-- Diambil dari DB setelah login
-            tunggakan: "Rp 150.000",
-            hari_tunggak: "2 Hari"
-        }; 
-        
-        // 3. Mengganti teks di HTML menggunakan data dari database:
-        document.getElementById('user-name').textContent = `Halo, ${dynamicUserData.nama}!`;
-        document.getElementById('user-plat').textContent = dynamicUserData.plat;
-        document.getElementById('tunggakan-nominal').textContent = dynamicUserData.tunggakan;
-        document.getElementById('tunggakan-hari').textContent = `${dynamicUserData.hari_tunggak} Tertunggak`;
-        
-        // Logika Status Hari Ini (Wajib Bayar)
-        document.getElementById('current-status').textContent = `HARI INI: WAJIB BAYAR (Rp 80.000)`;
-
-    });
-    </script>
-    
 </body>
 </html>
