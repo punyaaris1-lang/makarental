@@ -161,26 +161,78 @@ body {
     0 12px 30px rgba(0,234,255,.25);
 }
 
-/* ===================
-   BOTTOM NAV – PREMIUM SIZE
-=================== */
-
+/* =========================
+   PREMIUM BOTTOM NAV FIX
+========================= */
 .bottom-nav {
-  height: 78px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  height: 74px;
   padding-bottom: env(safe-area-inset-bottom);
+
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+
+  background: linear-gradient(
+    to top,
+    rgba(5, 8, 20, 0.95),
+    rgba(5, 8, 20, 0.80)
+  );
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border-top: 1px solid rgba(255,255,255,0.08);
+
+  z-index: 9999;
 }
 
-.nav-item {
-  font-size: .9em;
+/* ITEM */
+.bottom-nav a {
+  text-decoration: none;
+  flex: 1;
+  text-align: center;
+  color: #7c8399;
+  font-size: 11px;
+  font-weight: 500;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  height: 100%;
   gap: 4px;
+
+  transition: all .25s ease;
 }
 
-.nav-item span {
-  font-size: 1.9em;
+/* ICON */
+.bottom-nav a i,
+.bottom-nav a img {
+  font-size: 20px;
+  line-height: 1;
 }
 
-.nav-item.active span {
-  transform: scale(1.15);
+/* ACTIVE */
+.bottom-nav a.active {
+  color: #00ffe1;
+}
+
+.bottom-nav a.active i {
+  filter: drop-shadow(0 0 8px rgba(0,255,225,.7));
+}
+
+/* REMOVE GLOBAL EFFECT LEAK */
+.bottom-nav *,
+.bottom-nav *::before,
+.bottom-nav *::after {
+  filter: none !important;
+  box-shadow: none !important;
 }
 
 /* =================================================
