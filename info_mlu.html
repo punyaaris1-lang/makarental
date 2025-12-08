@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAKA Info MLU</title>
+    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="styles/theme.css">
+    <link rel="stylesheet" href="styles/components.css">
+    
+    <style>
+        .article-container {
+            padding: 20px;
+        }
+        .article-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 25px;
+            padding: 15px;
+            border: 1px solid rgba(0, 223, 255, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        .article-card h3 {
+            font-size: 1.3em;
+            color: var(--primary-neon);
+            margin-bottom: 5px;
+        }
+        .article-meta {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            display: block;
+        }
+        .article-content {
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        .article-photo {
+            width: 100%;
+            height: 200px; /* Placeholder tinggi */
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <header class="header">
+            <div class="user-info">
+                <h1>📰 Info MLU</h1>
+                <p>Artikel kegiatan dan pengumuman terbaru.</p>
+            </div>
+        </header>
+
+        <section class="article-container" id="article-list">
+            <p style="text-align: center; margin-top: 50px; color: var(--text-secondary);">Memuat artikel...</p>
+        </section>
+
+
+        <footer class="bottom-nav">
+            <a href="lokasi_fc.html" class="nav-item">
+                <span style="color: var(--primary-neon);">⚡</span>
+                Lokasi FC
+            </a>
+            <a href="dashboard.html" class="nav-item">
+                <span>🏠</span>
+                Home
+            </a>
+            <a href="daftar_antrian.html" class="nav-item">
+                <span style="color: var(--paid-gold);">🎫</span>
+                Antrian
+            </a>
+        </footer>
+    </div>
+    
+    <script>
+        function renderArticles() {
+            const articles = JSON.parse(localStorage.getItem('mlu_info_articles')) || [];
+            const container = document.getElementById('article-list');
+            container.innerHTML = '';
+
+            if (articles.length === 0) {
+                container.innerHTML = `<p style="text-align: center; margin-top: 50px; color: var(--text-secondary);">Belum ada artikel MLU Info yang diposting Admin.</p>`;
+                return;
+            }
+
+            articles.forEach(article => {
+                let photosHTML = article.photos.map(url => 
+                    `<img src="${url}" alt="Foto Artikel" class="article-photo">`
+                ).join('');
+
+                // Jika tidak ada foto, gunakan placeholder
+                if (photosHTML === '') {
+                    photosHTML = `<div class="article-photo" style="background: #333; display: flex; align-items: center; justify-content: center; color: #777;">[Tidak Ada Foto]</div>`;
+                }
+
+                container.innerHTML += `
+                    <div class="article-card">
+                        <h3>${article.title}</h3>
+                        <span class="article-meta">Diposting: ${article.date}</span>
+                        ${photosHTML}
+                        <p class="article-content">${article.content}</p>
+                    </div>
+                `;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderArticles);
+    </script>
+</body>
+</html>

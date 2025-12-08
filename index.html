@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAKA Login & Register</title>
+    <link rel="stylesheet" href="styles/theme.css">
+    <link rel="stylesheet" href="styles/components.css">
+    
+    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            
+            <header class="auth-header">
+                <h2>MAKA MOTORS</h2>
+                <p id="auth-subtitle">Selamat Datang Kembali</p>
+            </header>
+
+            <div id="form-container">
+                </div>
+
+            <footer class="auth-footer">
+                <button id="switch-mode-btn" onclick="toggleMode()">Belum punya akun? Daftar</button>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'login';
+        
+        // --- Fungsi KLIK Tombol Daftar/Login ---
+        function saveDataAndRedirect(event) {
+            event.preventDefault(); 
+            
+            const formId = event.target.id;
+            const btn = document.querySelector(`#${formId} .primary-btn`);
+            
+            let userName = "Pengguna MAKA";
+            let userPlat = "PLAT ANDA";
+            
+            if (formId === 'register-form') {
+                // Ambil data dari form Pendaftaran
+                userName = document.getElementById('reg-name').value;
+                userPlat = document.getElementById('reg-plat').value;
+
+                // Simpan Nama dan Plat ke Local Storage (Simulasi Login Session)
+                localStorage.setItem('maka_user_name', userName);
+                localStorage.setItem('maka_user_plat', userPlat);
+            }
+            // else if (formId === 'login-form') {
+            //     // Di sini kita akan memuat data user dari SQLite, tapi kita simulasikan
+            //     userName = document.getElementById('login-plat').value; // Mengambil plat sbg ID
+            //     // Data user yang sudah login akan diambil dari DB di sini
+            //     localStorage.setItem('maka_user_name', 'Nama User dari DB');
+            //     localStorage.setItem('maka_user_plat', userName);
+            // }
+
+            btn.textContent = (formId === 'register-form') ? 'Memproses Data...' : 'Sedang Masuk...';
+            btn.disabled = true;
+
+            // Redirect ke Dashboard setelah 1.5 detik
+            setTimeout(() => {
+                window.location.href = 'dashboard.html'; 
+            }, 1500); 
+        }
+        
+        // --- Konten Form Login ---
+        const loginContent = `
+            <form id="login-form" onsubmit="saveDataAndRedirect(event)">
+                <label for="login-plat">Nomor Plat Motor</label>
+                <input type="text" id="login-plat" placeholder="Contoh: B 4004 MA" required>
+                
+                <label for="login-password">Kata Sandi</label>
+                <input type="password" id="login-password" placeholder="Masukkan Kata Sandi" required>
+                
+                <button type="submit" class="primary-btn">MASUK KE AKUN</button>
+                <a href="#" class="forgot-link">Lupa Kata Sandi?</a>
+            </form>
+        `;
+
+        // --- Konten Form Pendaftaran ---
+        const registerContent = `
+            <form id="register-form" onsubmit="saveDataAndRedirect(event)">
+                <label for="reg-name">Nama Lengkap</label>
+                <input type="text" id="reg-name" required>
+                
+                <label for="reg-plat">Nomor Plat Motor (ID Login Anda)</label>
+                <input type="text" id="reg-plat" required>
+
+                <label for="reg-password">Buat Kata Sandi</label>
+                <input type="password" id="reg-password" required>
+
+                <hr class="divider">
+
+                <label for="reg-start-date">Tanggal Mulai Sewa</label>
+                <input type="date" id="reg-start-date" required>
+                
+                <label>Opsi DP</label>
+                <div class="radio-group">
+                    <input type="radio" id="dp355" name="dp-option" value="355" checked>
+                    <label for="dp355">DP 355rb (Cicilan DP 3 Bulan)</label><br>
+                    <input type="radio" id="dp755" name="dp-option" value="755">
+                    <label for="dp755">DP 755rb (Langsung Libur Tgl 14 & 28)</label>
+                </div>
+                
+                <button type="submit" class="primary-btn register-btn">DAFTAR & HITUNG JADWAL</button>
+            </form>
+        `;
+
+        // --- Fungsi Penggantian Form dan Load Awal (TIDAK BERUBAH) ---
+        function loadForm(mode) {
+            const container = document.getElementById('form-container');
+            const subtitle = document.getElementById('auth-subtitle');
+            const switchBtn = document.getElementById('switch-mode-btn');
+
+            if (mode === 'register') {
+                container.innerHTML = registerContent;
+                subtitle.textContent = 'Daftar Akun Baru';
+                switchBtn.textContent = 'Sudah punya akun? Masuk';
+                currentMode = 'register';
+            } else {
+                container.innerHTML = loginContent;
+                subtitle.textContent = 'Selamat Datang Kembali';
+                switchBtn.textContent = 'Belum punya akun? Daftar';
+                currentMode = 'login';
+            }
+        }
+
+        function toggleMode() {
+            if (currentMode === 'login') {
+                loadForm('register');
+            } else {
+                loadForm('login');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => loadForm('login'));
+    </script>
+</body>
+</html>

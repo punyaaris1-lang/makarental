@@ -1,0 +1,96 @@
+/* calendar-styles.css - CSS KHUSUS UNTUK KALENDER SEWA (ISOLATED FIX) */
+
+/* Ambil Variabel dari styles.css */
+:root {
+    --primary-neon: #00dfff; 
+    --secondary-neon: #39ff14; 
+    --holiday-color: #ff4545;
+    --dp-color: #cc99ff;
+    --bg-dark: #121212;
+    --bg-hwb: #1a3a4a; /* Dark Blue */
+    --bg-cdp: #4a3a5e; /* Dark Purple */
+    --bg-hlb: #3a2222; /* Dark Red */
+}
+
+/* Struktur dasar Kalender */
+.calendar-controls, .calendar-display { padding: 20px; }
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+.day {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    padding: 5px;
+    position: relative;
+}
+.day label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-weight: normal;
+    cursor: pointer;
+}
+.day input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 3;
+}
+
+/* --- LOGIKA WARNA HARI (Warna Dasar - FIX) --- */
+
+/* 1. HWB - Hari Wajib Bayar (Neon Biru) */
+.day.wajib-bayar:not(.paid) label {
+    background-color: var(--bg-hwb);
+    border: 1px solid var(--primary-neon);
+    color: var(--primary-neon);
+}
+
+/* 2. CDP - Cicilan DP (Ungu) */
+.day.cicilan-dp:not(.paid) label {
+    background-color: var(--bg-cdp);
+    color: var(--dp-color); 
+    border: 1px solid rgba(204, 153, 255, 0.3);
+}
+
+/* 3. HLB - Hari Libur (Merah) */
+.day.holiday label {
+    background-color: var(--bg-hlb);
+    color: var(--holiday-color);
+    border: 1px solid rgba(255, 69, 69, 0.2);
+}
+
+/* 4. PAID - Hari Sudah Dibayar (Hijau Neon) */
+.day.paid input[type="checkbox"]:checked + label {
+    background-color: var(--secondary-neon); 
+    color: var(--bg-dark); 
+    box-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+    border: 1px solid var(--secondary-neon);
+    font-weight: bold;
+}
+/* Memastikan warna dasar tidak menimpa warna hijau yang sudah dibayar */
+.day.paid label {
+    background-color: var(--secondary-neon);
+    color: var(--bg-dark);
+}
+
+/* Lain-lain */
+.day input[disabled] + label {
+    background-color: #1a1a1a;
+    color: #555;
+    border: 1px solid #333;
+    cursor: not-allowed;
+}
+.day.empty {
+    background-color: transparent;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "maka-rental-app",
+  "version": "1.0.0",
+  "description": "Core logic for Maka electric scooter rental self-tracking app.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.1.2",
+    "moment": "^2.30.1"
+  }
+}

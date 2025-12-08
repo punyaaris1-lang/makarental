@@ -1,0 +1,209 @@
+/* styles.css - Desain Cyberpunk Lux (Final Integration) */
+
+:root {
+    /* MENGGUNAKAN TEMA CYBERPUNK DARI SCRIPT ANTRIAN ANDA */
+    --primary-neon: #00e5ff; /* Cyan Terang (Dominan) */
+    --secondary-neon: #ff6b6b; /* Soft Red (Alarm/Danger) */
+    --paid-gold: #CCFF00; /* Kuning Stabilo (Paid/Accent) */
+    --holiday-color: #ff6b6b; /* Merah Muda (Tunggakan/Error) */
+    --bg-dark: #0b101a; /* Biru Gelap / Navy Cyber */
+    --card-bg: rgba(255, 255, 255, 0.05); /* Glass Effect / Background Kartu */
+    --text-light: #ffffff;
+    --text-muted: #8899a6;
+    --input-bg: rgba(0, 0, 0, 0.4);
+    
+    /* Efek Mewah */
+    --shadow-deep: 0 10px 30px rgba(0,0,0,0.5);
+    --glow-cyan: 0 0 15px rgba(0, 229, 255, 0.4);
+    --border-lux: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    /* Menggunakan font yang seragam dan futuristik */
+    font-family: 'Rajdhani', 'Orbitron', sans-serif;
+    color: var(--text-light);
+    font-size: 15px; 
+}
+
+body {
+    background-color: var(--bg-dark);
+}
+
+.app-container {
+    max-width: 450px;
+    margin: 0 auto;
+    background-color: var(--bg-dark);
+    min-height: 100vh;
+    padding-bottom: 70px; /* Jarak untuk Footer */
+}
+
+/* ------------------- HEADER & STATUS ------------------- */
+.header {
+    background: linear-gradient(180deg, #0b101a 90%, transparent); /* Sedikit gradasi */
+    padding: 30px 20px 20px;
+    border-bottom: 2px solid var(--primary-neon);
+    box-shadow: 0 5px 20px rgba(0, 229, 255, 0.2);
+    position: relative;
+}
+
+.user-info h1 {
+    font-family: 'Orbitron', sans-serif; /* Font khusus untuk Judul */
+    font-size: 1.6em; 
+    color: var(--primary-neon);
+    text-shadow: var(--glow-cyan);
+}
+
+.user-info p {
+    font-size: 0.9em;
+    color: var(--text-muted);
+}
+
+/* Hero Tunggakan - Menggunakan gaya Card */
+.hero-tunggakan {
+    background: var(--card-bg);
+    border: var(--border-lux);
+    padding: 15px 20px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-deep);
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.hero-tunggakan h3 {
+    font-size: 0.8em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+.hero-tunggakan-value span {
+    font-size: 1.6em;
+    font-weight: 900;
+    color: var(--holiday-color); /* Soft Red untuk Tunggakan */
+}
+.futuristic-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--primary-neon), transparent);
+    margin: 25px 0 15px 0;
+    box-shadow: 0 0 8px var(--primary-neon);
+}
+
+
+/* ------------------- METRICS & SECTIONS ------------------- */
+section {
+    padding: 20px;
+}
+h2 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--primary-neon);
+    font-size: 1.2em;
+    font-weight: 700;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--primary-neon);
+    padding-left: 10px;
+}
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 15px;
+    text-align: center;
+}
+.icon-item {
+    background: var(--card-bg); /* Glassy Background */
+    border: var(--border-lux);
+    box-shadow: var(--shadow-deep);
+    border-radius: 15px;
+    padding: 15px 10px;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+.icon-item:hover {
+    box-shadow: var(--glow-cyan);
+}
+.icon-item span { font-size: 1.8em; display: block; margin-bottom: 5px; }
+.icon-item p { font-size: 0.75em; color: var(--text-muted); font-weight: 600; }
+
+
+/* ------------------- BOTTOM NAVIGASI ------------------- */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 450px;
+    height: 65px;
+    background-color: var(--bg-dark);
+    border-top: 1px solid var(--primary-neon);
+    box-shadow: 0 -5px 25px rgba(0, 229, 255, 0.3); 
+    z-index: 100;
+}
+.nav-item {
+    text-decoration: none;
+    color: var(--text-muted);
+    text-align: center;
+    font-size: 0.8em;
+    padding: 5px 0;
+    transition: color 0.3s;
+}
+.nav-item.active {
+    color: var(--primary-neon);
+    font-weight: 700;
+    text-shadow: 0 0 5px var(--primary-neon);
+}
+.nav-item span { display: block; font-size: 1.5em; margin-bottom: 2px; }
+
+
+/* --- MODAL SYSTEM (WAJIB) --- */
+.modal-overlay {
+    display: none;              
+    position: fixed;            
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85); /* Lebih gelap untuk tema cyberpunk */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+.modal-overlay.active {
+    display: flex !important;
+}
+.modal-content {
+    background: var(--card-bg);
+    border: 1px solid var(--primary-neon);
+    padding: 25px;
+    border-radius: 12px;
+    max-width: 90%;
+    width: 400px;
+    box-shadow: 0 0 20px var(--glow-cyan);
+}
+.modal-content h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--primary-neon);
+    margin-bottom: 15px;
+}
+.modal-btn {
+    padding: 12px;
+    margin-top: 15px;
+    width: 80%;
+    max-width: 250px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.primary-btn { 
+    background: var(--primary-neon);
+    color: var(--bg-dark);
+}
+.secondary-btn { 
+    background: #555;
+    color: white;
+}

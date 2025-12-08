@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAKA Riwayat Transaksi</title>
+    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="styles/theme.css">
+    <link rel="stylesheet" href="styles/components.css">
+    
+    <style>
+        .transaction-list {
+            padding: 0 20px;
+        }
+        .transaction-item {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid var(--primary-neon); /* Garis neon */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
+        .transaction-item.paid {
+            border-left-color: var(--paid-gold);
+        }
+        .transaction-item.dp {
+            border-left-color: #cc99ff; /* Lilac/Ungu CDP */
+        }
+        .transaction-item.unpaid {
+            border-left-color: var(--holiday-color);
+        }
+        .transaction-details {
+            flex-grow: 1;
+        }
+        .transaction-details h3 {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        .transaction-details small {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+        }
+        .transaction-amount {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--secondary-neon);
+            text-align: right;
+        }
+        .transaction-amount.unpaid {
+            color: var(--holiday-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        
+        <header class="header" style="border-bottom: 2px solid var(--primary-neon);">
+            <div class="user-info">
+                <h1>🗒️ Riwayat Transaksi</h1>
+                <p>Log pembayaran dan tunggakan Anda.</p>
+            </div>
+        </header>
+
+        <section class="transaction-list">
+            <h2 style="margin-top: 15px;">Aktivitas Pembayaran Bulan Ini</h2>
+            <div id="history-log">
+                <p style="text-align: center; margin-top: 50px; color: var(--text-secondary);">Memuat data transaksi...</p>
+            </div>
+        </section>
+
+
+        <footer class="bottom-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span>🏠</span>
+                Dashboard
+            </a>
+            <a href="calendar.html" class="nav-item">
+                <span>📅</span>
+                Kalender
+            </a>
+            <a href="history.html" class="nav-item active">
+                <span>🗒️</span>
+                Riwayat
+            </a>
+            <a href="#" class="nav-item">
+                <span>⚙️</span>
+                Pengaturan
+            </a>
+        </footer>
+    </div>
+    
+    <script>
+        const userData = {
+            tarifNormal: 70000,
+            tarifMakaPlus: 10000 
+        };
+        
+        // Membaca data pembayaran dari Kalender
+        const savedPayments = JSON.parse(localStorage.getItem('maka_payments')) || {};
+        const logContainer = document.getElementById('history-log');
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(number);
+        }
+
+        function generateHistory() {
+            // Kita akan membuat log 10 hari terakhir sebagai contoh
+            const today = new Date();
+            let logHTML = '';
+            
+            // Log akan menampilkan 10 hari mundur dari hari ini (atau dari data terakhir)
+            for (let i = 0; i < 30; i++) {
+                const date = new Date(today);
+                date.setDate(today.getDate() - i);
+                
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                
+                const dateKey = `${year}-${month}-${day}`;
+                const dateDisplay = date.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'long' });
+
+                // DUMMY LOGIC: Kita asumsikan hari ganjil adalah HWB (70K) dan hari genap adalah CDP (80K)
+                let amount = userData.tarifNormal; // 70,000 IDR
+                let type = 'HWB';
+                let statusClass = 'unpaid';
+                let amountDisplay = formatRupiah(amount);
+                let statusText = 'Tunggakan';
+
+                // Implementasi logika pembayaran yang sebenarnya (sesuai Kalender)
+                const isPaid = savedPayments[dateKey] === true;
+
+                if (isPaid) {
+                    statusClass = 'paid';
+                    statusText = 'Dibayar Lunas';
+                    type = 'Bayar HWB';
+                } 
+                
+                // Logika khusus Cicilan DP (CDP)
+                if (day === 14 || day === 28) {
+                    amount = 80000;
+                    type = 'Cicilan DP';
+                    statusClass = isPaid ? 'dp' : 'unpaid';
+                    amountDisplay = formatRupiah(amount);
+                    statusText = isPaid ? 'Dibayar Lunas' : 'Tunggakan';
+                }
+
+                logHTML += `
+                    <div class="transaction-item ${statusClass}">
+                        <div class="transaction-details">
+                            <h3>${type}</h3>
+                            <small>${dateDisplay} | Status: ${statusText}</small>
+                        </div>
+                        <div class="transaction-amount ${statusClass === 'unpaid' ? 'unpaid' : ''}">
+                            ${amountDisplay}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (logHTML === '') {
+                logContainer.innerHTML = `<p style="text-align: center; margin-top: 50px; color: var(--text-secondary);">Belum ada riwayat transaksi yang tersimpan.</p>`;
+            } else {
+                logContainer.innerHTML = logHTML;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', generateHistory);
+    </script>
+</body>
+</html>

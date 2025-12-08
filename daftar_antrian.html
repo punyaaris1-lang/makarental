@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MAKA Daftar Antrian</title>
+    <link rel="stylesheet" href="styles/theme.css">
+    <link rel="stylesheet" href="styles/components.css">
+    
+    <link rel="stylesheet" href="styles.css"> 
+    
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* TEMA CYBERPUNK PREMIUM (V31) - Variabel disamakan ke MAKA styles.css */
+        :root {
+            --bg-ma: #0b101a; /* MAKA BG untuk antrian */
+            --glass: rgba(255, 255, 255, 0.05);
+            --text-ma: #ffffff;
+            --text-muted-ma: #8899a6;
+            --cyan-ma: #00e5ff;
+            --cyan-dim-ma: rgba(0, 229, 255, 0.1);
+            --soft-red-ma: #ff6b6b;
+            --border-ma: rgba(255, 255, 255, 0.1);
+            --card-bg-ma: rgba(255,255,255,0.03);
+            --input-bg-ma: rgba(0, 0, 0, 0.4);
+
+            /* MAPPING KE VARIABEL MAKA */
+            --cyan: var(--primary-neon); /* MAKA CYAN */
+            --soft-red: var(--holiday-color); /* MAKA RED */
+            --accent: var(--paid-gold); /* MAKA GOLD */
+        }
+
+        /* Gaya yang harus diutamakan dari Antrian */
+        body {
+            margin: 0; font-family: 'Rajdhani', sans-serif; background-color: var(--bg); color: var(--text);
+            min-height: 100vh; padding: 20px; padding-bottom: 80px; /* Diubah agar sesuai footer MAKA */
+            background-color: var(--bg-ma);
+        }
+
+        .container { max-width: 480px; margin: 0 auto; position: relative; }
+
+        /* HEADER */
+        .header-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-top: 20px; margin-bottom: 5px;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif; font-size: 24px; margin: 0;
+            background: linear-gradient(to right, #fff, var(--cyan-ma));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.3); letter-spacing: 1px;
+        }
+        .subtitle { 
+            text-align: left; color: var(--text-muted-ma); font-size: 10px; 
+            letter-spacing: 2px; margin-bottom: 25px; font-weight: bold;
+            text-transform: uppercase; border-bottom: 1px solid var(--border-ma); padding-bottom: 15px;
+        }
+
+        /* CARD */
+        .glass-card {
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--border-ma); border-radius: 20px; padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 25px;
+        }
+        input.field {
+            width: 100%; background: var(--input-bg-ma); border: 1px solid var(--border-ma); color: var(--text);
+            padding: 15px; border-radius: 10px; font-family: 'Rajdhani'; font-size: 20px;
+            font-weight: 700; outline: none; transition: 0.3s; margin-bottom: 15px; text-align: center;
+        }
+        input.field:focus { border-color: var(--cyan); box-shadow: 0 0 10px var(--cyan-dim-ma); }
+        .btn-cyan {
+            width: 100%; background: linear-gradient(90deg, var(--cyan-ma), #00bcd4);
+            border: none; padding: 16px; border-radius: 10px; color: #000;
+            font-family: 'Orbitron'; font-weight: 800; font-size: 16px;
+            cursor: pointer; box-shadow: 0 0 20px var(--cyan-dim-ma); margin-top: 5px;
+        }
+        
+        /* SLOTS GRID */
+        .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 30px; }
+        .slot-box { background: var(--card-bg-ma); border: 1px solid var(--border-ma); /* ... */ }
+        .slot-box.active { border-color: var(--cyan-ma); background: var(--cyan-dim-ma); }
+        .bat-fill { background: var(--cyan-ma); box-shadow: 0 0 10px var(--cyan-ma); }
+        .btn-start { background: var(--cyan-ma); color: #000; }
+
+        /* MODAL */
+        .modal-box { border: 2px solid var(--cyan-ma); }
+        .btn-modal.primary { background: var(--cyan-ma); color: #000; }
+        /* ADMIN PANEL */
+        .admin-trigger { border: 1px dashed var(--cyan-ma); color: var(--cyan-ma); background: var(--cyan-dim-ma); }
+    </style>
+</head>
+<body>
+
+    <audio id="alarmSound" loop>
+        <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU..." type="audio/wav">
+    </audio>
+
+    <div id="masterModal" class="modal">
+        <div id="modalBox" class="modal-box">
+            <span id="mIcon" class="modal-icon">✅</span>
+            <h3 id="mTitle" class="modal-title">TITLE</h3>
+            <p id="mMsg" class="modal-msg">Message</p>
+            <input type="password" id="mInput" style="display:none; width:100%; padding:10px; text-align:center; margin-bottom:15px; border-radius:5px; border:none;" placeholder="PIN">
+            <div class="modal-btns">
+                <button id="mBtnCancel" class="btn-modal" style="display:none;">BATAL</button>
+                <button id="mBtnOk" class="btn-modal primary">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header-row">
+            <h1>FAST CHARGING</h1>
+            <button class="theme-btn" onclick="toggleTheme()" id="themeIcon">☀️</button>
+        </div>
+        <div class="subtitle">KELAPA GADING | HOME OF MLU</div>
+
+        <div class="glass-card">
+            <label>PLAT NOMOR</label>
+            <input id="userPlat" class="field" placeholder="PLAT NOMOR" style="text-transform:uppercase;">
+            <label>BATERAI (%)</label>
+            <input id="userBattery" type="number" class="field" placeholder="0 - 99">
+            <button id="btnDaftar" class="btn-cyan">DAFTAR ANTRIAN</button>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+            <div style="width:8px; height:8px; background:var(--cyan); border-radius:50%; box-shadow:0 0 10px var(--cyan);"></div>
+            <span style="font-family:'Orbitron'; font-size:12px; color:var(--text);">STATUS 3 SLOT</span>
+        </div>
+
+        <div class="slots-grid" id="slotsContainer">
+            <div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-muted);">Loading System...</div>
+        </div>
+
+        <div class="glass-card" style="padding:15px; min-height:100px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid var(--border-ma); padding-bottom:10px;">
+                <span style="font-family:'Orbitron'; font-size:12px; color:var(--text);">DAFTAR TUNGGU</span>
+                <span id="qCount" style="font-size:12px; color:var(--cyan);">0</span>
+            </div>
+            <div id="queueList"></div>
+        </div>
+
+        <div class="admin-trigger" onclick="openAdminLogin()">🔒 ADMIN LOGIN AREA</div>
+        
+        <div id="adminPanel" class="admin-panel">
+            <h4 style="color:var(--soft-red); margin:0 0 15px; font-family:'Orbitron'; text-align:center;">PANEL KONTROL</h4>
+            
+            <label>MANUAL ASSIGN</label>
+            <div class="adm-row">
+                <select id="manSlot" class="adm-input" style="width:40%"><option value="0">Slot 1</option><option value="1">Slot 2</option><option value="2">Slot 3</option></select>
+                <input id="manPlat" placeholder="Plat" class="adm-input">
+            </div>
+            <button onclick="manualAssign()" class="adm-btn" style="background:var(--cyan); color:#000;">ISI SLOT MANUAL</button>
+            <button onclick="clearSlotManual()" class="adm-btn" style="background:#444; color:#fff;">KOSONGKAN SLOT (PAKSA)</button>
+
+            <label style="margin-top:15px;">BLOKIR</label>
+            <div class="adm-row">
+                <input id="blockPlatInput" placeholder="Plat Diblokir" class="adm-input">
+                <button onclick="blockUser()" class="adm-btn" style="width:auto; background:var(--soft-red); color:#fff;">BLOK</button>
+            </div>
+
+            <label style="margin-top:15px;">DANGER ZONE</label>
+            <button onclick="stopAll()" class="adm-btn" style="background:var(--soft-red); color:#fff;">STOP SEMUA SLOT</button>
+            <button onclick="resetAll()" class="adm-btn" style="border:1px solid var(--soft-red); background:none; color:var(--soft-red);">RESET DATABASE TOTAL</button>
+
+            <div onclick="document.getElementById('adminPanel').style.display='none'" style="text-align:center; margin-top:15px; font-size:10px; color:#555; cursor:pointer;">Tutup Panel</div>
+        </div>
+
+        <div class="footer">Created by : MLU SQUAD</div>
+    </div>
+
+    <div style="width: 100%; max-width: 450px; position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); background: var(--bg); border-top: 1px solid var(--cyan);">
+        <footer class="bottom-nav" style="background:none; box-shadow:none;">
+            <a href="lokasi_fc.html" class="nav-item">
+                <span style="color: var(--cyan);">⚡</span>
+                Lokasi FC
+            </a>
+            <a href="dashboard.html" class="nav-item">
+                <span>🏠</span>
+                Home
+            </a>
+            <a href="daftar_antrian.html" class="nav-item active">
+                <span style="color: var(--accent);">🎫</span>
+                Antrian
+            </a>
+        </footer>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, runTransaction, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+        // Konfigurasi Firebase dari script Anda
+        const firebaseConfig = {
+            apiKey: "AIzaSyALIlkIDALIlkIDALIk83K8s1htalvW6rmNNw02Go",
+            authDomain: "sistem-antrian-b1c39.firebaseapp.com",
+            projectId: "sistem-antrian-b1c39",
+            storageBucket: "sistem-antrian-b1c39.firebasestorage.app",
+            messagingSenderId: "454124587608",
+            appId: "1:454124587608:web:34fbb0f5211067a67f982d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const ref = doc(db, "antrian", "utama");
+
+        // --- SECURITY & AUDIO ---
+        let audioCtx = null;
+        let triggeredAlarms = new Set();
+        let isAdminLoggedIn = false; // State Admin
+
+        function initAudioAndNotif() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            g.gain.value = 0.01;
+            osc.connect(g); g.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.01);
+
+            if ("Notification" in window && Notification.permission !== "granted") {
+                Notification.requestPermission();
+            }
+        }
+
+        function playSiren() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(1000, audioCtx.currentTime + 0.5); 
+            osc.frequency.linearRampToValueAtTime(600, audioCtx.currentTime + 1.0);  
+            
+            gain.gain.value = 0.5;
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 2); 
+        }
+
+        document.body.addEventListener('click', initAudioAndNotif, { once: true });
+
+        window.toggleTheme = () => {
+            const body = document.body;
+            const btn = document.getElementById('themeIcon');
+            if (body.getAttribute('data-theme') === 'light') {
+                body.removeAttribute('data-theme');
+                btn.innerText = "☀️";
+                localStorage.setItem('theme', 'dark');
+            } else {
+                body.setAttribute('data-theme', 'light');
+                btn.innerText = "🌙";
+                localStorage.setItem('theme', 'light');
+            }
+        };
+        if(localStorage.getItem('theme') === 'light') window.toggleTheme();
+
+        // --- TRIGGER ALARM (ONLY FOR OWNER) ---
+        function triggerAlarm(name) {
+            const myPlat = localStorage.getItem('myPlat');
+            
+            if(myPlat && name === myPlat) {
+                showPopup('alarm', 'SELESAI!', `Motor <b>${name}</b> Selesai!`);
+                if(window.alarmInterval) clearInterval(window.alarmInterval);
+                playSiren();
+                window.alarmInterval = setInterval(playSiren, 2500);
+                if(navigator.vibrate) navigator.vibrate([1000, 500, 1000]);
+                if(Notification.permission === "granted") {
+                    new Notification("FAST CHARGING", { body: `Plat ${name} Selesai!`, icon: "https://via.placeholder.com/128?text=⚡" });
+                }
+            }
+        }
+
+        window.stopAlarm = () => {
+            if(window.alarmInterval) { clearInterval(window.alarmInterval); window.alarmInterval = null; }
+        };
+
+        // --- POPUP SYSTEM ---
+        function showPopup(type, title, msg, onOk = null) {
+            const m = document.getElementById('masterModal');
+            const box = document.getElementById('modalBox');
+            const icon = document.getElementById('mIcon');
+            const t = document.getElementById('mTitle');
+            const ms = document.getElementById('mMsg');
+            const btnOk = document.getElementById('mBtnOk');
+            const btnCancel = document.getElementById('mBtnCancel');
+            const inp = document.getElementById('mInput');
+
+            m.style.display = 'flex'; m.className = 'modal'; 
+            box.style.borderColor = 'var(--cyan-ma)';
+            t.innerText = title; ms.innerHTML = msg; 
+            inp.style.display = 'none'; btnCancel.style.display = 'none';
+            btnOk.className = 'btn-modal primary'; btnOk.innerText = 'OK';
+
+            btnOk.onclick = null; 
+
+            if(type === 'confirm') {
+                icon.innerText = '❓'; btnCancel.style.display = 'block'; btnOk.innerText = 'YA';
+                btnCancel.onclick = () => m.style.display = 'none';
+                btnOk.onclick = () => { m.style.display = 'none'; if(onOk) onOk(); };
+            }
+            else if(type === 'error') {
+                icon.innerText = '❌'; box.style.borderColor = 'var(--soft-red-ma)';
+                btnOk.className = 'btn-modal danger'; btnOk.innerText = 'TUTUP';
+                btnOk.onclick = () => m.style.display = 'none';
+            }
+            else if(type === 'alarm') {
+                icon.innerText = '🔔'; box.style.borderColor = 'var(--soft-red-ma)';
+                btnOk.className = 'btn-modal danger'; btnOk.innerText = 'MATIKAN ALARM';
+                btnOk.onclick = () => { window.stopAlarm(); m.style.display = 'none'; };
+            }
+            else if(type === 'admin') {
+                icon.innerText = '🔒'; inp.style.display = 'block'; inp.value=''; inp.focus();
+                btnOk.innerText = 'LOGIN'; btnCancel.style.display = 'block';
+                btnCancel.onclick = () => m.style.display = 'none';
+                btnOk.onclick = () => {
+                    if(inp.value === '1131') { 
+                        m.style.display = 'none'; 
+                        document.getElementById('adminPanel').style.display = 'block'; 
+                        isAdminLoggedIn = true;
+                    } 
+                    else showPopup('error','GAGAL','PIN Salah!');
+                };
+            }
+            else { icon.innerText = '✅'; btnOk.onclick = () => m.style.display = 'none'; }
+        }
+
+        window.openAdminLogin = () => showPopup('admin', 'ADMIN LOGIN', 'Masukkan PIN');
+
+        // --- MAIN LOGIC ---
+        document.getElementById('btnDaftar').onclick = async () => {
+            initAudioAndNotif(); 
+            const btn = document.getElementById('btnDaftar');
+            const plat = document.getElementById('userPlat').value.toUpperCase().trim();
+            const bat = parseInt(document.getElementById('userBattery').value);
+
+            if(!plat || isNaN(bat)) { showPopup('error','DATA KURANG','Mohon isi plat & baterai.'); return; }
+            btn.disabled=true; btn.innerText="PROSES...";
+
+            // SIMPAN PLAT DI HP
+            localStorage.setItem('myPlat', plat);
+
+            try {
+                await runTransaction(db, async(t)=>{
+                    const d = (await t.get(ref)).data() || {};
+                    let s = d.chargingSlots || [null,null,null];
+                    let q = d.waitingQueue || [];
+
+                    if((d.blockedList||[]).includes(plat)) throw "Plat ini DIBLOKIR!";
+                    if(s.some(x=>x?.name===plat) || q.some(x=>x?.name===plat)) throw "Plat sudah terdaftar!";
+
+                    let dur = 0; const target = 100;
+                    if(bat >= 90) dur = Math.ceil((100-bat) * 2.2); 
+                    else if(bat >= 80) dur = Math.ceil((100-bat) * 1.5);
+                    else dur = Math.ceil((100-bat) * 0.8);
+                    
+                    if(dur < 5) dur = 5;
+
+                    const item = { name:plat, startBattery:bat, targetLimit:target, durationMinutes:dur, startTime:null };
+                    const empty = s.findIndex(x=>x===null);
+                    if(empty!==-1) s[empty] = item; else q.push(item);
+                    t.set(ref, {chargingSlots:s, waitingQueue:q}, {merge:true});
+                });
+                showPopup('success','BERHASIL','Masuk antrian.');
+                document.getElementById('userPlat').value=''; document.getElementById('userBattery').value='';
+            } catch(e) { showPopup('error','GAGAL', e); }
+            btn.disabled=false; btn.innerText="DAFTAR ANTRIAN";
+        };
+
+        // --- RENDER & TIMER ---
+        setInterval(() => {
+            document.querySelectorAll('[data-end]').forEach(el => {
+                const end = parseInt(el.dataset.end);
+                const name = el.dataset.name;
+                const diff = end - Date.now();
+                if(diff > 0) {
+                    const m = Math.floor(diff/60000);
+                    const s = Math.floor((diff%60000)/1000);
+                    el.innerText = `${m}:${s<10?'0'+s:s}`;
+                } else {
+                    el.innerText = "SELESAI"; el.style.color = "var(--soft-red-ma)";
+                    const key = name+end;
+                    if(!triggeredAlarms.has(key)) { triggeredAlarms.add(key); triggerAlarm(name); }
+                }
+            });
+        }, 1000);
+
+        onSnapshot(ref, (snap) => {
+            const d = snap.data() || {};
+            const slots = d.chargingSlots || [null,null,null];
+            
+            document.getElementById('slotsContainer').innerHTML = slots.map((x,i)=>{
+                if(!x) return `
+                    <div class="slot-box" style="opacity:0.5; border-style:dashed;">
+                        <div class="bat-icon" style="border-color:var(--text-muted-ma)"><div class="bat-bolt" style="color:var(--text-muted-ma)">⚡</div></div>
+                        <div style="font-size:12px; color:var(--text-muted-ma)">KOSONG</div>
+                    </div>`;
+
+                const isRun = !!x.startTime;
+                let btn = isRun ? 
+                    `<button class="btn-act btn-stop" onclick="window.act(${i},'stop', '${x.name}')">STOP</button>` :
+                    `<button class="btn-act btn-start" onclick="window.act(${i},'start', '${x.name}')">MULAI</button>`;
+                
+                let time = `<div style="font-size:10px; color:var(--text-muted-ma); margin-top:5px;">Tap MULAI</div>`;
+                let h = x.startBattery;
+                let targetText = "";
+
+                if(isRun) {
+                    const start = x.startTime.seconds ? x.startTime.seconds*1000 : new Date(x.startTime).getTime();
+                    const end = start + (x.durationMinutes*60000);
+                    time = `<div style="font-size:16px; font-weight:bold; color:var(--cyan-ma); margin:5px 0;" data-end="${end}" data-name="${x.name}">...</div>`;
+                    h = 100;
+                    targetText = `<div style="font-size:9px; color:var(--cyan-ma);">Target: ${x.targetLimit}%</div>`;
+                }
+                return `
+                    <div class="slot-box active">
+                        <div class="bat-icon">
+                            <div class="bat-fill" style="height:${h}%"></div>
+                            <div class="bat-bolt">⚡</div>
+                        </div>
+                        <div style="font-weight:bold; color:var(--text-ma);">${x.name}</div>
+                        ${targetText}
+                        ${time}
+                        ${btn}
+                    </div>`;
+            }).join('');
+
+            const q = d.waitingQueue || [];
+            document.getElementById('qCount').innerText = q.length;
+            document.getElementById('queueList').innerHTML = q.length ? q.map((x,i)=>`
+                <div style="display:flex; justify-content:space-between; background:var(--card-bg-ma); padding:10px; margin-bottom:5px; border-radius:8px;">
+                    <div><b style="color:var(--text-ma);">${x.name}</b> <span style="font-size:12px; color:var(--cyan-ma)">(${x.startBattery}%)</span></div>
+                    <button onclick="window.delQ(${i}, '${x.name}')" style="background:none; border:none; color:var(--soft-red-ma); cursor:pointer;">✕</button>
+                </div>
+            `).join('') : '<div style="text-align:center; color:var(--text-muted-ma); font-size:12px;">Antrian Kosong</div>';
+        });
+
+        // --- ACTIONS (SECURED) ---
+        window.act = (i, type, platName) => {
+            initAudioAndNotif();
+            const myPlat = localStorage.getItem('myPlat');
+
+            if(type === 'stop' && !isAdminLoggedIn && myPlat !== platName) {
+                return showPopup('error', 'AKSES DITOLAK', 'Ini bukan kendaraan Anda!');
+            }
+
+            if(type==='stop') {
+                showPopup('confirm', 'KONFIRMASI', `Stop & Hapus Slot ${i+1}?`, () => {
+                    runTransaction(db, async(t)=>{
+                        const d = (await t.get(ref)).data();
+                        let s = d.chargingSlots; let q = d.waitingQueue;
+                        s[i]=null; if(q.length){ s[i]={...q.shift(), startTime:null}; }
+                        t.update(ref, {chargingSlots:s, waitingQueue:q});
+                    });
+                    window.stopAlarm();
+                });
+            } else {
+                runTransaction(db, async(t)=>{
+                    const s = (await t.get(ref)).data().chargingSlots;
+                    if(s[i]) s[i].startTime = new Date();
+                    t.update(ref, {chargingSlots:s});
+                });
+            }
+        };
+
+        window.delQ = (i, platName) => {
+            const myPlat = localStorage.getItem('myPlat');
+            if(!isAdminLoggedIn && myPlat !== platName) {
+                return showPopup('error', 'AKSES DITOLAK', 'Ini bukan antrian Anda!');
+            }
+
+            showPopup('confirm','HAPUS', 'Hapus antrian ini?', () => {
+                runTransaction(db, async(t)=>{
+                    const q = (await t.get(ref)).data().waitingQueue;
+                    q.splice(i,1); t.update(ref, {waitingQueue:q});
+                });
+            });
+        };
+
+        // ADMIN FUNCTIONS
+        window.manualAssign = () => {
+            // ... (Fungsi manualAssign) ...
+        };
+        window.clearSlotManual = () => {
+            // ... (Fungsi clearSlotManual) ...
+        };
+        window.blockUser = async () => {
+            // ... (Fungsi blockUser) ...
+        };
+        window.stopAll = () => {
+            // ... (Fungsi stopAll) ...
+        };
+        window.resetAll = () => {
+            // ... (Fungsi resetAll) ...
+        };
+    </script>
+</body>
+</html>
