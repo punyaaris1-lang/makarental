@@ -288,12 +288,105 @@ h2 {
     font-weight: 500;
 }
 
-.day input[disabled] + label {
-    background-color: #1a1a1a;
-    color: #555;
-    border: 1px solid #333;
-    cursor: not-allowed;
+/* --- CSS Khusus untuk Kalender Sewa (Wajib ditempel di styles.css) --- */
+
+.calendar-controls {
+    padding: 20px 20px 10px;
 }
+
+/* ... (Kode selector bulan dan hari tetap sama) ... */
+
+/* Tampilan Hari Kerja/Bayar */
+.calendar-display {
+    padding: 0 20px 20px;
+}
+
+.weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #999;
+    font-size: 0.85em;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.day {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 45px;
+    padding: 5px;
+    position: relative;
+}
+
+.day-number {
+    font-size: 0.9em;
+    z-index: 2;
+}
+
+/* --- LOGIKA WARNA HARI --- */
+
+/* HWB - Hari Wajib Bayar (Neon Biru) */
+.day.wajib-bayar label {
+    background-color: #1a3a4a; /* Biru gelap */
+    border: 1px solid var(--primary-neon);
+    color: var(--primary-neon);
+    transition: all 0.2s;
+}
+
+/* CDP - Cicilan DP (Ungu) */
+.day.cicilan-dp label {
+    background-color: #4a3a5e; /* Ungu gelap */
+    color: #cc99ff; 
+    border: 1px solid rgba(204, 153, 255, 0.3);
+}
+
+/* HLB - Hari Libur (Merah) */
+.day.holiday label {
+    background-color: #3a2222; /* Merah gelap */
+    color: #ff4545;
+    border: 1px solid rgba(255, 69, 69, 0.2);
+}
+
+/* --- LOGIKA WARNA KETIKA DIBAYAR (DICENTANG) --- */
+.day input[type="checkbox"]:checked + label {
+    background-color: var(--secondary-neon) !important; /* HIJAU SOLID */
+    color: var(--bg-dark) !important; /* Font Gelap agar terbaca */
+    box-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+    border: 1px solid var(--secondary-neon) !important;
+    font-weight: bold;
+}
+
+/* --- Logika input/checkbox (disembunyikan) tetap sama --- */
+.day input[type="checkbox"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0; 
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 3;
+}
+.day label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+/* ... (Kode CSS lainnya di styles.css tetap sama) ... */
+
 
 /* --- CSS UNTUK RIWAYAT TRANSAKSI (history.html) --- */
 .transaction-history {
