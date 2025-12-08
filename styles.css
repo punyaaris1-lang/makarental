@@ -1,14 +1,14 @@
-/* styles.css - Versi Premium */
+/* styles.css - DASHBOARD FUTURISTIK (Final Revision) */
 
-/* --- RESET & FONDASI --- */
 :root {
-    --primary-color: #1a73e8; /* Biru Google/Premium */
-    --accent-color: #ffc107; /* Emas/Kuning untuk Warning */
-    --bg-color: #f8f9fa; /* Latar Belakang Sangat Terang */
-    --card-bg: #ffffff;
-    --dark-text: #343a40;
-    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.1);
+    --primary-neon: #00dfff; /* Neon Biru Cyan */
+    --secondary-neon: #39ff14; /* Neon Hijau */
+    --bg-dark: #121212; /* Warna dasar gelap */
+    --card-bg: #1e1e1e; /* Warna card */
+    --text-light: #e0e0e0;
+    --input-bg: #2d2d2d;
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-neon: 0 0 8px rgba(0, 223, 255, 0.3);
 }
 
 * {
@@ -16,51 +16,49 @@
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-light);
 }
 
 body {
-    background-color: var(--bg-color);
-    line-height: 1.6;
+    background-color: var(--bg-dark);
 }
 
 .app-container {
     max-width: 450px;
     margin: 0 auto;
-    background-color: var(--card-bg);
+    background-color: var(--bg-dark);
     min-height: 100vh;
-    box-shadow: var(--shadow-deep);
     padding-bottom: 80px; 
 }
 
 /* --- HEADER & STATUS --- */
 .header {
-    /* Gradien untuk kesan premium */
-    background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
-    color: white;
+    /* Background yang solid dan gelap, berbeda dengan gradien login */
+    background-color: var(--card-bg); 
     padding: 30px 20px;
-    border-bottom-left-radius: 25px;
-    border-bottom-right-radius: 25px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    border-bottom: 2px solid var(--primary-neon);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
 .user-info h1 {
     font-size: 1.8em;
-    font-weight: 700;
+    color: var(--primary-neon); /* Aksen neon di nama */
 }
 
 .status-box {
     margin-top: 20px;
-    background: rgba(255, 255, 255, 0.15);
-    padding: 12px 15px;
+    background: var(--input-bg);
+    border: 1px solid var(--primary-neon);
+    padding: 15px;
     border-radius: 10px;
     text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: var(--shadow-neon);
 }
 
 .status-box span {
-    font-weight: 600;
+    font-weight: 700;
     font-size: 1.1em;
-    display: block;
+    color: var(--secondary-neon); /* Status HARI INI berwarna neon hijau */
 }
 
 /* --- SECTIONS UMUM --- */
@@ -69,10 +67,12 @@ section {
 }
 
 h2 {
-    color: var(--dark-text);
+    color: var(--primary-neon);
     font-size: 1.3em;
     font-weight: 600;
     margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
 }
 
 /* --- REKAP KEUANGAN --- */
@@ -87,27 +87,22 @@ h2 {
     padding: 20px;
     border-radius: 15px;
     box-shadow: var(--shadow-light);
-    transition: transform 0.2s;
-}
-
-.metric-card:hover {
-    transform: translateY(-2px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .metric-card h3 {
     font-size: 0.95em;
-    color: #6c757d;
-    margin-bottom: 8px;
+    color: #999;
     text-transform: uppercase;
 }
 
 .tunggakan-card p {
     font-size: 1.8em;
     font-weight: 700;
-    color: #dc3545; /* Merah untuk tunggakan */
+    color: #ff4545; /* Merah terang untuk tunggakan */
 }
 
-/* --- TOMBOL AKSI --- */
+/* --- TOMBOL AKSI (Aksen Neon) --- */
 .button-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -116,27 +111,22 @@ h2 {
 
 .action-btn {
     padding: 18px 10px;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     font-weight: 600;
-    color: var(--dark-text);
-    background-color: var(--bg-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: background-color 0.2s, transform 0.1s;
+    background-color: var(--input-bg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    color: var(--text-light);
+    transition: all 0.2s;
 }
 
-.action-btn:active {
-    transform: scale(0.98);
+.action-btn:hover {
+    box-shadow: 0 0 10px var(--primary-neon);
 }
 
-.sos-btn {
-    background-color: #f8d7da; /* Latar belakang soft untuk SOS */
-    color: #721c24; /* Teks merah tua */
-}
-.charging-btn {
-    background-color: #e2f0ff; /* Latar belakang soft biru */
-    color: #004085;
-}
+.charging-btn { color: var(--primary-neon); }
+.sos-btn { color: #ff9800; }
+.etle-btn { color: #ff4545; }
 
 /* --- BOTTOM NAVIGASI --- */
 .bottom-nav {
@@ -148,22 +138,18 @@ h2 {
     width: 100%;
     max-width: 450px;
     height: 70px;
-    background-color: var(--card-bg);
-    border-top: 1px solid #eee;
-    box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+    background-color: #212121;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.5);
     z-index: 100;
 }
 
 .bottom-nav a {
     text-decoration: none;
     color: #6c757d;
-    font-size: 0.85em;
-    text-align: center;
-    padding: 5px;
-    transition: color 0.2s;
 }
 
 .bottom-nav a.active {
-    color: var(--primary-color);
+    color: var(--primary-neon); /* Navigasi aktif menggunakan warna neon */
     font-weight: 700;
 }
