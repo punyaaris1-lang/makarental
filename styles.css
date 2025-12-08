@@ -1,289 +1,196 @@
-/* ==================================================
-   MAKARENTAL – FUTURISTIC PREMIUM UI
-   FULL CSS REWRITE (STABLE VERSION)
-   ================================================== */
+/* ===============================
+   MAKA PREMIUM UI – LEVEL PRO
+================================ */
 
-/* ---------------- ROOT THEME ---------------- */
 :root {
-  --neon-cyan: #00e5ff;
-  --neon-red: #ff6b6b;
-  --neon-gold: #ccff00;
+  --bg-main: #06090f;
+  --card-bg: rgba(18, 26, 44, 0.65);
+  --glass-border: rgba(255,255,255,.12);
 
-  --bg-main: #0b101a;
-  --bg-card: rgba(255,255,255,.06);
-  --bg-glass: rgba(255,255,255,.08);
+  --primary-neon: #00eaff;
+  --secondary-neon: #7cf3ff;
+  --paid-gold: #ffcc55;
+  --holiday-color: #ff5c5c;
+  --dp-color: #8fff9c;
 
-  --text-main: #ffffff;
-  --text-muted: #8b9bb4;
-
-  --border-soft: 1px solid rgba(255,255,255,.1);
-  --shadow-deep: 0 12px 35px rgba(0,0,0,.65);
-  --glow-cyan: 0 0 14px rgba(0,229,255,.45);
+  --text-main: #eaf1ff;
+  --text-secondary: #8fa3c7;
 }
 
-/* ---------------- RESET ---------------- */
+/* RESET */
 * {
-  margin: 0;
-  padding: 0;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
+  font-family: "Inter", system-ui, sans-serif;
 }
 
 body {
-  background: var(--bg-main);
+  margin: 0;
+  background:
+    radial-gradient(circle at top, #0c1222, #05080d 60%);
   color: var(--text-main);
-  font-family: "Rajdhani", "Orbitron", system-ui, sans-serif;
-  font-size: 15px;
 }
 
-/* ---------------- APP CONTAINER ---------------- */
+/* APP CONTAINER */
 .app-container {
-  max-width: 450px;
-  margin: 0 auto;
-  min-height: 100vh;
-  padding-bottom: 80px;
-  position: relative;
-  z-index: 1;
+  max-width: 420px;
+  margin: auto;
+  padding-bottom: 100px;
 }
 
-/* BACKGROUND AMBIENT GLOW */
-.app-container::before {
-  content: "";
-  position: fixed;
-  inset: -40%;
-  background: radial-gradient(circle, rgba(0,229,255,.08), transparent 60%);
-  animation: spinBG 18s linear infinite;
-  z-index: -1;
-  pointer-events: none;
-}
-
-@keyframes spinBG {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-/* ---------------- HEADER ---------------- */
+/* ================= HEADER ================= */
 .header {
-  padding: 28px 20px 22px;
-  border-bottom: 1px solid rgba(0,229,255,.3);
+  padding: 22px;
   position: relative;
-  overflow: hidden;
-}
-
-.header::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(0,229,255,.9),
-    transparent
-  );
-  animation: scanline 3.5s linear infinite;
-}
-
-@keyframes scanline {
-  to { left: 100%; }
 }
 
 .user-info h1 {
-  font-family: "Orbitron", sans-serif;
-  font-size: 1.55rem;
-  color: var(--neon-cyan);
-  text-shadow: var(--glow-cyan);
+  font-size: 1.25em;
+  margin: 0;
 }
 
 .user-info p {
   margin-top: 4px;
-  font-size: .85rem;
-  color: var(--text-muted);
+  font-size: .8em;
+  color: var(--text-secondary);
 }
 
-/* ---------------- HERO TUNGGAKAN ---------------- */
+/* ================= HERO CARD ================= */
 .hero-tunggakan {
   margin-top: 18px;
-  padding: 16px 18px;
-  border-radius: 16px;
-  background: var(--bg-card);
-  border: var(--border-soft);
-  box-shadow: var(--shadow-deep);
+  backdrop-filter: blur(16px);
+  background: linear-gradient(
+    135deg,
+    rgba(0,234,255,.15),
+    rgba(18,26,44,.7)
+  );
+  border-radius: 18px;
+  padding: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  box-shadow:
+    0 0 25px rgba(0,234,255,.15),
+    inset 0 0 0 1px var(--glass-border);
 }
 
 .hero-tunggakan h3 {
-  font-size: .7rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: .8px;
+  margin: 0;
+  font-size: .75em;
+  letter-spacing: 1px;
+  color: var(--primary-neon);
 }
 
-.hero-tunggakan span {
-  font-size: 1.7rem;
+.hero-tunggakan p {
+  margin: 4px 0 0;
+  font-size: .7em;
+  color: var(--text-secondary);
+}
+
+.hero-tunggakan-value span {
+  font-size: 1.35em;
   font-weight: 700;
-  color: var(--neon-red);
-  text-shadow: 0 0 10px rgba(255,107,107,.6);
+  color: var(--paid-gold);
 }
 
-/* ---------------- SECTION TITLE ---------------- */
-section {
-  padding: 22px 20px;
+.hero-tunggakan-value small {
+  display: block;
+  font-size: .7em;
+  color: var(--text-secondary);
 }
 
-section h2 {
-  font-family: "Orbitron", sans-serif;
-  color: var(--neon-cyan);
-  font-size: 1.1rem;
-  margin-bottom: 18px;
-  border-left: 3px solid var(--neon-cyan);
-  padding-left: 10px;
+/* NEON DIVIDER */
+.futuristic-divider {
+  height: 1px;
+  margin: 22px 0;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--primary-neon),
+    transparent
+  );
+  opacity: .5;
 }
 
-/* ---------------- DASHBOARD GRID ---------------- */
+/* ================= ICON GRID ================= */
+.icon-grid-section {
+  padding: 0 20px;
+}
+
+.icon-grid-section h2 {
+  font-size: .9em;
+  margin-bottom: 14px;
+}
+
 .icon-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3,1fr);
   gap: 14px;
 }
 
 .icon-item {
-  background: var(--bg-glass);
-  border: var(--border-soft);
+  backdrop-filter: blur(14px);
+  background: var(--card-bg);
   border-radius: 16px;
   padding: 16px 10px;
   text-align: center;
-  box-shadow: var(--shadow-deep);
   text-decoration: none;
-  transition: transform .25s ease, box-shadow .25s ease;
+
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+
+  transition: all .25s ease;
 }
 
 .icon-item span {
-  font-size: 1.8rem;
   display: block;
+  font-size: 1.7em;
+  margin-bottom: 6px;
 }
 
 .icon-item p {
-  margin-top: 6px;
-  font-size: .72rem;
-  color: var(--text-muted);
+  margin: 0;
+  font-size: .72em;
   font-weight: 600;
+  color: var(--text-secondary);
 }
 
-.icon-item:active {
-  transform: scale(.95);
+.icon-item:hover {
+  transform: translateY(-4px) scale(1.02);
   box-shadow:
-    0 10px 30px rgba(0,229,255,.35),
-    inset 0 0 18px rgba(0,229,255,.25);
+    0 12px 30px rgba(0,234,255,.25);
 }
 
-/* ---------------- DASHBOARD SUMMARY ---------------- */
-.dashboard-summary {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-.dashboard-summary .card {
-  background: var(--bg-card);
-  border-radius: 16px;
-  padding: 18px;
-  border: var(--border-soft);
-  box-shadow: var(--shadow-deep);
-  animation: fadeIn .5s ease forwards;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.label {
-  font-size: .7rem;
-  color: var(--text-muted);
-  letter-spacing: .6px;
-}
-
-.value {
-  margin-top: 8px;
-  font-size: 1.35rem;
-  font-weight: 700;
-}
-
-.value.gold {
-  color: var(--neon-gold);
-  animation: glowGold 2s ease-in-out infinite;
-}
-
-@keyframes glowGold {
-  0%,100% { text-shadow: 0 0 12px rgba(204,255,0,.7); }
-  50% { text-shadow: 0 0 28px rgba(204,255,0,1); }
-}
-
-/* ---------------- ACTION BUTTONS ---------------- */
-.dashboard-actions {
-  padding: 20px;
-  display: grid;
-  gap: 12px;
-}
-
-.btn {
-  height: 48px;
-  border-radius: 14px;
-  border: none;
-  font-weight: 700;
-  font-size: .95rem;
-  cursor: pointer;
-}
-
-.btn-primary {
-  background: linear-gradient(90deg,#00bfff,var(--neon-cyan));
-  color: #000;
-}
-
-.btn-outline {
-  background: transparent;
-  border: 1px solid var(--neon-cyan);
-  color: var(--neon-cyan);
-}
-
-.btn:active {
-  transform: scale(.97);
-}
-
-/* ---------------- BOTTOM NAV ---------------- */
+/* ================= BOTTOM NAV ================= */
 .bottom-nav {
   position: fixed;
   bottom: 0;
-  width: 100%;
-  max-width: 450px;
-  height: 68px;
+  left: 0;
+  right: 0;
+
+  backdrop-filter: blur(14px);
+  background: rgba(10,14,25,.85);
+
+  border-top: 1px solid var(--glass-border);
   display: flex;
-  background: var(--bg-main);
-  border-top: 1px solid rgba(0,229,255,.35);
-  box-shadow: 0 -10px 30px rgba(0,229,255,.25);
-  z-index: 100;
+  justify-content: space-around;
+  padding: 10px 0 12px;
 }
 
 .nav-item {
-  flex: 1;
-  text-align: center;
+  font-size: .7em;
   text-decoration: none;
-  font-size: .75rem;
-  color: var(--text-muted);
-  padding-top: 10px;
+  color: var(--text-secondary);
+  text-align: center;
 }
 
 .nav-item span {
   display: block;
-  font-size: 1.45rem;
+  font-size: 1.4em;
+  margin-bottom: 2px;
 }
 
 .nav-item.active {
-  color: var(--neon-cyan);
-  text-shadow: var(--glow-cyan);
+  color: var(--primary-neon);
+  text-shadow: 0 0 12px rgba(0,234,255,.5);
 }
