@@ -51,10 +51,10 @@
 
     <div id="confirmModal" class="modal-overlay">
         <div class="modal-content" style="border-color: #00dfff;">
-            <h3>Konfirmasi Pembayaran</h3>
+            <h3 style="color: #00dfff;">Konfirmasi Pembayaran</h3>
             <p>Anda yakin ingin menyimpan perubahan pembayaran untuk bulan ini? Tunggakan Anda akan dihitung ulang.</p>
-            <button class="modal-btn primary-btn" style="background-color: #39ff14;" onclick="savePayments()">YA, SIMPAN</button>
-            <button class="modal-btn secondary-btn" style="background-color: #555; color: white;" onclick="document.getElementById('confirmModal').style.display='none'">BATAL</button>
+            <button class="modal-btn primary-btn" onclick="savePayments()">YA, SIMPAN</button>
+            <button class="modal-btn secondary-btn" onclick="document.getElementById('confirmModal').style.display='none'">BATAL</button>
         </div>
     </div>
     
@@ -62,7 +62,7 @@
         <div class="modal-content" style="border-color: #39ff14;">
             <h3 style="color: #39ff14;">✅ Berhasil Disimpan</h3>
             <p>Data pembayaran berhasil disimpan. Dashboard akan menghitung ulang tunggakan Anda.</p>
-            <button class="modal-btn primary-btn" style="background-color: #39ff14;" onclick="closeSuccessModal()">OK</button>
+            <button class="modal-btn primary-btn" onclick="closeSuccessModal()">OK</button>
         </div>
     </div>
 
@@ -83,17 +83,20 @@
         let savedPayments = JSON.parse(localStorage.getItem('maka_payments')) || {};
 
         function getDayStatus(date) {
-            const dayOfMonth = date.getDate();
-            const year = date.getFullYear();
-            const month = date.getMonth();
+            const D = new Date(date);
+            const dayOfMonth = D.getDate();
+            const year = D.getFullYear();
+            const month = D.getMonth();
 
             if (dayOfMonth === 31) return 'HLB';
 
             const dateCheck = new Date(year, month, dayOfMonth);
 
-            if (userData.opsiDp === '355' && dateCheck >= DP_START && dateCheck < DP_END) {
-                if (dayOfMonth === 14 || dayOfMonth === 28) {
-                    return 'CDP'; 
+            if (userData.opsiDp === '355') {
+                if (dateCheck >= DP_START && dateCheck < DP_END) {
+                    if (dayOfMonth === 14 || dayOfMonth === 28) {
+                        return 'CDP'; 
+                    }
                 }
             }
             return 'HWB'; 
@@ -128,7 +131,7 @@
                 let isPayable = false;
 
                 if (status === 'HLB') {
-                    statusClass = 'holiday';
+                    statusClass = 'holiday'; // <-- MERAH
                 } else if (status === 'CDP') {
                     statusClass = 'cicilan-dp'; // <-- UNGU
                     isPayable = true;
@@ -178,7 +181,7 @@
             localStorage.setItem('maka_payments', JSON.stringify(savedPayments));
             
             document.getElementById('confirmModal').style.display='none';
-            document.getElementById('successModal').style.display='flex'; // Tampilkan modal sukses
+            document.getElementById('successModal').style.display='flex';
             
             renderCalendar();
         }
