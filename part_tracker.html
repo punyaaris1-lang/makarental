@@ -16,7 +16,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
         }
         .setting-group h3 {
-            color: var(--paid-gold); /* Gold untuk fitur eksklusif */
+            color: var(--paid-gold); 
             font-size: 1.1em;
             margin-bottom: 15px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -32,7 +32,7 @@
             background: var(--input-bg);
             padding: 12px;
             border-radius: 8px;
-            border: 1px solid rgba(255, 193, 7, 0.3); /* Border Soft Gold */
+            border: 1px solid rgba(255, 193, 7, 0.3); 
         }
         .part-card p {
             font-size: 0.9em;
@@ -69,10 +69,6 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .last-used {
-            color: var(--secondary-neon);
-            font-weight: 600;
-        }
     </style>
 </head>
 <body>
@@ -98,21 +94,19 @@
 
 
         <footer class="bottom-nav">
+            <a href="lokasi_fc.html" class="nav-item">
+                <span style="color: var(--primary-neon);">⚡</span>
+                Lokasi FC
+            </a>
+            
             <a href="dashboard.html" class="nav-item">
                 <span>🏠</span>
-                Dashboard
+                Home
             </a>
-            <a href="calendar.html" class="nav-item">
-                <span>📅</span>
-                Kalender
-            </a>
-            <a href="history.html" class="nav-item">
-                <span>🗒️</span>
-                Riwayat
-            </a>
-            <a href="settings.html" class="nav-item active">
-                <span>⚙️</span>
-                Pengaturan
+            
+            <a href="daftar_antrian.html" class="nav-item">
+                <span style="color: var(--paid-gold);">🎫</span>
+                Antrian
             </a>
         </footer>
     </div>
@@ -187,7 +181,6 @@
             });
         }
 
-        // Logic Catat Penggunaan (Modal Submit)
         document.getElementById('usage-form').addEventListener('submit', function(event) {
             event.preventDefault();
             const partKey = document.getElementById('part-select').value;
