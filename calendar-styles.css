@@ -1,48 +1,24 @@
-/* calendar-styles.css - CSS KHUSUS UNTUK KALENDER SEWA */
+/* calendar-styles.css - CSS KHUSUS UNTUK KALENDER SEWA (ISOLATED FIX) */
 
-/* Ambil variabel warna dari :root di styles.css */
-/* Asumsi warna di styles.css sudah ada */
-
-.calendar-controls {
-    padding: 20px 20px 10px;
+/* Ambil Variabel dari styles.css */
+:root {
+    --primary-neon: #00dfff; 
+    --secondary-neon: #39ff14; 
+    --holiday-color: #ff4545;
+    --dp-color: #cc99ff;
+    --bg-dark: #121212;
+    --bg-hwb: #1a3a4a; /* Dark Blue */
+    --bg-cdp: #4a3a5e; /* Dark Purple */
+    --bg-hlb: #3a2222; /* Dark Red */
 }
 
-.month-selector {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--primary-neon);
-}
-
-.nav-month-btn {
-    background: none;
-    border: none;
-    color: var(--primary-neon);
-    font-size: 1.5em;
-    cursor: pointer;
-    padding: 5px 10px;
-}
-
-.calendar-display {
-    padding: 0 20px 20px;
-}
-
-.weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    margin-bottom: 10px;
-    font-weight: 600;
-    color: #999;
-    font-size: 0.85em;
-}
-
+/* Struktur dasar Kalender */
+.calendar-controls, .calendar-display { padding: 20px; }
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 5px;
 }
-
 .day {
     display: flex;
     justify-content: center;
@@ -51,7 +27,6 @@
     padding: 5px;
     position: relative;
 }
-
 .day label {
     display: flex;
     justify-content: center;
@@ -60,14 +35,11 @@
     height: 100%;
     border-radius: 8px;
     transition: all 0.2s;
-    font-weight: normal !important;
+    font-weight: normal;
     cursor: pointer;
 }
-
 .day input[type="checkbox"] {
     position: absolute;
-    top: 0;
-    left: 0;
     opacity: 0;
     width: 100%;
     height: 100%;
@@ -75,52 +47,50 @@
     z-index: 3;
 }
 
-/* --- LOGIKA WARNA HARI (Warna Dasar) --- */
-/* Menggunakan selector yang sangat kuat */
+/* --- LOGIKA WARNA HARI (Warna Dasar - FIX) --- */
 
-/* HWB - Hari Wajib Bayar (Neon Biru) */
+/* 1. HWB - Hari Wajib Bayar (Neon Biru) */
 .day.wajib-bayar:not(.paid) label {
-    background-color: var(--bg-hwb) !important;
-    border: 1px solid var(--primary-neon) !important;
-    color: var(--primary-neon) !important;
+    background-color: var(--bg-hwb);
+    border: 1px solid var(--primary-neon);
+    color: var(--primary-neon);
 }
 
-/* CDP - Cicilan DP (Ungu) */
+/* 2. CDP - Cicilan DP (Ungu) */
 .day.cicilan-dp:not(.paid) label {
-    background-color: var(--bg-cdp) !important;
-    color: var(--dp-color) !important; 
-    border: 1px solid rgba(204, 153, 255, 0.3) !important;
+    background-color: var(--bg-cdp);
+    color: var(--dp-color); 
+    border: 1px solid rgba(204, 153, 255, 0.3);
 }
 
-/* HLB - Hari Libur (Merah) */
+/* 3. HLB - Hari Libur (Merah) */
 .day.holiday label {
-    background-color: var(--bg-hlb) !important;
-    color: var(--holiday-color) !important;
-    border: 1px solid rgba(255, 69, 69, 0.2) !important;
+    background-color: var(--bg-hlb);
+    color: var(--holiday-color);
+    border: 1px solid rgba(255, 69, 69, 0.2);
 }
 
 /* 4. PAID - Hari Sudah Dibayar (Hijau Neon) */
 .day.paid input[type="checkbox"]:checked + label {
-    background-color: var(--secondary-neon) !important; 
-    color: var(--bg-dark) !important; 
-    box-shadow: 0 0 8px rgba(57, 255, 20, 0.5) !important;
-    border: 1px solid var(--secondary-neon) !important;
-    font-weight: bold !important;
+    background-color: var(--secondary-neon); 
+    color: var(--bg-dark); 
+    box-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+    border: 1px solid var(--secondary-neon);
+    font-weight: bold;
+}
+/* Memastikan warna dasar tidak menimpa warna hijau yang sudah dibayar */
+.day.paid label {
+    background-color: var(--secondary-neon);
+    color: var(--bg-dark);
 }
 
-/* Hari yang dinonaktifkan (masa depan atau HLB) */
+/* Lain-lain */
 .day input[disabled] + label {
-    background-color: #1a1a1a !important;
-    color: #555 !important;
-    border: 1px solid #333 !important;
-    cursor: not-allowed !important;
-}
-
-/* --- Lain-lain --- */
-.day .day-number {
-    font-size: 0.9em;
-    z-index: 2;
+    background-color: #1a1a1a;
+    color: #555;
+    border: 1px solid #333;
+    cursor: not-allowed;
 }
 .day.empty {
-    background-color: transparent !important;
+    background-color: transparent;
 }
