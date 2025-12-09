@@ -4,14 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kalender Tagihan</title>
-<link rel="stylesheet" href="css/app.css">
-</head>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="styles.css"> </head>
 
-<body>
-<div class="app">
+<body class="app-body">
+<div class="app-container">
 
-<h3 style="padding:16px;margin:0">📅 Kalender Pembayaran</h3>
-<div class="cal" id="calendar"></div>
+    <h3 class="header-title" style="padding: 22px 22px 0;">📅 Kalender Pembayaran</h3>
+
+    <div class="cal-header">
+        <span style="color: #ff5c5c;">Min</span>
+        <span>Sen</span>
+        <span>Sel</span>
+        <span>Rab</span>
+        <span>Kam</span>
+        <span>Jum</span>
+        <span>Sab</span>
+    </div>
+
+    <div class="cal-grid" id="calendar"></div>
 
 </div>
 
@@ -22,27 +33,16 @@
 </footer>
 
 <style>
-.cal{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:8px;
-  padding:14px;
+.cal-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    padding: 10px 14px 0;
+    font-size: 0.7em;
+    font-weight: 600;
+    color: var(--text-secondary);
 }
-.day{
-  border-radius:14px;
-  padding:10px 0;
-  font-size:.75em;
-  text-align:center;
-  border:1px solid rgba(0,0,0,.1);
-  background:#ffffff22;
-  backdrop-filter:blur(10px);
-}
-.pay{background:#dbe8ff}
-.dp{background:#fff4d0}
-.holiday{background:#ffd6d6}
-.today{outline:2px solid #007aff}
-.day b{display:block;font-size:1em}
-.day small{opacity:.8}
+/* Style kalender dari styles.css */
 </style>
 
 <script src="app.js"></script>
@@ -58,27 +58,53 @@ const m = now.getMonth();
 
 const daysInMonth = new Date(y, m+1, 0).getDate();
 
+// Temukan hari pertama bulan ini untuk menentukan offset grid
+const firstDayOfMonth = new Date(y, m, 1).getDay(); // 0 (Min) - 6 (Sab)
+
+// Buat kotak kosong untuk offset hari
+for(let i=0; i<firstDayOfMonth; i++){
+    const emptyBox = document.createElement('div');
+    emptyBox.className = 'day-box';
+    emptyBox.innerHTML = '&nbsp;';
+    emptyBox.style.border = 'none';
+    emptyBox.style.background = 'transparent';
+    cal.appendChild(emptyBox);
+}
+
+
 for(let d=1; d<=daysInMonth; d++){
   const date = new Date(y,m,d);
-  const iso = date.toISOString().slice(0,10);
+  date.setHours(0,0,0,0);
+  const iso = dateOnly(date); // Gunakan fungsi dateOnly dari app.js
 
   const box = document.createElement('div');
-  box.className = 'day';
+  box.className = 'day-box';
   box.innerHTML = `<b>${d}</b>`;
 
-  if(+date === +now) box.classList.add('today');
+  // Cek apakah hari ini
+  if(date.getTime() === now.getTime()) box.classList.add('today-day');
 
-  if(isHoliday(user, iso)){
-    box.classList.add('holiday');
+  // Cek status pembayaran
+  const isPaid = user.payments[iso]?.paid;
+  const dpStatus = getDPCicilStatus(user, iso); // Dapatkan status DP
+
+  if(isPaid){
+    box.classList.add('paid-day');
+    box.innerHTML += `<small>Bayar</small>`;
+  }
+  else if(isHoliday(user, iso)){
+    box.classList.add('holiday-day');
     box.innerHTML += `<small>Libur</small>`;
   }
-  else if(isDPDay(user, iso)){
-    box.classList.add('dp');
-    box.innerHTML += `<small>DP</small>`;
+  else if(dpStatus.isCicilDay){ // Hari Cicilan DP (Tgl 14/28 di 3 bulan awal)
+    box.classList.add('dp-day');
+    box.innerHTML += `<small>Cicil DP</small>`;
+    // Klik tetap mencatat pembayaran harian (kecuali admin yang mencatat cicilan DP)
+    box.onclick = ()=> confirmPay(iso, getDailyRate(user, iso)); 
   }
   else{
+    // Hari wajib bayar harian
     const rate = getDailyRate(user, iso);
-    box.classList.add('pay');
     box.innerHTML += `<small>${formatIDR(rate)}</small>`;
     box.onclick = ()=> confirmPay(iso, rate);
   }
@@ -87,8 +113,11 @@ for(let d=1; d<=daysInMonth; d++){
 }
 
 function confirmPay(date, amount){
+  if(amount === 0) return; // Tidak bisa bayar jika rate 0 (libur)
+
   if(confirm(`Bayar tanggal ${date}\nTagihan: ${formatIDR(amount)}`)){
-    markPaid(date);
+    // Panggil fungsi markPaid dari app.js
+    markPaid(user, date); 
     alert('✅ Dicatat sebagai dibayar');
     location.reload();
   }
