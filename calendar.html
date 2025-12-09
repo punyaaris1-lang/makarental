@@ -1,20 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kalender MAKA</title>
+
+<style>
+:root{
+ --bg:#030615;
+ --card:#0b1324;
+ --line:rgba(255,255,255,.08);
+ --cyan:#00dfff;
+ --purple:#cc99ff;
+ --yellow:#ffe600;
+ --red:#ff4545;
+}
+
+body{
+ margin:0;
+ background:linear-gradient(180deg,#020512,#060a18);
+ font-family:Inter,system-ui;
+ color:#fff;
+}
+
+.app{
+ max-width:520px;
+ margin:auto;
+ padding-bottom:120px;
+}
+
+/* HEADER */
+header{padding:20px}
+header h1{margin:0;font-size:1.2em}
+header p{margin:6px 0 0;color:#aaa;font-size:.8em}
+
+/* MONTH */
+.month{
+ display:flex;justify-content:space-between;
+ align-items:center;padding:0 20px
+}
+.month button{
+ background:none;border:1px solid var(--line);
+ color:#aaa;padding:6px 12px;border-radius:12px
+}
+
+/* WEEK */
+.week{
+ display:grid;grid-template-columns:repeat(7,1fr);
+ padding:12px 20px;font-size:.7em;
+ text-align:center;color:#7fa3ff
+}
+
+/* GRID */
+.grid{
+ display:grid;grid-template-columns:repeat(7,1fr);
+ gap:10px;padding:0 20px 20px
+}
+
+.box{
+ aspect-ratio:1/1;border-radius:14px;
+ display:flex;align-items:center;justify-content:center;
+ font-weight:600;font-size:.9em;
+ border:1px solid var(--line);
+ background:var(--card);
+ color:#8cbaff;
+}
+
+.wajib{border-color:var(--cyan);color:var(--cyan)}
+.libur{border-color:var(--red);color:var(--red)}
+.paid{
+ background:var(--yellow);
+ color:#000;border:none;
+}
+.future{opacity:.25;pointer-events:none}
+
+/* PREVIEW */
+.preview{
+ margin:0 20px;background:#0a1330;
+ padding:16px;border-radius:16px;
+}
+
+/* MODAL */
+.modal{
+ position:fixed;inset:0;
+ background:rgba(0,0,0,.6);
+ display:none;align-items:flex-end
+}
+.modal.active{display:flex}
+.sheet{
+ width:100%;max-width:520px;
+ background:#050814;
+ padding:22px;border-radius:24px 24px 0 0
+}
+.sheet button{
+ width:100%;padding:14px;
+ background:var(--yellow);
+ border:none;border-radius:14px;
+ font-weight:700;margin-top:10px
+}
+.sheet .cancel{
+ background:#1a1a2e;color:#aaa
+}
+
+/* NAV */
+.bottom-nav{
+ position:fixed;bottom:0;left:50%;
+ transform:translateX(-50%);
+ width:100%;max-width:520px;
+ height:90px;display:flex;
+ background:linear-gradient(to top,#050814,#020512);
+ border-top:1px solid var(--line)
+}
+.bottom-nav a{
+ flex:1;text-align:center;
+ font-size:.7em;color:#777;text-decoration:none;
+ padding-top:14px
+}
+.bottom-nav span{
+ display:block;font-size:26px;margin-bottom:6px
+}
+.bottom-nav .active{color:#fff}
+.bottom-nav .active span{
+ background:#3d5cff;width:56px;height:56px;
+ border-radius:50%;display:flex;
+ align-items:center;justify-content:center;
+ margin:0 auto 6px
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+ <h1>Kalender Pembayaran</h1>
+ <p>Klik tanggal untuk bayar</p>
+</header>
+
+<div class="month">
+ <button onclick="nav(-1)">‹</button>
+ <h2 id="label"></h2>
+ <button onclick="nav(1)">›</button>
+</div>
+
+<div class="week">
+ <div>Min</div><div>Sen</div><div>Sel</div>
+ <div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="preview">
+ <small>Total tagihan bulan ini</small>
+ <strong id="total">Rp 0</strong>
+</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+ <div class="sheet">
+  <h3 id="m-date"></h3>
+  <p id="m-desc"></p>
+  <button onclick="doPay()">Bayar</button>
+  <button class="cancel" onclick="closeModal()">Batal</button>
+ </div>
+</div>
+
+<footer class="bottom-nav">
+<a href="lokasi_fc.html"><span>⚡</span>FC</a>
+<a href="dashboard.html"><span>🏠</span>Home</a>
+<a href="calendar.html" class="active"><span>📅</span>Kalender</a>
+</footer>
+
 <script>
-/* ========= KONFIG ========= */
+/* ================= CONFIG ================= */
 const TGL_AMBIL = new Date('2025-09-18')
 TGL_AMBIL.setDate(TGL_AMBIL.getDate()+1) // H+1
 
-const DP_MODE = '355'   // '355' atau '755'
-const MAKA_PLUS = false
+const DP_MODE = '355'    // '355' atau '755'
+const MAKA_PLUS = false // true / false
 
 const HARIAN = 80000
 const CICIL = 70000
-const TOTAL_CICIL_DP = 6
+const TOTAL_DP = 6
 
 let view = new Date()
-let active = null
+let activePay = null
 
-/* ========= RULE ENGINE ========= */
-function getDayRule(date, dpLunas){
+/* ================= RULE ENGINE ================= */
+function getRule(date, dpLunas){
  const d = date.getDate()
 
  // 31 SELALU LIBUR
@@ -32,21 +206,24 @@ function getDayRule(date, dpLunas){
  return 'NORMAL'
 }
 
-/* ========= RENDER ========= */
+/* ================= RENDER ================= */
 function render(){
- const grid=document.getElementById('grid')
+ const grid = document.getElementById('grid')
  grid.innerHTML=''
- let total=0
-
- const pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
- const dpPaid=Object.values(pay).filter(v=>v==='DP').length
- const dpLunas=dpPaid>=TOTAL_CICIL_DP
+ let total = 0
 
  const y=view.getFullYear(), m=view.getMonth()
- const first=new Date(y,m,1).getDay()
- const days=new Date(y,m+1,0).getDate()
+ document.getElementById('label').textContent =
+  view.toLocaleDateString('id-ID',{month:'long',year:'numeric'})
+
+ const pay = JSON.parse(localStorage.getItem('maka_payments')) || {}
+ const dpPaid = Object.values(pay).filter(v=>v==='DP').length
+ const dpLunas = dpPaid >= TOTAL_DP
+
  const today=new Date(); today.setHours(0,0,0,0)
 
+ const first = new Date(y,m,1).getDay()
+ const days = new Date(y,m+1,0).getDate()
  for(let i=0;i<first;i++) grid.innerHTML+='<div></div>'
 
  for(let d=1; d<=days; d++){
@@ -55,19 +232,20 @@ function render(){
 
   if(date < TGL_AMBIL){ grid.innerHTML+='<div></div>'; continue }
 
-  const rule=getDayRule(date, dpLunas)
-  let price=0, type='', cls='box'
+  const rule=getRule(date,dpLunas)
 
-  if(rule === 'LIBUR'){
+  let cls='box', price=0, label=''
+
+  if(rule==='LIBUR'){
    cls+=' libur'
-  }else if(rule === 'DP_ONLY'){
+  }else if(rule==='DP_ONLY'){
+   cls+=' wajib'
    price=CICIL
-   type='Cicilan DP'
-   cls+=' wajib'
+   label='Cicilan DP'
   }else{
-   price = MAKA_PLUS ? HARIAN : CICIL
-   type = MAKA_PLUS ? 'Harian Motor' : 'Cicilan Motor'
    cls+=' wajib'
+   price=MAKA_PLUS?HARIAN:CICIL
+   label=MAKA_PLUS?'Harian Motor':'Cicilan Motor'
   }
 
   if(pay[key]) cls+=' paid'
@@ -76,8 +254,8 @@ function render(){
 
   grid.innerHTML+=`
    <div class="${cls}"
-    onclick="${(price>0 && !pay[key] && date<=today) ?
-      `openPay('${key}','${type}',${price})` : ''}">
+    onclick="${(price>0 && !pay[key] && date<=today)?
+     `openModal('${key}','${label}',${price})`:''}">
     ${d}
    </div>`
  }
@@ -86,24 +264,27 @@ function render(){
   'Rp '+total.toLocaleString('id-ID')
 }
 
-/* ========= POPUP ========= */
-function openPay(k,t,p){
- active={k,t,p}
- document.getElementById('m-date').textContent=k
+/* ================= MODAL ================= */
+function openModal(k,l,p){
+ activePay={k,l,p}
+ document.getElementById('m-date').textContent='Tanggal '+k
  document.getElementById('m-desc').textContent=
-  `${t} · Rp ${p.toLocaleString('id-ID')}`
+  l+' · Rp '+p.toLocaleString('id-ID')
  document.getElementById('modal').classList.add('active')
-}
-function pay(){
- const pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
- pay[active.k]=active.t.includes('DP')?'DP':'HARI'
- localStorage.setItem('maka_payments',JSON.stringify(pay))
- closeModal()
- render()
 }
 function closeModal(){
  document.getElementById('modal').classList.remove('active')
 }
+function doPay(){
+ const pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
+ pay[activePay.k]=activePay.l.includes('DP')?'DP':'HARI'
+ localStorage.setItem('maka_payments',JSON.stringify(pay))
+ closeModal()
+ render()
+}
 function nav(n){view.setMonth(view.getMonth()+n);render()}
+
 render()
 </script>
+</body>
+</html>
