@@ -5,12 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAKA Dashboard</title>
 
-<!-- inject app.css -->
 <link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="styles.css"> 
 </head>
 
-<body>
-
+<body class="app-body">
 <div class="app-container">
 
 <header class="header">
@@ -19,26 +18,37 @@
     <p>Plat Motor <b id="userPlate"></b></p>
   </div>
 
-  <div class="hero">
+  <div class="hero-tunggakan">
     <div>
-      <h3>STATUS PEMBAYARAN</h3>
-      <p class="hero-sub">Perlu dibayar hari ini</p>
+      <h3 id="tunggakanTitle">JUMLAH TUNGGAKAN</h3>
+      <p class="hero-sub" id="tunggakanDays">0 Hari</p>
     </div>
-    <div class="hero-right">
-      <span id="billTotal">Rp 0</span><br>
-      <small id="plusStatus"></small>
+    <div class="hero-tunggakan-value">
+      <span id="billTotal">Rp 0</span>
     </div>
   </div>
+
+  <div class="futuristic-divider"></div>
+
+  <div class="progress-box">
+    <div class="progress-label">
+      <span id="progressLabel">Progress RTO</span>
+      <span id="progressText">0 / 1009 Hari</span>
+    </div>
+    <div class="progress-bar">
+      <div id="progressBarFill"></div>
+    </div>
+  </div>
+  
 </header>
 
 <section class="icon-grid-section">
 <h3 class="section-title">✨ Fitur</h3>
 
 <div class="icon-grid">
-
   <a href="calendar.html" class="icon-item">
     <span>📅</span>
-    <p>Bayar</p>
+    <p>Kalender</p>
   </a>
 
   <a href="history.html" class="icon-item">
@@ -48,17 +58,17 @@
 
   <a href="part_tracker.html" class="icon-item">
     <span>🎁</span>
-    <p>Gratisan</p>
+    <p>Part Gratis</p>
   </a>
 
   <a href="info_mlu.html" class="icon-item">
     <span>📰</span>
-    <p>Info</p>
+    <p>Info MLU</p>
   </a>
 
   <a href="tips_maka.html" class="icon-item">
     <span>💡</span>
-    <p>Tips</p>
+    <p>Maka Tips</p>
   </a>
 
   <a href="maka_plus.html" class="icon-item">
@@ -70,16 +80,11 @@
     <span>⚙️</span>
     <p>Setting</p>
   </a>
-
-  <a href="admin.html" class="icon-item">
-    <span>🛠️</span>
-    <p>Admin</p>
-  </a>
-
+  
   <a href="https://wa.me/62812XXXXXXX" target="_blank"
-     class="icon-item sos">
+     class="icon-item sos-card">
      <span>🚨</span>
-     <p>SOS</p>
+     <p>SOS CS</p>
   </a>
 
 </div>
@@ -95,18 +100,29 @@
 
 <script src="app.js"></script>
 <script>
+// Logic Dashboard.html
 const user = getActiveUser();
 if(!user) location.href='index.html';
 
-userName.textContent = 'Halo, ' + user.nama;
-userPlate.textContent = user.plat;
-billTotal.textContent = formatIDR(getTotalBillUntilToday(user));
+const totalDays = DB.config.totalRentalDays;
+const tunggakanData = getTotalTunggakan(user);
+const progressPercent = (user.progressHari / totalDays) * 100;
 
-if(user.makaPlus.active){
-  plusStatus.textContent = '⭐ MAKA+ AKTIF';
-}else{
-  plusStatus.textContent = '';
+document.getElementById('userName').textContent = 'Halo, ' + user.nama;
+document.getElementById('userPlate').textContent = user.plat;
+
+// TUNGGAKAN
+document.getElementById('billTotal').textContent = formatIDR(tunggakanData.nominal);
+document.getElementById('tunggakanDays').textContent = tunggakanData.hari + ' Hari Tertunggak';
+// Beri efek danger jika ada tunggakan
+if(tunggakanData.hari > 0) {
+    document.getElementById('billTotal').style.color = 'var(--holiday-color)'; // Merah
+    document.getElementById('tunggakanDays').style.color = 'var(--holiday-color)'; 
 }
+
+// PROGRESS BAR
+document.getElementById('progressText').textContent = user.progressHari + ' / ' + totalDays + ' Hari';
+document.getElementById('progressBarFill').style.width = progressPercent.toFixed(2) + '%';
 </script>
 
 </body>
