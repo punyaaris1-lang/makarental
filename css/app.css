@@ -1,0 +1,164 @@
+/* Global iOS Clean Theme – Maka Rental */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body.app-body {
+  background: #f5f6f8;
+  color: #222;
+  padding-bottom: 90px;
+}
+
+/* Glass Header */
+.header-glass {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  padding: 18px 20px 12px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  z-index: 50;
+}
+.header-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+.header-sub {
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+/* Content Wrapper */
+.content {
+  padding: 20px;
+  margin-top: 10px;
+}
+
+/* Card */
+.card {
+  background: #fff;
+  border-radius: 22px;
+  padding: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  margin-bottom: 20px;
+}
+
+/* User Card */
+.user-card h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.user-card p {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* Progress */
+.progress-box {
+  margin: 18px 0;
+}
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background: #e9ecf0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+#progressBarFill {
+  height: 100%;
+  background: #0a84ff;
+  width: 0%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+
+/* Tunggakan */
+.tunggakan-box {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-top: 10px;
+}
+.danger-text {
+  color: #e63946;
+  font-weight: 600;
+}
+
+/* Grid Menu */
+.grid-menu {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 10px;
+}
+.menu-item {
+  background: #fff;
+  padding: 16px;
+  border-radius: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: #222;
+  font-size: 13px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  transition: transform 0.15s ease;
+}
+.menu-item img {
+  width: 34px;
+  height: 34px;
+  opacity: 0.85;
+}
+.menu-item:active {
+  transform: scale(0.96);
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 12px 25px;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(18px);
+  border-top: 1px solid rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-around;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+}
+.nav-item {
+  text-decoration: none;
+  color: #444;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+.nav-item img {
+  width: 26px;
+  opacity: 0.7;
+}
+.nav-item.active img {
+  opacity: 1;
+}
+.nav-item.active span {
+  color: #0a84ff;
+  font-weight: 600;
+}
