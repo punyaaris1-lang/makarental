@@ -11,88 +11,117 @@
 body.dashboard{background:#050814}
 .app-container{max-width:520px;margin:auto;padding-bottom:120px}
 
-/* HEADER */
+/* ===== HEADER ===== */
 .header{padding:22px 20px 16px}
 .user-info h1{font-size:1.25em;font-weight:700}
 
 .hero-tunggakan{
- margin-top:18px;
- background:linear-gradient(135deg,#0f1a3a,#020512);
- border-radius:20px;
- padding:18px 20px;
- display:flex;
- justify-content:space-between;
- align-items:center;
- border:1px solid rgba(255,255,255,.06);
- box-shadow:0 12px 28px rgba(0,0,0,.6);
+  margin-top:18px;
+  background:linear-gradient(135deg,#0f1a3a,#020512);
+  border-radius:20px;
+  padding:18px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border:1px solid rgba(255,255,255,.06);
+  box-shadow:0 12px 28px rgba(0,0,0,.6);
 }
 
 .hero-tunggakan h3{
- font-size:.75em;
- letter-spacing:1px;
- color:#7aa2ff;
+  font-size:.75em;
+  letter-spacing:1px;
+  color:#7aa2ff;
 }
 
 .hero-tunggakan-value span{
- font-size:1.3em;
- font-weight:800;
+  font-size:1.3em;
+  font-weight:800;
 }
 
 .futuristic-divider{
- height:1px;
- background:linear-gradient(to right,transparent,#2b4cff,transparent);
- margin-top:22px;
+  height:1px;
+  background:linear-gradient(to right,transparent,#2b4cff,transparent);
+  margin-top:22px;
 }
 
-/* ICON GRID */
+/* ===== ICON GRID ===== */
 .icon-grid-section{padding:20px}
 .icon-grid{
- display:grid;
- grid-template-columns:repeat(3,1fr);
- gap:18px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
 }
 .icon-item{
- text-decoration:none;
- background:rgba(255,255,255,.03);
- padding:18px 10px;
- border-radius:18px;
- text-align:center;
- border:1px solid rgba(255,255,255,.06);
- box-shadow:0 10px 24px rgba(0,0,0,.45);
- transition:.3s;
- color:#fff;
+  text-decoration:none;
+  background:rgba(255,255,255,.03);
+  padding:18px 10px;
+  border-radius:18px;
+  text-align:center;
+  border:1px solid rgba(255,255,255,.06);
+  box-shadow:0 10px 24px rgba(0,0,0,.45);
+  transition:.3s;
 }
-.icon-item:hover{transform:translateY(-4px);border-color:#3d5cff}
-.icon-item span{font-size:30px;display:block;margin-bottom:8px}
-.icon-item p{font-size:.8em;color:#ccc;font-weight:600}
+.icon-item:hover{
+  transform:translateY(-4px);
+  border-color:#3d5cff;
+}
+.icon-item span{
+  font-size:30px;
+  display:block;
+  margin-bottom:8px;
+}
+.icon-item p{
+  font-size:.8em;
+  color:#ccc;
+  font-weight:600;
+}
+.sos-card{
+  border:1px solid rgba(255,0,0,.5);
+  box-shadow:0 0 20px rgba(255,0,0,.25);
+}
 
+/* ===== BOTTOM NAV ===== */
 .bottom-nav{
- position:fixed;
- bottom:0;left:50%;
- transform:translateX(-50%);
- width:100%;max-width:520px;
- height:90px;
- background:linear-gradient(to top,#050814,#020512);
- display:flex;
- border-top:1px solid rgba(255,255,255,.08);
- z-index:999;
+  position:fixed;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:520px;
+  height:90px;
+  background:linear-gradient(to top,#050814,#020512);
+  display:flex;
+  border-top:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(16px);
+  z-index:999;
 }
+
 .nav-item{
- flex:1;text-align:center;
- text-decoration:none;
- color:#888;font-size:.7em;
- padding-top:12px;
+  flex:1;
+  text-align:center;
+  text-decoration:none;
+  color:#888;
+  font-size:.7em;
+  padding-top:12px;
 }
-.nav-item span{font-size:26px;display:block;margin-bottom:6px}
+
+.nav-item span{
+  display:block;
+  font-size:26px;
+  margin-bottom:6px;
+}
+
 .nav-item.active{color:#fff}
+
 .nav-item.active span{
- background:#3d5cff;
- width:56px;height:56px;
- border-radius:50%;
- display:flex;
- align-items:center;
- justify-content:center;
- margin:0 auto 6px;
+  background:#3d5cff;
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 6px;
 }
 </style>
 </head>
@@ -102,20 +131,24 @@ body.dashboard{background:#050814}
 <div class="app-container">
 
 <header class="header">
+<a href="admin_login.html"
+ style="position:absolute;top:14px;right:18px;font-size:.7em;color:#888">
+ ADMIN
+</a>
 
 <div class="user-info">
-<h1 id="user-name">Halo</h1>
-<p>Plat Motor <strong id="user-plate"></strong></p>
+  <h1 id="user-name-display">Halo</h1>
+  <p>Plat Motor <strong id="user-plate-display"></strong></p>
 </div>
 
 <div class="hero-tunggakan">
 <div>
-<h3>STATUS PEMBAYARAN</h3>
-<p>Perlu dibayar sampai hari ini</p>
+  <h3>STATUS PEMBAYARAN</h3>
+  <p>Perlu dibayar sampai hari ini</p>
 </div>
 <div class="hero-tunggakan-value">
-<span id="total-bill">Rp 0</span>
-<small id="total-days">0 Hari</small>
+  <span id="hero-tunggakan-nominal">Rp 0</span>
+  <small id="hero-tunggakan-days">0 Hari</small>
 </div>
 </div>
 
@@ -124,9 +157,20 @@ body.dashboard{background:#050814}
 
 <section class="icon-grid-section">
 <div class="icon-grid">
-<a href="calendar.html" class="icon-item"><span>📅</span><p>Kalender</p></a>
+
+<a href="calendar.html" class="icon-item"><span>📅</span><p>Bayar</p></a>
 <a href="history.html" class="icon-item"><span>🗒️</span><p>Riwayat</p></a>
+<a href="part_tracker.html" class="icon-item"><span>🎁</span><p>Gratisan</p></a>
+
+<a href="info_mlu.html" class="icon-item"><span>📰</span><p>Info</p></a>
+<a href="tips_maka.html" class="icon-item"><span>💡</span><p>Tips</p></a>
+<a href="#" onclick="window.open('https://etle-pmj.info','_blank')" class="icon-item"><span>🚓</span><p>ETLE</p></a>
+
+<a href="settings.html" class="icon-item"><span>⚙️</span><p>Setting</p></a>
 <a href="maka_plus.html" class="icon-item"><span>⭐</span><p>MAKA+</p></a>
+<a href="https://wa.me/62812XXXXXXXX?text=SOS%20MAKA%20DARURAT"
+ target="_blank" class="icon-item sos-card"><span>🚨</span><p>SOS</p></a>
+
 </div>
 </section>
 
@@ -139,79 +183,84 @@ body.dashboard{background:#050814}
 </footer>
 
 <script>
-/* ===============================
-   DASHBOARD BILLING – SINGLE LOGIC
-   =============================== */
+/* =====================================
+   DASHBOARD ⬄ CALENDAR BILLING (FINAL)
+   ===================================== */
 
-const user = JSON.parse(localStorage.getItem('maka_user'))
-const payments = JSON.parse(localStorage.getItem('maka_payments')) || {}
+const user = JSON.parse(localStorage.getItem('maka_user') || '{}')
+const payments = JSON.parse(localStorage.getItem('maka_payments') || '{}')
 
-if(!user){ throw 'USER NOT FOUND' }
+/* SAFE USER FIELD */
+const nama =
+  user.nama || user.name || 'User'
+const plat =
+  user.plat || user.nopol || '-'
+const tglAmbil =
+  user.tglAmbil || null
+const dpMode =
+  user.dpMode || '355'
+const makaPlus =
+  user.makaPlus === true
 
-/* INFO */
-document.getElementById('user-name').textContent = 'Halo, ' + user.nama
-document.getElementById('user-plate').textContent = user.plat || '-'
+document.getElementById('user-name-display').textContent =
+ 'Halo, ' + nama
+document.getElementById('user-plate-display').textContent = plat
+
+if(!tglAmbil){
+ document.getElementById('hero-tunggakan-nominal').textContent='Rp 0'
+ document.getElementById('hero-tunggakan-days').textContent='0 Hari'
+ throw 'TANGGAL AMBIL MOTOR TIDAK ADA'
+}
 
 /* CONFIG */
 const HARIAN = 80000
 const CICIL = 70000
-const DP_TARGET = 6
+const TOTAL_DP = 6
 
-/* DATE */
-const start = new Date(user.tglAmbil)
+/* RANGE */
+const start = new Date(tglAmbil)
 start.setDate(start.getDate()+1)
 start.setHours(0,0,0,0)
 
 const today = new Date()
 today.setHours(0,0,0,0)
 
-/* HITUNG CICIL DP */
+/* DP STATUS */
 let dpPaid = Object.values(payments).filter(v=>v==='DP').length
-let dpLunas = dpPaid >= DP_TARGET
+let dpLunas = dpPaid >= TOTAL_DP
 
 function rule(date){
  const d = date.getDate()
  if(d===31) return 'LIBUR'
-
- if(user.dpMode==='755'){
-  if(d===14||d===28) return 'LIBUR'
+ if(dpMode==='755' && (d===14||d===28)) return 'LIBUR'
+ if(dpMode==='355' && (d===14||d===28)){
+  return dpLunas?'LIBUR':'CDP'
  }
-
- if(user.dpMode==='355'){
-  if(d===14||d===28){
-   return dpLunas?'LIBUR':'CDP'
-  }
- }
-
  return 'NORMAL'
 }
 
-/* HITUNG TOTAL */
-let total=0, hari=0
-let cur = new Date(start)
+/* CALC */
+let total=0, days=0
+let cur=new Date(start)
 
 while(cur<=today){
- const key = `${cur.getFullYear()}-${cur.getMonth()+1}-${cur.getDate()}`
-
+ const key=`${cur.getFullYear()}-${cur.getMonth()+1}-${cur.getDate()}`
  if(!payments[key]){
-  const r = rule(cur)
-
-  if(r==='CDP'){
-   total+=CICIL; hari++
-  }
+  const r=rule(cur)
+  if(r==='CDP'){total+=CICIL;days++}
   if(r==='NORMAL'){
-   total+= user.makaPlus ? HARIAN : CICIL
-   hari++
+   total+= makaPlus?HARIAN:CICIL
+   days++
   }
  }
  cur.setDate(cur.getDate()+1)
 }
 
 /* OUTPUT */
-document.getElementById('total-bill').textContent =
+document.getElementById('hero-tunggakan-nominal').textContent =
  'Rp '+total.toLocaleString('id-ID')
-document.getElementById('total-days').textContent =
- hari+' Hari'
+document.getElementById('hero-tunggakan-days').textContent =
+ days+' Hari'
 </script>
 
 </body>
