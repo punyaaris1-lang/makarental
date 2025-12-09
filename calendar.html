@@ -1,326 +1,77 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Kalender Pembayaran</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kalender MAKA</title>
+
 <style>
-:root{
- --bg:#030615;
- --card:#0b1324;
- --line:rgba(255,255,255,.08);
- --cyan:#00dfff;      /* wajib */
- --purple:#cc99ff;    /* cicilan dp */
- --yellow:#ffe600;    /* paid */
- --red:#ff4545;       /* libur */
- --text:#cfe7ff;
-}
-*{box-sizing:border-box}
-body{
- margin:0;
- background:linear-gradient(180deg,#020512,#060a18);
- font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
- color:var(--text);
-}
-.app{max-width:520px;margin:0 auto;padding-bottom:120px}
-
-/* header */
-header{padding:20px}
-header h1{margin:0;font-size:1.2em}
-header p{margin:6px 0 0;color:#9aaedb;font-size:.85em}
-
-/* month nav */
-.month{display:flex;justify-content:space-between;align-items:center;padding:0 20px}
-.month h2{font-size:1em;color:#dbeeff}
-.month button{
- background:none;border:1px solid var(--line);
- color:#9fbfff;padding:8px 12px;border-radius:12px;cursor:pointer
-}
-
-/* week labels */
-.week{display:grid;grid-template-columns:repeat(7,1fr);padding:12px 20px;font-size:.75em;text-align:center;color:#7fa3ff}
-
-/* grid */
-.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:0 20px 20px}
-.day.empty{pointer-events:none;opacity:.02}
+body{margin:0;background:#020512;color:#fff;font-family:Inter}
+.app{max-width:520px;margin:auto;padding-bottom:120px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;padding:20px}
 .box{
- aspect-ratio:1/1;border-radius:14px;display:flex;align-items:center;justify-content:center;
- font-weight:700;font-size:.95em;border:1px solid var(--line);background:var(--card);color:#8cbaff;
- cursor:pointer;transition:transform .12s ease
+ aspect-ratio:1;border-radius:12px;
+ display:flex;align-items:center;justify-content:center;
+ border:1px solid rgba(255,255,255,.1)
 }
-.box:hover{transform:scale(1.03)}
-.wajib{border-color:var(--cyan);color:var(--cyan)}
-.cdp{border-color:var(--purple);color:var(--purple)}
-.libur{border-color:var(--red);color:var(--red)}
-.paid{background:var(--yellow);color:#000;border:none;box-shadow:0 0 18px rgba(255,230,0,.25)}
-.future{opacity:.32;pointer-events:none;filter:grayscale(.2)}
-/* small label under day when needed */
-.day .meta{display:block;font-size:.6em;margin-top:6px;color:#9fbfff}
-
-/* preview */
-.preview{margin:12px 20px;background:#07122b;padding:14px;border-radius:12px;border:1px solid rgba(0,223,255,.06)}
-.preview small{color:#9adfff}
-.preview strong{display:block;font-size:1.1em;margin-top:6px}
-
-/* modal */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;z-index:9999}
-.modal.active{display:flex}
-.sheet{
- width:100%;max-width:520px;background:#050814;padding:18px;border-radius:20px 20px 0 0;
- padding-bottom:120px; /* so modal content not hidden by nav */
-}
-.sheet h3{margin:0 0 6px}
-.sheet p{margin:0 0 12px;color:#d0e9ff}
-.btn{width:100%;padding:12px;border-radius:12px;border:none;font-weight:700;font-size:1em;cursor:pointer}
-.btn-pay{background:var(--yellow);color:#000;margin-bottom:8px}
-.btn-cancel{background:#2a2d3a;color:#d0d6e8}
-
-/* bottom nav (existing app nav) */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;height:90px;display:flex;background:linear-gradient(to top,#050814,#020512);border-top:1px solid rgba(255,255,255,.06);z-index:900}
-.bottom-nav a{flex:1;text-align:center;text-decoration:none;color:#aaa;padding-top:14px;font-size:.75em}
-.bottom-nav span{display:block;font-size:26px;margin-bottom:6px}
-.bottom-nav .active{color:#fff}
-.bottom-nav .active span{background:#3d5cff;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
-
-/* small helper */
-.badge{display:inline-block;padding:4px 8px;border-radius:10px;background:rgba(255,255,255,.03);font-size:.8em;color:#bcd}
-.msg{padding:12px 20px;color:#bcd}
+.harian{border-color:#00dfff;color:#00dfff}
+.cdp{border-color:#cc99ff;color:#cc99ff}
+.libur{border-color:#ff4545;color:#ff4545}
+.paid{background:#ffe600;color:#000}
+.bottom{position:fixed;bottom:0;width:100%;max-width:520px;height:90px;
+ background:#020512;border-top:1px solid rgba(255,255,255,.08)}
 </style>
 </head>
+
 <body>
 <div class="app">
-<header>
- <h1>Kalender Pembayaran</h1>
- <p>Status real sesuai dashboard</p>
-</header>
-
-<div class="month">
- <button id="prevBtn" aria-label="prev">‹</button>
- <h2 id="label">—</h2>
- <button id="nextBtn" aria-label="next">›</button>
-</div>
-
-<div class="week">
- <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
-</div>
-
-<div id="info" class="msg" style="display:none"></div>
-
+<h2 style="padding:20px">Kalender Pembayaran</h2>
 <div class="grid" id="grid"></div>
-
-<div class="preview">
- <small>Total tagihan bulan ini</small>
- <strong id="total">Rp 0</strong>
 </div>
-</div>
-
-<!-- modal -->
-<div class="modal" id="modal">
- <div class="sheet" role="dialog" aria-modal="true">
-  <h3 id="m-date">Tanggal</h3>
-  <p id="m-desc">Detail</p>
-  <button class="btn btn-pay" id="btnPay">Bayar</button>
-  <button class="btn btn-cancel" id="btnCancel">Batal</button>
- </div>
-</div>
-
-<footer class="bottom-nav">
- <a href="lokasi_fc.html"><span>⚡</span>FC</a>
- <a href="dashboard.html"><span>🏠</span>Home</a>
- <a href="calendar.html" class="active"><span>📅</span>Kalender</a>
-</footer>
+<div class="bottom"></div>
 
 <script>
-/* ==========================
-   Calendar final – full file
-   ==========================
-   Uses localStorage keys:
-   - maka_user  : { tglAmbil: "YYYY-MM-DD", dpMode: "355"|"755", makaPlus: true|false, nama, plat }
-   - maka_payments : { "YYYY-M-D": "DP"|"HARI", ... }
-   ==========================
-*/
+const user=JSON.parse(localStorage.getItem('maka_user'));
+const finance=JSON.parse(localStorage.getItem('maka_finance_settings'))||{hwb_rate:80000,cdp_rate:70000};
+const pay=JSON.parse(localStorage.getItem('maka_payments'))||{};
+const now=new Date();now.setHours(0,0,0,0);
 
-/* -- helpers -- */
-function isoDateKey(d){ return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate() }
-function normalize(d){ const x=new Date(d); x.setHours(0,0,0,0); return x }
+let dpLeft=6-user.dpTerbayar;
 
-/* -- load user & payments -- */
-let user = JSON.parse(localStorage.getItem('maka_user') || 'null')
-let payData = JSON.parse(localStorage.getItem('maka_payments') || '{}')
+const view=new Date();
+view.setDate(1);
 
-/* default safe user message if not present */
-if(!user){
- document.getElementById('info').style.display='block'
- document.getElementById('info').textContent =
-  'Belum ada data user. Isi `maka_user` di localStorage dulu (tglAmbil, dpMode, makaPlus).'
-}
+const grid=document.getElementById('grid');
+const days=new Date(view.getFullYear(),view.getMonth()+1,0).getDate();
 
-/* params and constants */
-const HARIAN = 80000
-const CICIL = 70000
-const TOTAL_DP = 6
+for(let i=1;i<=days;i++){
+ const d=new Date(view.getFullYear(),view.getMonth(),i);
+ let cls='box';
+ let price=0;
 
-/* view state */
-let view = new Date()
-view.setDate(1)
-let active = null // {key,label,amt}
-
-/* event listeners nav */
-document.getElementById('prevBtn').addEventListener('click',()=>{ view.setMonth(view.getMonth()-1); render() })
-document.getElementById('nextBtn').addEventListener('click',()=>{ view.setMonth(view.getMonth()+1); render() })
-
-/* modal buttons */
-const modal = document.getElementById('modal')
-const btnPay = document.getElementById('btnPay')
-const btnCancel = document.getElementById('btnCancel')
-btnCancel.addEventListener('click', closeModal)
-btnPay.addEventListener('click', doPay)
-
-/* rule engine */
-function computeDpPaid(payData){
- return Object.values(payData).filter(v=>v==='DP').length
-}
-
-function getRuleForDate(date, dpLunas, dpMode){
- const d = date.getDate()
- if(d === 31) return 'LIBUR'
- if(dpMode === '755' && (d === 14 || d === 28)) return 'LIBUR'
- if(dpMode === '355' && (d === 14 || d === 28)) return dpLunas ? 'LIBUR' : 'CDP'
- return 'NORMAL'
-}
-
-/* render calendar */
-function render(){
- // refresh local data (so dashboard changes reflect)
- user = JSON.parse(localStorage.getItem('maka_user') || 'null')
- payData = JSON.parse(localStorage.getItem('maka_payments') || '{}')
-
- const infoEl = document.getElementById('info')
- if(!user){
-  infoEl.style.display='block'
-  infoEl.textContent =
-   'Belum ada data user. Buka halaman pendaftaran / simpan `maka_user` di localStorage.'
- } else {
-  infoEl.style.display='none'
+ if(i===31){cls+=' libur'}
+ else if(user.dp==='355' && dpLeft>0 && (i===14||i===28)){
+   cls+=' cdp';price=finance.cdp_rate;dpLeft--;
+ }
+ else if(user.dp==='755' && (i===14||i===28)){
+   cls+=' libur'
+ }
+ else if(i!==14 && i!==28){
+   cls+=' harian';price=finance.hwb_rate
  }
 
- const grid = document.getElementById('grid')
- grid.innerHTML = ''
- const label = document.getElementById('label')
+ if(pay[d.toDateString()])cls+=' paid';
 
- const y = view.getFullYear(), m = view.getMonth()
- label.textContent = view.toLocaleDateString('id-ID',{month:'long',year:'numeric'})
+ grid.innerHTML+=`<div class="${cls}" onclick="bayar('${d.toDateString()}',${price})">${i}</div>`;
+}
 
- // compute dpPaid across all months
- const dpPaidCount = computeDpPaid(payData)
- const dpLunas = dpPaidCount >= TOTAL_DP
-
- // start pay date (H+1)
- let startPay = null
- if(user && user.tglAmbil){
-  startPay = normalize(new Date(user.tglAmbil))
-  startPay.setDate(startPay.getDate()+1)
+function bayar(key,nom){
+ if(nom===0)return alert('Hari libur');
+ if(confirm('Bayar Rp '+nom.toLocaleString('id-ID')+'?')){
+   pay[key]=true;
+   localStorage.setItem('maka_payments',JSON.stringify(pay));
+   location.reload();
  }
-
- const firstDay = new Date(y,m,1).getDay()
- const daysInMonth = new Date(y,m+1,0).getDate()
- const today = normalize(new Date())
-
- for(let i=0;i<firstDay;i++) grid.innerHTML += '<div class="day empty"></div>'
-
- let total = 0
-
- for(let d=1; d<=daysInMonth; d++){
-  const date = normalize(new Date(y,m,d))
-  const key = isoDateKey(date)
-
-  let cls = 'box'
-  let price = 0
-  let labelTxt = ''
-
-  // if no user or before startPay -> mark as empty (not clickable, show muted)
-  if(!startPay || date < startPay){
-   cls += ' libur' // visually muted as unavailable
-  } else {
-   // determine rule
-   const rule = getRuleForDate(date, dpLunas, (user && user.dpMode) ? user.dpMode : '355')
-   if(rule === 'LIBUR'){
-    cls += ' libur'
-   } else if(rule === 'CDP'){
-    cls += ' cdp'
-    price = CICIL
-    labelTxt = 'Cicilan DP'
-   } else { // NORMAL
-    cls += ' wajib'
-    price = (user && user.makaPlus) ? HARIAN : CICIL
-    labelTxt = (user && user.makaPlus) ? 'Harian Motor' : 'Cicilan Motor'
-   }
-  }
-
-  // apply paid / future flags
-  if(payData[key]) cls += ' paid'
-  if(date > today) cls += ' future'
-
-  // total calculation: only count unpaid and only up to today and only within month
-  if(!payData[key] && price>0 && date <= today){
-   total += price
-  }
-
-  // create cell
-  // onclick only when price>0 AND not paid AND date<=today
-  const canClick = price>0 && !payData[key] && date <= today
-  const onclick = canClick ? `openModal('${key}','${labelTxt}',${price})` : ''
-
-  grid.innerHTML += `
-   <div class="day">
-     <div class="${cls}" ${ onclick ? `onclick="${onclick}"` : '' } data-date="${key}">
-       <div>${d}</div>
-     </div>
-   </div>`
- }
-
- document.getElementById('total').textContent = 'Rp ' + total.toLocaleString('id-ID')
-}
-
-/* open modal */
-function openModal(key,labelTxt,price){
- active = { key, labelTxt, price }
- document.getElementById('m-date').textContent = 'Tanggal ' + key
- document.getElementById('m-desc').textContent = (labelTxt || 'Pembayaran') + ' · Rp ' + price.toLocaleString('id-ID')
- modal.classList.add('active')
- // ensure focus on pay button for accessibility
- btnPay.focus()
-}
-
-/* close modal */
-function closeModal(){
- active = null
- modal.classList.remove('active')
-}
-
-/* do payment */
-function doPay(){
- if(!active) return
- // store as 'DP' if label includes DP else 'HARI'
- const v = (active.labelTxt && active.labelTxt.toLowerCase().includes('dp')) ? 'DP' : 'HARI'
- payData = JSON.parse(localStorage.getItem('maka_payments') || '{}')
- payData[active.key] = v
- localStorage.setItem('maka_payments', JSON.stringify(payData))
- // after paying, re-render (dpPaid count will update)
- closeModal()
- render()
-}
-
-/* initial render */
-render()
-
-/* expose some helpers to console for debugging if needed */
-window.__maka_debug = {
- userKey: 'maka_user',
- paymentsKey: 'maka_payments',
- refresh: render,
- openModal,
- closeModal
 }
 </script>
 </body>
