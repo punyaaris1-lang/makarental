@@ -1,267 +1,111 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Kalender Pembayaran</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalender Tagihan</title>
+<link rel="stylesheet" href="styles.css">
+
 <style>
-:root{
- --bg:#020512; --card:#0b1324; --line:rgba(255,255,255,.08);
- --cyan:#00dfff; --purple:#cc99ff; --red:#ff4545; --paid:#ffe600;
+body{background:#050814;color:#fff;margin:0}
+.app{max-width:520px;margin:auto;padding-bottom:110px}
+
+h3{padding:16px;margin:0}
+
+.cal{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+  padding:14px
 }
-body{margin:0;background:linear-gradient(180deg,#020512,#060a18);font-family:Inter,system-ui;color:#e6f0ff}
-.app{max-width:520px;margin:0 auto;padding-bottom:120px}
-header{padding:18px}
-.month{display:flex;justify-content:space-between;align-items:center;padding:0 18px}
-.week{display:grid;grid-template-columns:repeat(7,1fr);padding:12px 18px;color:#7fa3ff;text-align:center}
-.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:0 18px 20px}
-.box{aspect-ratio:1;border-radius:12px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);background:var(--card);cursor:pointer;font-weight:700}
-.box:hover{transform:scale(1.03)}
-.wajib{border-color:var(--cyan);color:var(--cyan)}
-.cdp{border-color:var(--purple);color:var(--purple)}
-.libur{border-color:var(--red);color:var(--red)}
-.paid{background:var(--paid);color:#000;border:none}
-.future{opacity:.35;pointer-events:none;filter:grayscale(.2)}
-.preview{margin:12px 18px;background:#07122b;padding:12px;border-radius:12px;border:1px solid rgba(0,223,255,.06)}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;z-index:9999}
-.modal.active{display:flex}
-.sheet{width:100%;max-width:520px;background:#050814;padding:18px;border-radius:18px 18px 0 0;padding-bottom:120px}
-.btn{width:100%;padding:12px;border-radius:12px;border:none;font-weight:700;margin-top:8px;cursor:pointer}
-.btn-pay{background:var(--paid);color:#000}
-.btn-cancel{background:#2b2f3b;color:#dbeaff}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;height:90px;display:flex;background:linear-gradient(to top,#050814,#020512);border-top:1px solid rgba(255,255,255,.04);z-index:900}
-.bottom-nav a{flex:1;text-align:center;color:#888;text-decoration:none;padding-top:14px}
-.bottom-nav span{display:block;font-size:26px;margin-bottom:6px}
+.day{
+  border-radius:14px;
+  padding:10px 0;
+  font-size:.75em;
+  text-align:center;
+  border:1px solid rgba(255,255,255,.08);
+}
+.pay{background:#0f1a3a}
+.dp{background:#5a4200}
+.holiday{background:#5a0000}
+.today{outline:2px solid #4f6bff}
+
+.day b{display:block;font-size:1em}
+.day small{opacity:.8}
 </style>
 </head>
+
 <body>
 <div class="app">
-<header>
- <h2>Kalender Pembayaran</h2>
- <p class="small">Klik tanggal untuk bayar — warna: <span style="color:var(--cyan)">Wajib</span>, <span style="color:var(--purple)">Cicilan DP</span>, <span style="color:var(--red)">Libur</span></p>
-</header>
 
-<div class="month">
- <button id="prev">‹</button>
- <h3 id="label">—</h3>
- <button id="next">›</button>
-</div>
+<h3>📅 Kalender Pembayaran</h3>
+<div class="cal" id="calendar"></div>
 
-<div class="week">
- <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
-</div>
-
-<div class="grid" id="grid"></div>
-
-<div class="preview">
- <small>Total tagihan bulan ini</small>
- <strong id="total">Rp 0</strong>
-</div>
-</div>
-
-<!-- modal -->
-<div class="modal" id="modal">
- <div class="sheet" role="dialog" aria-modal="true">
-  <h3 id="m-date">Tanggal</h3>
-  <p id="m-desc">Detail</p>
-  <button id="payBtn" class="btn btn-pay">Bayar</button>
-  <button id="cancelBtn" class="btn btn-cancel">Batal</button>
- </div>
 </div>
 
 <footer class="bottom-nav">
- <a href="lokasi_fc.html"><span>⚡</span>FC</a>
- <a href="dashboard.html"><span>🏠</span>Home</a>
- <a href="calendar.html" class="active"><span>📅</span>Kalender</a>
+  <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>FC</a>
+  <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
+  <a href="calendar.html" class="nav-item active"><span>📅</span>Bayar</a>
 </footer>
 
+<script src="app.js"></script>
 <script>
-/* Calendar logic (full, robust)
-   uses localStorage keys:
-   - maka_user (object) OR fallback first of maka_users array
-   - maka_finance_settings: {hwb_rate, cdp_rate}
-   - maka_payments: {"YYYY-M-D": "DP"|"HARI"}
-   - maka_tagihan: array of invoices {id,userId,tgl,nominal,status,qris}
-*/
+const user = getActiveUser();
+if(!user) location.href='index.html';
 
-function getUserFromStorage(){
-  try{
-    const u = JSON.parse(localStorage.getItem('maka_user'));
-    if(u && u.tanggalAmbil) return u;
-  }catch(e){}
-  try{
-    const arr = JSON.parse(localStorage.getItem('maka_users'))||[];
-    if(arr.length) return arr[0];
-  }catch(e){}
-  return null;
-}
+const cal = document.getElementById('calendar');
+const now = new Date();
+now.setHours(0,0,0,0);
+const y = now.getFullYear();
+const m = now.getMonth();
 
-const user = getUserFromStorage();
-const finance = JSON.parse(localStorage.getItem('maka_finance_settings')) || {hwb_rate:80000,cdp_rate:70000};
-let payments = JSON.parse(localStorage.getItem('maka_payments') || '{}');
-let invoices = JSON.parse(localStorage.getItem('maka_tagihan') || '[]');
+const daysInMonth = new Date(y, m+1, 0).getDate();
 
-const grid = document.getElementById('grid');
-const label = document.getElementById('label');
-const totalEl = document.getElementById('total');
-const modal = document.getElementById('modal');
-const payBtn = document.getElementById('payBtn');
-const cancelBtn = document.getElementById('cancelBtn');
-let active = null;
+for(let d=1; d<=daysInMonth; d++){
+  const date = new Date(y,m,d);
+  const iso = date.toISOString().slice(0,10);
 
-let view = new Date();
-view.setDate(1);
+  const box = document.createElement('div');
+  box.className = 'day';
+  box.innerHTML = `<b>${d}</b>`;
 
-document.getElementById('prev').addEventListener('click', ()=>{ view.setMonth(view.getMonth()-1); render(); });
-document.getElementById('next').addEventListener('click', ()=>{ view.setMonth(view.getMonth()+1); render(); });
-cancelBtn.addEventListener('click', closeModal);
-payBtn.addEventListener('click', doPay);
+  if(+date === +now) box.classList.add('today');
 
-function normalize(d){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
-function keyOf(d){ return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }
-
-function computeDpPaid(){
-  return Object.values(payments).filter(v=>v==='DP').length +
-    invoices.filter(i=> (i.type==='DP' || (i.note && i.note.includes('DP'))) && (i.paid===true || (i.status && i.status.toUpperCase()==='LUNAS')) ).length;
-}
-
-function getRule(date){
-  const d = date.getDate();
-  if(d===31) return 'LIBUR';
-  const dpMode = user && (user.dp || user.dpMode) ? (user.dp||user.dpMode) : '355';
-  if(String(dpMode)==='755' && (d===14||d===28)) return 'LIBUR';
-  if(String(dpMode)==='355' && (d===14||d===28)){
-    const dpPaid = computeDpPaid();
-    if(dpPaid >= 6) return 'LIBUR';
-    return 'CDP';
-  }
-  return 'NORMAL';
-}
-
-function isPaid(date){
-  const k = keyOf(date);
-  if(payments[k]) return true;
-  // check invoices for this user same date
-  const inv = invoices.find(i=> {
-    const invDate = i.date || i.tgl || i.tanggal || i.tglInvoice;
-    if(!invDate) return false;
-    const dt = new Date(invDate); dt.setHours(0,0,0,0);
-    return dt.getTime()===date.getTime() && (String(i.userId)===String(user.id) || i.userName===user.nama || i.userPlat===user.plat);
-  });
-  return !!(inv && (inv.paid===true || (inv.status && inv.status.toUpperCase()==='LUNAS')));
-}
-
-function invoiceFor(date){
-  const dtStr = date.toISOString().slice(0,10);
-  return invoices.find(i => (i.tgl===dtStr || i.date===dtStr || i.tgl===date.toDateString()) && (String(i.userId)===String(user.id) || i.userName===user.nama || i.userPlat===user.plat));
-}
-
-function render(){
-  grid.innerHTML='';
-  if(!user){
-    label.textContent = 'Tidak ada user (buka index.html)';
-    totalEl.textContent = 'Rp 0';
-    return;
-  }
-  label.textContent = view.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
-
-  const y = view.getFullYear(), m = view.getMonth();
-  const first = new Date(y,m,1).getDay();
-  const days = new Date(y,m+1,0).getDate();
-
-  for(let i=0;i<first;i++) grid.innerHTML += '<div></div>';
-
-  let total = 0;
-  const today = normalize(new Date());
-
-  for(let d=1; d<=days; d++){
-    const date = normalize(new Date(y,m,d));
-    const rule = getRule(date);
-    let cls = 'box';
-    let price = 0;
-    let labelTxt = '';
-
-    if(!user || !user.tanggalAmbil){
-      cls += ' libur';
-    } else {
-      const start = normalize(new Date(user.tanggalAmbil));
-      start.setDate(start.getDate()+1);
-      if(date < start){
-        cls += ' libur';
-      } else {
-        if(rule==='LIBUR'){ cls += ' libur'; }
-        else if(rule==='CDP'){ cls += ' cdp'; price = finance.cdp_rate || 70000; labelTxt='Cicilan DP'; }
-        else { cls += ' wajib'; price = (user.makaPlus? (finance.hwb_rate||80000) : (finance.hwb_rate||80000)); labelTxt = user.makaPlus? 'Harian (MAKA+)' : 'Harian'; 
-               // add makaPlus extra 10k if active since date
-               if(user.makaPlus && user.makaPlusAktifSejak){
-                  const akt = normalize(new Date(user.makaPlusAktifSejak));
-                  akt.setDate(akt.getDate()+1);
-                  if(date >= akt) price += 10000;
-               }
-        }
-      }
-    }
-
-    // invoice-specific price override
-    const inv = invoiceFor(date);
-    if(inv){
-      price = inv.nominal || price;
-      labelTxt = inv.note || 'Tagihan Admin';
-    }
-
-    if(isPaid(date)) cls += ' paid';
-    if(date > today) cls += ' future';
-    if(!isPaid(date) && price>0 && date<=today) total += price;
-
-    // clickable only if price>0 and not paid and not future
-    const canClick = price>0 && !isPaid(date) && date<=today;
-    const onclick = canClick ? `openModal('${keyOf(date)}','${labelTxt.replace(/'/g,"\\'")}',${price})` : '';
-
-    grid.innerHTML += `<div><div class="${cls}" ${onclick?`onclick="${onclick}"`:''} data-date="${keyOf(date)}">${d}</div></div>`;
+  // LIBUR
+  if(isHoliday(user, iso)){
+    box.classList.add('holiday');
+    box.innerHTML += `<small>Libur</small>`;
   }
 
-  totalEl.textContent = 'Rp ' + total.toLocaleString('id-ID');
-}
-
-/* modal functions */
-function openModal(key,label,price){
-  active = { key, label, price };
-  document.getElementById('m-date').textContent = 'Tanggal ' + key;
-  document.getElementById('m-desc').textContent = (label||'Pembayaran') + ' · Rp ' + price.toLocaleString('id-ID');
-  modal.classList.add('active');
-  payBtn.focus();
-}
-function closeModal(){ active=null; modal.classList.remove('active'); }
-
-function doPay(){
-  if(!active) return;
-  // mark payment in maka_payments
-  payments = JSON.parse(localStorage.getItem('maka_payments')||'{}');
-  payments[active.key] = active.label && active.label.toLowerCase().includes('dp') ? 'DP' : 'HARI';
-  localStorage.setItem('maka_payments', JSON.stringify(payments));
-  // also mark invoice paid if exists
-  invoices = JSON.parse(localStorage.getItem('maka_tagihan')||'[]');
-  const invIdx = invoices.findIndex(i=>{
-    const invDate = i.date || i.tgl || i.tglInvoice;
-    if(!invDate) return false;
-    const invD = new Date(invDate); invD.setHours(0,0,0,0);
-    const keyParts = active.key.split('-').map(n=>Number(n));
-    const actD = new Date(keyParts[0], keyParts[1]-1, keyParts[2]); actD.setHours(0,0,0,0);
-    const sameDate = invD.getTime()===actD.getTime();
-    const matchUser = (i.userId && user.id && String(i.userId)===String(user.id)) || i.userName===user.nama || i.userPlat===user.plat;
-    return sameDate && matchUser;
-  });
-  if(invIdx>=0){
-    invoices[invIdx].paid = true;
-    invoices[invIdx].status = 'LUNAS';
-    localStorage.setItem('maka_tagihan', JSON.stringify(invoices));
+  // CICILAN DP (14 & 28 dst)
+  else if(isDPDay(user, iso)){
+    box.classList.add('dp');
+    box.innerHTML += `<small>DP</small>`;
   }
-  closeModal();
-  render();
+
+  // TAGIHAN NORMAL
+  else{
+    const rate = getDailyRate(user, iso);
+    box.classList.add('pay');
+    box.innerHTML += `<small>${formatIDR(rate)}</small>`;
+
+    box.onclick = ()=> confirmPay(iso, rate);
+  }
+
+  cal.appendChild(box);
 }
 
-/* init */
-render();
+function confirmPay(date, amount){
+  if(confirm(
+    `Bayar tanggal ${date}\nTagihan: ${formatIDR(amount)}`
+  )){
+    markPaid(date);
+    alert('✅ Dicatat sebagai dibayar');
+    location.reload();
+  }
+}
 </script>
+
 </body>
 </html>
