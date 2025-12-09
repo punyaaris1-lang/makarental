@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kalender MAKA</title>
 
 <style>
@@ -10,10 +10,10 @@
  --bg:#030615;
  --card:#0b1324;
  --line:rgba(255,255,255,.08);
- --cyan:#00dfff;
- --purple:#cc99ff;
- --yellow:#ffe600;
- --red:#ff4545;
+ --cyan:#00dfff;      /* wajib */
+ --purple:#cc99ff;    /* cicilan dp */
+ --yellow:#ffe600;    /* paid */
+ --red:#ff4545;       /* libur */
 }
 
 body{
@@ -34,6 +34,7 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  display:flex;justify-content:space-between;
  align-items:center;padding:0 20px
 }
+.month h2{font-size:1em}
 .month button{
  background:none;border:1px solid var(--line);
  color:#aaa;padding:6px 12px;border-radius:12px
@@ -51,14 +52,16 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  display:grid;grid-template-columns:repeat(7,1fr);
  gap:10px;padding:0 20px 20px
 }
-
+.day.empty{pointer-events:none}
 .box{
  aspect-ratio:1/1;border-radius:14px;
  display:flex;align-items:center;justify-content:center;
  font-weight:600;font-size:.9em;
  border:1px solid var(--line);
  background:var(--card);color:#8cbaff;
+ transition:.2s
 }
+.box:hover{transform:scale(1.05)}
 
 .wajib{border-color:var(--cyan);color:var(--cyan)}
 .cdp{border-color:var(--purple);color:var(--purple)}
@@ -67,33 +70,41 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
 .paid{
  background:var(--yellow);
  color:#000;border:none;
+ box-shadow:0 0 18px rgba(255,230,0,.5)
 }
-.future{opacity:.25;pointer-events:none}
 
+/* PREVIEW */
 .preview{
  margin:0 20px;background:#0a1330;
  padding:16px;border-radius:16px;
+ border:1px solid rgba(0,223,255,.25)
 }
 
 /* MODAL */
 .modal{
- position:fixed;inset:0;
+ position:fixed;
+ inset:0;
  background:rgba(0,0,0,.6);
- display:none;align-items:flex-end
+ display:none;
+ align-items:flex-end;
+ z-index:2000;
 }
 .modal.active{display:flex}
 .sheet{
  width:100%;max-width:520px;
  background:#050814;
- padding:22px;border-radius:24px 24px 0 0
+ padding:22px;
+ padding-bottom:120px; /* ⬅️ biar ga ketutupan nav */
+ border-radius:24px 24px 0 0
 }
+.sheet h3{margin:0 0 8px}
 .sheet button{
  width:100%;padding:14px;
- background:var(--yellow);
  border:none;border-radius:14px;
  font-weight:700;margin-top:12px
 }
-.sheet .cancel{background:#1a1a2e;color:#aaa}
+.btn-pay{background:var(--yellow)}
+.btn-cancel{background:#222;color:#aaa}
 
 /* NAV */
 .bottom-nav{
@@ -102,7 +113,8 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  width:100%;max-width:520px;
  height:90px;display:flex;
  background:linear-gradient(to top,#050814,#020512);
- border-top:1px solid var(--line)
+ border-top:1px solid var(--line);
+ z-index:999;
 }
 .bottom-nav a{
  flex:1;text-align:center;
@@ -127,7 +139,7 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
 
 <header>
  <h1>Kalender Pembayaran</h1>
- <p>Sinkron dengan dashboard</p>
+ <p>Status real sesuai dashboard</p>
 </header>
 
 <div class="month">
@@ -144,7 +156,7 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
 <div class="grid" id="grid"></div>
 
 <div class="preview">
- <small>Total tagihan sampai hari ini</small>
+ <small>Total tagihan bulan ini</small>
  <strong id="total">Rp 0</strong>
 </div>
 </div>
@@ -154,8 +166,8 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  <div class="sheet">
   <h3 id="m-date"></h3>
   <p id="m-desc"></p>
-  <button onclick="doPay()">Bayar</button>
-  <button class="cancel" onclick="closeModal()">Batal</button>
+  <button class="btn-pay" onclick="pay()">Bayar</button>
+  <button class="btn-cancel" onclick="closeModal()">Batal</button>
  </div>
 </div>
 
@@ -166,110 +178,120 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
 </footer>
 
 <script>
-/* ===== USER (SAMA DASHBOARD) ===== */
-const user = JSON.parse(localStorage.getItem('maka_user')) || {
- tglAmbil:'2025-09-18',
- dpMode:'355',
- makaPlus:false
-}
+/* =============================
+   SHARED BILLING LOGIC
+   ============================= */
 
-const TGL_MULAI = new Date(user.tglAmbil)
-TGL_MULAI.setDate(TGL_MULAI.getDate()+1)
+const user = JSON.parse(localStorage.getItem('maka_user'))
+const payData = JSON.parse(localStorage.getItem('maka_payments')) || {}
+const view = new Date()
 
 const HARIAN = 80000
 const CICIL = 70000
 const TOTAL_DP = 6
 
-let view=new Date()
-let active=null
+if(!user) throw 'USER NOT FOUND'
 
-function getRule(date,dpLunas){
- const d=date.getDate()
+/* HITUNG DP LUNAS */
+let dpPaid = Object.values(payData).filter(v=>v==='DP').length
+let dpLunas = dpPaid >= TOTAL_DP
+
+/* RULE TANGGAL */
+function rule(date){
+ const d = date.getDate()
+
  if(d===31) return 'LIBUR'
+
  if(user.dpMode==='755' && (d===14||d===28)) return 'LIBUR'
- if(user.dpMode==='355'){
-  if(!dpLunas && (d===14||d===28)) return 'CDP'
-  if(dpLunas && (d===14||d===28)) return 'LIBUR'
+
+ if(user.dpMode==='355' && (d===14||d===28)){
+  return dpLunas ? 'LIBUR' : 'CDP'
  }
+
  return 'NORMAL'
 }
 
+/* RENDER */
+let activeKey=null,activeType=null,activeAmount=0
+
+function nav(n){view.setMonth(view.getMonth()+n);render()}
+
 function render(){
- const grid=document.getElementById('grid')
- grid.innerHTML=''
- let total=0
-
- const pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
- const dpPaid=Object.values(pay).filter(v=>v==='DP').length
- const dpLunas=dpPaid>=TOTAL_DP
-
- const today=new Date()
- today.setHours(0,0,0,0)
-
- const y=view.getFullYear(), m=view.getMonth()
+ const y=view.getFullYear(),m=view.getMonth()
  document.getElementById('label').textContent=
   view.toLocaleDateString('id-ID',{month:'long',year:'numeric'})
 
  const first=new Date(y,m,1).getDay()
  const days=new Date(y,m+1,0).getDate()
+ const grid=document.getElementById('grid')
+ grid.innerHTML=''
+ let total=0
 
- for(let i=0;i<first;i++) grid.innerHTML+='<div></div>'
+ const start=new Date(user.tglAmbil)
+ start.setDate(start.getDate()+1)
+ start.setHours(0,0,0,0)
+
+ const today=new Date()
+ today.setHours(0,0,0,0)
+
+ for(let i=0;i<first;i++)
+  grid.innerHTML+='<div class="day empty"></div>'
 
  for(let d=1;d<=days;d++){
   const date=new Date(y,m,d)
   date.setHours(0,0,0,0)
+
   const key=`${y}-${m+1}-${d}`
+  const status=rule(date)
 
-  if(date<TGL_MULAI){grid.innerHTML+='<div></div>';continue}
+  let cls='box'
+  let price=0
+  let type=null
 
-  const rule=getRule(date,dpLunas)
-  let cls='box',price=0,label=''
-
-  if(rule==='LIBUR'){
+  if(date < start){
    cls+=' libur'
-  }else if(rule==='CDP'){
-   cls+=' cdp'
-   price=CICIL
-   label='Cicilan DP'
   }else{
-   cls+=' wajib'
-   price=user.makaPlus?HARIAN:CICIL
-   label=user.makaPlus?'Harian Motor':'Cicilan Motor'
+   if(status==='LIBUR') cls+=' libur'
+   if(status==='CDP'){cls+=' cdp';price=CICIL;type='DP'}
+   if(status==='NORMAL'){
+    cls+=' wajib'
+    price=user.makaPlus?HARIAN:CICIL
+    type='HARIAN'
+   }
   }
 
-  if(pay[key]) cls+=' paid'
-  if(date>today) cls+=' future'
-  if(!pay[key]&&price>0&&date<=today) total+=price
+  if(payData[key]) cls+=' paid'
+  if(!payData[key]&&price>0&&date<=today) total+=price
 
   grid.innerHTML+=`
-   <div class="${cls}"
-    onclick="${(price>0&&!pay[key]&&date<=today)?
-     `openModal('${key}','${label}',${price})`:''}">
-    ${d}
+   <div class="day">
+    <div class="${cls}"
+     onclick="openModal('${key}','${type}',${price})">${d}</div>
    </div>`
  }
 
  document.getElementById('total').textContent=
-  'Rp '+total.toLocaleString('id-ID')
+  `Rp ${total.toLocaleString('id-ID')}`
 }
 
-function openModal(k,l,p){
- active={k,l,p}
- document.getElementById('m-date').textContent='Tanggal '+k
+/* MODAL */
+function openModal(k,t,p){
+ if(!p) return
+ activeKey=k;activeType=t;activeAmount=p
+ document.getElementById('m-date').textContent=`Tanggal ${k}`
  document.getElementById('m-desc').textContent=
-  l+' · Rp '+p.toLocaleString('id-ID')
+  `Bayar ${t==='DP'?'Cicilan DP':'Harian'} · Rp ${p.toLocaleString('id-ID')}`
  document.getElementById('modal').classList.add('active')
 }
 function closeModal(){
  document.getElementById('modal').classList.remove('active')
 }
-function doPay(){
- const pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
- pay[active.k]=active.l.includes('DP')?'DP':'HARI'
- localStorage.setItem('maka_payments',JSON.stringify(pay))
+function pay(){
+ payData[activeKey]=activeType
+ localStorage.setItem('maka_payments',JSON.stringify(payData))
  closeModal();render()
 }
-function nav(n){view.setMonth(view.getMonth()+n);render()}
+
 render()
 </script>
 </body>
