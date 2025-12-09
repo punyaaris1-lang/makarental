@@ -4,77 +4,131 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAKA Dashboard</title>
+
 <link rel="stylesheet" href="styles.css">
+
+<style>
+body{background:#050814;color:#fff;margin:0;font-family:sans-serif}
+.app-container{max-width:520px;margin:auto;padding-bottom:120px}
+
+.header{padding:22px}
+.user-info h1{margin:0;font-size:1.3em}
+.user-info p{margin:4px 0;color:#aaa}
+
+.hero{
+  margin-top:18px;
+  background:linear-gradient(135deg,#0f1a3a,#020512);
+  border-radius:20px;
+  padding:18px;
+  display:flex;
+  justify-content:space-between;
+  border:1px solid rgba(255,255,255,.08);
+}
+.hero h3{margin:0;font-size:.75em;color:#7aa2ff}
+.hero span{font-size:1.4em;font-weight:800}
+
+.icon-grid-section{padding:20px}
+.icon-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+.icon-item{
+  background:rgba(255,255,255,.04);
+  border-radius:16px;
+  text-align:center;
+  padding:16px 8px;
+  text-decoration:none;
+  color:#fff;
+  border:1px solid rgba(255,255,255,.08);
+}
+.icon-item span{font-size:28px;display:block;margin-bottom:6px}
+.icon-item p{font-size:.8em;margin:0;color:#ccc}
+
+.sos{border:1px solid rgba(255,0,0,.6);box-shadow:0 0 18px rgba(255,0,0,.3)}
+
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;
+  transform:translateX(-50%);
+  width:100%;max-width:520px;height:90px;
+  background:#050814;
+  display:flex;border-top:1px solid rgba(255,255,255,.08)
+}
+.nav-item{flex:1;text-align:center;color:#777;text-decoration:none;padding-top:14px;font-size:.7em}
+.nav-item span{display:block;font-size:26px;margin-bottom:6px}
+.nav-item.active{color:#fff}
+.nav-item.active span{
+  background:#3d5cff;
+  width:56px;height:56px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 6px;
+}
+</style>
 </head>
 
-<body class="dashboard">
-
+<body>
 <div class="app-container">
 
 <header class="header">
   <div class="user-info">
     <h1 id="userName">Halo</h1>
-    <p>Plat Motor <strong id="userPlate"></strong></p>
+    <p>Plat Motor <b id="userPlate"></b></p>
   </div>
 
-  <div class="hero-tunggakan">
+  <div class="hero">
     <div>
-      <h3>TAGIHAN BERJALAN</h3>
-      <p>Sampai hari ini</p>
+      <h3>STATUS PEMBAYARAN</h3>
+      <p style="margin:4px 0;font-size:.8em">Perlu dibayar hari ini</p>
     </div>
     <div>
-      <span id="totalBill">Rp 0</span><br>
-      <small id="totalDays">0 Hari</small>
+      <span id="billTotal">Rp 0</span><br>
+      <small id="plusStatus" style="color:#7aa2ff"></small>
     </div>
   </div>
 </header>
 
 <section class="icon-grid-section">
+<h3>✨ Fitur</h3>
+
 <div class="icon-grid">
-<a href="calendar.html" class="icon-item">📅<p>Kalender</p></a>
-<a href="history.html" class="icon-item">🧾<p>Riwayat</p></a>
-<a href="part_tracker.html" class="icon-item">🎁<p>Gratisan</p></a>
-<a href="info_mlu.html" class="icon-item">📰<p>Info</p></a>
-<a href="tips_maka.html" class="icon-item">💡<p>Tips</p></a>
-<a href="maka_plus.html" class="icon-item">⭐<p>MAKA+</p></a>
+  <a href="calendar.html" class="icon-item"><span>📅</span><p>Bayar</p></a>
+  <a href="history.html" class="icon-item"><span>🧾</span><p>Riwayat</p></a>
+  <a href="part_tracker.html" class="icon-item"><span>🎁</span><p>Gratisan</p></a>
+
+  <a href="info_mlu.html" class="icon-item"><span>📰</span><p>Info</p></a>
+  <a href="tips_maka.html" class="icon-item"><span>💡</span><p>Tips</p></a>
+  <a href="maka_plus.html" class="icon-item"><span>⭐</span><p>MAKA+</p></a>
+
+  <a href="settings.html" class="icon-item"><span>⚙️</span><p>Setting</p></a>
+  <a href="admin.html" class="icon-item"><span>🛠️</span><p>Admin</p></a>
+  <a href="https://wa.me/62812XXXXXXX" target="_blank"
+     class="icon-item sos"><span>🚨</span><p>SOS</p></a>
 </div>
 </section>
 
 </div>
 
 <footer class="bottom-nav">
-  <a href="lokasi_fc.html" class="nav-item">⚡<span>FC</span></a>
-  <a href="dashboard.html" class="nav-item active">🏠<span>Home</span></a>
-  <a href="calendar.html" class="nav-item">📅<span>Bayar</span></a>
+  <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>FC</a>
+  <a href="dashboard.html" class="nav-item active"><span>🏠</span>Home</a>
+  <a href="calendar.html" class="nav-item"><span>📅</span>Bayar</a>
 </footer>
 
 <script src="app.js"></script>
 <script>
-const user = DB.activeUser;
-if(!user){ location.href='index.html'; }
+const user = getActiveUser();
+if(!user) location.href='index.html';
 
-user.dpPaidCount = user.dpPaidCount || 0;
+userName.textContent = 'Halo, ' + user.nama;
+userPlate.textContent = user.plat;
+billTotal.textContent = formatIDR(getTotalBillUntilToday(user));
 
-document.getElementById('userName').textContent = "Halo, " + user.name;
-document.getElementById('userPlate').textContent = user.plate;
-
-let total = 0;
-let days = 0;
-const today = new Date();
-let d = new Date(user.startDate);
-d.setDate(d.getDate()+1); // H+1
-
-while(d <= today){
-  const ds = d.toISOString().slice(0,10);
-  if(!isHoliday(user, ds)){
-    total += getDailyRate(user, ds);
-    days++;
-  }
-  d.setDate(d.getDate()+1);
+if(user.makaPlus.active){
+  plusStatus.textContent = '⭐ MAKA+ AKTIF';
+}else{
+  plusStatus.textContent = '';
 }
-
-document.getElementById('totalBill').textContent = formatIDR(total);
-document.getElementById('totalDays').textContent = days + " Hari";
 </script>
+
 </body>
 </html>
