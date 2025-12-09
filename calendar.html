@@ -6,67 +6,74 @@
 <title>Kalender MAKA</title>
 
 <style>
-/* === CSS TIDAK DIUBAH === */
 :root{
  --bg:#030615;
  --card:#0b1324;
  --line:rgba(255,255,255,.08);
  --cyan:#00dfff;
- --purple:#cc99ff;
  --yellow:#ffe600;
  --red:#ff4545;
 }
+
 body{
  margin:0;
  background:linear-gradient(180deg,#020512,#060a18);
  font-family:Inter,system-ui;
  color:#fff;
 }
-.app{max-width:520px;margin:auto;padding-bottom:120px}
+.app{
+ max-width:520px;
+ margin:auto;
+ padding-bottom:160px; /* ✅ NAV FIX */
+}
+
 header{padding:20px}
 header h1{margin:0;font-size:1.2em}
 header p{margin:6px 0 0;color:#aaa;font-size:.8em}
-.month{display:flex;justify-content:space-between;align-items:center;padding:0 20px}
-.month h2{font-size:1em}
+
+.month{
+ display:flex;justify-content:space-between;
+ align-items:center;padding:0 20px
+}
 .month button{
  background:none;border:1px solid var(--line);
  color:#aaa;padding:6px 12px;border-radius:12px
 }
+
 .week{
  display:grid;grid-template-columns:repeat(7,1fr);
  padding:12px 20px;font-size:.7em;
  text-align:center;color:#7fa3ff
 }
+
 .grid{
  display:grid;grid-template-columns:repeat(7,1fr);
  gap:10px;padding:0 20px 20px
 }
-.day.empty{pointer-events:none}
+
 .box{
  aspect-ratio:1/1;border-radius:14px;
  display:flex;align-items:center;justify-content:center;
  font-weight:600;font-size:.9em;
  border:1px solid var(--line);
  background:var(--card);color:#8cbaff;
- transition:.2s
 }
-.box:hover{transform:scale(1.05)}
+
 .wajib{border-color:var(--cyan);color:var(--cyan)}
-.cdp{border-color:var(--purple);color:var(--purple)}
 .libur{border-color:var(--red);color:var(--red)}
+
 .paid{
  background:var(--yellow);
  color:#000;border:none;
- box-shadow:0 0 18px rgba(255,230,0,.5)
 }
+
 .future{opacity:.25;pointer-events:none}
+
 .preview{
  margin:0 20px;background:#0a1330;
  padding:16px;border-radius:16px;
- border:1px solid rgba(0,223,255,.25)
 }
-.preview small{color:#9adfff}
-.preview strong{display:block;font-size:1.3em;margin-top:4px}
+
 .modal{
  position:fixed;inset:0;
  background:rgba(0,0,0,.6);
@@ -78,19 +85,13 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  background:#050814;
  padding:22px;border-radius:24px 24px 0 0
 }
-.sheet h3{margin:0 0 8px}
-.sheet button{
- width:100%;padding:14px;
- background:var(--yellow);
- border:none;border-radius:14px;
- font-weight:700;margin-top:16px
-}
+
 .bottom-nav{
  position:fixed;bottom:0;left:50%;
  transform:translateX(-50%);
  width:100%;max-width:520px;
  height:90px;display:flex;
- background:linear-gradient(to top,#050814,#020512);
+ background:#050814;
  border-top:1px solid var(--line)
 }
 .bottom-nav a{
@@ -98,25 +99,15 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  font-size:.7em;color:#777;text-decoration:none;
  padding-top:14px
 }
-.bottom-nav span{
- display:block;font-size:26px;margin-bottom:6px
-}
 .bottom-nav .active{color:#fff}
-.bottom-nav .active span{
- background:#3d5cff;width:56px;height:56px;
- border-radius:50%;display:flex;
- align-items:center;justify-content:center;
- margin:0 auto 6px
-}
 </style>
 </head>
 
 <body>
 <div class="app">
-
 <header>
  <h1>Kalender Pembayaran</h1>
- <p>Status real sesuai dashboard</p>
+ <p>Tagihan real sesuai aturan</p>
 </header>
 
 <div class="month">
@@ -133,12 +124,11 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
 <div class="grid" id="grid"></div>
 
 <div class="preview">
- <small>Total tagihan bulan ini</small>
+ <small>Total tagihan</small>
  <strong id="total">Rp 0</strong>
 </div>
 </div>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
  <div class="sheet">
   <h3 id="m-date"></h3>
@@ -147,101 +137,89 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  </div>
 </div>
 
+<footer class="bottom-nav">
+<a href="#">⚡ FC</a>
+<a href="#">🏠 Home</a>
+<a href="#" class="active">📅 Kalender</a>
+</footer>
+
 <script>
-/* ===== CONFIG USER ===== */
-const USER = {
- takeDate: '2025-09-20',
- dpType: '355', // '355' | '755'
- hasMakaPlus: true,
- dpPaid: Number(localStorage.getItem('dpPaid')||0)
-}
-const RATE = 70000
+/* ===== USER DATA ===== */
+const START_SEWA = new Date('2025-09-18')
+START_SEWA.setDate(START_SEWA.getDate()+1) // ✅ H+1
 
-/* ===== DATE UTIL ===== */
-function iso(d){return d.toISOString().split('T')[0]}
-const startPay = new Date(USER.takeDate)
-startPay.setDate(startPay.getDate()+1)
-startPay.setHours(0,0,0,0)
+const USER_DP = '355' // atau '755'
+const MAKA_PLUS = false
 
-/* ===== PAYMENTS ===== */
-let payments = JSON.parse(localStorage.getItem('maka_payments'))||{}
+const HWB = 80000
+const CICIL = 70000
+const CICIL_TOTAL = 6
 
-/* ===== LOGIC ===== */
-function isHoliday(date){
- const day=date.getDate()
+let view=new Date()
+let activeKey=null
 
- if(day===31) return true
- if(!USER.hasMakaPlus) return false
- if(USER.dpType==='755') return day===14||day===28
- if(USER.dpType==='355'){
-  if(USER.dpPaid<6) return false
-  return day===14||day===28
- }
+function isLibur(d,dpLunas){
+ if(d.getDate()===31) return true
+ if(USER_DP==='755') return [14,28].includes(d.getDate())
+ if(USER_DP==='355' && dpLunas) return [14,28].includes(d.getDate())
  return false
 }
-
-/* ===== RENDER ===== */
-let view=new Date(),activeKey=null
-
-function nav(n){view.setMonth(view.getMonth()+n);render()}
 
 function render(){
  const y=view.getFullYear(),m=view.getMonth()
  document.getElementById('label').textContent=
-  view.toLocaleDateString('id-ID',{month:'long',year:'numeric'})
+ view.toLocaleDateString('id-ID',{month:'long',year:'numeric'})
+
  const first=new Date(y,m,1).getDay()
  const days=new Date(y,m+1,0).getDate()
  const grid=document.getElementById('grid')
  grid.innerHTML=''
  let total=0
- const today=new Date();today.setHours(0,0,0,0)
+ const now=new Date();now.setHours(0,0,0,0)
 
- for(let i=0;i<first;i++)grid.innerHTML+='<div class="day empty"></div>'
+ const pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
+ const cicilanPaid=Object.values(pay).filter(v=>v==='CDP').length
+ const dpLunas=cicilanPaid>=CICIL_TOTAL
+
+ for(let i=0;i<first;i++)grid.innerHTML+='<div></div>'
 
  for(let d=1;d<=days;d++){
   const date=new Date(y,m,d)
-  const key=iso(date)
-  let cls='box'
-  let price=0
+  const key=`${y}-${m+1}-${d}`
+  if(date<START_SEWA){grid.innerHTML+='<div></div>';continue}
 
-  if(date<startPay){cls+=' future'}
-  else if(isHoliday(date)){cls+=' libur'}
-  else{
-   cls+=(USER.dpType==='355'&&USER.dpPaid<6?' cdp':' wajib')
-   price=RATE
-  }
+  const libur=isLibur(date,dpLunas)
+  let price=MAKA_PLUS?HWB:CICIL
+  let cls='box wajib'
 
-  if(payments[key]) cls+=' paid'
-  if(price&&!payments[key]&&!date>today) total+=price
+  if(libur){cls='box libur';price=0}
+  if(pay[key])cls+=' paid'
+  if(date>now)cls+=' future'
+  if(!pay[key]&&price>0)total+=price
 
   grid.innerHTML+=`
-   <div class="day">
-    <div class="${cls}"
-     onclick="openModal('${key}',${price},'${cls}')">${d}</div>
-   </div>`
+   <div class="${cls}"
+    onclick="${(price>0&&!pay[key]&&date<=now)?`openModal('${key}',${price})`:''}">
+    ${d}</div>`
  }
  document.getElementById('total').textContent=
   `Rp ${total.toLocaleString('id-ID')}`
 }
 
-/* ===== MODAL ===== */
-function openModal(k,p,cls){
- if(!p||cls.includes('libur')||cls.includes('future')) return
+function openModal(k,p){
  activeKey=k
- document.getElementById('m-date').textContent=`Tanggal ${k}`
- document.getElementById('m-desc').textContent=`Tagihan Rp ${p.toLocaleString('id-ID')}`
+ document.getElementById('m-date').textContent=k
+ document.getElementById('m-desc').textContent=`Bayar Rp ${p.toLocaleString()}`
  document.getElementById('modal').classList.add('active')
 }
 function pay(){
- payments[activeKey]=true
- if(USER.dpType==='355'&&USER.dpPaid<6){
-  USER.dpPaid++
-  localStorage.setItem('dpPaid',USER.dpPaid)
- }
- localStorage.setItem('maka_payments',JSON.stringify(payments))
+ let pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
+ pay[activeKey]=USER_DP==='355'?'CDP':'HWB'
+ localStorage.setItem('maka_payments',JSON.stringify(pay))
  document.getElementById('modal').classList.remove('active')
  render()
 }
+function nav(n){view.setMonth(view.getMonth()+n);render()}
 render()
 </script>
 </body>
