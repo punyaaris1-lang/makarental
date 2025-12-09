@@ -2,176 +2,146 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>MAKA Admin – Tagihan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAKA Admin Panel</title>
 
 <style>
-body{margin:0;background:#050814;color:#fff;font-family:Inter}
-.app{max-width:520px;margin:auto;padding:20px;padding-bottom:120px}
-.card{background:#0b1324;border-radius:16px;padding:20px;margin-bottom:18px}
-h2,h3{margin:0 0 10px}
-label{font-size:.8em;color:#aaa;display:block;margin-top:12px}
-input,select,button{
- width:100%;padding:12px;border-radius:10px;
- background:#020512;color:#fff;
- border:1px solid rgba(255,255,255,.1);margin-top:6px
-}
-button{background:#ffe600;color:#000;font-weight:700;margin-top:16px}
-.user{padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-top:10px}
-.small{font-size:.75em;color:#aaa}
-.badge{font-size:.7em;padding:4px 8px;border-radius:6px}
-.unpaid{background:#ff4545}
-.paid{background:#00dfff;color:#000}
-.qr{
- background:#fff;color:#000;
- padding:20px;border-radius:12px;
- text-align:center;margin-top:10px
-}
-.bottom{
- position:fixed;bottom:0;left:50%;transform:translateX(-50%);
- width:100%;max-width:520px;height:90px;
- background:#020512;border-top:1px solid rgba(255,255,255,.08)
-}
+body{margin:0;background:#0b0f1a;color:#fff;font-family:Arial}
+header{padding:15px;background:#141a2a;text-align:center;font-weight:bold}
+.card{background:#141a2a;margin:12px;padding:15px;border-radius:10px}
+input,select{width:100%;padding:10px;margin-top:8px;border:none;border-radius:8px}
+button{margin-top:10px;padding:10px;width:100%;border:none;border-radius:8px;font-weight:bold;background:#00e0ff}
+button.red{background:#ff4d4d}
+.small{font-size:12px;color:#aaa}
+.part{background:#0b1220;padding:6px;margin-top:6px;border-radius:6px}
 </style>
 </head>
 
 <body>
-<div class="app">
 
-<div class="card" id="loginCard">
-<h2>🔐 Admin Login</h2>
-<input id="pass" type="password" placeholder="Password admin">
-<button onclick="login()">MASUK</button>
-</div>
+<header>ADMIN – MANAGE USER & TAGIHAN</header>
 
-<div id="panel" style="display:none">
+<section id="users"></section>
 
 <div class="card">
-<h3>📄 Buat Tagihan</h3>
-
-<label>Pilih User</label>
-<select id="userSelect"></select>
-
-<label>Tanggal Tagihan</label>
+<h3>Tambah Tagihan</h3>
+<select id="billUser"></select>
 <input type="date" id="billDate">
-
-<label>Jenis Tagihan</label>
-<select id="billType" onchange="autoNominal()">
-  <option value="harian">Sewa Harian</option>
-  <option value="dp">Cicilan DP</option>
-  <option value="manual">Manual</option>
-</select>
-
-<label>Nominal</label>
-<input type="number" id="amount">
-
-<button onclick="createInvoice()">BUAT TAGIHAN</button>
+<input type="number" id="billAmount" placeholder="Nominal">
+<button onclick="addBill()">BUAT TAGIHAN</button>
 </div>
 
-<div class="card">
-<h3>📋 Daftar Tagihan</h3>
-<div id="invoiceList"></div>
-</div>
-
-</div>
-</div>
-
-<div class="bottom"></div>
+<button class="red" onclick="logout()">LOGOUT</button>
 
 <script>
-/* ===== CONFIG ===== */
-const ADMIN_PASS='1131'
-const finance=JSON.parse(localStorage.getItem('maka_finance_settings'))||
-{hwb_rate:80000,cdp_rate:70000}
-
-/* ===== LOGIN ===== */
-function login(){
- if(pass.value!==ADMIN_PASS)return alert('Password salah');
- loginCard.style.display='none';
- panel.style.display='block';
- loadUsers();
- renderInvoices();
+// ===== PROTEKSI =====
+if(localStorage.getItem("admin_login")!=="yes"){
+  location.href="admin_login.html"
 }
 
-/* ===== LOAD USER ===== */
-function loadUsers(){
- const users=JSON.parse(localStorage.getItem('maka_users'))||[];
- userSelect.innerHTML='';
- users.forEach((u,i)=>{
-   userSelect.innerHTML+=`<option value="${i}">
-     ${u.nama} – ${u.plat}
-   </option>`;
- });
-}
+// ===== DB =====
+let users = JSON.parse(localStorage.getItem("maka_users")) || []
+let bills = JSON.parse(localStorage.getItem("maka_tagihan")) || []
 
-/* ===== AUTO NOMINAL ===== */
-function autoNominal(){
- if(billType.value==='harian')amount.value=finance.hwb_rate;
- if(billType.value==='dp')amount.value=finance.cdp_rate;
- if(billType.value==='manual')amount.value='';
-}
+// ===== RENDER =====
+function render(){
+  const wrap=document.getElementById("users")
+  const sel=document.getElementById("billUser")
+  wrap.innerHTML=""
+  sel.innerHTML=""
 
-/* ===== BUAT TAGIHAN ===== */
-function createInvoice(){
- const idx=userSelect.value;
- const date=billDate.value;
- const nominal=+amount.value;
- if(!date||!nominal)return alert('Lengkapi data');
+  users.forEach(u=>{
+    sel.innerHTML+=`<option value="${u.id}">${u.nama} - ${u.plat}</option>`
 
- const invoices=JSON.parse(localStorage.getItem('maka_invoices'))||[];
+    const userBills=bills.filter(b=>b.userId===u.id)
+    const parts=u.parts||[]
 
- invoices.push({
-   id:Date.now(),
-   userIndex:idx,
-   date:date,
-   nominal:nominal,
-   paid:false
- });
+    wrap.innerHTML+=`
+    <div class="card">
+      <b>${u.nama}</b><br>
+      <span class="small">${u.plat}</span>
 
- localStorage.setItem('maka_invoices',JSON.stringify(invoices));
- alert('Tagihan dibuat');
- renderInvoices();
-}
+      <label>Nama</label>
+      <input value="${u.nama}" onchange="editUser('${u.id}','nama',this.value)">
+      <label>Plat</label>
+      <input value="${u.plat}" onchange="editUser('${u.id}','plat',this.value)">
+      <label>Tgl Ambil</label>
+      <input type="date" value="${u.startDate}" onchange="editUser('${u.id}','startDate',this.value)">
 
-/* ===== RENDER TAGIHAN ===== */
-function renderInvoices(){
- const list=document.getElementById('invoiceList');
- const users=JSON.parse(localStorage.getItem('maka_users'))||[];
- const invoices=JSON.parse(localStorage.getItem('maka_invoices'))||[];
- list.innerHTML='';
+      <label>MAKA+</label>
+      <select onchange="toggleMaka('${u.id}',this.value)">
+        <option value="off" ${!u.makaPlus?'selected':''}>OFF</option>
+        <option value="on" ${u.makaPlus?'selected':''}>ON</option>
+      </select>
 
- invoices.forEach(inv=>{
-   const user=users[inv.userIndex];
-   list.innerHTML+=`
-    <div class="user">
-      <strong>${user.nama}</strong>
-      <div class="small">${inv.date}</div>
-      <div>Rp ${inv.nominal.toLocaleString('id-ID')}</div>
-      <span class="badge ${inv.paid?'paid':'unpaid'}">
-        ${inv.paid?'LUNAS':'BELUM'}
-      </span>
+      <h4>Part Gratis</h4>
+      ${parts.map(p=>`<div class="part">${p}</div>`).join("")}
+      <input placeholder="Tambah Part" onkeydown="if(event.key==='Enter')addPart('${u.id}',this)">
 
-      ${inv.paid?'':`
-      <div class="qr">
-        <strong>QRIS</strong><br>
-        <small>Scan untuk bayar</small><br><br>
-        <em>[ QRIS STATIC DI SINI ]</em>
-      </div>
-      <button onclick="markPaid(${inv.id})">TANDAI LUNAS</button>
-      `}
+      <h4>Tagihan</h4>
+      ${userBills.map(b=>`
+        <div class="part">
+          ${b.tgl} - Rp ${b.nominal.toLocaleString()} (${b.status})
+        </div>
+      `).join("") || '<div class="small">Belum ada</div>'}
     </div>
-   `;
- });
+    `
+  })
 }
 
-/* ===== MARK PAID ===== */
-function markPaid(id){
- const inv=JSON.parse(localStorage.getItem('maka_invoices'));
- const target=inv.find(i=>i.id===id);
- target.paid=true;
- localStorage.setItem('maka_invoices',JSON.stringify(inv));
- renderInvoices();
+// ===== EDIT USER =====
+function editUser(id,key,val){
+  const u=users.find(x=>x.id===id)
+  u[key]=val
+  saveUsers()
 }
+function toggleMaka(id,val){
+  const u=users.find(x=>x.id===id)
+  u.makaPlus = val==="on"
+  if(val==="on") u.makaStart=new Date().toISOString().slice(0,10)
+  saveUsers()
+}
+
+// ===== PART =====
+function addPart(id,input){
+  if(!input.value)return
+  const u=users.find(x=>x.id===id)
+  u.parts=u.parts||[]
+  u.parts.push(input.value)
+  input.value=""
+  saveUsers()
+}
+
+// ===== TAGIHAN =====
+function addBill(){
+  const userId=billUser.value
+  const tgl=billDate.value
+  const nominal=Number(billAmount.value)
+  if(!tgl||!nominal)return alert("Lengkapi")
+
+  bills.push({
+    id:Date.now(),
+    userId,tgl,nominal,
+    status:"BELUM BAYAR"
+  })
+  localStorage.setItem("maka_tagihan",JSON.stringify(bills))
+  alert("Tagihan dibuat")
+  render()
+}
+
+// ===== SAVE =====
+function saveUsers(){
+  localStorage.setItem("maka_users",JSON.stringify(users))
+  render()
+}
+
+// ===== LOGOUT =====
+function logout(){
+  localStorage.removeItem("admin_login")
+  location.href="admin_login.html"
+}
+
+render()
 </script>
 </body>
 </html>
