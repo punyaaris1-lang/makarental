@@ -1,67 +1,142 @@
-<script>
-/* ================= DATABASE ================= */
-const DB = {
-  get users(){
-    return JSON.parse(localStorage.getItem("maka_users") || "[]");
+/***********************
+ * MAKA RENTAL APP CORE
+ ***********************/
+
+const DB_KEY = 'MAKA_DB_V1';
+
+const DEFAULT_DB = {
+  users: [
+    {
+      id: 'USR001',
+      nama: 'USER DEMO',
+      plat: 'B 1234 XYZ',
+      startDate: '2025-09-18', // tgl ambil motor
+
+      dpType: '355', // '355' | '755'
+      dpPaidCount: 0, // max 6 (70rb x 6)
+
+      makaPlus: {
+        active: false,
+        activatedAt: null
+      },
+
+      payments: {
+        // '2025-09-19': { paid:true, amount:70000 }
+      },
+
+      freeParts: []
+    }
+  ],
+
+  config: {
+    baseDaily: 70000,
+    makaPlusDaily: 10000
   },
-  set users(val){
-    localStorage.setItem("maka_users", JSON.stringify(val));
-  },
-  get activeUser(){
-    return JSON.parse(localStorage.getItem("maka_active_user"));
-  },
-  set activeUser(val){
-    localStorage.setItem("maka_active_user", JSON.stringify(val));
-  }
+
+  activeUserId: 'USR001'
 };
 
-/* ================= UTIL ================= */
-function toDate(str){
-  return new Date(str + "T00:00:00");
+/* INIT */
+function loadDB() {
+  return JSON.parse(localStorage.getItem(DB_KEY)) || DEFAULT_DB;
+}
+function saveDB(db) {
+  localStorage.setItem(DB_KEY, JSON.stringify(db));
 }
 
+const DB = loadDB();
+
+/* UTIL */
 function formatIDR(n){
-  return "Rp " + n.toLocaleString("id-ID");
+  return 'Rp ' + n.toLocaleString('id-ID');
+}
+function dateOnly(d){
+  return d.toISOString().slice(0,10);
 }
 
-/* ================= MAKA+ LOGIC ================= */
-function isMakaPlusActiveOn(user, dateStr){
-  if(!user.makaPlus || !user.makaPlus.active) return false;
-
-  const activeDate = toDate(user.makaPlus.activatedAt);
-  const checkDate = toDate(dateStr);
-
-  // MAKA+ berlaku H+1
-  activeDate.setDate(activeDate.getDate() + 1);
-
-  return checkDate >= activeDate;
+/* USER */
+function getActiveUser(){
+  return DB.users.find(u=>u.id===DB.activeUserId);
 }
 
-/* ================= LIBUR ================= */
+/* MAKA PLUS */
+function isMakaPlusActive(user, dateStr){
+  if(!user.makaPlus.active) return false;
+  const d = new Date(dateStr);
+  const act = new Date(user.makaPlus.activatedAt);
+  act.setDate(act.getDate()+1); // H+1
+  return d >= act;
+}
+
+/* DP LOGIC */
+function dpHolidayBlocked(user){
+  if(user.dpType==='355' && user.dpPaidCount < 6){
+    return ['14','28']; // blm libur
+  }
+  return [];
+}
+
+/* HOLIDAY */
 function isHoliday(user, dateStr){
-  const d = toDate(dateStr);
-  const t = d.getDate();
+  const d = new Date(dateStr);
+  const day = d.getDate().toString();
 
-  if(t === 31) return true;
+  if(day === '31') return true;
 
-  if(user.dpType === "355"){
-    if(user.dpPaidCount < 6){
-      return false; // 14 & 28 TIDAK LIBUR
-    }
-    return t === 14 || t === 28;
+  if(user.dpType === '755'){
+    if(day==='14'||day==='28') return true;
   }
 
-  if(user.dpType === "755"){
-    return t === 14 || t === 28;
-  }
+  if(dpHolidayBlocked(user).includes(day)) return false;
+  if(day==='14'||day==='28') return true;
 
   return false;
 }
 
-/* ================= TARIF HARIAN ================= */
+/* DAILY RATE */
 function getDailyRate(user, dateStr){
-  let rate = 70000;
-  if(isMakaPlusActiveOn(user, dateStr)) rate += 10000;
+  if(isHoliday(user, dateStr)) return 0;
+
+  let rate = DB.config.baseDaily;
+
+  if(isMakaPlusActive(user, dateStr)){
+    rate += DB.config.makaPlusDaily;
+  }
+
   return rate;
 }
-</script>
+
+/* TAGIHAN TOTAL */
+function getTotalBillUntilToday(user){
+  const start = new Date(user.startDate);
+  start.setDate(start.getDate()+1); // H+1 mulai tagihan
+
+  let total = 0;
+  const today = new Date();
+
+  for(let d=new Date(start); d<=today; d.setDate(d.getDate()+1)){
+    const ds = dateOnly(d);
+    if(user.payments[ds]?.paid) continue;
+    total += getDailyRate(user, ds);
+  }
+  return total;
+}
+
+/* PAY */
+function payDate(user, dateStr){
+  const rate = getDailyRate(user, dateStr);
+  if(rate===0) return;
+
+  user.payments[dateStr] = {
+    paid:true,
+    amount:rate
+  };
+
+  if(user.dpType==='355' && (new Date(dateStr).getDate()==14 || new Date(dateStr).getDate()==28)){
+    if(user.dpPaidCount < 6){
+      user.dpPaidCount++;
+    }
+  }
+
+  saveDB(DB);
+}
