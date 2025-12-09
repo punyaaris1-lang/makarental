@@ -4,41 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kalender Tagihan</title>
-<link rel="stylesheet" href="styles.css">
-
-<style>
-body{background:#050814;color:#fff;margin:0}
-.app{max-width:520px;margin:auto;padding-bottom:110px}
-
-h3{padding:16px;margin:0}
-
-.cal{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:8px;
-  padding:14px
-}
-.day{
-  border-radius:14px;
-  padding:10px 0;
-  font-size:.75em;
-  text-align:center;
-  border:1px solid rgba(255,255,255,.08);
-}
-.pay{background:#0f1a3a}
-.dp{background:#5a4200}
-.holiday{background:#5a0000}
-.today{outline:2px solid #4f6bff}
-
-.day b{display:block;font-size:1em}
-.day small{opacity:.8}
-</style>
+<link rel="stylesheet" href="css/app.css">
 </head>
 
 <body>
 <div class="app">
 
-<h3>📅 Kalender Pembayaran</h3>
+<h3 style="padding:16px;margin:0">📅 Kalender Pembayaran</h3>
 <div class="cal" id="calendar"></div>
 
 </div>
@@ -48,6 +20,30 @@ h3{padding:16px;margin:0}
   <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
   <a href="calendar.html" class="nav-item active"><span>📅</span>Bayar</a>
 </footer>
+
+<style>
+.cal{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+  padding:14px;
+}
+.day{
+  border-radius:14px;
+  padding:10px 0;
+  font-size:.75em;
+  text-align:center;
+  border:1px solid rgba(0,0,0,.1);
+  background:#ffffff22;
+  backdrop-filter:blur(10px);
+}
+.pay{background:#dbe8ff}
+.dp{background:#fff4d0}
+.holiday{background:#ffd6d6}
+.today{outline:2px solid #007aff}
+.day b{display:block;font-size:1em}
+.day small{opacity:.8}
+</style>
 
 <script src="app.js"></script>
 <script>
@@ -72,24 +68,18 @@ for(let d=1; d<=daysInMonth; d++){
 
   if(+date === +now) box.classList.add('today');
 
-  // LIBUR
   if(isHoliday(user, iso)){
     box.classList.add('holiday');
     box.innerHTML += `<small>Libur</small>`;
   }
-
-  // CICILAN DP (14 & 28 dst)
   else if(isDPDay(user, iso)){
     box.classList.add('dp');
     box.innerHTML += `<small>DP</small>`;
   }
-
-  // TAGIHAN NORMAL
   else{
     const rate = getDailyRate(user, iso);
     box.classList.add('pay');
     box.innerHTML += `<small>${formatIDR(rate)}</small>`;
-
     box.onclick = ()=> confirmPay(iso, rate);
   }
 
@@ -97,9 +87,7 @@ for(let d=1; d<=daysInMonth; d++){
 }
 
 function confirmPay(date, amount){
-  if(confirm(
-    `Bayar tanggal ${date}\nTagihan: ${formatIDR(amount)}`
-  )){
+  if(confirm(`Bayar tanggal ${date}\nTagihan: ${formatIDR(amount)}`)){
     markPaid(date);
     alert('✅ Dicatat sebagai dibayar');
     location.reload();
