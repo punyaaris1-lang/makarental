@@ -6,6 +6,7 @@
 <title>Kalender MAKA</title>
 
 <style>
+/* === CSS TIDAK DIUBAH === */
 :root{
  --bg:#030615;
  --card:#0b1324;
@@ -15,7 +16,6 @@
  --yellow:#ffe600;
  --red:#ff4545;
 }
-
 body{
  margin:0;
  background:linear-gradient(180deg,#020512,#060a18);
@@ -23,31 +23,20 @@ body{
  color:#fff;
 }
 .app{max-width:520px;margin:auto;padding-bottom:120px}
-
-/* HEADER */
 header{padding:20px}
 header h1{margin:0;font-size:1.2em}
 header p{margin:6px 0 0;color:#aaa;font-size:.8em}
-
-/* MONTH */
-.month{
- display:flex;justify-content:space-between;
- align-items:center;padding:0 20px
-}
+.month{display:flex;justify-content:space-between;align-items:center;padding:0 20px}
 .month h2{font-size:1em}
 .month button{
  background:none;border:1px solid var(--line);
  color:#aaa;padding:6px 12px;border-radius:12px
 }
-
-/* WEEK */
 .week{
  display:grid;grid-template-columns:repeat(7,1fr);
  padding:12px 20px;font-size:.7em;
  text-align:center;color:#7fa3ff
 }
-
-/* GRID */
 .grid{
  display:grid;grid-template-columns:repeat(7,1fr);
  gap:10px;padding:0 20px 20px
@@ -62,19 +51,15 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  transition:.2s
 }
 .box:hover{transform:scale(1.05)}
-
 .wajib{border-color:var(--cyan);color:var(--cyan)}
 .cdp{border-color:var(--purple);color:var(--purple)}
 .libur{border-color:var(--red);color:var(--red)}
-
 .paid{
  background:var(--yellow);
  color:#000;border:none;
  box-shadow:0 0 18px rgba(255,230,0,.5)
 }
 .future{opacity:.25;pointer-events:none}
-
-/* PREVIEW */
 .preview{
  margin:0 20px;background:#0a1330;
  padding:16px;border-radius:16px;
@@ -82,8 +67,6 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
 }
 .preview small{color:#9adfff}
 .preview strong{display:block;font-size:1.3em;margin-top:4px}
-
-/* MODAL */
 .modal{
  position:fixed;inset:0;
  background:rgba(0,0,0,.6);
@@ -102,8 +85,6 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  border:none;border-radius:14px;
  font-weight:700;margin-top:16px
 }
-
-/* NAV */
 .bottom-nav{
  position:fixed;bottom:0;left:50%;
  transform:translateX(-50%);
@@ -166,76 +147,77 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  </div>
 </div>
 
-<footer class="bottom-nav">
-<a href="lokasi_fc.html"><span>⚡</span>FC</a>
-<a href="dashboard.html"><span>🏠</span>Home</a>
-<a href="calendar.html" class="active"><span>📅</span>Kalender</a>
-</footer>
-
 <script>
-/* ===== CONFIG (SAMA DASHBOARD) ===== */
-const USER_TGL_MULAI_SEWA='2025-09-20'
-const USER_OPSI_DP='355'
-const ADMIN=JSON.parse(localStorage.getItem('maka_finance_settings'))||
-{hwb_rate:80000,cdp_rate:70000}
-const HWB=ADMIN.hwb_rate, CDP=ADMIN.cdp_rate
-const DP_START=new Date(new Date(USER_TGL_MULAI_SEWA).getFullYear(),
- new Date(USER_TGL_MULAI_SEWA).getMonth()+1,1)
-const DP_END=new Date(DP_START.getFullYear(),DP_START.getMonth()+3,1)
+/* ===== CONFIG USER ===== */
+const USER = {
+ takeDate: '2025-09-20',
+ dpType: '355', // '355' | '755'
+ hasMakaPlus: true,
+ dpPaid: Number(localStorage.getItem('dpPaid')||0)
+}
+const RATE = 70000
 
-/* ===== LOGIC CORE ===== */
-function getStatus(d){
- const day=d.getDate()
- if(day===31)return'HLB'
- if(USER_OPSI_DP==='355'){
-  if(d>=DP_START&&d<DP_END&&(day==14||day==28))return'CDP'
-  if(d>=DP_END&&(day==14||day==28))return'HLB'
+/* ===== DATE UTIL ===== */
+function iso(d){return d.toISOString().split('T')[0]}
+const startPay = new Date(USER.takeDate)
+startPay.setDate(startPay.getDate()+1)
+startPay.setHours(0,0,0,0)
+
+/* ===== PAYMENTS ===== */
+let payments = JSON.parse(localStorage.getItem('maka_payments'))||{}
+
+/* ===== LOGIC ===== */
+function isHoliday(date){
+ const day=date.getDate()
+
+ if(day===31) return true
+ if(!USER.hasMakaPlus) return false
+ if(USER.dpType==='755') return day===14||day===28
+ if(USER.dpType==='355'){
+  if(USER.dpPaid<6) return false
+  return day===14||day===28
  }
- return'HWB'
+ return false
 }
 
 /* ===== RENDER ===== */
-let view=new Date()
-let activeKey=null
+let view=new Date(),activeKey=null
 
 function nav(n){view.setMonth(view.getMonth()+n);render()}
 
 function render(){
  const y=view.getFullYear(),m=view.getMonth()
  document.getElementById('label').textContent=
- view.toLocaleDateString('id-ID',{month:'long',year:'numeric'})
-
+  view.toLocaleDateString('id-ID',{month:'long',year:'numeric'})
  const first=new Date(y,m,1).getDay()
  const days=new Date(y,m+1,0).getDate()
  const grid=document.getElementById('grid')
  grid.innerHTML=''
-
  let total=0
- const now=new Date();now.setHours(0,0,0,0)
- const pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
+ const today=new Date();today.setHours(0,0,0,0)
 
  for(let i=0;i<first;i++)grid.innerHTML+='<div class="day empty"></div>'
 
  for(let d=1;d<=days;d++){
   const date=new Date(y,m,d)
-  const key=`${y}-${m+1}-${d}`
-  const status=getStatus(date)
-  const paid=pay[key]
+  const key=iso(date)
   let cls='box'
   let price=0
 
-  if(status==='HWB'){cls+=' wajib';price=HWB}
-  if(status==='CDP'){cls+=' cdp';price=CDP}
-  if(status==='HLB'){cls+=' libur'}
+  if(date<startPay){cls+=' future'}
+  else if(isHoliday(date)){cls+=' libur'}
+  else{
+   cls+=(USER.dpType==='355'&&USER.dpPaid<6?' cdp':' wajib')
+   price=RATE
+  }
 
-  if(paid)cls+=' paid'
-  if(date>now)cls+=' future'
-  if(!paid&&price>0)total+=price
+  if(payments[key]) cls+=' paid'
+  if(price&&!payments[key]&&!date>today) total+=price
 
   grid.innerHTML+=`
    <div class="day">
     <div class="${cls}"
-     onclick="openModal('${key}','${status}',${price})">${d}</div>
+     onclick="openModal('${key}',${price},'${cls}')">${d}</div>
    </div>`
  }
  document.getElementById('total').textContent=
@@ -243,18 +225,20 @@ function render(){
 }
 
 /* ===== MODAL ===== */
-function openModal(k,s,p){
- if(p===0)return
+function openModal(k,p,cls){
+ if(!p||cls.includes('libur')||cls.includes('future')) return
  activeKey=k
  document.getElementById('m-date').textContent=`Tanggal ${k}`
- document.getElementById('m-desc').textContent=
-  `Status ${s} · Rp ${p.toLocaleString('id-ID')}`
+ document.getElementById('m-desc').textContent=`Tagihan Rp ${p.toLocaleString('id-ID')}`
  document.getElementById('modal').classList.add('active')
 }
 function pay(){
- let pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
- pay[activeKey]=true
- localStorage.setItem('maka_payments',JSON.stringify(pay))
+ payments[activeKey]=true
+ if(USER.dpType==='355'&&USER.dpPaid<6){
+  USER.dpPaid++
+  localStorage.setItem('dpPaid',USER.dpPaid)
+ }
+ localStorage.setItem('maka_payments',JSON.stringify(payments))
  document.getElementById('modal').classList.remove('active')
  render()
 }
