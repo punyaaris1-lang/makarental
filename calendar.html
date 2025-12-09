@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kalender Tagihan</title>
 <link rel="stylesheet" href="app.css">
-<link rel="stylesheet" href="styles.css"> </head>
+<link rel="stylesheet" href="styles.css"> 
+</head>
 
 <body class="app-body">
 <div class="app-container">
@@ -13,7 +14,7 @@
     <h3 class="header-title" style="padding: 22px 22px 0;">📅 Kalender Pembayaran</h3>
 
     <div class="cal-header">
-        <span style="color: #ff5c5c;">Min</span>
+        <span style="color: var(--holiday-color);">Min</span>
         <span>Sen</span>
         <span>Sel</span>
         <span>Rab</span>
@@ -42,11 +43,11 @@
     font-weight: 600;
     color: var(--text-secondary);
 }
-/* Style kalender dari styles.css */
 </style>
 
 <script src="app.js"></script>
 <script>
+// Pastikan semua fungsi dari app.js (getActiveUser, dateOnly, isHoliday, getDPCicilStatus, formatIDR, markPaid, getDailyRate) tersedia
 const user = getActiveUser();
 if(!user) location.href='index.html';
 
@@ -68,6 +69,7 @@ for(let i=0; i<firstDayOfMonth; i++){
     emptyBox.innerHTML = '&nbsp;';
     emptyBox.style.border = 'none';
     emptyBox.style.background = 'transparent';
+    emptyBox.style.boxShadow = 'none'; // Tambahan agar bersih di light mode
     cal.appendChild(emptyBox);
 }
 
@@ -86,7 +88,7 @@ for(let d=1; d<=daysInMonth; d++){
 
   // Cek status pembayaran
   const isPaid = user.payments[iso]?.paid;
-  const dpStatus = getDPCicilStatus(user, iso); // Dapatkan status DP
+  const dpStatus = getDPCicilStatus(user, iso); 
 
   if(isPaid){
     box.classList.add('paid-day');
@@ -99,24 +101,31 @@ for(let d=1; d<=daysInMonth; d++){
   else if(dpStatus.isCicilDay){ // Hari Cicilan DP (Tgl 14/28 di 3 bulan awal)
     box.classList.add('dp-day');
     box.innerHTML += `<small>Cicil DP</small>`;
-    // Klik tetap mencatat pembayaran harian (kecuali admin yang mencatat cicilan DP)
     box.onclick = ()=> confirmPay(iso, getDailyRate(user, iso)); 
   }
   else{
     // Hari wajib bayar harian
     const rate = getDailyRate(user, iso);
     box.innerHTML += `<small>${formatIDR(rate)}</small>`;
-    box.onclick = ()=> confirmPay(iso, rate);
+    
+    // Hanya hari yang belum lewat dan bukan hari ini yang bisa di-klik untuk dibayar
+    if (date.getTime() <= now.getTime()) {
+      box.onclick = ()=> confirmPay(iso, rate);
+    }
+    
+    // Beri penanda jika hari ini adalah Hari Tagihan (misal: warna teks)
+    if (date.getTime() === now.getTime() && rate > 0) {
+        box.style.color = 'var(--holiday-color)'; // Teks Merah/Kontras jika Hari Ini Belum Bayar
+    }
   }
 
   cal.appendChild(box);
 }
 
 function confirmPay(date, amount){
-  if(amount === 0) return; // Tidak bisa bayar jika rate 0 (libur)
+  if(amount === 0) return; 
 
   if(confirm(`Bayar tanggal ${date}\nTagihan: ${formatIDR(amount)}`)){
-    // Panggil fungsi markPaid dari app.js
     markPaid(user, date); 
     alert('✅ Dicatat sebagai dibayar');
     location.reload();
