@@ -22,12 +22,7 @@ body{
  font-family:Inter,system-ui;
  color:#fff;
 }
-
-.app{
- max-width:520px;
- margin:auto;
- padding-bottom:120px;
-}
+.app{max-width:520px;margin:auto;padding-bottom:120px}
 
 /* HEADER */
 header{padding:20px}
@@ -62,19 +57,19 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  display:flex;align-items:center;justify-content:center;
  font-weight:600;font-size:.9em;
  border:1px solid var(--line);
- background:var(--card);
- color:#8cbaff;
+ background:var(--card);color:#8cbaff;
 }
 
 .wajib{border-color:var(--cyan);color:var(--cyan)}
+.cdp{border-color:var(--purple);color:var(--purple)}
 .libur{border-color:var(--red);color:var(--red)}
+
 .paid{
  background:var(--yellow);
  color:#000;border:none;
 }
 .future{opacity:.25;pointer-events:none}
 
-/* PREVIEW */
 .preview{
  margin:0 20px;background:#0a1330;
  padding:16px;border-radius:16px;
@@ -96,11 +91,9 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
  width:100%;padding:14px;
  background:var(--yellow);
  border:none;border-radius:14px;
- font-weight:700;margin-top:10px
+ font-weight:700;margin-top:12px
 }
-.sheet .cancel{
- background:#1a1a2e;color:#aaa
-}
+.sheet .cancel{background:#1a1a2e;color:#aaa}
 
 /* NAV */
 .bottom-nav{
@@ -134,7 +127,7 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
 
 <header>
  <h1>Kalender Pembayaran</h1>
- <p>Klik tanggal untuk bayar</p>
+ <p>Sinkron dengan dashboard</p>
 </header>
 
 <div class="month">
@@ -151,7 +144,7 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
 <div class="grid" id="grid"></div>
 
 <div class="preview">
- <small>Total tagihan bulan ini</small>
+ <small>Total tagihan sampai hari ini</small>
  <strong id="total">Rp 0</strong>
 </div>
 </div>
@@ -173,100 +166,95 @@ header p{margin:6px 0 0;color:#aaa;font-size:.8em}
 </footer>
 
 <script>
-/* ================= CONFIG ================= */
-const TGL_AMBIL = new Date('2025-09-18')
-TGL_AMBIL.setDate(TGL_AMBIL.getDate()+1) // H+1
+/* ===== USER (SAMA DASHBOARD) ===== */
+const user = JSON.parse(localStorage.getItem('maka_user')) || {
+ tglAmbil:'2025-09-18',
+ dpMode:'355',
+ makaPlus:false
+}
 
-const DP_MODE = '355'    // '355' atau '755'
-const MAKA_PLUS = false // true / false
+const TGL_MULAI = new Date(user.tglAmbil)
+TGL_MULAI.setDate(TGL_MULAI.getDate()+1)
 
 const HARIAN = 80000
 const CICIL = 70000
 const TOTAL_DP = 6
 
-let view = new Date()
-let activePay = null
+let view=new Date()
+let active=null
 
-/* ================= RULE ENGINE ================= */
-function getRule(date, dpLunas){
- const d = date.getDate()
-
- // 31 SELALU LIBUR
- if(d === 31) return 'LIBUR'
-
- // DP 755 → 14 & 28 LIBUR
- if(DP_MODE === '755' && (d === 14 || d === 28)) return 'LIBUR'
-
- // DP 355
- if(DP_MODE === '355'){
-  if(!dpLunas && (d === 14 || d === 28)) return 'DP_ONLY'
-  if(dpLunas && (d === 14 || d === 28)) return 'LIBUR'
+function getRule(date,dpLunas){
+ const d=date.getDate()
+ if(d===31) return 'LIBUR'
+ if(user.dpMode==='755' && (d===14||d===28)) return 'LIBUR'
+ if(user.dpMode==='355'){
+  if(!dpLunas && (d===14||d===28)) return 'CDP'
+  if(dpLunas && (d===14||d===28)) return 'LIBUR'
  }
-
  return 'NORMAL'
 }
 
-/* ================= RENDER ================= */
 function render(){
- const grid = document.getElementById('grid')
+ const grid=document.getElementById('grid')
  grid.innerHTML=''
- let total = 0
+ let total=0
+
+ const pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
+ const dpPaid=Object.values(pay).filter(v=>v==='DP').length
+ const dpLunas=dpPaid>=TOTAL_DP
+
+ const today=new Date()
+ today.setHours(0,0,0,0)
 
  const y=view.getFullYear(), m=view.getMonth()
- document.getElementById('label').textContent =
+ document.getElementById('label').textContent=
   view.toLocaleDateString('id-ID',{month:'long',year:'numeric'})
 
- const pay = JSON.parse(localStorage.getItem('maka_payments')) || {}
- const dpPaid = Object.values(pay).filter(v=>v==='DP').length
- const dpLunas = dpPaid >= TOTAL_DP
+ const first=new Date(y,m,1).getDay()
+ const days=new Date(y,m+1,0).getDate()
 
- const today=new Date(); today.setHours(0,0,0,0)
-
- const first = new Date(y,m,1).getDay()
- const days = new Date(y,m+1,0).getDate()
  for(let i=0;i<first;i++) grid.innerHTML+='<div></div>'
 
- for(let d=1; d<=days; d++){
+ for(let d=1;d<=days;d++){
   const date=new Date(y,m,d)
+  date.setHours(0,0,0,0)
   const key=`${y}-${m+1}-${d}`
 
-  if(date < TGL_AMBIL){ grid.innerHTML+='<div></div>'; continue }
+  if(date<TGL_MULAI){grid.innerHTML+='<div></div>';continue}
 
   const rule=getRule(date,dpLunas)
-
-  let cls='box', price=0, label=''
+  let cls='box',price=0,label=''
 
   if(rule==='LIBUR'){
    cls+=' libur'
-  }else if(rule==='DP_ONLY'){
-   cls+=' wajib'
+  }else if(rule==='CDP'){
+   cls+=' cdp'
    price=CICIL
    label='Cicilan DP'
   }else{
    cls+=' wajib'
-   price=MAKA_PLUS?HARIAN:CICIL
-   label=MAKA_PLUS?'Harian Motor':'Cicilan Motor'
+   price=user.makaPlus?HARIAN:CICIL
+   label=user.makaPlus?'Harian Motor':'Cicilan Motor'
   }
 
   if(pay[key]) cls+=' paid'
   if(date>today) cls+=' future'
-  if(!pay[key] && price>0) total+=price
+  if(!pay[key]&&price>0&&date<=today) total+=price
 
   grid.innerHTML+=`
    <div class="${cls}"
-    onclick="${(price>0 && !pay[key] && date<=today)?
+    onclick="${(price>0&&!pay[key]&&date<=today)?
      `openModal('${key}','${label}',${price})`:''}">
     ${d}
    </div>`
  }
 
- document.getElementById('total').textContent =
+ document.getElementById('total').textContent=
   'Rp '+total.toLocaleString('id-ID')
 }
 
-/* ================= MODAL ================= */
 function openModal(k,l,p){
- activePay={k,l,p}
+ active={k,l,p}
  document.getElementById('m-date').textContent='Tanggal '+k
  document.getElementById('m-desc').textContent=
   l+' · Rp '+p.toLocaleString('id-ID')
@@ -277,13 +265,11 @@ function closeModal(){
 }
 function doPay(){
  const pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
- pay[activePay.k]=activePay.l.includes('DP')?'DP':'HARI'
+ pay[active.k]=active.l.includes('DP')?'DP':'HARI'
  localStorage.setItem('maka_payments',JSON.stringify(pay))
- closeModal()
- render()
+ closeModal();render()
 }
 function nav(n){view.setMonth(view.getMonth()+n);render()}
-
 render()
 </script>
 </body>
