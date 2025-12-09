@@ -2,52 +2,43 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin MAKA</title>
+<title>Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
-<h2 style="padding:10px">ADMIN PANEL</h2>
+<h2>ADMIN PANEL</h2>
 
-<section style="padding:10px">
-<h3>Kelola User</h3>
-<div id="users"></div>
-</section>
+<select id="userSel"></select>
+<button onclick="togglePlus()">Toggle MAKA+</button>
 
-<section style="padding:10px">
-<h3>Buat Tagihan Manual</h3>
-<select id="uid"></select>
-<input type="date" id="billDate">
-<button onclick="makeBill()">Buat</button>
-</section>
+<h3>Tambah Part Gratis</h3>
+<input id="partNote" placeholder="Catatan part">
+<button onclick="addPart()">Tambah</button>
 
 <script src="app.js"></script>
 <script>
-const users = DB.users;
-const ul = document.getElementById('users');
-const sel = document.getElementById('uid');
-
-users.forEach((u,i)=>{
-  const d=document.createElement('div');
-  d.textContent=u.name+' - '+u.plate;
-  ul.appendChild(d);
-
+const sel=document.getElementById('userSel');
+DB.users.forEach(u=>{
   const o=document.createElement('option');
-  o.value=i;
-  o.text=u.name;
+  o.value=u.id;o.textContent=u.nama;
   sel.appendChild(o);
 });
 
-function makeBill(){
- const u = users[sel.value];
- const d = billDate.value;
- alert(
-  'Tagihan '+u.name+
-  '\n'+d+
-  '\n'+formatIDR(getDailyRate(u,d))
- );
+function togglePlus(){
+  const u=DB.users.find(x=>x.id===sel.value);
+  u.makaPlus.active=!u.makaPlus.active;
+  u.makaPlus.activatedAt=new Date().toISOString();
+  saveDB(DB);
+  alert('MAKA+ diubah');
+}
+
+function addPart(){
+  const u=DB.users.find(x=>x.id===sel.value);
+  u.freeParts.push({date:dateOnly(new Date()),note:partNote.value});
+  saveDB(DB);
+  alert('Part dicatat');
 }
 </script>
 </body>
