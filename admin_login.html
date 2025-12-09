@@ -1,313 +1,75 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles/theme.css">
-<link rel="stylesheet" href="styles/components.css">
-    
-    <title>MAKA Admin Panel</title>
-    <link rel="stylesheet" href="styles.css"> 
-    
-    <style>
-        /* Admin Styles */
-        .admin-section {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(0, 223, 255, 0.1);
-        }
-        .admin-section h3 {
-            color: var(--paid-gold);
-            border-bottom: 1px solid rgba(0, 223, 255, 0.2);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-        .admin-form label {
-            display: block;
-            margin-top: 10px;
-            color: var(--text-light);
-            font-size: 0.9em;
-        }
-        .admin-form input[type="text"], 
-        .admin-form input[type="number"],
-        .admin-form textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border-radius: 6px;
-            border: 1px solid #444;
-            background: var(--input-bg);
-            color: var(--text-light);
-            box-sizing: border-box;
-        }
-        .admin-form button {
-            background: var(--primary-neon);
-            color: var(--bg-dark);
-            font-weight: bold;
-            padding: 12px;
-            margin-top: 20px;
-            width: 100%;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        #login-panel { text-align: center; padding: 50px 20px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login</title>
+
+<style>
+body{
+    margin:0;
+    background:#0b0f1a;
+    font-family:Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.box{
+    background:#141a2a;
+    padding:25px;
+    border-radius:10px;
+    width:100%;
+    max-width:320px;
+    color:white;
+}
+input{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:8px;
+}
+button{
+    width:100%;
+    margin-top:15px;
+    padding:12px;
+    border:none;
+    border-radius:8px;
+    background:#00e0ff;
+    font-weight:bold;
+    cursor:pointer;
+}
+.error{
+    color:#ff4d4d;
+    margin-top:10px;
+    display:none;
+}
+</style>
 </head>
+
 <body>
-    <div class="app-container">
-        
-        <header class="header" style="border-bottom: 2px solid var(--paid-gold);">
-            <div class="user-info">
-                <h1>🔒 Admin Dashboard</h1>
-                <p>Pengaturan Inti Sistem (Hanya Admin)</p>
-            </div>
-        </header>
 
-        <section id="login-panel">
-            <h2 style="color: var(--holiday-color);">Akses Terbatas</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 20px;">Masukkan Kode Akses Admin:</p>
-            <input type="password" id="admin-password" placeholder="Password..." style="width: 80%; padding: 10px;">
-            <button onclick="loginAdmin()" style="width: 80%;">MASUK SEBAGAI ADMIN</button>
-            <small style="display: block; margin-top: 10px; color: var(--dp-color);">Password Sim: 1131</small>
-        </section>
+<div class="box">
+    <h2>🔐 Admin Login</h2>
+    <input type="password" id="pass" placeholder="Password Admin">
+    <button onclick="login()">MASUK</button>
+    <div id="error" class="error">Password salah</div>
+</div>
 
-        <section id="settings-panel" style="display: none; padding: 20px;">
-            
-            <div class="admin-section">
-                <h3>💰 Pengaturan Keuangan</h3>
-                <form id="finance-form" class="admin-form">
-                    <label for="hwb-rate">Tarif Sewa Harian (Rp):</label>
-                    <input type="number" id="hwb-rate" value="80000">
-                    
-                    <label for="cdp-rate">Cicilan DP (Rp):</label>
-                    <input type="number" id="cdp-rate" value="70000">
-                    
-                    <button type="button" onclick="saveFinance()">SIMPAN KEUNGAN</button>
-                </form>
-            </div>
-            
-            <div class="admin-section">
-                <h3>🛠️ Kelola Jatah Part (Default)</h3>
-                <form id="part-limit-form" class="admin-form">
-                    <label for="ban_depan_limit">Jatah Ban Depan (Total Kontrak):</label>
-                    <input type="number" id="ban_depan_limit" value="3">
-                    <label for="ban_belakang_limit">Jatah Ban Belakang (Total Kontrak):</label>
-                    <input type="number" id="ban_belakang_limit" value="3">
-                    <label for="kampas_depan_limit">Jatah Kampas Rem Depan (Total Kontrak):</label>
-                    <input type="number" id="kampas_depan_limit" value="3">
-                    <label for="kampas_belakang_limit">Jatah Kampas Rem Belakang (Total Kontrak):</label>
-                    <input type="number" id="kampas_belakang_limit" value="3">
-                    <button type="button" onclick="savePartLimits()">SIMPAN JATAH PART</button>
-                </form>
-            </div>
-            
-            <div class="admin-section">
-                <h3>🆕 Tambah Jenis Part Baru</h3>
-                <form id="new-part-form" class="admin-form">
-                    <label for="new-part-key">Key Part (Contoh: ban_baru):</label>
-                    <input type="text" id="new-part-key">
-                    <label for="new-part-name">Nama Part:</label>
-                    <input type="text" id="new-part-name">
-                    <label for="new-part-limit">Jatah Total Kontrak:</label>
-                    <input type="number" id="new-part-limit">
-                    <button type="button" onclick="addNewPart()">TAMBAH PART BARU</button>
-                </form>
-            </div>
+<script>
+const ADMIN_PASS = "1131";
 
+function login(){
+    const pass = document.getElementById('pass').value;
+    if(pass === ADMIN_PASS){
+        localStorage.setItem("admin_login","yes");
+        window.location.href = "admin.html";
+    }else{
+        document.getElementById('error').style.display = "block";
+    }
+}
+</script>
 
-            <div class="admin-section">
-                <h3>📰 Kelola Artikel MLU Info</h3>
-                <p style="font-size: 0.8em; color: var(--text-secondary);">Articles: <span id="mlu-count">0</span> (Artikel baru ditambahkan di paling atas)</p>
-                <form id="mlu-article-form" class="admin-form">
-                    <label for="mlu-title">Judul Artikel:</label>
-                    <input type="text" id="mlu-title">
-                    <label for="mlu-content">Isi Konten:</label>
-                    <textarea id="mlu-content" rows="5"></textarea>
-                    <label for="mlu-photos">Photo URLs (Pisahkan dengan koma):</label>
-                    <input type="text" id="mlu-photos">
-                    <button type="button" onclick="saveArticle('mlu_info')">POST ARTIKEL MLU</button>
-                </form>
-            </div>
-
-             <div class="admin-section">
-                <h3>💡 Kelola Artikel MAKA Tips</h3>
-                <p style="margin-top: 10px; font-size: 0.8em; color: var(--text-secondary);">Articles: <span id="tips-count">0</span> (Artikel baru ditambahkan di paling atas)</p>
-                <form id="tips-article-form" class="admin-form">
-                    <label for="tips-title">Judul Artikel:</label>
-                    <input type="text" id="tips-title">
-                    <label for="tips-content">Isi Konten:</label>
-                    <textarea id="tips-content" rows="5"></textarea>
-                    <label for="tips-photos">Photo URLs (Pisahkan dengan koma):</label>
-                    <input type="text" id="tips-photos">
-                    <button type="button" onclick="saveArticle('maka_tips')">POST ARTIKEL TIPS</button>
-                </form>
-            </div>
-
-
-            <div class="admin-section">
-                <h3>🚫 Daftar Banned Member</h3>
-                <form id="banned-form" class="admin-form">
-                    <textarea id="banned-list" rows="5">B 1000 ABC, B 2000 XYZ</textarea>
-                    <button type="button" onclick="saveBanned()">SIMPAN DAFTAR BANNED</button>
-                </form>
-            </div>
-
-        </section>
-
-
-        <footer class="bottom-nav">
-            <a href="lokasi_fc.html" class="nav-item">
-                <span style="color: var(--primary-neon);">⚡</span>
-                Lokasi FC
-            </a>
-            <a href="dashboard.html" class="nav-item">
-                <span>🏠</span>
-                Home
-            </a>
-            <a href="daftar_antrian.html" class="nav-item">
-                <span style="color: var(--paid-gold);">🎫</span>
-                Antrian
-            </a>
-        </footer>
-    </div>
-    
-    <script>
-        const ADMIN_PASS = '1131';
-
-        function loginAdmin() {
-            const password = document.getElementById('admin-password').value;
-            if (password === ADMIN_PASS) {
-                document.getElementById('login-panel').style.display = 'none';
-                document.getElementById('settings-panel').style.display = 'block';
-                loadSettings();
-                updateArticleCounts();
-            } else {
-                alert('Password Salah!');
-            }
-        }
-
-        function loadSettings() {
-            const finance = JSON.parse(localStorage.getItem('maka_finance_settings')) || { hwb_rate: 80000, cdp_rate: 70000 };
-            const parts = JSON.parse(localStorage.getItem('maka_part_limits')) || { ban_depan: 3, ban_belakang: 3, kampas_depan: 3, kampas_belakang: 3 };
-            const banned = localStorage.getItem('maka_banned_list') || 'B 1000 ABC, B 2000 XYZ';
-
-            document.getElementById('hwb-rate').value = finance.hwb_rate;
-            document.getElementById('cdp-rate').value = finance.cdp_rate;
-            
-            document.getElementById('ban_depan_limit').value = parts.ban_depan || 3;
-            document.getElementById('ban_belakang_limit').value = parts.ban_belakang || 3;
-            document.getElementById('kampas_depan_limit').value = parts.kampas_depan || 3;
-            document.getElementById('kampas_belakang_limit').value = parts.kampas_belakang || 3;
-            
-            document.getElementById('banned-list').value = banned;
-        }
-        
-        function updateArticleCounts() {
-            const mluArticles = JSON.parse(localStorage.getItem('mlu_info_articles')) || [];
-            const tipsArticles = JSON.parse(localStorage.getItem('maka_tips_articles')) || [];
-            document.getElementById('mlu-count').textContent = mluArticles.length;
-            document.getElementById('tips-count').textContent = tipsArticles.length;
-        }
-
-        function saveFinance() {
-            const hwbRate = document.getElementById('hwb-rate').value;
-            const cdpRate = document.getElementById('cdp-rate').value;
-            
-            const newFinance = { hwb_rate: parseInt(hwbRate), cdp_rate: parseInt(cdpRate) };
-            localStorage.setItem('maka_finance_settings', JSON.stringify(newFinance));
-            alert('Pengaturan Keuangan Berhasil Disimpan! HARAP MUAT ULANG SEMUA HALAMAN.');
-        }
-
-        function savePartLimits() {
-            const newLimits = {
-                ban_depan: parseInt(document.getElementById('ban_depan_limit').value),
-                ban_belakang: parseInt(document.getElementById('ban_belakang_limit').value),
-                kampas_depan: parseInt(document.getElementById('kampas_depan_limit').value),
-                kampas_belakang: parseInt(document.getElementById('kampas_belakang_limit').value)
-            };
-            localStorage.setItem('maka_part_limits', JSON.stringify(newLimits));
-            alert('Pengaturan Jatah Part Berhasil Disimpan! HARAP MUAT ULANG SEMUA HALAMAN.');
-        }
-        
-        function addNewPart() {
-            const key = document.getElementById('new-part-key').value.toLowerCase().replace(/\s/g, '_');
-            const name = document.getElementById('new-part-name').value;
-            const limit = parseInt(document.getElementById('new-part-limit').value);
-            
-            if (!key || !name || isNaN(limit) || limit <= 0) {
-                alert('Mohon isi semua kolom dengan benar (Limit harus angka > 0).');
-                return;
-            }
-
-            // Simpan jatah limit baru
-            let limits = JSON.parse(localStorage.getItem('maka_part_limits')) || {};
-            limits[key] = limit;
-            localStorage.setItem('maka_part_limits', JSON.stringify(limits));
-
-            // Simpan nama part baru untuk daftar (dropdown)
-            let adminParts = JSON.parse(localStorage.getItem('maka_admin_parts')) || [];
-            // Cek apakah key sudah ada
-            if (!adminParts.some(p => p.key === key)) {
-                adminParts.push({ key: key, name: name });
-                localStorage.setItem('maka_admin_parts', JSON.stringify(adminParts));
-            } else {
-                 alert(`Part '${name}' sudah ada. Hanya limit yang diupdate.`);
-            }
-
-            alert(`Part '${name}' (Key: ${key}) dengan jatah ${limit} Berhasil Ditambahkan/Diupdate! HARAP MUAT ULANG SEMUA HALAMAN.`);
-            document.getElementById('new-part-key').value = '';
-            document.getElementById('new-part-name').value = '';
-            document.getElementById('new-part-limit').value = '';
-        }
-
-
-        function saveBanned() {
-            const bannedList = document.getElementById('banned-list').value;
-            localStorage.setItem('maka_banned_list', bannedList);
-            alert('Daftar Banned Berhasil Disimpan!');
-        }
-
-        function saveArticle(type) {
-            const titleId = `${type === 'mlu_info' ? 'mlu' : 'tips'}-title`;
-            const contentId = `${type === 'mlu_info' ? 'mlu' : 'tips'}-content`;
-            const photosId = `${type === 'mlu_info' ? 'mlu' : 'tips'}-photos`;
-
-            const title = document.getElementById(titleId).value;
-            const content = document.getElementById(contentId).value;
-            const photosInput = document.getElementById(photosId).value;
-            
-            const photoUrls = photosInput.split(',').map(url => url.trim()).filter(url => url !== '');
-
-            if (!title || !content) {
-                alert('Judul dan Konten tidak boleh kosong.');
-                return;
-            }
-
-            const article = {
-                title: title,
-                content: content,
-                photos: photoUrls,
-                date: new Date().toLocaleDateString('id-ID')
-            };
-
-            const key = `${type}_articles`;
-            let articles = JSON.parse(localStorage.getItem(key)) || [];
-            articles.unshift(article); // Tambah di depan
-            localStorage.setItem(key, JSON.stringify(articles));
-
-            alert(`Artikel ${type === 'mlu_info' ? 'MLU Info' : 'MAKA Tips'} Berhasil Diposting! HARAP MUAT ULANG HALAMAN ARTIKEL.`);
-            document.getElementById(titleId).value = '';
-            document.getElementById(contentId).value = '';
-            document.getElementById(photosId).value = '';
-            updateArticleCounts();
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-             // Cek jika sudah login (opsional)
-        });
-    </script>
 </body>
 </html>
