@@ -3,186 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAKA – Pendaftaran</title>
+<title>Login MAKA</title>
 
 <style>
-:root{
- --bg:#020512;
- --card:#0b1324;
- --line:rgba(255,255,255,.08);
- --blue:#3d5cff;
- --text:#dbe7ff;
-}
-
-*{box-sizing:border-box}
-
 body{
- margin:0;
- background:linear-gradient(180deg,#020512,#060a18);
- font-family:Inter,system-ui;
- color:var(--text);
+  margin:0;
+  font-family:Inter,system-ui;
+  background:linear-gradient(180deg,#020512,#060a18);
+  color:#fff;
 }
-
-.container{
- max-width:420px;
- margin:auto;
- padding:32px 20px;
+.app{
+  max-width:420px;
+  margin:auto;
+  padding:40px 20px;
 }
-
-h1{
- font-size:1.4em;
- margin-bottom:6px;
-}
-
-p.desc{
- font-size:.85em;
- color:#9fb2ff;
- margin-bottom:28px;
-}
-
 .card{
- background:var(--card);
- border-radius:20px;
- padding:22px;
- border:1px solid var(--line);
- box-shadow:0 18px 30px rgba(0,0,0,.6);
+  background:#0b1324;
+  border-radius:16px;
+  padding:24px;
+  border:1px solid rgba(255,255,255,.08);
 }
-
+h1{margin-top:0}
 label{
- display:block;
- font-size:.75em;
- color:#9fb2ff;
- margin-bottom:6px;
- margin-top:16px;
+  display:block;
+  margin-top:14px;
+  font-size:.8em;
+  color:#aaa
 }
-
 input,select{
- width:100%;
- padding:14px;
- border-radius:14px;
- border:1px solid var(--line);
- background:#050814;
- color:#fff;
- font-size:.95em;
- outline:none;
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.1);
+  background:#050814;
+  color:#fff;
+  margin-top:6px
 }
-
-input:focus,select:focus{
- border-color:var(--blue);
-}
-
-.info{
- font-size:.7em;
- color:#8fa4ff;
- margin-top:6px;
-}
-
 button{
- width:100%;
- padding:15px;
- margin-top:24px;
- border-radius:16px;
- border:none;
- font-weight:700;
- font-size:1em;
- background:var(--blue);
- color:white;
- cursor:pointer;
-}
-
-button:active{
- transform:scale(.98);
-}
-
-.footer-note{
- margin-top:18px;
- font-size:.65em;
- color:#777;
- text-align:center;
+  margin-top:24px;
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:#ffe600;
+  font-weight:700
 }
 </style>
-
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-<script>
-const firebaseConfig = {
-  apiKey: "API_KEY",
-  authDomain: "PROJECT.firebaseapp.com",
-  projectId: "PROJECT",
-  storageBucket: "PROJECT.appspot.com",
-  messagingSenderId: "XXXX",
-  appId: "XXXX"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-</script>
 </head>
 
 <body>
+<div class="app">
+  <div class="card">
+    <h1>Login MAKA</h1>
 
-<div class="container">
-<h1>Selamat Datang 👋</h1>
-<p class="desc">Lengkapi data di bawah untuk mulai menggunakan MAKA</p>
+    <label>Nama User</label>
+    <input id="nama" type="text" placeholder="Nama lengkap">
 
-<div class="card">
+    <label>Plat Nomor</label>
+    <input id="plat" type="text" placeholder="B 1234 ABC">
 
-<label>Nama Lengkap</label>
-<input id="nama" placeholder="Nama pengguna">
+    <label>Tanggal Ambil Motor</label>
+    <input id="tanggalAmbil" type="date">
 
-<label>Plat Nomor Motor</label>
-<input id="plat" placeholder="B 1234 CD">
+    <label>Opsi DP</label>
+    <select id="dp">
+      <option value="355">DP 355.000 (Cicil)</option>
+      <option value="755">DP 755.000 (Langsung)</option>
+    </select>
 
-<label>Tanggal Ambil Motor</label>
-<input type="date" id="tglAmbil">
-
-<label>Metode Down Payment</label>
-<select id="dpMode">
- <option value="355">DP 355.000 (cicil DP)</option>
- <option value="755">DP 755.000 (langsung lunas)</option>
-</select>
-<div class="info">
-• DP 355: cicilan 70rb (14 & 28) selama 3 bulan<br>
-• DP 755: langsung libur tgl 14 & 28
-</div>
-
-<button onclick="daftar()">Mulai Sekarang</button>
-
-</div>
-
-<div class="footer-note">
-Dengan melanjutkan, Anda menyetujui sistem pembayaran MAKA
-</div>
+    <button onclick="loginUser()">MASUK</button>
+  </div>
 </div>
 
 <script>
-async function daftar(){
- const nama = document.getElementById('nama').value.trim()
- const plat = document.getElementById('plat').value.trim()
- const tglAmbil = document.getElementById('tglAmbil').value
- const dpMode = document.getElementById('dpMode').value
+/* ================= DATABASE LOCAL ================= */
+function saveUser(data){
+  localStorage.setItem('maka_user', JSON.stringify(data));
+}
 
- if(!nama || !plat || !tglAmbil){
-   alert('Lengkapi semua data')
-   return
- }
+/* ================= LOGIN LOGIC ================= */
+function loginUser(){
+  const nama = document.getElementById('nama').value.trim();
+  const plat = document.getElementById('plat').value.trim();
+  const tanggalAmbil = document.getElementById('tanggalAmbil').value;
+  const dp = document.getElementById('dp').value;
 
- const uid = 'UID_' + Date.now()
+  if(!nama || !plat || !tanggalAmbil){
+    alert('Lengkapi semua data');
+    return;
+  }
 
- await db.collection('maka_users').doc(uid).set({
-   nama,
-   plat,
-   tglAmbil,
-   dpMode,
-   makaPlus:false,          // ⬅️ user aktifkan sendiri di dashboard
-   makaPlusActiveAt:null,   // ⬅️ nanti diisi saat user aktifkan
-   createdAt:Date.now(),
-   status:'aktif'
- })
+  const user = {
+    nama: nama,
+    plat: plat,
+    tanggalAmbil: tanggalAmbil,
+    dp: dp,
+    dpTerbayar: 0,
+    makaPlus: false,
+    makaPlusAktifSejak: null
+  };
 
- localStorage.setItem('MAKA_UID', uid)
-
- location.href = 'dashboard.html'
+  saveUser(user);
+  window.location.href = 'dashboard.html';
 }
 </script>
 
