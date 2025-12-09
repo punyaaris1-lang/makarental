@@ -3,145 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAKA Admin Panel</title>
-
-<style>
-body{margin:0;background:#0b0f1a;color:#fff;font-family:Arial}
-header{padding:15px;background:#141a2a;text-align:center;font-weight:bold}
-.card{background:#141a2a;margin:12px;padding:15px;border-radius:10px}
-input,select{width:100%;padding:10px;margin-top:8px;border:none;border-radius:8px}
-button{margin-top:10px;padding:10px;width:100%;border:none;border-radius:8px;font-weight:bold;background:#00e0ff}
-button.red{background:#ff4d4d}
-.small{font-size:12px;color:#aaa}
-.part{background:#0b1220;padding:6px;margin-top:6px;border-radius:6px}
-</style>
+<title>Admin MAKA</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
-<header>ADMIN – MANAGE USER & TAGIHAN</header>
+<h2 style="padding:10px">ADMIN PANEL</h2>
 
-<section id="users"></section>
+<section style="padding:10px">
+<h3>Kelola User</h3>
+<div id="users"></div>
+</section>
 
-<div class="card">
-<h3>Tambah Tagihan</h3>
-<select id="billUser"></select>
+<section style="padding:10px">
+<h3>Buat Tagihan Manual</h3>
+<select id="uid"></select>
 <input type="date" id="billDate">
-<input type="number" id="billAmount" placeholder="Nominal">
-<button onclick="addBill()">BUAT TAGIHAN</button>
-</div>
+<button onclick="makeBill()">Buat</button>
+</section>
 
-<button class="red" onclick="logout()">LOGOUT</button>
-
+<script src="app.js"></script>
 <script>
-// ===== PROTEKSI =====
-if(localStorage.getItem("admin_login")!=="yes"){
-  location.href="admin_login.html"
+const users = DB.users;
+const ul = document.getElementById('users');
+const sel = document.getElementById('uid');
+
+users.forEach((u,i)=>{
+  const d=document.createElement('div');
+  d.textContent=u.name+' - '+u.plate;
+  ul.appendChild(d);
+
+  const o=document.createElement('option');
+  o.value=i;
+  o.text=u.name;
+  sel.appendChild(o);
+});
+
+function makeBill(){
+ const u = users[sel.value];
+ const d = billDate.value;
+ alert(
+  'Tagihan '+u.name+
+  '\n'+d+
+  '\n'+formatIDR(getDailyRate(u,d))
+ );
 }
-
-// ===== DB =====
-let users = JSON.parse(localStorage.getItem("maka_users")) || []
-let bills = JSON.parse(localStorage.getItem("maka_tagihan")) || []
-
-// ===== RENDER =====
-function render(){
-  const wrap=document.getElementById("users")
-  const sel=document.getElementById("billUser")
-  wrap.innerHTML=""
-  sel.innerHTML=""
-
-  users.forEach(u=>{
-    sel.innerHTML+=`<option value="${u.id}">${u.nama} - ${u.plat}</option>`
-
-    const userBills=bills.filter(b=>b.userId===u.id)
-    const parts=u.parts||[]
-
-    wrap.innerHTML+=`
-    <div class="card">
-      <b>${u.nama}</b><br>
-      <span class="small">${u.plat}</span>
-
-      <label>Nama</label>
-      <input value="${u.nama}" onchange="editUser('${u.id}','nama',this.value)">
-      <label>Plat</label>
-      <input value="${u.plat}" onchange="editUser('${u.id}','plat',this.value)">
-      <label>Tgl Ambil</label>
-      <input type="date" value="${u.startDate}" onchange="editUser('${u.id}','startDate',this.value)">
-
-      <label>MAKA+</label>
-      <select onchange="toggleMaka('${u.id}',this.value)">
-        <option value="off" ${!u.makaPlus?'selected':''}>OFF</option>
-        <option value="on" ${u.makaPlus?'selected':''}>ON</option>
-      </select>
-
-      <h4>Part Gratis</h4>
-      ${parts.map(p=>`<div class="part">${p}</div>`).join("")}
-      <input placeholder="Tambah Part" onkeydown="if(event.key==='Enter')addPart('${u.id}',this)">
-
-      <h4>Tagihan</h4>
-      ${userBills.map(b=>`
-        <div class="part">
-          ${b.tgl} - Rp ${b.nominal.toLocaleString()} (${b.status})
-        </div>
-      `).join("") || '<div class="small">Belum ada</div>'}
-    </div>
-    `
-  })
-}
-
-// ===== EDIT USER =====
-function editUser(id,key,val){
-  const u=users.find(x=>x.id===id)
-  u[key]=val
-  saveUsers()
-}
-function toggleMaka(id,val){
-  const u=users.find(x=>x.id===id)
-  u.makaPlus = val==="on"
-  if(val==="on") u.makaStart=new Date().toISOString().slice(0,10)
-  saveUsers()
-}
-
-// ===== PART =====
-function addPart(id,input){
-  if(!input.value)return
-  const u=users.find(x=>x.id===id)
-  u.parts=u.parts||[]
-  u.parts.push(input.value)
-  input.value=""
-  saveUsers()
-}
-
-// ===== TAGIHAN =====
-function addBill(){
-  const userId=billUser.value
-  const tgl=billDate.value
-  const nominal=Number(billAmount.value)
-  if(!tgl||!nominal)return alert("Lengkapi")
-
-  bills.push({
-    id:Date.now(),
-    userId,tgl,nominal,
-    status:"BELUM BAYAR"
-  })
-  localStorage.setItem("maka_tagihan",JSON.stringify(bills))
-  alert("Tagihan dibuat")
-  render()
-}
-
-// ===== SAVE =====
-function saveUsers(){
-  localStorage.setItem("maka_users",JSON.stringify(users))
-  render()
-}
-
-// ===== LOGOUT =====
-function logout(){
-  localStorage.removeItem("admin_login")
-  location.href="admin_login.html"
-}
-
-render()
 </script>
 </body>
 </html>
