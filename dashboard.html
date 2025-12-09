@@ -1,224 +1,80 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MAKA Dashboard</title>
-<style>
-:root{
- --bg:#050814;
- --card:#0b1324;
- --muted:#9fb2ff;
- --accent:#3d5cff;
- --paid:#ffe600;
-}
-body{margin:0;font-family:Inter,system-ui;background:linear-gradient(180deg,#020512,#050814);color:#e6f0ff}
-.app{max-width:520px;margin:0 auto;padding-bottom:120px}
-.header{padding:20px}
-.user-info h1{margin:0;font-size:1.25em}
-.user-info p{margin:6px 0 0;color:#b7c9ff}
-.hero{margin-top:14px;background:linear-gradient(135deg,#0f1a3a,#020512);border-radius:16px;padding:14px;border:1px solid rgba(255,255,255,.04);display:flex;justify-content:space-between;align-items:center}
-.hero .left small{color:var(--muted);display:block}
-.hero .right{ text-align:right }
-.hero .right span{display:block;font-size:1.3em;font-weight:800}
-.icon-grid{padding:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.icon{background:var(--card);padding:18px;border-radius:14px;text-align:center;color:#dbeeff;text-decoration:none;display:block;border:1px solid rgba(255,255,255,.04)}
-.icon span{font-size:28px;display:block;margin-bottom:8px}
-.icon p{margin:0;font-weight:700;font-size:.9em}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;height:90px;display:flex;background:linear-gradient(to top,#050814,#020512);border-top:1px solid rgba(255,255,255,.04);z-index:999}
-.nav-item{flex:1;text-align:center;padding-top:12px;color:#888;text-decoration:none;font-size:.75em}
-.nav-item span{display:block;font-size:26px;margin-bottom:6px}
-.nav-item.active{color:#fff}
-.nav-item.active span{background:var(--accent);width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 6px}
-.small{font-size:.8em;color:#aebfe8}
-</style>
+<link rel="stylesheet" href="styles.css">
 </head>
-<body>
-<div class="app">
-  <header class="header">
-    <div class="user-info">
-      <h1 id="user-name">Halo</h1>
-      <p>Plat Motor <strong id="user-plate">-</strong></p>
+
+<body class="dashboard">
+
+<div class="app-container">
+
+<header class="header">
+  <div class="user-info">
+    <h1 id="userName">Halo</h1>
+    <p>Plat Motor <strong id="userPlate"></strong></p>
+  </div>
+
+  <div class="hero-tunggakan">
+    <div>
+      <h3>TAGIHAN BERJALAN</h3>
+      <p>Sampai hari ini</p>
     </div>
-
-    <div class="hero" style="margin-top:12px">
-      <div class="left">
-        <small>STATUS PEMBAYARAN</small>
-        <div class="small" id="hero-note">Tagihan sampai hari ini</div>
-      </div>
-      <div class="right">
-        <span id="hero-total">Rp 0</span>
-        <small class="small" id="hero-days">0 Hari</small>
-      </div>
+    <div>
+      <span id="totalBill">Rp 0</span><br>
+      <small id="totalDays">0 Hari</small>
     </div>
-  </header>
+  </div>
+</header>
 
-  <section class="icon-grid" aria-label="fitur">
-    <a class="icon" href="lokasi_fc.html"><span>⚡</span><p>FC</p></a>
-    <a class="icon" href="dashboard.html"><span>🏠</span><p>Home</p></a>
-    <a class="icon" href="calendar.html"><span>📅</span><p>Kalender</p></a>
+<section class="icon-grid-section">
+<div class="icon-grid">
+<a href="calendar.html" class="icon-item">📅<p>Kalender</p></a>
+<a href="history.html" class="icon-item">🧾<p>Riwayat</p></a>
+<a href="part_tracker.html" class="icon-item">🎁<p>Gratisan</p></a>
+<a href="info_mlu.html" class="icon-item">📰<p>Info</p></a>
+<a href="tips_maka.html" class="icon-item">💡<p>Tips</p></a>
+<a href="maka_plus.html" class="icon-item">⭐<p>MAKA+</p></a>
+</div>
+</section>
 
-    <a class="icon" href="history.html"><span>🗒️</span><p>Riwayat</p></a>
-    <a class="icon" href="part_tracker.html"><span>🎁</span><p>Gratisan</p></a>
-    <a class="icon" href="info_mlu.html"><span>📰</span><p>Info</p></a>
-
-    <a class="icon" href="tips_maka.html"><span>💡</span><p>Tips</p></a>
-    <a class="icon" href="settings.html"><span>⚙️</span><p>Setting</p></a>
-    <a class="icon" href="#" onclick="window.open('https://wa.me/62812XXXXXXXX?text=SOS%20MAKA%20DARURAT','_blank')"><span>🚨</span><p>SOS</p></a>
-  </section>
 </div>
 
-<footer class="bottom-nav" role="navigation">
-  <a class="nav-item active" href="dashboard.html"><span>🏠</span>Home</a>
-  <a class="nav-item" href="calendar.html"><span>📅</span>Kalender</a>
-  <a class="nav-item" href="admin_login.html"><span>⚙️</span>Admin</a>
+<footer class="bottom-nav">
+  <a href="lokasi_fc.html" class="nav-item">⚡<span>FC</span></a>
+  <a href="dashboard.html" class="nav-item active">🏠<span>Home</span></a>
+  <a href="calendar.html" class="nav-item">📅<span>Bayar</span></a>
 </footer>
 
+<script src="app.js"></script>
 <script>
-/*
-  Dashboard logic:
-  - Read user from localStorage: try 'maka_user' first, fallback to first of 'maka_users' array
-  - Read finance settings from 'maka_finance_settings' (defaults)
-  - Read payments from 'maka_payments' (object keyed 'YYYY-M-D' -> 'DP'|'HARI')
-  - Read invoices from 'maka_tagihan' (array)
-  - Calculate total outstanding from startDate (H+1) until today:
-    - skip date 31 (libur)
-    - DP 355: 14 & 28 are cicilan DP until dp paid 6 times
-    - DP 755: 14 & 28 are libur
-    - daily: hwb_rate (or cicil if not makaPlus)
-    - if makaPlus activated and active since date, add +10000 starting H+1 of makaPlusActiveAt
-    - also include admin-made invoices (maka_tagihan) if date <= today and not paid
-*/
+const user = DB.activeUser;
+if(!user){ location.href='index.html'; }
 
-function getStorageUser(){
-  let u = null;
-  try { u = JSON.parse(localStorage.getItem('maka_user')); } catch(e){}
-  if(u && u.tanggalAmbil) return u;
-  // fallback: first user in maka_users (admin flow)
-  try{
-    const arr = JSON.parse(localStorage.getItem('maka_users')) || [];
-    if(arr.length) return arr[0];
-  }catch(e){}
-  return null;
+user.dpPaidCount = user.dpPaidCount || 0;
+
+document.getElementById('userName').textContent = "Halo, " + user.name;
+document.getElementById('userPlate').textContent = user.plate;
+
+let total = 0;
+let days = 0;
+const today = new Date();
+let d = new Date(user.startDate);
+d.setDate(d.getDate()+1); // H+1
+
+while(d <= today){
+  const ds = d.toISOString().slice(0,10);
+  if(!isHoliday(user, ds)){
+    total += getDailyRate(user, ds);
+    days++;
+  }
+  d.setDate(d.getDate()+1);
 }
 
-const user = getStorageUser();
-if(!user){
-  // redirect to index to create user
-  console.warn('No user found in storage (maka_user / maka_users). Redirect to index.');
-  // don't redirect silently; show placeholder
-  document.getElementById('user-name').textContent = 'Halo, Silakan daftar';
-  document.getElementById('user-plate').textContent = '-';
-  document.getElementById('hero-total').textContent = 'Rp 0';
-} else {
-  document.getElementById('user-name').textContent = 'Halo, ' + (user.nama || 'User');
-  document.getElementById('user-plate').textContent = user.plat || '-';
-
-  const finance = JSON.parse(localStorage.getItem('maka_finance_settings')) || { hwb_rate:80000, cdp_rate:70000 };
-
-  // payments object { "2025-9-19": "DP" }
-  const payments = JSON.parse(localStorage.getItem('maka_payments') || '{}');
-  const invoices = JSON.parse(localStorage.getItem('maka_tagihan') || '[]');
-
-  // count dp paid (from payments) and also invoices paid with type matching (we treat invoice status)
-  let dpPaidCount = Object.values(payments).filter(v=>v==='DP').length;
-  // also count invoices that are marked paid (we store status on invoices)
-  dpPaidCount += (invoices.filter(inv=>inv.status && inv.status.toUpperCase()==='LUNAS' && (inv.type==='DP' || inv.type==='DP'===false)).length);
-
-  // compute dpRemaining: admin may also store dpTerbayar in user object (backwards compat)
-  let dpTerbayar = 0;
-  if(typeof user.dpTerbayar === 'number') dpTerbayar = user.dpTerbayar;
-  // merge counts
-  dpTerbayar = Math.max(dpTerbayar, dpPaidCount);
-
-  // start = H+1 from tanggalAmbil
-  const start = new Date(user.tanggalAmbil);
-  start.setDate(start.getDate()+1);
-  start.setHours(0,0,0,0);
-  const today = new Date(); today.setHours(0,0,0,0);
-
-  // helper: rule
-  function getRule(date){
-    const d = date.getDate();
-    if(d===31) return 'LIBUR';
-    const dpMode = user.dp || user.dpMode || (user.dpMode?user.dpMode:'355');
-    if(String(dpMode)==='755' && (d===14||d===28)) return 'LIBUR';
-    if(String(dpMode)==='355' && (d===14||d===28)){
-      // if user.dpTerbayar >=6 then libur, else CDP
-      if(dpTerbayar >= 6) return 'LIBUR';
-      return 'CDP';
-    }
-    return 'NORMAL';
-  }
-
-  // helper: check if day paid by payments or invoices
-  function isPaidFor(date){
-    const key = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
-    if(payments[key]) return true;
-    // check invoices for this user & date and paid status
-    const inv = invoices.find(i => (String(i.userId) === String(user.id) || (i.userIndex && i.userIndex==0 && user.nama && i.userName===user.nama)) && i.date === key || (i.tgl && i.tgl === date.toISOString().slice(0,10)));
-    if(inv && (inv.paid===true || (inv.status && inv.status.toUpperCase()==='LUNAS'))) return true;
-    return false;
-  }
-
-  // compute total outstanding from start -> today
-  let total = 0;
-  let cntDays = 0;
-  // DP remaining variable for iteration: assume dpTerbayar counts from earliest; we don't decrement global dpTerbayar here to keep simple
-  for(let d = new Date(start); d <= today; d.setDate(d.getDate()+1)){
-    const date = new Date(d); date.setHours(0,0,0,0);
-    const rule = getRule(date);
-    const key = date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate();
-
-    // skip if already paid
-    if(isPaidFor(date)) continue;
-
-    if(rule === 'LIBUR'){
-      // skip
-      continue;
-    } else if(rule === 'CDP'){
-      total += (finance.cdp_rate || 70000);
-      cntDays++;
-    } else { // NORMAL
-      let base = user.makaPlus && user.makaPlusAktifSejak ? (finance.hwb_rate || 80000) : (finance.hwb_rate || 80000);
-      // if makaPlus active and active since date before this date + H+1 rule: check makaPlusAktifSejak field (YYYY-MM-DD)
-      if(user.makaPlus){
-        // if makaPlusAktifSejak is set, start adding +10k from H+1 of that date
-        const aktif = user.makaPlusAktifSejak || user.makaPlusStart || user.makaStart;
-        if(aktif){
-          const dt = new Date(aktif);
-          dt.setDate(dt.getDate()+1); dt.setHours(0,0,0,0);
-          if(date >= dt) base += 10000;
-        } else {
-          // if no aktif date, assume not yet (no extra)
-        }
-      }
-      total += base;
-      cntDays++;
-    }
-  }
-
-  // include admin-created invoices up to today that are unpaid
-  const addInv = invoices.filter(i => {
-    // match by userId if exists, or try to match by name/plat fallback
-    const match = (i.userId && user.id && String(i.userId) === String(user.id)) ||
-                  (i.userName && i.userName === user.nama) ||
-                  (i.userPlat && i.userPlat === user.plat);
-    if(!match) return false;
-    // invoice date compare
-    let invDate = i.date || i.tgl || i.tanggal || i.tglInvoice;
-    if(!invDate) return false;
-    // convert to comparable forms
-    // accept "YYYY-M-D" or "YYYY-MM-DD"
-    const invD = new Date(invDate);
-    invD.setHours(0,0,0,0);
-    return invD <= today && !(i.paid===true || (i.status && i.status.toUpperCase()==='LUNAS'));
-  });
-  addInv.forEach(ii => { total += (ii.nominal||0); cntDays++; });
-
-  document.getElementById('hero-total').textContent = 'Rp ' + total.toLocaleString('id-ID');
-  document.getElementById('hero-days').textContent = cntDays + ' Hari';
-}
+document.getElementById('totalBill').textContent = formatIDR(total);
+document.getElementById('totalDays').textContent = days + " Hari";
 </script>
 </body>
 </html>
