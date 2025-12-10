@@ -3,38 +3,119 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Login MAKA Online</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<title>Login RTO MAKA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* CSS SAMA SEPERTI SEBELUMNYA */
-:root { --bg:#f6f8fb; --surface:#ffffff; --muted:#6b7280; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; --radius-lg:24px; --radius-md:14px; }
+/* GLOBAL THEME */
+:root { 
+    --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
+    --glass-bg:rgba(255,255,255,0.75); --glass-border:rgba(255,255,255,0.5); 
+    --glass-shadow:0 8px 32px 0 rgba(31, 38, 135, 0.15); --backdrop-blur:blur(12px);
+    --radius-lg:24px; --radius-md:16px; 
+}
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { margin:0; padding:0; font-family:'Inter', sans-serif; background:linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%); color:var(--text); min-height:100vh; display:flex; align-items:center; justify-content:center; }
+
+body { 
+    margin:0; padding:0; font-family:'Inter', sans-serif; 
+    background-color: var(--bg-base); color:var(--text); 
+    min-height:100vh; display:flex; align-items:center; justify-content:center; 
+    position: relative; overflow: hidden;
+}
+
+/* BACKGROUND IMAGE */
+body::before {
+    content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: url('1763947427555.jpg') center/cover no-repeat; 
+    opacity: 0.15; z-index: -1; pointer-events: none;
+}
+
 .app-container { width:100%; max-width:460px; padding:24px; }
-.auth-card { background:var(--surface); border-radius:var(--radius-lg); padding:32px 24px; box-shadow:0 20px 40px rgba(15,23,42,0.08); border:1px solid rgba(255,255,255,0.6); }
-.brand-title { font-family:'Syne'; font-size:28px; font-weight:800; text-align:center; margin:0 0 8px; }
-.brand-subtitle { color:var(--muted); font-size:14px; text-align:center; margin-bottom:24px; }
-.tabs { display:flex; background:#f1f5f9; padding:4px; border-radius:12px; margin-bottom:24px; }
-.tab-btn { flex:1; padding:10px; border:none; background:transparent; color:var(--muted); font-weight:700; border-radius:10px; cursor:pointer; }
-.tab-btn.active { background:white; color:var(--text); box-shadow:0 2px 5px rgba(0,0,0,0.05); }
-.form-view { display:none; } .form-view.active { display:block; }
+
+/* CARD LOGIN */
+.auth-card { 
+    background:var(--glass-bg); backdrop-filter:var(--backdrop-blur); 
+    -webkit-backdrop-filter:var(--backdrop-blur);
+    border-radius:var(--radius-lg); padding:32px 24px; 
+    box-shadow:var(--glass-shadow); border:1px solid var(--glass-border); 
+}
+
+/* JUDUL BARU (RTO MAKA) */
+.brand-title { 
+    font-family:'Syne', sans-serif; font-size:2.2em; font-weight:800; 
+    text-align:center; margin:0 0 8px; color: var(--text);
+    letter-spacing: -1px;
+}
+.brand-subtitle { 
+    color:#64748b; font-size:0.9em; text-align:center; 
+    margin-bottom:24px; font-weight: 500; 
+}
+
+/* TABS */
+.tabs { display:flex; background:rgba(255,255,255,0.5); padding:5px; border-radius:16px; margin-bottom:24px; }
+.tab-btn { 
+    flex:1; padding:12px; border:none; background:transparent; 
+    color:#64748b; font-weight:700; border-radius:12px; cursor:pointer; 
+    font-family: 'Inter'; transition: 0.3s;
+}
+.tab-btn.active { background:white; color:var(--accent); box-shadow:0 4px 10px rgba(0,0,0,0.05); }
+
+/* FORM */
+.form-view { display:none; animation: fadeIn 0.4s ease; } 
+.form-view.active { display:block; }
+@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
 .form-group { margin-bottom:16px; }
-label { display:block; font-size:11px; font-weight:700; color:var(--muted); margin-bottom:6px; text-transform:uppercase; }
-input, select { width:100%; padding:14px; border-radius:var(--radius-md); border:1px solid #e2e8f0; background:#fbfdff; outline:none; }
-.btn-primary { width:100%; margin-top:12px; padding:16px; border:none; border-radius:var(--radius-md); background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:white; font-weight:800; cursor:pointer; }
-.btn-primary:disabled { background:#ccc; cursor:not-allowed; }
+label { display:block; font-size:0.75em; font-weight:800; color:#64748b; margin-bottom:8px; text-transform:uppercase; letter-spacing: 0.5px; }
+input, select { 
+    width:100%; padding:16px; border-radius:var(--radius-md); 
+    border:1px solid #cbd5e1; background:rgba(255,255,255,0.8); 
+    outline:none; font-size: 1em; font-family: 'Inter'; transition: 0.2s;
+}
+input:focus { border-color: var(--accent); background: white; }
+
+/* BUTTON */
+.btn-primary { 
+    width:100%; margin-top:12px; padding:18px; border:none; 
+    border-radius:var(--radius-md); 
+    background:linear-gradient(90deg, var(--accent), var(--accent-2)); 
+    color:white; font-weight:800; font-size: 1em; cursor:pointer; 
+    box-shadow: 0 10px 25px rgba(14, 165, 166, 0.3); transition: 0.2s;
+    font-family: 'Syne'; letter-spacing: 0.5px;
+}
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { background:#cbd5e1; box-shadow: none; cursor:not-allowed; }
+
+/* CUSTOM MODAL POP-UP */
+.modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);
+    z-index:9999; display:none; align-items:center; justify-content:center;
+    opacity:0; transition:opacity 0.3s;
+}
+.modal-overlay.show { display:flex; opacity:1; }
+.modal-box {
+    background:white; width:85%; max-width:320px; padding:30px; border-radius:28px;
+    text-align:center; box-shadow:0 25px 60px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-overlay.show .modal-box { transform:scale(1); }
+.modal-icon { font-size:40px; margin-bottom:15px; display:block; }
+.modal-title { font-family:'Syne'; font-size:1.4em; font-weight:800; margin:0 0 10px; color:var(--text); }
+.modal-desc { font-size:0.95em; color:#64748b; line-height:1.5; margin-bottom:25px; }
+.btn-modal { 
+    width: 100%; padding:14px; border-radius:14px; border:none; 
+    background:var(--text); color:white; font-weight:800; cursor:pointer; 
+}
 </style>
 </head>
 <body>
 
 <div class="app-container">
   <div class="auth-card">
-    <div class="brand-title">MAKA App</div>
-    <div class="brand-subtitle">Database Online & Realtime</div>
+    <div class="brand-title">RTO MAKA</div>
+    <div class="brand-subtitle">Real Time Operation System</div>
 
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('login')">MASUK</button>
@@ -43,15 +124,15 @@ input, select { width:100%; padding:14px; border-radius:var(--radius-md); border
 
     <div id="view-login" class="form-view active">
       <div class="form-group">
-        <label>Plat Nomor</label>
-        <input id="l-plat" type="text" placeholder="B 1234 XYZ" style="text-transform:uppercase;">
+        <label>Plat Nomor Kendaraan</label>
+        <input id="l-plat" type="text" placeholder="Contoh: B 1234 XYZ" style="text-transform:uppercase;">
       </div>
-      <button id="btnLogin" class="btn-primary" onclick="handleLogin()">MASUK</button>
+      <button id="btnLogin" class="btn-primary" onclick="handleLogin()">MASUK APLIKASI</button>
     </div>
 
     <div id="view-register" class="form-view">
       <div class="form-group"><label>Nama Lengkap</label><input id="r-nama" placeholder="Sesuai KTP"></div>
-      <div class="form-group"><label>Nomor HP</label><input id="r-hp" type="tel" placeholder="08xxxxxxxxxx"></div>
+      <div class="form-group"><label>Nomor HP (WA)</label><input id="r-hp" type="tel" placeholder="08xxxxxxxxxx"></div>
       <div class="form-group"><label>Plat Nomor</label><input id="r-plat" placeholder="B 1234 XYZ" style="text-transform:uppercase;"></div>
       <div class="form-group"><label>Tanggal Ambil Motor</label><input id="r-tgl" type="date"></div>
       <div class="form-group"><label>Opsi DP</label>
@@ -61,6 +142,25 @@ input, select { width:100%; padding:14px; border-radius:var(--radius-md); border
     </div>
   </div>
 </div>
+
+<div id="customModal" class="modal-overlay">
+    <div class="modal-box">
+        <span id="mIcon" class="modal-icon">🔔</span>
+        <h3 id="mTitle" class="modal-title">Info</h3>
+        <p id="mDesc" class="modal-desc">Pesan...</p>
+        <button class="btn-modal" onclick="closeModal()">OK, SIAP</button>
+    </div>
+</div>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('PWA Ready', reg))
+        .catch(err => console.log('PWA Error', err));
+    });
+  }
+</script>
 
 <script>
 // --- CONFIG FIREBASE ---
@@ -75,7 +175,18 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// --- LOGIC ---
+// --- MODAL LOGIC ---
+function showModal(title, msg, type="info") {
+    document.getElementById('mTitle').innerText = title;
+    document.getElementById('mDesc').innerText = msg;
+    document.getElementById('mIcon').innerText = type === "error" ? "⚠️" : (type === "success" ? "✅" : "🔔");
+    document.getElementById('customModal').classList.add('show');
+}
+function closeModal() {
+    document.getElementById('customModal').classList.remove('show');
+}
+
+// --- APP LOGIC ---
 function switchTab(mode) {
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   event.target.classList.add('active');
@@ -91,37 +202,38 @@ function handleRegister() {
   const dp = document.getElementById('r-dp').value;
   const btn = document.getElementById('btnReg');
 
-  if(!nama || !hp || !plat || !tgl) return alert('Lengkapi data!');
+  if(!nama || !hp || !plat || !tgl) return showModal("Data Kurang", "Mohon lengkapi semua formulir.", "error");
 
   btn.disabled = true; btn.innerText = "MENDAFTAR...";
 
-  // Cek apakah plat sudah ada
   const docRef = db.collection('users').doc(plat);
   docRef.get().then((doc) => {
     if (doc.exists) {
-      alert("Plat nomor sudah terdaftar! Silakan login.");
+      showModal("Sudah Terdaftar", "Plat nomor ini sudah ada. Silakan Login.", "error");
       switchTab('login');
       document.getElementById('l-plat').value = plat;
       btn.disabled = false; btn.innerText = "DAFTAR SEKARANG";
     } else {
-      // Simpan ke Firebase
       const userData = {
         nama: nama, hp: hp, plat: plat, tglAmbil: tgl, dp: dp,
-        joinedAt: new Date().toISOString(),
-        isBanned: false,
+        joinedAt: new Date().toISOString(), isBanned: false,
         makaPlus: { active:false, activatedAt:null }
       };
       
       docRef.set(userData).then(() => {
-        // Simpan sesi di lokal juga biar cepet
         localStorage.setItem('maka_user', JSON.stringify(userData));
-        alert("Pendaftaran Berhasil!");
-        window.location.href = 'dashboard.html';
+        showModal("Sukses", "Pendaftaran Berhasil! Selamat Datang.", "success");
+        setTimeout(() => window.location.href = 'dashboard.html', 1500);
       });
     }
   }).catch((error) => {
     console.error("Error:", error);
-    alert("Gagal koneksi server.");
+    // Jika error database not found, user harus buat database dulu di console
+    if(error.code === 'not-found' || error.message.includes('not exist')) {
+        showModal("Database Belum Siap", "Admin: Harap buat database Firestore di Console Firebase.", "error");
+    } else {
+        showModal("Gagal", "Periksa koneksi internet Anda.", "error");
+    }
     btn.disabled = false; btn.innerText = "DAFTAR SEKARANG";
   });
 }
@@ -130,7 +242,7 @@ function handleLogin() {
   const plat = document.getElementById('l-plat').value.trim().toUpperCase();
   const btn = document.getElementById('btnLogin');
   
-  if(!plat) return alert("Isi plat nomor!");
+  if(!plat) return showModal("Input Kosong", "Mohon isi Plat Nomor Anda.", "error");
   
   btn.disabled = true; btn.innerText = "MEMERIKSA...";
 
@@ -138,20 +250,23 @@ function handleLogin() {
     if (doc.exists) {
       const data = doc.data();
       if(data.isBanned) {
-        alert("⛔ AKUN ANDA DIBLOKIR ADMIN. Hubungi layanan pelanggan.");
-        btn.disabled = false; btn.innerText = "MASUK";
+        showModal("Akses Ditolak", "Akun Anda diblokir oleh Admin.", "error");
+        btn.disabled = false; btn.innerText = "MASUK APLIKASI";
         return;
       }
-      
       localStorage.setItem('maka_user', JSON.stringify(data));
       window.location.href = 'dashboard.html';
     } else {
-      alert("Data tidak ditemukan. Silakan Daftar Baru.");
-      btn.disabled = false; btn.innerText = "MASUK";
+      showModal("Tidak Ditemukan", "Plat nomor belum terdaftar. Silakan Daftar Baru.", "error");
+      btn.disabled = false; btn.innerText = "MASUK APLIKASI";
     }
   }).catch((error) => {
-    alert("Gagal koneksi. Cek internet.");
-    btn.disabled = false; btn.innerText = "MASUK";
+    if(error.code === 'not-found' || error.message.includes('not exist')) {
+        showModal("Database Error", "Database belum dibuat di Firebase Console.", "error");
+    } else {
+        showModal("Koneksi Gagal", "Cek internet Anda.", "error");
+    }
+    btn.disabled = false; btn.innerText = "MASUK APLIKASI";
   });
 }
 </script>
