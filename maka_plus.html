@@ -301,5 +301,15 @@ footer.bottom-nav {
 
     document.addEventListener('DOMContentLoaded', loadState);
 </script>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('PWA Registered'))
+        .catch(err => console.log('PWA Error', err));
+    });
+  }
+  </script>
+  
 </body>
 </html>
