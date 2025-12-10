@@ -2,49 +2,218 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MAKA Riwayat Transaksi</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MAKA Riwayat</title>
 
-<!-- inject app.css -->
-<link rel="stylesheet" href="app.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
 
+<style>
+/* ================= THEME VARIABLES ================= */
+:root {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --muted: #9ca3af;
+  --text: #0f1724;
+  
+  --accent: #0ea5a6;       /* Teal (Lunas) */
+  --danger: #ef4444;       /* Merah (Tunggakan) */
+  --purple: #8b5cf6;       /* Ungu (DP) */
+  
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --card-shadow: 0 4px 20px rgba(15,23,42,0.04);
+  --max-width: 520px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0; padding: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.app-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 20px 20px 120px 20px;
+}
+
+/* ================= HEADER ================= */
+.header {
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: 16px;
+}
+.header h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.8em;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+.header p {
+  color: var(--muted);
+  font-size: 0.95em;
+  margin: 4px 0 0 0;
+}
+
+/* ================= HISTORY LIST ================= */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(15,23,42,0.03);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.1s;
+}
+
+.history-card:active {
+  transform: scale(0.98);
+}
+
+/* Status Indicator Bar (Left Side) */
+.history-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 5px;
+  background: #ccc; /* Default */
+}
+
+/* LEFT SIDE INFO */
+.h-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.h-type {
+  font-weight: 800;
+  font-size: 1em;
+  color: var(--text);
+}
+.h-date {
+  font-size: 0.75em;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* RIGHT SIDE INFO */
+.h-amount-box {
+  text-align: right;
+}
+.h-amount {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.1em;
+  color: var(--text);
+}
+.h-status {
+  font-size: 0.75em;
+  font-weight: 700;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+/* COLOR VARIANTS */
+/* PAID / LUNAS */
+.card-paid::before { background: var(--accent); }
+.card-paid .h-status {
+  background: rgba(14, 165, 166, 0.1);
+  color: var(--accent);
+}
+
+/* UNPAID / TUNGGAKAN */
+.card-unpaid::before { background: var(--danger); }
+.card-unpaid .h-status {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+/* DP (Cicilan) */
+.card-dp::before { background: var(--purple); }
+.card-dp .h-status {
+  background: rgba(139, 92, 246, 0.1);
+  color: var(--purple);
+}
+
+/* Empty State */
+.empty-msg {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9em;
+  padding: 40px 0;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px dashed rgba(0,0,0,0.1);
+}
+
+/* ================= BOTTOM NAV ================= */
+footer.bottom-nav {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 20px;
+  width: calc(100% - 40px);
+  max-width: 480px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 999px;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.5);
+  z-index: 999;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px;
+}
+.nav-item span { font-size: 20px; margin-bottom: 2px; }
+.nav-item.active { color: var(--accent); font-weight: 700; }
+.nav-item.active span { transform: scale(1.1); }
+</style>
 </head>
+
 <body>
 <div class="app-container">
 
-<header class="header neon-border">
-    <div class="user-info">
-        <h1>🗒️ Riwayat Transaksi</h1>
-        <p>Log pembayaran dan tunggakan Anda.</p>
-    </div>
+<header class="header">
+    <h1>Riwayat</h1>
+    <p>Aktivitas pembayaran bulan ini</p>
 </header>
 
-<section class="transaction-list">
-    <h2 class="section-title">Aktivitas Pembayaran Bulan Ini</h2>
-
-    <div id="history-log" class="history-loading">
-        Memuat data transaksi...
-    </div>
-</section>
-
-
-<footer class="bottom-nav">
-    <a href="dashboard.html" class="nav-item">
-        <span>🏠</span>Dashboard
-    </a>
-    <a href="calendar.html" class="nav-item">
-        <span>📅</span>Kalender
-    </a>
-    <a href="history.html" class="nav-item active">
-        <span>🗒️</span>Riwayat
-    </a>
-    <a href="settings.html" class="nav-item">
-        <span>⚙️</span>Pengaturan
-    </a>
-</footer>
+<div id="history-log" class="history-list">
+    <div class="empty-msg">Memuat data...</div>
+</div>
 
 </div>
 
+<footer class="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
+    <a href="calendar.html" class="nav-item"><span>📅</span>Bayar</a>
+    <a href="history.html" class="nav-item active"><span>🗒️</span>Riwayat</a>
+    <a href="settings.html" class="nav-item"><span>⚙️</span>Setting</a>
+</footer>
 
 <script>
 const userData = {
@@ -52,7 +221,7 @@ const userData = {
     tarifMakaPlus: 10000
 };
 
-// Baca dari kalender
+// Baca dari localStorage (source of truth sama dengan calendar.html)
 const savedPayments = JSON.parse(localStorage.getItem('maka_payments')) || {};
 const logContainer = document.getElementById('history-log');
 
@@ -64,10 +233,11 @@ function formatRupiah(number) {
 }
 
 function generateHistory() {
-
     const today = new Date();
     let logHTML = '';
+    let hasData = false;
 
+    // Loop 30 hari ke belakang
     for (let i = 0; i < 30; i++) {
         const date = new Date(today);
         date.setDate(today.getDate() - i);
@@ -77,45 +247,55 @@ function generateHistory() {
         const d = date.getDate();
 
         const key = `${y}-${m}-${d}`;
-        const display = date.toLocaleDateString('id-ID', {
-            weekday: 'short', day: 'numeric', month: 'long'
+        const displayDate = date.toLocaleDateString('id-ID', {
+            weekday: 'short', day: 'numeric', month: 'short'
         });
 
+        // Logika Status & Harga (Sederhana)
         let amount = userData.tarifNormal;
-        let type = 'HWB';
-        let statusClass = 'unpaid';
+        let typeName = 'Sewa Harian';
+        let statusClass = 'card-unpaid';
         let statusText = 'Tunggakan';
+        let isSpecialDate = false;
+
+        // Cek tanggal khusus (Cicilan DP tgl 14 & 28) - Logika sederhana visual
+        if (d === 14 || d === 28) {
+            amount = 80000;
+            typeName = 'Cicilan DP';
+            isSpecialDate = true;
+        }
 
         const paid = savedPayments[key] === true;
 
         if (paid) {
-            statusClass = 'paid';
-            statusText = 'Dibayar Lunas';
-            type = 'Bayar HWB';
+            statusClass = isSpecialDate ? 'card-dp' : 'card-paid';
+            statusText = 'Lunas';
+        } else {
+            statusClass = 'card-unpaid';
+            statusText = 'Belum Bayar';
         }
 
-        if (d === 14 || d === 28) {
-            amount = 80000;
-            type = 'Cicilan DP';
-            statusClass = paid ? 'dp' : 'unpaid';
-            statusText = paid ? 'Dibayar Lunas' : 'Tunggakan';
-        }
-
+        // Generate HTML Kartu
         logHTML += `
-            <div class="transaction-item ${statusClass}">
-                <div class="transaction-details">
-                    <h3>${type}</h3>
-                    <small>${display} | Status: ${statusText}</small>
+            <div class="history-card ${statusClass}">
+                <div class="h-info">
+                    <span class="h-type">${typeName}</span>
+                    <span class="h-date">${displayDate}</span>
                 </div>
-                <div class="transaction-amount ${statusClass === 'unpaid' ? 'unpaid' : ''}">
-                    ${formatRupiah(amount)}
+                <div class="h-amount-box">
+                    <div class="h-amount">${formatRupiah(amount)}</div>
+                    <div class="h-status">${statusText}</div>
                 </div>
             </div>
         `;
+        hasData = true;
     }
 
-    logContainer.innerHTML =
-        logHTML || `<p class="history-empty">Belum ada riwayat transaksi.</p>`;
+    if(hasData) {
+        logContainer.innerHTML = logHTML;
+    } else {
+        logContainer.innerHTML = `<div class="empty-msg">Belum ada riwayat transaksi.</div>`;
+    }
 }
 
 document.addEventListener('DOMContentLoaded', generateHistory);
