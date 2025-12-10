@@ -12,7 +12,7 @@
 <style>
 /* GLOBAL THEME */
 :root { 
-    --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; 
+    --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
     --danger:#ef4444; --success:#10b981; --warning:#fbbf24;
     --glass-bg:rgba(255,255,255,0.85); --glass-border:rgba(255,255,255,0.6); 
     --radius-lg:24px;
@@ -56,7 +56,7 @@ body::before {
     color: var(--muted); margin-bottom: 10px; text-transform: uppercase;
 }
 .date-cell {
-    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     border-radius: 14px; font-weight: 700; font-size: 0.9em;
     background: rgba(255,255,255,0.6); position: relative;
     transition: 0.2s; border: 1px solid transparent;
@@ -64,21 +64,33 @@ body::before {
 
 /* STATUS WARNA KALENDER */
 .date-cell.lunas { background: #dcfce7; color: var(--success); border-color: var(--success); }
-.date-cell.tunggak { background: #fee2e2; color: var(--danger); border-color: var(--danger); box-shadow: 0 4px 10px rgba(239,68,68,0.2); }
+.date-cell.tunggak { 
+    background: #fee2e2; color: var(--danger); border-color: var(--danger); 
+    box-shadow: 0 4px 10px rgba(239,68,68,0.2); 
+    cursor: pointer; /* Bisa diklik */
+}
+.date-cell.tunggak:active { transform: scale(0.95); opacity: 0.8; }
+
 .date-cell.today { border: 2px solid var(--text); background: white; }
 .date-cell.empty { background: transparent; border: none; }
 
-/* HERO CARD (TOTAL TUNGGAKAN) */
+/* WARNA KHUSUS (MARKER) */
+.date-cell.dp { background: #fef9c3; color: #b45309; border: 1px solid #fbbf24; } 
+.date-cell.libur { color: var(--danger); font-weight: 900; } 
+
+.small-label { font-size: 0.5em; margin-top: -2px; opacity: 0.8; font-weight: 600; text-transform: uppercase; }
+
+/* HERO CARD */
 .hero-card {
-    background: linear-gradient(135deg, #ef4444, #b91c1c); /* Merah Utang */
+    background: linear-gradient(135deg, #ef4444, #b91c1c); /* Merah */
     color: white; padding: 24px; border-radius: 24px;
     box-shadow: 0 15px 40px rgba(239, 68, 68, 0.3);
     position: relative; overflow: hidden; text-align: center;
     transition: 0.3s;
 }
 .hero-card.aman {
-    background: linear-gradient(135deg, #10b981, #059669); /* Hijau Aman */
-    box-shadow: 0 15px 40px rgba(16, 185, 129, 0.3);
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); /* Biru Tema */
+    box-shadow: 0 15px 40px rgba(14, 165, 166, 0.3);
 }
 
 .hero-label { font-size: 0.8em; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.9; margin-bottom: 5px; }
@@ -86,7 +98,7 @@ body::before {
 .hero-desc { font-size: 0.9em; margin-top: 10px; font-weight: 600; opacity: 0.9; }
 .money-icon { font-size: 3em; position: absolute; right: 20px; bottom: 10px; opacity: 0.2; transform: rotate(-20deg); }
 
-/* FOOTER NAV (Fixed Kapsul) */
+/* FOOTER NAV */
 footer.bottom-nav {
     position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
     width: auto; min-width: 260px; 
@@ -101,9 +113,17 @@ footer.bottom-nav {
 .nav-item.active { color: var(--accent); }
 
 /* MODAL */
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:9999; display:none; align-items:center; justify-content:center; }
-.modal-overlay.show { display:flex; }
-.modal-box { background:white; width:80%; max-width:300px; padding:25px; border-radius:24px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.3); }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:9999; display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s; }
+.modal-overlay.show { display:flex; opacity:1; }
+.modal-box { background:white; width:80%; max-width:300px; padding:25px; border-radius:24px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s; }
+.modal-overlay.show .modal-box { transform:scale(1); }
+.modal-icon { font-size:40px; margin-bottom:15px; display:block; }
+.modal-title { font-family:'Inter'; font-size:1.3em; font-weight:800; margin:0 0 10px; color:var(--text); }
+.modal-desc { font-size:0.9em; color:#64748b; line-height:1.5; margin-bottom:20px; }
+.modal-btns { display:flex; gap:10px; justify-content:center; }
+.btn-modal { flex:1; padding:12px; border-radius:12px; border:none; font-weight:700; cursor:pointer; font-size:0.9em; }
+.btn-confirm { background:var(--text); color:white; }
+.btn-cancel { background:#f1f5f9; color:#64748b; }
 </style>
 </head>
 <body>
@@ -118,7 +138,7 @@ footer.bottom-nav {
     <div class="calendar-grid" id="calendarGrid">
         <div class="day-name">MIN</div><div class="day-name">SEN</div><div class="day-name">SEL</div>
         <div class="day-name">RAB</div><div class="day-name">KAM</div><div class="day-name">JUM</div><div class="day-name">SAB</div>
-        </div>
+    </div>
 
     <div id="heroCard" class="hero-card">
         <div class="hero-label">TOTAL TUNGGAKAN BULAN INI</div>
@@ -127,10 +147,12 @@ footer.bottom-nav {
         <div class="money-icon">💰</div>
     </div>
     
-    <div style="text-align:center; margin-top:20px; font-size:0.8em; color:#64748b;">
-        <span style="display:inline-block; width:10px; height:10px; background:#fee2e2; border:1px solid red; border-radius:2px;"></span> Belum Bayar
+    <div style="text-align:center; margin-top:20px; font-size:0.7em; color:#64748b; line-height: 1.6;">
+        <span style="display:inline-block; width:8px; height:8px; background:#fee2e2; border:1px solid red; border-radius:2px;"></span> Belum Bayar (Klik utk Lunas)
         &nbsp;&nbsp;
-        <span style="display:inline-block; width:10px; height:10px; background:#dcfce7; border:1px solid green; border-radius:2px;"></span> Lunas
+        <span style="display:inline-block; width:8px; height:8px; background:#dcfce7; border:1px solid green; border-radius:2px;"></span> Lunas
+        &nbsp;&nbsp;
+        <span style="display:inline-block; width:8px; height:8px; background:#fef9c3; border:1px solid orange; border-radius:2px;"></span> Jadwal DP
     </div>
 </div>
 
@@ -140,15 +162,23 @@ footer.bottom-nav {
     <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
 </footer>
 
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(err => console.log('PWA Error', err));
-    });
-  }
-</script>
+<div id="customModal" class="modal-overlay">
+    <div class="modal-box">
+        <span id="mIcon" class="modal-icon">🔔</span>
+        <h3 id="mTitle" class="modal-title">Judul</h3>
+        <p id="mDesc" class="modal-desc">Keterangan...</p>
+        <div id="mBtns" class="modal-btns"></div>
+    </div>
+</div>
 
 <script>
+// --- PWA ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
+    });
+}
+
 // --- CONFIG FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
@@ -171,7 +201,6 @@ document.addEventListener("DOMContentLoaded", () => {
     loadInvoices();
 });
 
-// 1. TARIK DATA INVOICE DARI FIREBASE
 function loadInvoices() {
     db.collection('invoices')
       .where('plat', '==', currentUser.plat)
@@ -179,20 +208,17 @@ function loadInvoices() {
           invoiceData = [];
           snap.forEach(doc => {
               const d = doc.data();
-              // Konversi Range Tanggal menjadi Array Tanggal Satuan
-              // Contoh: Invoice 10-12 Des, pecah jadi: [10, 11, 12]
               let start = new Date(d.startDate);
               let end = new Date(d.endDate);
-              
-              // Hitung harga per hari (Rata-rata)
               let diffTime = Math.abs(end - start);
               let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; 
               let dailyPrice = d.amount / diffDays;
 
               for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
                   invoiceData.push({
-                      dateStr: dt.toISOString().split('T')[0], // YYYY-MM-DD
-                      status: d.status, // paid / unpaid
+                      id: doc.id, // Simpan ID agar bisa diupdate
+                      dateStr: dt.toISOString().split('T')[0],
+                      status: d.status,
                       amount: dailyPrice
                   });
               }
@@ -201,19 +227,17 @@ function loadInvoices() {
       });
 }
 
-// 2. RENDER KALENDER
 function renderCalendar() {
     const grid = document.getElementById('calendarGrid');
     grid.innerHTML = '<div class="day-name">MIN</div><div class="day-name">SEN</div><div class="day-name">SEL</div><div class="day-name">RAB</div><div class="day-name">KAM</div><div class="day-name">JUM</div><div class="day-name">SAB</div>';
     
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
     const todayStr = new Date().toISOString().split('T')[0];
 
     document.getElementById('monthDisplay').innerText = 
         new Date(currentYear, currentMonth).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
 
-    // Empty Slots
     for(let i=0; i<firstDay; i++) {
         grid.innerHTML += `<div class="date-cell empty"></div>`;
     }
@@ -221,59 +245,71 @@ function renderCalendar() {
     let totalTunggakanBulanIni = 0;
     let countTunggak = 0;
 
-    // Date Slots
     for(let d=1; d<=daysInMonth; d++) {
-        // Format YYYY-MM-DD (Perhatikan Timezone +7 biar akurat, disini pakai simple string)
-        // Agar aman, kita pakai string manual
         let mStr = (currentMonth+1).toString().padStart(2, '0');
         let dStr = d.toString().padStart(2, '0');
         let dateKey = `${currentYear}-${mStr}-${dStr}`;
         
-        // Cek Status di Data Invoice
         let statusClass = "";
+        let label = "";
+        let clickEvent = ""; // Event klik
+        
         let dataFound = invoiceData.find(x => x.dateStr === dateKey);
         
         if (dataFound) {
             if (dataFound.status === 'paid') {
                 statusClass = "lunas";
             } else {
-                // Hanya hitung tunggakan jika tanggal SUDAH LEWAT atau HARI INI
                 if (dateKey <= todayStr) {
                     statusClass = "tunggak";
                     totalTunggakanBulanIni += dataFound.amount;
                     countTunggak++;
-                } else {
-                    // Belum jatuh tempo (Invoice masa depan)
-                    statusClass = ""; 
+                    // Enable Click untuk Tanggal Merah
+                    clickEvent = `onclick="markSelfPaid('${dataFound.id}', '${d} ${document.getElementById('monthDisplay').innerText}')"`;
                 }
             }
+        } else {
+            if (d === 14 || d === 28) { statusClass = "dp"; label = `<div class="small-label">DP</div>`; } 
+            else if (d === 31) { statusClass = "libur"; label = `<div class="small-label" style="color:red">OFF</div>`; }
         }
 
-        // Cek Hari Ini
         if (dateKey === todayStr) statusClass += " today";
 
-        grid.innerHTML += `<div class="date-cell ${statusClass}">${d}</div>`;
+        grid.innerHTML += `<div class="date-cell ${statusClass}" ${clickEvent}>${d} ${label}</div>`;
     }
 
     updateHeroCard(totalTunggakanBulanIni, countTunggak);
 }
 
-// 3. UPDATE HERO CARD
+// LOGIC USER BAYAR SENDIRI
+function markSelfPaid(invoiceId, dateLabel) {
+    showModalConfirm(
+        "Konfirmasi Pembayaran", 
+        `Apakah Anda sudah melakukan transfer/setor tunai untuk tanggal <b>${dateLabel}</b>?`,
+        () => {
+            // Update Firebase
+            db.collection('invoices').doc(invoiceId).update({ status: 'paid' })
+            .then(() => {
+                showModal("Berhasil", "Status telah diperbarui menjadi LUNAS. Terima kasih!", "✅");
+            })
+            .catch(err => showModal("Gagal", "Error: " + err.message));
+        }
+    );
+}
+
 function updateHeroCard(amount, count) {
     const card = document.getElementById('heroCard');
     const txtAmount = document.getElementById('totalDebt');
     const txtDesc = document.getElementById('debtDesc');
 
     if (amount > 0) {
-        // Ada Tunggakan
         card.className = "hero-card"; // Merah
         txtAmount.innerText = "Rp " + Math.round(amount).toLocaleString('id-ID');
-        txtDesc.innerText = `Anda menunggak ${count} hari. Segera lunasi!`;
+        txtDesc.innerText = `Anda menunggak ${count} hari. Klik tanggal merah untuk bayar.`;
     } else {
-        // Aman
-        card.className = "hero-card aman"; // Hijau
+        card.className = "hero-card aman"; // Biru Teal
         txtAmount.innerText = "Rp 0";
-        txtDesc.innerText = "Tidak ada tunggakan bulan ini. Mantap! 👍";
+        txtDesc.innerText = "Status pembayaran aman. Mantap! 👍";
     }
 }
 
@@ -283,6 +319,31 @@ function changeMonth(n) {
     else if(currentMonth < 0) { currentMonth=11; currentYear--; }
     renderCalendar();
 }
+
+// MODAL HELPER
+function showModal(title, desc, icon="🔔") {
+    document.getElementById('mTitle').innerText = title;
+    document.getElementById('mDesc').innerHTML = desc;
+    document.getElementById('mIcon').innerText = icon;
+    const btns = document.getElementById('mBtns');
+    btns.innerHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK</button>`;
+    document.getElementById('customModal').classList.add('show');
+}
+
+function showModalConfirm(title, desc, onYes) {
+    document.getElementById('mTitle').innerText = title;
+    document.getElementById('mDesc').innerHTML = desc;
+    document.getElementById('mIcon').innerText = "🤔";
+    const btns = document.getElementById('mBtns');
+    btns.innerHTML = `
+        <button class="btn-modal btn-cancel" onclick="closeModal()">Batal</button>
+        <button class="btn-modal btn-confirm" id="btnYes">Ya, Sudah</button>
+    `;
+    document.getElementById('btnYes').onclick = () => { closeModal(); onYes(); };
+    document.getElementById('customModal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('customModal').classList.remove('show'); }
 </script>
 </body>
 </html>
