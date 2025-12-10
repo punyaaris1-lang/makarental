@@ -3,100 +3,117 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Admin Ops - MAKA</title>
+<title>Admin Ops - MAKA Online</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <style>
-/* THEME */
-:root { --bg:#f6f8fb; --surface:#ffffff; --text:#0f1724; --accent:#0ea5a6; --danger:#ef4444; --radius-lg:20px; }
-body { margin:0; padding:20px; font-family:'Inter'; background:var(--bg); color:var(--text); }
-.container { max-width:600px; margin:0 auto; padding-bottom:50px; }
-
-h2 { font-family:'Syne'; margin-bottom:20px; border-bottom:1px solid #ddd; padding-bottom:10px; }
-
-/* TABS */
-.tabs { display:flex; gap:10px; margin-bottom:20px; overflow-x:auto; }
-.tab-btn { padding:10px 20px; border-radius:10px; border:none; background:#e2e8f0; color:#64748b; font-weight:700; cursor:pointer; white-space:nowrap; }
-.tab-btn.active { background:var(--text); color:#fff; }
-
+/* CSS GLOBAL THEME (Sama seperti sebelumnya) */
+:root { --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; --danger:#ef4444; --glass-bg:rgba(255,255,255,0.85); --glass-border:rgba(255,255,255,0.6); --glass-shadow:0 8px 32px 0 rgba(31,38,135,0.1); --backdrop-blur:blur(12px); --radius-lg:20px; }
+body { margin:0; padding:20px; font-family:'Inter'; background:var(--bg-base); color:var(--text); min-height:100vh; }
+body::before { content:""; position:fixed; inset:0; background:url('1763947427555.jpg') center/cover; opacity:0.15; z-index:-1; pointer-events:none; }
+.container { max-width:650px; margin:0 auto; padding-bottom:50px; }
+h2 { font-family:'Syne'; margin-bottom:20px; display:flex; justify-content:space-between; }
+.tabs { display:flex; gap:10px; margin-bottom:20px; overflow-x:auto; padding-bottom:5px; }
+.tab-btn { padding:10px 20px; border-radius:12px; border:none; background:rgba(255,255,255,0.6); font-weight:700; cursor:pointer; white-space:nowrap; transition:0.2s; }
+.tab-btn.active { background:var(--text); color:#fff; box-shadow:0 5px 15px rgba(0,0,0,0.2); }
 .section { display:none; animation:fadeIn 0.3s; }
 .section.active { display:block; }
-@keyframes fadeIn { from{opacity:0} to{opacity:1} }
-
-/* CARDS */
-.card { background:var(--surface); padding:20px; border-radius:var(--radius-lg); margin-bottom:15px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
-label { display:block; font-size:0.8em; font-weight:700; margin-bottom:5px; color:#64748b; }
-input, textarea, select { width:100%; padding:12px; border-radius:10px; border:1px solid #cbd5e1; margin-bottom:15px; }
-button { width:100%; padding:14px; background:var(--accent); color:white; border:none; border-radius:10px; font-weight:700; cursor:pointer; }
-button.danger { background:var(--danger); }
-
-/* TABLE USER */
-.user-item { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #eee; }
-.u-info h4 { margin:0; font-size:0.95em; }
-.u-info p { margin:2px 0 0; font-size:0.8em; color:#666; }
-.btn-ban { padding:6px 12px; font-size:0.7em; background:#fee2e2; color:red; border-radius:6px; }
+@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+.glass-card { background:var(--glass-bg); backdrop-filter:var(--backdrop-blur); border:1px solid var(--glass-border); border-radius:var(--radius-lg); padding:24px; margin-bottom:20px; box-shadow:var(--glass-shadow); }
+label { display:block; font-size:0.8em; font-weight:700; margin-bottom:6px; color:#64748b; text-transform:uppercase; }
+input, textarea, select { width:100%; padding:12px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:15px; font-family:'Inter'; background:rgba(255,255,255,0.9); }
+button { width:100%; padding:14px; background:var(--accent); color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; box-shadow:0 5px 15px rgba(14,165,166,0.3); transition:0.2s; }
+button:active { transform:scale(0.98); }
+button.danger { background:var(--danger); box-shadow:0 5px 15px rgba(239, 68, 68, 0.3); }
+.user-item { display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid rgba(0,0,0,0.05); background:rgba(255,255,255,0.5); margin-bottom:8px; border-radius:12px; }
+.u-info h4 { margin:0; font-size:1em; font-weight:700; }
+.u-info p { margin:4px 0 0; font-size:0.8em; color:#666; }
+.btn-small { width:auto; padding:8px 16px; font-size:0.8em; }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2>🛠️ Admin Ops</h2>
-        <a href="admin_login.html" style="color:red; text-decoration:none; font-weight:bold; font-size:0.8em;">LOGOUT</a>
-    </div>
+    <h2>
+        <span>🛠️ Admin Ops</span>
+        <a href="admin_login.html" style="color:var(--danger); text-decoration:none; font-size:0.7em;">LOGOUT</a>
+    </h2>
 
     <div class="tabs">
         <button class="tab-btn active" onclick="sw(1)">👥 User Base</button>
-        <button class="tab-btn" onclick="sw(2)">🔧 Part Master</button>
-        <button class="tab-btn" onclick="sw(3)">📝 Info/Tips</button>
+        <button class="tab-btn" onclick="sw(2)">🔧 Master Part</button>
+        <button class="tab-btn" onclick="sw(3)">📢 Broadcast</button>
     </div>
 
     <div id="sec-1" class="section active">
-        <div class="card">
-            <h3>Database User</h3>
-            <input type="text" placeholder="Cari Nama / Plat Nomor..." onkeyup="filterUser()">
-            <div id="userList">
-                <div class="user-item">
-                    <div class="u-info">
-                        <h4>M. Rizky (B 4248 SWF)</h4>
-                        <p>08123456789 • Aktif</p>
-                    </div>
-                    <button class="btn-ban" onclick="banUser('B 4248 SWF')">BAN 🚫</button>
-                </div>
+        <div class="glass-card">
+            <h3>Database User Realtime</h3>
+            <input type="text" id="searchUser" placeholder="Cari Plat Nomor..." onkeyup="loadUsers()">
+            <div id="userListContainer">
+                <p style="text-align:center; color:#999;">Memuat data...</p>
             </div>
         </div>
     </div>
 
     <div id="sec-2" class="section">
-        <div class="card">
-            <h3>Tambah Jenis Part Baru</h3>
-            <label>Nama Part</label>
-            <input id="newPartName" placeholder="Contoh: Oli Gardan">
-            
-            <label>Limit Gratis (Qty)</label>
-            <input id="newPartLimit" type="number" placeholder="Contoh: 12">
-            
-            <button onclick="addNewPartMaster()">TAMBAH KE SISTEM</button>
+        <div class="glass-card">
+            <h3>Tambah Part Baru</h3>
+            <label>Nama Part</label><input id="partName" placeholder="Contoh: Oli Mesin">
+            <label>Limit Gratis (Qty per 3 Tahun)</label><input id="partLimit" type="number" placeholder="Contoh: 12">
+            <button onclick="addPartMaster()">SIMPAN KE SERVER</button>
         </div>
-
-        <div class="card">
+        <div class="glass-card">
             <h3>Daftar Part Aktif</h3>
-            <div id="partMasterList" style="font-size:0.9em; color:#555;">
-                Loading...
-            </div>
+            <div id="partListContainer">Loading...</div>
         </div>
     </div>
 
     <div id="sec-3" class="section">
-        <div class="card">
-            <h3>Posting Berita/Tips</h3>
-            <p style="font-size:0.8em; color:#666;">Gunakan fitur ini untuk mengisi halaman Info MLU & Tips User.</p>
-            <button onclick="alert('Fitur posting sama seperti kode sebelumnya')">BUKA EDITOR</button>
+        <div class="glass-card" style="border:1px solid #fcd34d; background:rgba(255,251,235,0.9);">
+            <h3>🔔 Kirim Notifikasi HP</h3>
+            <p style="font-size:0.8em; color:#b45309; margin-bottom:15px;">Pesan ini akan muncul seperti notifikasi WA di HP semua user yang sedang online.</p>
+            
+            <label>Judul Notifikasi</label>
+            <input id="notifTitle" placeholder="Cth: INFO PENTING!">
+            
+            <label>Pesan Singkat</label>
+            <input id="notifBody" placeholder="Cth: Lokasi FC Baru sudah dibuka di...">
+            
+            <button onclick="sendBroadcast()" style="background:#d97706; box-shadow:0 5px 15px rgba(217,119,6,0.3);">KIRIM NOTIFIKASI 🚀</button>
+        </div>
+
+        <div class="glass-card">
+            <h3>Posting Artikel (Info/Tips)</h3>
+            <label>Kategori</label>
+            <select id="postType">
+                <option value="info">📰 Info MLU</option>
+                <option value="tips">💡 Tips User</option>
+            </select>
+            <label>Judul</label><input id="postTitle">
+            <label>Isi Konten</label><textarea id="postContent" rows="4"></textarea>
+            <label>Link Foto (Opsional)</label><input id="postImg">
+            <button onclick="publishContent()">PUBLISH SEKARANG</button>
         </div>
     </div>
 
 </div>
 
 <script>
+// --- FIREBASE CONFIG ---
+const firebaseConfig = {
+  apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
+  authDomain: "rtomaka-e67b5.firebaseapp.com",
+  projectId: "rtomaka-e67b5",
+  storageBucket: "rtomaka-e67b5.firebasestorage.app",
+  messagingSenderId: "472036722228",
+  appId: "1:472036722228:web:11d520f9204db317d02c61"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 function sw(id){
     document.querySelectorAll('.section').forEach(d=>d.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -104,60 +121,89 @@ function sw(id){
     event.target.classList.add('active');
 }
 
-// LOGIC PART MASTER
-function loadParts() {
-    // Ambil data limits yang ada atau default
-    const limits = JSON.parse(localStorage.getItem('maka_part_limits')) || {
-        ban_depan: 3, ban_belakang: 3, kampas_depan: 3, kampas_belakang: 3
-    };
-    
-    // Tampilkan di list
-    const list = document.getElementById('partMasterList');
-    list.innerHTML = Object.entries(limits).map(([key, val]) => 
-        `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed #eee;">
-            <span>${key.replace(/_/g, ' ').toUpperCase()}</span>
-            <strong>${val}x</strong>
-         </div>`
-    ).join('');
+// === 1. USER MANAGEMENT ===
+function loadUsers() {
+    const search = document.getElementById('searchUser').value.toUpperCase();
+    const container = document.getElementById('userListContainer');
+    db.collection('users').get().then(snap => {
+        let html = '';
+        snap.forEach(doc => {
+            const u = doc.data();
+            if(u.plat.includes(search) || u.nama.toUpperCase().includes(search)) {
+                const isBanned = u.isBanned === true;
+                const btnAction = isBanned 
+                    ? `<button class="btn-small" style="background:#10b981;" onclick="toggleBan('${u.plat}', false)">UN-BAN ✅</button>`
+                    : `<button class="btn-small danger" onclick="toggleBan('${u.plat}', true)">BAN 🚫</button>`;
+                html += `<div class="user-item">
+                    <div class="u-info"><h4>${u.nama} (${u.plat}) ${isBanned?'<span style="color:red;font-size:0.8em">[BLOKIR]</span>':''}</h4><p>${u.hp}</p></div>
+                    <div>${btnAction}</div></div>`;
+            }
+        });
+        container.innerHTML = html || '<p style="text-align:center">Tidak ada user ditemukan.</p>';
+    });
+}
+function toggleBan(plat, status) {
+    if(!confirm(status ? "Blokir user ini?" : "Buka blokir user ini?")) return;
+    db.collection('users').doc(plat).update({ isBanned: status }).then(() => { alert("Status diubah!"); loadUsers(); });
 }
 
-function addNewPartMaster() {
-    const name = document.getElementById('newPartName').value.trim();
-    const limit = parseInt(document.getElementById('newPartLimit').value);
-    
-    if(!name || !limit) return alert("Lengkapi data part");
-    
-    // Buat Key (misal: "Oli Gardan" -> "oli_gardan")
+// === 2. PART MASTER ===
+function addPartMaster() {
+    const name = document.getElementById('partName').value;
+    const limit = parseInt(document.getElementById('partLimit').value);
+    if(!name || !limit) return alert("Isi data!");
     const key = name.toLowerCase().replace(/\s+/g, '_');
-    
-    // Simpan ke LocalStorage Admin (Nantinya ini dikirim ke Firebase)
-    const limits = JSON.parse(localStorage.getItem('maka_part_limits')) || {};
-    limits[key] = limit;
-    localStorage.setItem('maka_part_limits', JSON.stringify(limits));
-    
-    // Simpan juga ke Daftar Nama Display (agar di User muncul namanya bagus)
-    const adminParts = JSON.parse(localStorage.getItem('maka_admin_parts')) || [];
-    // Cek duplikat
-    if(!adminParts.find(p => p.key === key)) {
-        adminParts.push({ key: key, name: name });
-        localStorage.setItem('maka_admin_parts', JSON.stringify(adminParts));
-    }
-
-    alert(`Part "${name}" berhasil ditambahkan dengan limit ${limit}!`);
-    document.getElementById('newPartName').value = '';
-    document.getElementById('newPartLimit').value = '';
-    loadParts();
+    db.collection('settings').doc('parts').set({ [key]: { name: name, limit: limit } }, { merge: true }).then(() => {
+        alert("Part berhasil ditambahkan!"); loadParts();
+    });
+}
+function loadParts() {
+    db.collection('settings').doc('parts').onSnapshot(doc => {
+        if(doc.exists) {
+            const data = doc.data();
+            let html = '';
+            for(const key in data) { html += `<div class="user-item"><div class="u-info"><h4>${data[key].name}</h4></div><strong>Limit: ${data[key].limit}x</strong></div>`; }
+            document.getElementById('partListContainer').innerHTML = html;
+        }
+    });
 }
 
-function banUser(plat) {
-    if(confirm("Yakin ingin memblokir user " + plat + "? User tidak akan bisa login.")) {
-        // Logika Banned (Nanti dikirim ke Firebase 'blockedList')
-        alert("User " + plat + " telah diblokir dari sistem.");
-    }
+// === 3. BROADCAST NOTIFIKASI ===
+function sendBroadcast() {
+    const title = document.getElementById('notifTitle').value;
+    const body = document.getElementById('notifBody').value;
+    if(!title || !body) return alert("Isi judul dan pesan notifikasi!");
+
+    if(!confirm("Kirim notifikasi ini ke SEMUA user?")) return;
+
+    db.collection('broadcasts').add({
+        title: title,
+        body: body,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        alert("📢 Notifikasi terkirim!");
+        document.getElementById('notifTitle').value = '';
+        document.getElementById('notifBody').value = '';
+    });
 }
 
-// Init
-loadParts();
+// === 4. PUBLISH KONTEN ===
+function publishContent() {
+    const type = document.getElementById('postType').value;
+    const title = document.getElementById('postTitle').value;
+    const content = document.getElementById('postContent').value;
+    const img = document.getElementById('postImg').value;
+    if(!title || !content) return alert("Isi lengkap!");
+    
+    const collectionName = type === 'info' ? 'info_mlu' : 'tips_maka';
+    const today = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'});
+    
+    db.collection(collectionName).add({
+        title: title, content: content, photos: img ? [img] : [], date: today, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => { alert("Artikel Terbit!"); });
+}
+
+loadUsers(); loadParts();
 </script>
 </body>
 </html>
