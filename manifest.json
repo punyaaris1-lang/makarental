@@ -1,11 +1,10 @@
 {
-  "name": "MLU Super App",
-  "short_name": "MLU App",
-  "start_url": "index.html",
+  "name": "Punya MLU",
+  "short_name": "Punya MLU",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f0f4f8",
   "theme_color": "#0ea5a6",
-  "orientation": "portrait",
   "icons": [
     {
       "src": "icon-192.png",
