@@ -10,8 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* CSS DARI VERSI SEBELUMNYA (PREMIUM GLASS) - COPY PASTE DISINI ATAU BIARKAN SAMA */
-/* SAYA RINGKAS AGAR MUAT, GUNAKAN CSS LENGKAP YANG TADI */
+/* CSS SAMA SEPERTI SEBELUMNYA (PREMIUM GLASS) */
 :root { --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; --danger:#ef4444; --glass-bg:rgba(255,255,255,0.65); --glass-border:rgba(255,255,255,0.4); --glass-shadow:0 8px 32px 0 rgba(31,38,135,0.15); --backdrop-blur:blur(12px); --radius-lg:24px; --max-width:520px; }
 body { margin:0; font-family:'Inter'; background:var(--bg-base); color:var(--text); min-height:100vh; position:relative; }
 body::before { content:""; position:fixed; inset:0; background:url('1763947427555.jpg') center/cover; opacity:0.15; z-index:-1; pointer-events:none; }
@@ -97,7 +96,7 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
 </footer>
 
 <script>
-// --- CONFIG FIREBASE (SAMA UTK SEMUA FILE) ---
+// --- CONFIG FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -119,44 +118,43 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('user-plate-display').innerText = currentUser.plat;
     document.getElementById('user-avatar').innerText = currentUser.nama.charAt(0).toUpperCase();
 
-    // 1. HITUNG TAGIHAN LOKAL (Estimasi)
+    // Request Izin Notifikasi
+    if ("Notification" in window) Notification.requestPermission();
+
     calculateLocalBill();
 
-    // 2. LISTEN TAGIHAN DARI ADMIN (REALTIME)
-    // Jika admin kirim invoice, otomatis nambah
-    db.collection('invoices').where('plat', '==', currentUser.plat)
-      .where('status', '==', 'unpaid')
-      .onSnapshot((snapshot) => {
-          let totalOnlineBill = 0;
-          snapshot.forEach((doc) => {
-              totalOnlineBill += parseInt(doc.data().amount);
-          });
-          
-          if(totalOnlineBill > 0) {
-              const currentText = document.getElementById('hero-tunggakan-nominal').innerText;
-              const currentVal = parseInt(currentText.replace(/\D/g,'')) || 0;
-              // Tambahkan tagihan admin ke estimasi harian
-              const finalTotal = currentVal + totalOnlineBill;
-              
-              document.getElementById('hero-tunggakan-nominal').innerText = "Rp " + finalTotal.toLocaleString('id-ID');
-              document.getElementById('hero-status-badge').innerText = "Ada Tagihan";
-              document.getElementById('hero-status-badge').style.color = "var(--danger)";
-          }
-      });
-
-    // 3. LISTEN SOS BROADCAST (GLOBAL)
-    // Mendengarkan jika ada dokumen baru di koleksi 'sos_alerts'
-    // Hanya alert yg dibuat dalam 1 menit terakhir
+    // 1. LISTEN NOTIFIKASI BROADCAST DARI ADMIN
+    // Jika admin kirim pesan di admin_user.html
     const now = new Date();
     const oneMinAgo = new Date(now.getTime() - 60000).toISOString();
 
+    db.collection('broadcasts')
+      .where('timestamp', '>', firebase.firestore.Timestamp.now()) // Listen yg baru aja
+      .onSnapshot((snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+              if (change.type === "added") {
+                  const data = change.doc.data();
+                  // Tampilkan Notifikasi Sistem
+                  if (Notification.permission === "granted") {
+                      navigator.vibrate([200, 100, 200]);
+                      new Notification(data.title, {
+                          body: data.body,
+                          icon: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png' // Icon Lonceng
+                      });
+                  } else {
+                      alert("🔔 " + data.title + "\n" + data.body);
+                  }
+              }
+          });
+      });
+
+    // 2. LISTEN SOS (SAMA SEPERTI SEBELUMNYA)
     db.collection('sos_alerts')
       .where('timestamp', '>', oneMinAgo)
       .onSnapshot((snapshot) => {
           snapshot.docChanges().forEach((change) => {
               if (change.type === "added") {
                   const data = change.doc.data();
-                  // Jangan bunyikan alarm sendiri
                   if (data.plat !== currentUser.plat) {
                       showSosScreen(data.plat, data.msg);
                   }
@@ -166,14 +164,14 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function calculateLocalBill() {
+    // HARGA DASAR SUDAH 70.000
     const today = new Date(); today.setHours(0,0,0,0);
-    const day = today.getDate();
-    let bill = 70000; // Dasar 70rb
+    let bill = 70000; 
     
     // Cek Cicilan MAKA+
     const plusData = JSON.parse(localStorage.getItem('maka_plus_data'));
     if(plusData && plusData.active) {
-        bill += 10000; // Tambah 10rb
+        bill += 10000; // Jadi 80rb
     }
     document.getElementById('hero-tunggakan-nominal').innerText = "Rp " + bill.toLocaleString('id-ID');
 }
@@ -181,33 +179,21 @@ function calculateLocalBill() {
 // KIRIM SOS
 function triggerSOS() {
     if(!confirm("⚠️ PANGGILAN DARURAT ⚠️\n\nIni akan mengirim alarm ke SEMUA user yang sedang online. Lanjutkan?")) return;
-    
-    const msg = prompt("Tulis pesan singkat (Contoh: Ban bocor di Jl. Ahmad Yani)", "Darurat!");
+    const msg = prompt("Tulis pesan singkat:", "Darurat!");
     if(!msg) return;
 
     db.collection('sos_alerts').add({
-        plat: currentUser.plat,
-        nama: currentUser.nama,
-        msg: msg,
+        plat: currentUser.plat, nama: currentUser.nama, msg: msg,
         timestamp: new Date().toISOString()
-    }).then(() => {
-        alert("SOS Terkirim! Buka WhatsApp Group untuk koordinasi lebih lanjut.");
-        // Redirect ke WA Group (Opsional)
-        window.open("https://wa.me/62812XXXXXXXX?text=SOS%20DARI%20APP:%20" + msg, "_blank");
-    });
+    }).then(() => { alert("SOS Terkirim!"); });
 }
 
-// TAMPILKAN ALARM MERAH
 function showSosScreen(plat, msg) {
     document.getElementById('sosMsg').innerHTML = `User <b>${plat}</b> butuh bantuan:<br>"${msg}"`;
     document.getElementById('sosScreen').style.display = 'flex';
-    // Getar HP
     if(navigator.vibrate) navigator.vibrate([1000, 500, 1000]);
 }
-
-function closeSos() {
-    document.getElementById('sosScreen').style.display = 'none';
-}
+function closeSos() { document.getElementById('sosScreen').style.display = 'none'; }
 </script>
 </body>
 </html>
