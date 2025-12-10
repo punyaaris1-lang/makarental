@@ -2,180 +2,74 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Admin Finance - MAKA Online</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Finance - MAKA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Syne:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* ================= GLOBAL THEME ================= */
-:root {
-  --bg-base: #f0f4f8;
-  --accent: #0ea5a6;
-  --text: #0f1724;
-  --danger: #ef4444;
-  --success: #10b981;
-  
-  --radius-lg: 20px;
-  --glass-bg: rgba(255, 255, 255, 0.9);
-  --glass-border: rgba(255, 255, 255, 0.6);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-  --backdrop-blur: blur(12px);
-}
-
-body {
-  margin: 0; padding: 20px; font-family: 'Inter', sans-serif;
-  background-color: var(--bg-base); color: var(--text);
-  min-height: 100vh;
-}
-
-body::before {
-  content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: url('1763947427555.jpg') center/cover no-repeat; 
-  opacity: 0.15; z-index: -1; pointer-events: none;
-}
-
-.container { max-width: 750px; margin: 0 auto; padding-bottom: 50px; }
-
-h2 {
-  font-family: 'Syne'; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;
-  display: flex; justify-content: space-between; align-items: center;
-}
-
-/* CARDS */
-.glass-card {
-  background: var(--glass-bg); backdrop-filter: var(--backdrop-blur);
-  border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
-  padding: 24px; margin-bottom: 20px; box-shadow: var(--glass-shadow);
-}
-
-.form-row { display: flex; gap: 15px; margin-bottom: 15px; }
-.form-col { flex: 1; }
-
-label { display: block; font-size: 0.75em; font-weight: 700; margin-bottom: 6px; color: #64748b; text-transform: uppercase; }
-input, select {
-  width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1;
-  font-family: 'Inter'; background: rgba(255,255,255,0.8); outline: none;
-}
-
-button {
-  width: 100%; padding: 14px; background: var(--text); color: white;
-  border: none; border-radius: 10px; font-weight: 700; cursor: pointer;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: 0.2s;
-}
-button:active { transform: scale(0.98); }
-button.send-online { background: var(--success); }
-button.print { background: var(--accent); }
-
-/* TABLE */
-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; }
-th { text-align: left; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 6px; }
-td { border-bottom: 1px solid rgba(0,0,0,0.05); padding: 10px; }
-.total-row td { font-weight: 800; font-size: 1.2em; background: rgba(255,255,255,0.5); }
-
-/* QRIS BOX */
-.qris-area {
-  display: none; text-align: center; margin-top: 20px; padding: 20px;
-  border: 2px dashed #cbd5e1; border-radius: 15px; background: #fff;
-}
-.qris-area.active { display: block; animation: pop 0.3s; }
-@keyframes pop { from{transform:scale(0.9)} to{transform:scale(1)} }
-#qrcode { display: flex; justify-content: center; margin: 15px 0; }
-
-/* SEARCH RESULT */
-.search-res {
-  position: absolute; background: white; width: 100%; max-height: 200px;
-  overflow-y: auto; border: 1px solid #ccc; border-radius: 0 0 10px 10px;
-  z-index: 10; display: none;
-}
-.search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
-.search-item:hover { background: #f0f9ff; }
+/* CSS ADMIN FINANCE (SAMA SEPERTI SEBELUMNYA) */
+:root { --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; --success:#10b981; --glass-bg:rgba(255,255,255,0.9); --radius-lg:20px; }
+body{margin:0;padding:20px;font-family:'Inter';background:var(--bg-base);color:var(--text);min-height:100vh;}
+.container{max-width:750px;margin:0 auto;padding-bottom:50px;}
+.glass-card{background:var(--glass-bg);border:1px solid #fff;border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;box-shadow:0 8px 32px rgba(0,0,0,0.05);}
+h2{font-family:'Syne';display:flex;justify-content:space-between;border-bottom:1px solid #ccc;padding-bottom:10px;margin-bottom:20px;}
+.form-row{display:flex;gap:15px;margin-bottom:15px;} .form-col{flex:1;}
+label{display:block;font-size:0.7em;font-weight:700;margin-bottom:6px;color:#64748b;text-transform:uppercase;}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #cbd5e1;}
+button{width:100%;padding:12px;background:var(--text);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;}
+table{width:100%;border-collapse:collapse;font-size:0.9em;} th,td{padding:10px;text-align:left;border-bottom:1px solid #eee;}
+.status-unpaid{color:red;background:#fee2e2;padding:4px 8px;border-radius:6px;font-size:0.8em;font-weight:bold;}
+.status-paid{color:green;background:#d1fae5;padding:4px 8px;border-radius:6px;font-size:0.8em;font-weight:bold;}
+.btn-lunas{padding:6px 12px;background:var(--success);font-size:0.8em;width:auto;}
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>
-        <span>💰 Admin Finance</span>
-        <a href="admin_login.html" style="color:var(--danger); text-decoration:none; font-size:0.6em;">LOGOUT</a>
-    </h2>
+    <h2><span>💰 Admin Finance</span> <a href="admin_login.html" style="font-size:0.6em;color:red;text-decoration:none;">LOGOUT</a></h2>
 
-    <div class="glass-card" style="position:relative;">
-        <div class="form-row">
-            <div class="form-col" style="position:relative;">
-                <label>Cari User (Plat / Nama)</label>
-                <input id="searchInp" placeholder="Ketik plat nomor..." onkeyup="searchUser()" autocomplete="off">
-                <div id="searchList" class="search-res"></div>
-            </div>
-            <div class="form-col">
-                <label>Nama User</label>
-                <input id="invName" readonly style="background:#e2e8f0;">
-            </div>
+    <div class="glass-card">
+        <h3 style="margin-top:0;">Daftar Tagihan (Invoice)</h3>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>User</th>
+                        <th>Jumlah</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="invoiceList">
+                    <tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
     <div class="glass-card">
+        <h3>Buat Tagihan Baru</h3>
         <div class="form-row">
-            <div class="form-col">
-                <label>Dari Tanggal</label>
-                <input type="date" id="startDate">
-            </div>
-            <div class="form-col">
-                <label>Sampai Tanggal</label>
-                <input type="date" id="endDate">
-            </div>
+            <div class="form-col"><label>Cari Plat</label><input id="searchInp" placeholder="Ketik Plat..." onkeyup="searchUser()"></div>
+            <div class="form-col"><label>Nama</label><input id="invName" readonly style="background:#eee;"></div>
         </div>
-        <button onclick="previewInvoice()">PREVIEW INVOICE</button>
-    </div>
-
-    <div id="previewArea" style="display:none;">
-        <div class="glass-card" id="printSection">
-            <div style="text-align:center; border-bottom:2px dashed #ccc; padding-bottom:15px; margin-bottom:15px;">
-                <h3 style="margin:0; font-family:'Syne';">MAKA RENTAL</h3>
-                <small>Invoice Tagihan Resmi</small>
-            </div>
-
-            <table id="invTable">
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>Keterangan</th>
-                        <th style="text-align:right;">Biaya</th>
-                    </tr>
-                </thead>
-                <tbody id="invBody"></tbody>
-                <tfoot>
-                    <tr class="total-row">
-                        <td colspan="2">TOTAL TAGIHAN</td>
-                        <td style="text-align:right;" id="invTotal">Rp 0</td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <div id="qrisBox" class="qris-area">
-                <div style="font-weight:bold; color:var(--text);">SCAN UNTUK BAYAR</div>
-                <div id="qrcode"></div>
-                <div id="qrisNominal" style="font-size:1.2em; font-weight:800; color:var(--accent);">Rp 0</div>
-                <small>NMID: MAKA-RENTAL-OFFICIAL</small>
-            </div>
-        </div>
-
+        <div id="searchResult" style="background:#fff;border:1px solid #eee;display:none;margin-bottom:15px;"></div>
+        
         <div class="form-row">
-            <button class="send-online" onclick="sendToUser()">🚀 KIRIM KE USER</button>
-            <button class="print" onclick="window.print()">🖨️ PRINT</button>
+            <div class="form-col"><label>Mulai</label><input type="date" id="startDate"></div>
+            <div class="form-col"><label>Selesai</label><input type="date" id="endDate"></div>
         </div>
-        <button onclick="toggleQris()" style="background:#334155; margin-top:5px;">TAMPILKAN QRIS</button>
+        <button onclick="sendInvoice()">KIRIM TAGIHAN</button>
     </div>
-
 </div>
 
 <script>
-// --- CONFIG FIREBASE ---
+// --- PASTE CONFIG FIREBASE ANDA DI SINI ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -187,136 +81,84 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// --- VARIABLES ---
-const HWB_RATE = 70000; // HARGA SUDAH 70.000
-const CDP_RATE = 70000;
-const MAKA_PLUS_RATE = 10000; // Cicilan
-
 let selectedUser = null;
-let currentTotal = 0;
 
-// --- 1. SEARCH USER ---
-function searchUser() {
-    const key = document.getElementById('searchInp').value.toUpperCase();
-    const list = document.getElementById('searchList');
-    
-    if(key.length < 2) { list.style.display='none'; return; }
-
-    db.collection('users').get().then(snap => {
+// 1. LOAD INVOICES (MONITORING)
+function loadInvoices() {
+    db.collection('invoices').orderBy('createdAt', 'desc').onSnapshot(snap => {
         let html = '';
         snap.forEach(doc => {
-            const u = doc.data();
-            if(u.plat.includes(key) || u.nama.toUpperCase().includes(key)) {
-                // Simpan data user lengkap di atribut data
-                const userJson = JSON.stringify(u).replace(/"/g, '&quot;');
-                html += `<div class="search-item" onclick="selectUser('${userJson}')">
-                            <b>${u.plat}</b> - ${u.nama}
-                         </div>`;
-            }
-        });
-        list.innerHTML = html;
-        list.style.display = html ? 'block' : 'none';
-    });
-}
+            const d = doc.data();
+            const date = new Date(d.createdAt.seconds * 1000).toLocaleDateString('id-ID');
+            const statusBadge = d.status === 'paid' 
+                ? `<span class="status-paid">LUNAS</span>` 
+                : `<span class="status-unpaid">BELUM BAYAR</span>`;
+            
+            const actionBtn = d.status === 'unpaid'
+                ? `<button class="btn-lunas" onclick="markPaid('${doc.id}')">LUNAS ✅</button>`
+                : `<span style="color:#aaa;">-</span>`;
 
-function selectUser(jsonStr) {
-    selectedUser = JSON.parse(jsonStr);
-    document.getElementById('searchInp').value = selectedUser.plat;
-    document.getElementById('invName').value = selectedUser.nama;
-    document.getElementById('searchList').style.display = 'none';
-    
-    // Auto set start date (hari ini)
-    document.getElementById('startDate').valueAsDate = new Date();
-    document.getElementById('endDate').valueAsDate = new Date();
-}
-
-// --- 2. GENERATE PREVIEW ---
-function previewInvoice() {
-    if(!selectedUser) return alert("Pilih user dulu!");
-    
-    const start = new Date(document.getElementById('startDate').value);
-    const end = new Date(document.getElementById('endDate').value);
-    const tbody = document.getElementById('invBody');
-    tbody.innerHTML = '';
-    currentTotal = 0;
-
-    // Cek apakah user punya MAKA+ aktif
-    // Note: Di sistem real, admin harusnya fetch data makaPlus user dari server.
-    // Di sini kita asumsikan admin tau atau user sudah sync.
-    // Untuk demo ini, kita hitung murni HWB.
-    
-    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const day = d.getDate();
-        let desc = "Sewa Harian (HWB)";
-        let cost = HWB_RATE;
-
-        if(day === 14 || day === 28) {
-            desc = "Cicilan DP (CDP)";
-            cost = CDP_RATE;
-        }
-
-        // Add Row
-        const dateStr = d.toLocaleDateString('id-ID');
-        currentTotal += cost;
-        
-        tbody.innerHTML += `
+            html += `
             <tr>
-                <td>${dateStr}</td>
-                <td>${desc}</td>
-                <td style="text-align:right;">${cost.toLocaleString('id-ID')}</td>
-            </tr>
-        `;
-    }
-
-    document.getElementById('invTotal').innerText = "Rp " + currentTotal.toLocaleString('id-ID');
-    document.getElementById('qrisNominal').innerText = "Rp " + currentTotal.toLocaleString('id-ID');
-    document.getElementById('previewArea').style.display = 'block';
-    
-    // Generate QR
-    document.getElementById('qrcode').innerHTML = "";
-    new QRCode(document.getElementById("qrcode"), {
-        text: `MAKA_PAY:${selectedUser.plat}:${currentTotal}`,
-        width: 128, height: 128
+                <td>${date}</td>
+                <td>${d.nama}<br><small>${d.plat}</small></td>
+                <td>Rp ${parseInt(d.amount).toLocaleString('id-ID')}</td>
+                <td>${statusBadge}</td>
+                <td>${actionBtn}</td>
+            </tr>`;
+        });
+        document.getElementById('invoiceList').innerHTML = html || '<tr><td colspan="5" align="center">Belum ada tagihan.</td></tr>';
     });
 }
 
-function toggleQris() {
-    document.getElementById('qrisBox').classList.toggle('active');
+// 2. MARK AS PAID (AKSI ADMIN)
+function markPaid(docId) {
+    if(!confirm("Tandai tagihan ini sebagai LUNAS?")) return;
+    db.collection('invoices').doc(docId).update({ status: 'paid' }).then(() => {
+        alert("Status berhasil diperbarui!");
+    });
 }
 
-// --- 3. KIRIM KE USER (FIREBASE) ---
-function sendToUser() {
-    if(!selectedUser || currentTotal <= 0) return;
+// 3. SEARCH & SEND (SAMA SEPERTI SEBELUMNYA)
+function searchUser() {
+    const key = document.getElementById('searchInp').value.toUpperCase();
+    if(key.length<2) { document.getElementById('searchResult').style.display='none'; return; }
     
-    if(!confirm(`Kirim tagihan Rp ${currentTotal.toLocaleString('id-ID')} ke user ${selectedUser.nama}?`)) return;
+    db.collection('users').get().then(snap => {
+        let h=''; 
+        snap.forEach(doc=>{ 
+            const u=doc.data(); 
+            if(u.plat.includes(key)||u.nama.toUpperCase().includes(key)) 
+                h+=`<div style="padding:10px;cursor:pointer;border-bottom:1px solid #eee;" onclick='selUser(${JSON.stringify(u)})'>${u.plat} - ${u.nama}</div>`; 
+        });
+        const res = document.getElementById('searchResult');
+        res.innerHTML=h; res.style.display='block';
+    });
+}
+function selUser(u){ 
+    selectedUser=u; 
+    document.getElementById('searchInp').value=u.plat; 
+    document.getElementById('invName').value=u.nama; 
+    document.getElementById('searchResult').style.display='none'; 
+}
 
-    // Kirim ke koleksi 'invoices'
+function sendInvoice(){
+    if(!selectedUser) return alert("Pilih user!");
+    // Hitung sederhana untuk demo (logic 70rb/hari)
+    const s=new Date(document.getElementById('startDate').value);
+    const e=new Date(document.getElementById('endDate').value);
+    const diff = Math.ceil((e-s)/(1000*60*60*24)) + 1;
+    const amount = diff * 70000; // Dasar 70rb
+
     db.collection('invoices').add({
-        plat: selectedUser.plat,
-        nama: selectedUser.nama,
-        amount: currentTotal,
+        plat: selectedUser.plat, nama: selectedUser.nama, amount: amount,
         startDate: document.getElementById('startDate').value,
         endDate: document.getElementById('endDate').value,
-        status: 'unpaid',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-        alert("✅ Tagihan Terkirim! User akan melihatnya di Dashboard.");
-        
-        // Kirim Notifikasi Sistem juga (opsional)
-        db.collection('broadcasts').add({
-            title: "Tagihan Baru",
-            body: `Hai ${selectedUser.nama}, ada tagihan baru sebesar Rp ${currentTotal.toLocaleString('id-ID')}`,
-            targetPlat: selectedUser.plat,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        document.getElementById('previewArea').style.display = 'none';
-        document.getElementById('searchInp').value = '';
-        selectedUser = null;
-    }).catch(err => {
-        alert("Gagal kirim: " + err.message);
-    });
+        status: 'unpaid', createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(()=>{ alert("Tagihan Terkirim!"); });
 }
+
+loadInvoices(); // Jalankan saat load
 </script>
 </body>
 </html>
