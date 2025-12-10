@@ -8,31 +8,48 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
 
 <style>
-/* ================= THEME VARIABLES ================= */
+/* ================= GLOBAL PREMIUM THEME ================= */
 :root {
-  --bg: #f6f8fb;
-  --surface: #ffffff;
-  --muted: #9ca3af;
+  --bg-base: #f0f4f8;
+  --accent: #0ea5a6;       /* Teal */
+  --accent-2: #06b6d4;     /* Cyan */
+  --purple: #8b5cf6;       /* CDP */
+  --red: #ef4444;          /* Libur */
+  --gold: #f59e0b;         /* Paid/Waiting */
   --text: #0f1724;
+  --muted: #64748b;
+
+  /* Glassmorphism Variables */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --backdrop-blur: blur(12px);
   
-  --accent: #0ea5a6;       /* HWB (Teal) */
-  --purple: #8b5cf6;       /* CDP (Ungu) */
-  --red: #ef4444;          /* Libur (Merah) */
-  --gold: #fbbf24;         /* Paid (Kuning Emas) */
-  
-  --radius-lg: 20px;
-  --radius-md: 14px;
-  --card-shadow: 0 4px 20px rgba(15,23,42,0.05);
+  --radius-lg: 24px;
   --max-width: 520px;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
 body {
   margin: 0; padding: 0;
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%);
+  background-color: var(--bg-base);
   color: var(--text);
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* --- GLOBAL BACKGROUND IMAGE --- */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('1763947427555.jpg') center/cover no-repeat; 
+  opacity: 0.15;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .app-container {
@@ -41,89 +58,70 @@ body {
   padding: 20px 20px 120px 20px;
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 .header {
   margin-bottom: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  display: flex; justify-content: space-between; align-items: flex-end;
 }
 .header h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.8em;
-  font-weight: 800;
-  margin: 0;
-  color: var(--text);
-  letter-spacing: -0.5px;
+  font-family: 'Syne', sans-serif; font-size: 1.8em; font-weight: 800;
+  margin: 0; color: var(--text); letter-spacing: -0.5px;
 }
 .header p { color: var(--muted); font-size: 0.9em; margin: 4px 0 0 0; }
 
-/* MONTH NAV */
+/* ================= MONTH NAV ================= */
 .month-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  background: var(--surface);
-  padding: 12px 16px;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px; padding: 12px 16px;
+  /* Glass Effect */
+  background: var(--glass-bg);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
   border-radius: var(--radius-lg);
-  box-shadow: var(--card-shadow);
-  border: 1px solid rgba(15,23,42,0.03);
+  box-shadow: var(--glass-shadow);
+  border: 1px solid var(--glass-border);
 }
 
 .month-nav h2 {
-  font-size: 1.1em;
-  font-weight: 800;
-  margin: 0;
-  color: var(--text);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-size: 1.1em; font-weight: 800; margin: 0; color: var(--text);
+  text-transform: uppercase; letter-spacing: 0.5px;
 }
 
 .btn-nav {
-  background: #f3f4f6;
-  border: none;
-  width: 36px; height: 36px;
-  border-radius: 10px;
-  color: var(--text);
-  font-weight: 700;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.5); border: 1px solid rgba(0,0,0,0.05);
+  width: 36px; height: 36px; border-radius: 12px;
+  color: var(--text); font-weight: 700; font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: 0.2s;
 }
-.btn-nav:active { background: #e5e7eb; transform: scale(0.95); }
+.btn-nav:active { transform: scale(0.9); background: #fff; }
 
-/* CALENDAR GRID */
+/* ================= CALENDAR GRID ================= */
 .week {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  text-align: center;
-  font-size: 0.75em;
-  font-weight: 700;
-  color: var(--muted);
-  margin-bottom: 12px;
-  text-transform: uppercase;
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  text-align: center; font-size: 0.75em; font-weight: 700;
+  color: var(--muted); margin-bottom: 12px; text-transform: uppercase;
 }
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-  margin-bottom: 24px;
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 8px; margin-bottom: 24px;
 }
 
 .day { aspect-ratio: 1/1; position: relative; }
 
 .box {
   width: 100%; height: 100%;
-  border-radius: 12px;
+  border-radius: 14px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   font-weight: 700; font-size: 0.95em;
-  background: var(--surface);
-  border: 1px solid transparent;
-  box-shadow: 0 2px 5px rgba(15,23,42,0.03);
+  
+  /* Glass Item */
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255,255,255,0.4);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  
   color: var(--text);
   transition: transform 0.15s;
   cursor: pointer;
@@ -132,72 +130,107 @@ body {
 .box:active { transform: scale(0.9); }
 .day.empty { pointer-events: none; }
 
-/* STATUS COLORS */
+/* STATUS COLORS & INDICATORS */
 .wajib { border-color: rgba(14, 165, 166, 0.3); color: var(--accent); background: rgba(14, 165, 166, 0.05); }
 .cdp { border-color: rgba(139, 92, 246, 0.3); color: var(--purple); background: rgba(139, 92, 246, 0.05); }
 .libur { color: var(--red); opacity: 0.5; }
 
-/* PAID & FUTURE */
+/* Paid = Gold Gradient */
 .paid {
-  background: var(--gold);
-  color: #fff;
-  border: none;
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: #fff; border: none;
+  box-shadow: 0 4px 10px rgba(251, 191, 36, 0.4);
 }
-.future { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
 
-/* INDIKATOR CICILAN MAKA+ */
+/* Future = Tetap bisa diklik, hanya visual agak transparan */
+.future { opacity: 0.6; filter: grayscale(0.5); }
+
+/* Indikator Cicilan MAKA+ */
 .plus-dot {
-  position: absolute;
-  bottom: 4px;
-  width: 4px; height: 4px;
-  background: #f59e0b; /* Warna Gold Gelap */
-  border-radius: 50%;
+  position: absolute; bottom: 4px; width: 4px; height: 4px;
+  background: var(--text); border-radius: 50%; opacity: 0.5;
 }
+.paid .plus-dot { background: #fff; opacity: 0.8; }
 
-/* PREVIEW CARD */
+/* ================= PREVIEW CARD ================= */
 .preview-card {
+  /* High Contrast Gradient agar teks putih terbaca */
   background: linear-gradient(135deg, var(--accent-2), var(--accent));
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 24px;
   color: white;
-  box-shadow: 0 10px 25px rgba(14, 165, 166, 0.25);
+  box-shadow: 0 15px 30px rgba(14, 165, 166, 0.25);
   display: flex; justify-content: space-between; align-items: center;
+  border: 1px solid rgba(255,255,255,0.2);
+  position: relative; overflow: hidden;
 }
-.preview-card small { display: block; font-size: 0.8em; opacity: 0.9; margin-bottom: 4px; }
-.preview-card strong { font-family: 'Syne', sans-serif; font-size: 1.6em; display: block; }
 
-/* MODAL */
-.modal {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+/* Efek Glossy pada kartu */
+.preview-card::after {
+  content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.preview-card small { display: block; font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; font-weight: 600; }
+.preview-card strong { font-family: 'Syne', sans-serif; font-size: 1.8em; display: block; z-index: 2; position: relative; }
+.preview-card span.icon { font-size: 2.5em; opacity: 0.8; z-index: 2; }
+
+/* ================= PREMIUM MODAL (POP UP) ================= */
+.modal-overlay {
+  position: fixed; inset: 0; 
+  background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
   display: none; align-items: center; justify-content: center; z-index: 2000;
+  opacity: 0; transition: opacity 0.3s;
 }
-.modal.active { display: flex; }
+.modal-overlay.active { display: flex; opacity: 1; }
 
-.sheet {
-  background: var(--surface); width: 85%; max-width: 320px; padding: 24px; border-radius: 24px;
-  text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  transform: scale(0.9); transition: transform 0.2s;
+.modal-content {
+  background: #ffffff;
+  width: 85%; max-width: 320px; padding: 24px; border-radius: 28px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
 }
-.modal.active .sheet { transform: scale(1); }
-.sheet h3 { margin: 0 0 8px; font-family: 'Syne', sans-serif; font-size: 1.4em; }
-.sheet p { color: var(--muted); margin: 0 0 20px; font-size: 0.95em; }
+.modal-overlay.active .modal-content { transform: scale(1); }
 
+.modal-content h3 { margin: 10px 0 5px; font-family: 'Syne', sans-serif; font-size: 1.4em; }
+.modal-content p { color: var(--muted); margin: 0 0 25px; font-size: 0.95em; line-height: 1.5; }
+
+/* Tombol Modal */
 .btn-pay {
-  width: 100%; padding: 14px; border-radius: var(--radius-md); background: var(--gold);
+  width: 100%; padding: 14px; border-radius: 16px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
   color: white; border: none; font-weight: 800; font-size: 1em; cursor: pointer;
-  box-shadow: 0 8px 20px rgba(251, 191, 36, 0.3);
+  box-shadow: 0 8px 20px rgba(14, 165, 166, 0.25);
+  transition: 0.2s;
+}
+.btn-pay:active { transform: scale(0.98); }
+
+.btn-close {
+  position: absolute; top: 15px; right: 15px;
+  background: #f1f5f9; color: #64748b; border: none;
+  width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;
 }
 
-/* NAV */
+/* ================= BOTTOM NAV (STANDAR) ================= */
 footer.bottom-nav {
-  position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px; width: calc(100% - 40px); max-width: 480px;
-  background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-radius: 999px; padding: 12px 20px;
-  display: flex; justify-content: space-around; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5); z-index: 999;
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px;
+  width: calc(100% - 40px); max-width: 480px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-radius: 999px; padding: 12px 20px; display: flex; justify-content: space-around;
+  align-items: center; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.5); z-index: 999;
 }
-.nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; }
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; transition: 0.2s;
+}
 .nav-item span { font-size: 20px; margin-bottom: 2px; }
 .nav-item.active { color: var(--accent); font-weight: 700; }
+.nav-item.active span { transform: scale(1.1); filter: drop-shadow(0 2px 4px rgba(14,165,166,0.3)); }
 </style>
 </head>
 
@@ -229,31 +262,34 @@ footer.bottom-nav {
    <small>Total Tagihan Bulan Ini</small>
    <strong id="total">Rp 0</strong>
  </div>
- <span style="font-size: 2em;">💰</span>
+ <span class="icon">💰</span>
 </div>
 
 </div>
 
-<div class="modal" id="modal" onclick="closeModal(event)">
- <div class="sheet">
+<div class="modal-overlay" id="modal" onclick="closeModal(event)">
+ <div class="modal-content">
+  <button class="btn-close" onclick="forceClose()">✕</button>
+  <div style="font-size:3em; margin-bottom:10px;">🧾</div>
   <h3 id="m-date">Tanggal</h3>
   <p id="m-desc">Keterangan</p>
-  <button class="btn-pay" onclick="pay()">TANDAI DIBAYAR</button>
+  <button class="btn-pay" onclick="pay()">TANDAI SUDAH BAYAR</button>
  </div>
 </div>
 
 <footer class="bottom-nav">
-    <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
-    <a href="calendar.html" class="nav-item active"><span>📅</span>Bayar</a>
-    <a href="maka_plus.html" class="nav-item"><span>⭐</span>MAKA+</a>
+  <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
+  <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
+  <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
 </footer>
 
 <script>
 /* ===== CONFIG ===== */
 const USER_TGL_MULAI_SEWA='2025-09-20'
 const USER_OPSI_DP='355'
-const ADMIN=JSON.parse(localStorage.getItem('maka_finance_settings'))||{hwb_rate:80000,cdp_rate:70000}
-const HWB=ADMIN.hwb_rate, CDP=ADMIN.cdp_rate
+// Default rates
+const HWB=80000; 
+const CDP=70000;
 const DP_START=new Date(new Date(USER_TGL_MULAI_SEWA).getFullYear(),new Date(USER_TGL_MULAI_SEWA).getMonth()+1,1)
 const DP_END=new Date(DP_START.getFullYear(),DP_START.getMonth()+3,1)
 
@@ -284,11 +320,11 @@ function render(){
  grid.innerHTML=''
 
  let total=0
- const now=new Date();now.setHours(0,0,0,0)
+ const now=new Date(); now.setHours(0,0,0,0);
  const payData=JSON.parse(localStorage.getItem('maka_payments'))||{}
  const makaPlusData=JSON.parse(localStorage.getItem('maka_plus_data'));
 
- // Cek Tanggal Aktivasi MAKA+
+ // Cek Tanggal Aktivasi MAKA+ (Cicilan Charger)
  let plusActiveDate = null;
  if(makaPlusData && makaPlusData.active) {
     plusActiveDate = new Date(makaPlusData.activatedAt);
@@ -312,12 +348,12 @@ function render(){
   if(status==='CDP'){cls+=' cdp';price=CDP}
   if(status==='HLB'){cls+=' libur'}
 
-  // 2. Logic Tambahan MAKA+ (Cicilan +10rb)
-  // Berlaku H+1 s.d H+365 dari tanggal aktivasi
-  if (plusActiveDate && status !== 'HLB') { // Libur tetap gratis
+  // 2. Logic Tambahan MAKA+ (Cicilan +10rb selama 365 hari)
+  if (plusActiveDate && status !== 'HLB') {
     const diffTime = date - plusActiveDate;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
+    // Tagihan +10rb hanya berlaku H+1 s.d H+365
     if (diffDays >= 1 && diffDays <= 365) {
         price += 10000;
         isPlusDay = true;
@@ -326,16 +362,16 @@ function render(){
 
   // 3. Styling & Total
   if(paid)cls+=' paid'
-  if(date>now)cls+=' future'
-  if(!paid&&price>0)total+=price
+  if(date>now)cls+=' future' // Future sekarang tetap bisa diklik (hanya visual opacity)
+  
+  if(!paid && price>0) total+=price
 
   // Render HTML
-  // Jika ada cicilan, tambahkan titik indikator
   const dotHtml = isPlusDay && !paid ? '<div class="plus-dot"></div>' : '';
 
   grid.innerHTML+=`
    <div class="day">
-    <div class="${cls}" onclick="openModal('${key}','${status}',${price})">
+    <div class="${cls}" onclick="openModal('${key}','${status}',${price},${isPlusDay})">
       ${d}
       ${dotHtml}
     </div>
@@ -345,18 +381,26 @@ function render(){
 }
 
 /* ===== MODAL ===== */
-function openModal(k,s,p){
- if(p===0)return
+function openModal(k,s,p,plus){
+ if(p===0)return // Skip jika harga 0 (libur)
  activeKey=k
- document.getElementById('m-date').textContent=`Tanggal ${k}`
- document.getElementById('m-desc').textContent=`Tagihan: ${s} (Total Rp ${p.toLocaleString('id-ID')})`
- document.getElementById('modal').classList.add('active')
+ document.getElementById('m-date').textContent=`${k}`
+ 
+ let desc = `Biaya Sewa: ${s}`;
+ if(plus) desc += `\n+ Cicilan Charger (10rb)`;
+ desc += `\n\nTotal: Rp ${p.toLocaleString('id-ID')}`;
+ 
+ document.getElementById('m-desc').innerText = desc;
+ document.getElementById('modal').classList.add('active');
 }
 
 function closeModal(e){
     if(e.target.id === 'modal') {
         document.getElementById('modal').classList.remove('active');
     }
+}
+function forceClose(){
+    document.getElementById('modal').classList.remove('active');
 }
 
 function pay(){
