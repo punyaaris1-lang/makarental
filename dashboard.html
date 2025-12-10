@@ -4,256 +4,47 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MAKA Dashboard</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
-
 <style>
-/* ================= THEME VARIABLES ================= */
-:root {
-  --bg: #f6f8fb;
-  --surface: #ffffff;
-  --muted: #6b7280;
-  --accent: #0ea5a6;       /* Teal utama */
-  --accent-2: #06b6d4;     /* Cyan sekunder */
-  --text: #0f1724;
-  --danger: #ef4444;
-  --radius-lg: 20px;
-  --max-width: 520px;
-}
-
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body {
-  margin: 0; padding: 0;
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-.app-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 20px 20px 120px 20px;
-}
-
-/* ================= HEADER ================= */
-.header {
-  margin-bottom: 24px;
-  /* position relative dihapus karena admin link sudah tidak ada */
-}
-
-.user-info h1 {
-  font-family: 'Syne', sans-serif;
-  /* FONT SIZE DIPERKECIL AGAR MUAT NAMA PANJANG */
-  font-size: 1.4em; 
-  font-weight: 700;
-  margin: 0;
-  color: var(--text);
-  line-height: 1.2;
-}
-
-.user-info p {
-  color: var(--muted);
-  font-size: 0.9em;
-  margin: 4px 0 0 0;
-}
-
-/* ================= HERO CARD (REVISI BIRU) ================= */
-.hero-tunggakan {
-  margin-top: 24px;
-  /* BACKGROUND BERUBAH JADI GRADIENT BIRU/TEAL */
-  background: linear-gradient(135deg, var(--accent-2), var(--accent));
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  /* Shadow berwarna agar menyatu */
-  box-shadow: 0 10px 25px rgba(6, 182, 212, 0.25);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-  overflow: hidden;
-  color: #ffffff; /* Semua teks di dalam jadi putih default */
-}
-
-/* Dekorasi background */
-.hero-tunggakan::before {
-  content: '';
-  position: absolute;
-  top: -20px; right: -20px;
-  width: 100px; height: 100px;
-  /* Lingkaran putih transparan */
-  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-  border-radius: 50%;
-}
-
-.hero-content h3 {
-  font-size: 0.75em;
-  letter-spacing: 1px;
-  /* Warna putih agak transparan */
-  color: rgba(255, 255, 255, 0.85);
-  margin: 0 0 6px 0;
-  text-transform: uppercase;
-  font-weight: 700;
-}
-
-.hero-content p {
-  margin: 0;
-  font-size: 0.9em;
-  /* Warna putih solid */
-  color: #ffffff;
-  font-weight: 700;
-}
-
-.hero-tunggakan-value {
-  text-align: right;
-  z-index: 1;
-}
-
-.hero-tunggakan-value span {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.6em;
-  font-weight: 800;
-  /* Warna putih solid */
-  color: #ffffff;
-  display: block;
-  margin-bottom: 4px;
-}
-
-/* Badge Status (Aman/Telat) */
-.hero-tunggakan-value small {
-  font-size: 0.75em;
-  font-weight: 700;
-  /* Background Putih agar kontras dengan kartu biru */
-  background: #ffffff;
-  /* Teks mengikuti warna aksen (atau merah jika nanti di-set JS) */
-  color: var(--accent); 
-  padding: 4px 10px;
-  border-radius: 99px;
-  display: inline-block;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(15,23,42,0.1), transparent);
-  margin: 24px 0;
-}
-
-/* ================= ICON GRID ================= */
-.icon-grid-section h2 {
-  font-size: 1.1em;
-  font-weight: 800;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text);
-}
-
-.icon-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.icon-item {
-  text-decoration: none;
-  background: var(--surface);
-  padding: 18px 10px;
-  border-radius: 18px;
-  text-align: center;
-  border: 1px solid rgba(15,23,42,0.03);
-  box-shadow: 0 4px 12px rgba(15,23,42,0.03);
-  transition: transform 0.2s, box-shadow 0.2s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.icon-item:active {
-  transform: scale(0.97);
-}
-
-.icon-item span {
-  font-size: 28px;
-  display: block;
-  margin-bottom: 10px;
-}
-
-.icon-item p {
-  font-size: 0.75em;
-  color: var(--text);
-  font-weight: 600;
-  margin: 0;
-}
-
-/* Highlight Khusus SOS */
-.sos-card {
-  background: #fff5f5;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-.sos-card p { color: var(--danger); }
-
-/* ================= BOTTOM NAV ================= */
-footer.bottom-nav {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 20px;
-  width: calc(100% - 40px);
-  max-width: 480px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 999px;
-  padding: 12px 20px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-  border: 1px solid rgba(255,255,255,0.5);
-  z-index: 999;
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  color: var(--muted);
-  font-size: 11px;
-  gap: 4px;
-  transition: 0.2s;
-}
-
-.nav-item span {
-  font-size: 20px;
-  margin-bottom: 2px;
-}
-
-.nav-item.active {
-  color: var(--accent);
-  font-weight: 700;
-}
-.nav-item.active span {
-  transform: scale(1.1);
-}
-
+/* ... (Copy CSS dari dashboard V2 sebelumnya) ... */
+/* Agar tidak terlalu panjang di chat, saya fokus di Logic JS di bawah */
+:root { --bg:#f6f8fb; --surface:#ffffff; --muted:#6b7280; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; --danger:#ef4444; --radius-lg:20px; --max-width:520px; }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { margin:0; padding:0; font-family:'Inter', sans-serif; background:linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%); color:var(--text); min-height:100vh; }
+.app-container { max-width:var(--max-width); margin:0 auto; padding:20px 20px 120px 20px; }
+.header { margin-bottom:24px; }
+.user-info h1 { font-family:'Syne', sans-serif; font-size:1.4em; font-weight:700; margin:0; color:var(--text); line-height:1.2; }
+.user-info p { color:var(--muted); font-size:0.9em; margin:4px 0 0 0; }
+.hero-tunggakan { margin-top:24px; background:linear-gradient(135deg, var(--accent-2), var(--accent)); border-radius:var(--radius-lg); padding:24px; box-shadow:0 10px 25px rgba(6,182,212,0.25); display:flex; justify-content:space-between; align-items:center; position:relative; overflow:hidden; color:#ffffff; }
+.hero-tunggakan::before { content:''; position:absolute; top:-20px; right:-20px; width:100px; height:100px; background:radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%); border-radius:50%; }
+.hero-content h3 { font-size:0.75em; letter-spacing:1px; color:rgba(255,255,255,0.85); margin:0 0 6px 0; text-transform:uppercase; font-weight:700; }
+.hero-content p { margin:0; font-size:0.9em; color:#ffffff; font-weight:700; }
+.hero-tunggakan-value { text-align:right; z-index:1; }
+.hero-tunggakan-value span { font-family:'Syne', sans-serif; font-size:1.6em; font-weight:800; color:#ffffff; display:block; margin-bottom:4px; }
+.hero-tunggakan-value small { font-size:0.75em; font-weight:700; background:#ffffff; color:var(--accent); padding:4px 10px; border-radius:99px; display:inline-block; }
+.divider { height:1px; background:linear-gradient(90deg, transparent, rgba(15,23,42,0.1), transparent); margin:24px 0; }
+.icon-grid-section h2 { font-size:1.1em; font-weight:800; margin-bottom:16px; display:flex; align-items:center; gap:8px; color:var(--text); }
+.icon-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; }
+.icon-item { text-decoration:none; background:var(--surface); padding:18px 10px; border-radius:18px; text-align:center; border:1px solid rgba(15,23,42,0.03); box-shadow:0 4px 12px rgba(15,23,42,0.03); transition:transform 0.2s; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.icon-item:active { transform:scale(0.97); }
+.icon-item span { font-size:28px; display:block; margin-bottom:10px; }
+.icon-item p { font-size:0.75em; color:var(--text); font-weight:600; margin:0; }
+.sos-card { background:#fff5f5; border:1px solid rgba(239, 68, 68, 0.2); }
+.sos-card p { color:var(--danger); }
+footer.bottom-nav { position:fixed; left:50%; transform:translateX(-50%); bottom:20px; width:calc(100% - 40px); max-width:480px; background:rgba(255,255,255,0.9); backdrop-filter:blur(12px); border-radius:999px; padding:12px 20px; display:flex; justify-content:space-around; align-items:center; box-shadow:0 10px 40px rgba(0,0,0,0.08); border:1px solid rgba(255,255,255,0.5); z-index:999; }
+.nav-item { display:flex; flex-direction:column; align-items:center; justify-content:center; text-decoration:none; color:var(--muted); font-size:11px; gap:4px; }
+.nav-item span { font-size:20px; margin-bottom:2px; }
+.nav-item.active { color:var(--accent); font-weight:700; }
 </style>
 </head>
-
 <body class="dashboard">
 
 <div class="app-container">
-
 <header class="header">
   <div class="user-info">
     <h1 id="user-name-display">Halo User</h1>
     <p>Plat Motor <strong id="user-plate-display">Loading...</strong></p>
   </div>
-
   <div class="hero-tunggakan">
     <div class="hero-content">
       <h3>STATUS PEMBAYARAN</h3>
@@ -261,55 +52,96 @@ footer.bottom-nav {
     </div>
     <div class="hero-tunggakan-value">
       <span id="hero-tunggakan-nominal">Rp 0</span>
-      <small id="hero-tunggakan-days">Aman</small>
+      <small id="hero-status-badge">Aman</small>
     </div>
   </div>
-
   <div class="divider"></div>
 </header>
-
 <section class="icon-grid-section">
   <h2>✨ Fitur Premium</h2>
-  
   <div class="icon-grid">
     <a href="calendar.html" class="icon-item"><span>📅</span><p>Bayar</p></a>
     <a href="history.html" class="icon-item"><span>🗒️</span><p>Riwayat</p></a>
     <a href="part_tracker.html" class="icon-item"><span>🎁</span><p>Gratisan</p></a>
-
     <a href="info_mlu.html" class="icon-item"><span>📰</span><p>Info</p></a>
     <a href="tips_maka.html" class="icon-item"><span>💡</span><p>Tips</p></a>
     <a href="#" onclick="window.open('https://etle-pmj.info','_blank')" class="icon-item"><span>🚓</span><p>ETLE</p></a>
-
     <a href="settings.html" class="icon-item"><span>⚙️</span><p>Setting</p></a>
     <a href="maka_plus.html" class="icon-item"><span>⭐</span><p>MAKA+</p></a>
     <a href="https://wa.me/62812XXXXXXXX?text=SOS%20MAKA%20DARURAT" target="_blank" class="icon-item sos-card"><span>🚨</span><p>SOS</p></a>
   </div>
 </section>
-
 </div>
-
 <footer class="bottom-nav">
-  <a href="lokasi_fc.html" class="nav-item">
-    <span>⚡</span>Lokasi
-  </a>
-  <a href="dashboard.html" class="nav-item active">
-    <span>🏠</span>Home
-  </a>
-  <a href="daftar_antrian.html" class="nav-item">
-    <span>🎫</span>Antrian
-  </a>
+  <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
+  <a href="dashboard.html" class="nav-item active"><span>🏠</span>Home</a>
+  <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
 </footer>
 
 <script>
-/* JS LOGIC BIARKAN SEPERTI SEMULA */
+/* ================== LOGIC DASHBOARD ================== */
 document.addEventListener("DOMContentLoaded", function() {
+    // 1. Load User Info
     const user = JSON.parse(localStorage.getItem('maka_user'));
     if(user) {
         document.getElementById('user-name-display').innerText = "Halo, " + user.nama.split(" ")[0];
         document.getElementById('user-plate-display').innerText = user.plat;
     }
+
+    // 2. Hitung Tagihan Hari Ini
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const day = today.getDate();
+    
+    // Default: HWB (Sewa Harian)
+    let tagihanHariIni = 70000; 
+    let labelTagihan = "HWB Harian";
+
+    // Cek Tanggal Cicilan DP (14 & 28)
+    if (day === 14 || day === 28) {
+        tagihanHariIni = 80000; // Contoh: Angsuran DP
+        labelTagihan = "Cicilan DP";
+    }
+
+    // 3. Cek Status MAKA+ (Cicilan Charger)
+    const makaPlusData = JSON.parse(localStorage.getItem('maka_plus_data'));
+    
+    if (makaPlusData && makaPlusData.active) {
+        const activationDate = new Date(makaPlusData.activatedAt);
+        activationDate.setHours(0,0,0,0);
+        
+        // Hitung selisih hari
+        const diffTime = today - activationDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        // LOGIC: Tagihan +10rb HANYA jika H+1 s.d H+365 (1 Tahun)
+        if (diffDays >= 1 && diffDays <= 365) {
+            tagihanHariIni += 10000;
+            console.log("MAKA+ Active: +10rb (Day " + diffDays + " of 365)");
+        }
+    }
+
+    // 4. Render ke UI
+    document.getElementById('hero-tunggakan-nominal').innerText = "Rp " + tagihanHariIni.toLocaleString('id-ID');
+
+    // Cek Status Pembayaran (Simple Check di LocalStorage)
+    const y = today.getFullYear();
+    const m = today.getMonth() + 1;
+    const d = today.getDate();
+    const key = `${y}-${m}-${d}`;
+    
+    const payments = JSON.parse(localStorage.getItem('maka_payments')) || {};
+    const isPaid = payments[key] === true;
+
+    if(isPaid) {
+        document.getElementById('hero-tunggakan-nominal').innerText = "LUNAS";
+        document.getElementById('hero-status-badge').innerText = "Terima Kasih";
+        document.getElementById('hero-status-badge').style.color = "var(--success)";
+    } else {
+        document.getElementById('hero-status-badge').innerText = "Belum Bayar";
+        document.getElementById('hero-status-badge').style.color = "var(--danger)";
+    }
 });
 </script>
-
 </body>
 </html>
