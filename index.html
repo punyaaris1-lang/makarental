@@ -43,9 +43,11 @@ body::before {
     box-shadow:var(--glass-shadow); border:1px solid var(--glass-border); 
 }
 
-/* JUDUL BARU (RTO MAKA) */
+/* JUDUL BARU (FONT KECIL) */
 .brand-title { 
-    font-family:'Syne', sans-serif; font-size:2.2em; font-weight:800; 
+    font-family:'Syne', sans-serif; 
+    font-size:2.0em; /* Dikecilkan dari 2.2em */
+    font-weight:800; 
     text-align:center; margin:0 0 8px; color: var(--text);
     letter-spacing: -1px;
 }
@@ -216,7 +218,8 @@ function handleRegister() {
     } else {
       const userData = {
         nama: nama, hp: hp, plat: plat, tglAmbil: tgl, dp: dp,
-        joinedAt: new Date().toISOString(), isBanned: false,
+        joinedAt: new Date(tgl).toISOString(), // Menggunakan tanggal ambil motor sebagai joinedAt
+        isBanned: false,
         makaPlus: { active:false, activatedAt:null }
       };
       
@@ -228,7 +231,6 @@ function handleRegister() {
     }
   }).catch((error) => {
     console.error("Error:", error);
-    // Jika error database not found, user harus buat database dulu di console
     if(error.code === 'not-found' || error.message.includes('not exist')) {
         showModal("Database Belum Siap", "Admin: Harap buat database Firestore di Console Firebase.", "error");
     } else {
