@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Admin Ops - MAKA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<style>
+/* SAMA SEPERTI DASHBOARD USER */
+:root { --bg:#f6f8fb; --surface:#ffffff; --text:#0f1724; --accent:#0ea5a6; --radius-lg:20px; }
+body { margin:0; padding:20px; font-family:'Inter'; background:var(--bg); color:var(--text); }
+.container { max-width:600px; margin:0 auto; padding-bottom:50px; }
+
+h2 { font-family:'Syne'; margin-bottom:20px; border-bottom:1px solid #ddd; padding-bottom:10px; }
+
+/* TABS */
+.tabs { display:flex; gap:10px; margin-bottom:20px; overflow-x:auto; }
+.tab-btn { padding:10px 20px; border-radius:10px; border:none; background:#e2e8f0; color:#64748b; font-weight:700; cursor:pointer; white-space:nowrap; }
+.tab-btn.active { background:var(--text); color:#fff; }
+
+.section { display:none; animation:fadeIn 0.3s; }
+.section.active { display:block; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+/* CARDS & FORMS */
+.card { background:var(--surface); padding:20px; border-radius:var(--radius-lg); margin-bottom:15px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
+label { display:block; font-size:0.8em; font-weight:700; margin-bottom:5px; color:#64748b; }
+input, textarea, select { width:100%; padding:12px; border-radius:10px; border:1px solid #cbd5e1; margin-bottom:15px; font-family:'Inter'; }
+button { width:100%; padding:14px; background:var(--accent); color:white; border:none; border-radius:10px; font-weight:700; cursor:pointer; }
+button.secondary { background:#f1f5f9; color:var(--text); margin-top:10px; }
+
+.item-list { font-size:0.9em; border-top:1px solid #eee; margin-top:10px; padding-top:10px; }
+.item-row { display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:8px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2>🛠️ Admin Ops</h2>
+        <a href="admin_login.html" style="color:red; text-decoration:none; font-weight:bold; font-size:0.8em;">LOGOUT</a>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="sw(1)">📝 Info MLU</button>
+        <button class="tab-btn" onclick="sw(2)">💡 Tips</button>
+        <button class="tab-btn" onclick="sw(3)">🔧 Part Gratis</button>
+    </div>
+
+    <div id="sec-1" class="section active">
+        <div class="card">
+            <h3>Posting Berita Baru</h3>
+            <label>Judul</label><input id="infoTitle">
+            <label>Isi Berita</label><textarea id="infoContent" rows="4"></textarea>
+            <label>Link Foto (Opsional)</label><input id="infoImg" placeholder="https://...">
+            <button onclick="postInfo()">POSTING</button>
+        </div>
+        <div class="card">
+            <h3>List Berita Aktif</h3>
+            <div id="infoList" class="item-list"></div>
+            <button class="secondary" onclick="clearData('mlu_info_articles')">Hapus Semua Berita</button>
+        </div>
+    </div>
+
+    <div id="sec-2" class="section">
+        <div class="card">
+            <h3>Posting Tips Baru</h3>
+            <label>Judul Tips</label><input id="tipsTitle">
+            <label>Isi Tips</label><textarea id="tipsContent" rows="4"></textarea>
+            <label>Link Foto (Opsional)</label><input id="tipsImg" placeholder="https://...">
+            <button onclick="postTips()">POSTING</button>
+        </div>
+    </div>
+
+    <div id="sec-3" class="section">
+        <div class="card">
+            <h3>Input Penggunaan Part</h3>
+            <label>Pilih Part</label>
+            <select id="partType">
+                <option value="ban_depan">Ban Depan</option>
+                <option value="ban_belakang">Ban Belakang</option>
+                <option value="kampas_depan">Kampas Depan</option>
+                <option value="kampas_belakang">Kampas Belakang</option>
+            </select>
+            <p style="font-size:0.8em; color:#666;">
+                Catatan: Data ini akan mengurangi jatah gratisan di HP User secara otomatis saat user membuka menu "Gratisan".
+            </p>
+            <button onclick="addPartUsage()">CATAT PENGGUNAAN</button>
+        </div>
+        
+        <div class="card">
+            <h3>Current Usage Data</h3>
+            <pre id="partDebug" style="font-size:0.7em; background:#eee; padding:10px; overflow:auto;"></pre>
+            <button class="secondary" style="color:red" onclick="resetPart()">Reset Part User (3 Tahun Baru)</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function sw(id){
+    document.querySelectorAll('.section').forEach(d=>d.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('sec-'+id).classList.add('active');
+    event.target.classList.add('active');
+}
+
+// === INFO LOGIC ===
+function postInfo(){
+    const t = document.getElementById('infoTitle').value;
+    const c = document.getElementById('infoContent').value;
+    const i = document.getElementById('infoImg').value;
+    if(!t || !c) return alert("Isi judul & konten");
+
+    const list = JSON.parse(localStorage.getItem('mlu_info_articles')) || [];
+    const date = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+    
+    list.push({ title:t, content:c, date:date, photos: i ? [i] : [] });
+    localStorage.setItem('mlu_info_articles', JSON.stringify(list));
+    alert("Berita Terposting!");
+    renderInfoList();
+}
+
+function renderInfoList(){
+    const list = JSON.parse(localStorage.getItem('mlu_info_articles')) || [];
+    const el = document.getElementById('infoList');
+    el.innerHTML = list.map((x,idx) => 
+        `<div class="item-row"><span>${x.title}</span><small>${x.date}</small></div>`
+    ).join('');
+}
+
+// === TIPS LOGIC ===
+function postTips(){
+    const t = document.getElementById('tipsTitle').value;
+    const c = document.getElementById('tipsContent').value;
+    const i = document.getElementById('tipsImg').value;
+    
+    const list = JSON.parse(localStorage.getItem('maka_tips_articles')) || [];
+    const date = new Date().toLocaleDateString('id-ID');
+    list.push({ title:t, content:c, date:date, photos: i ? [i] : [] });
+    localStorage.setItem('maka_tips_articles', JSON.stringify(list));
+    alert("Tips Terposting!");
+}
+
+// === PART LOGIC ===
+// Simulasi: Mengubah data di localStorage 'maka_part_usage'.
+// Note: Karena di prototype ini localStorage ada di browser client,
+// admin dan user harus di browser yang sama agar "connect".
+// Di sistem asli, ini akan tembak ke database server.
+function addPartUsage(){
+    const type = document.getElementById('partType').value;
+    let usage = JSON.parse(localStorage.getItem('maka_part_usage')) || {
+        ban_depan: 0, ban_belakang: 0, kampas_depan: 0, kampas_belakang: 0, last_used: {}
+    };
+
+    usage[type] = (usage[type] || 0) + 1;
+    usage.last_used[type] = new Date().toLocaleDateString('id-ID');
+
+    localStorage.setItem('maka_part_usage', JSON.stringify(usage));
+    alert("Part berhasil dicatat! Jatah user berkurang.");
+    showPartDebug();
+}
+
+function showPartDebug(){
+    const u = localStorage.getItem('maka_part_usage');
+    document.getElementById('partDebug').innerText = u ? JSON.stringify(JSON.parse(u),null,2) : "Belum ada data";
+}
+function resetPart(){
+    if(confirm("Reset semua jatah part user ke 0?")) {
+        localStorage.removeItem('maka_part_usage');
+        showPartDebug();
+    }
+}
+
+// Init
+renderInfoList();
+showPartDebug();
+</script>
+</body>
+</html>
