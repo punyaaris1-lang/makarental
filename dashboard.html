@@ -23,9 +23,9 @@ body::before { content:""; position:fixed; inset:0; background:url('176394742755
     width:50px; height:50px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); 
     border-radius:14px; display:flex; align-items:center; justify-content:center; 
     color:white; font-family:'Syne'; font-size:1.4em; font-weight:800; box-shadow:0 4px 15px rgba(14,165,166,0.3);
+    background-size: cover; background-position: center; /* Untuk Foto Custom */
 }
 .user-text h1 {
-    /* FONT NAMA DIGANTI KE INTER (Lebih Rapi) & SIZE 1.2em AGAR 1 BARIS */
     font-family: 'Inter', sans-serif; font-size: 1.2em; font-weight: 700;
     margin: 0; color: var(--text); line-height: 1.1; letter-spacing: -0.5px;
 }
@@ -41,7 +41,6 @@ body::before { content:""; position:fixed; inset:0; background:url('176394742755
 
 /* --- SECTION TITLE --- */
 .section-title {
-    /* GANTI TEXT FITUR PREMIUM JADI MLU | MAU APE LU DGN FONT SYNE */
     font-family: 'Syne', sans-serif; font-size: 1.1em; font-weight: 800;
     margin: 25px 0 15px; color: var(--text); display: flex; align-items: center; gap: 8px;
 }
@@ -58,22 +57,21 @@ body::before { content:""; position:fixed; inset:0; background:url('176394742755
 .icon-item p { font-size:0.7em; color:var(--text); font-weight:600; margin:0; }
 .sos-card { background:rgba(255,230,230,0.8)!important; border:1px solid rgba(239,68,68,0.2)!important; }
 
-/* --- FOOTER NAV (UKURAN DIKEMBALIKAN KECIL) --- */
+/* --- FOOTER NAV --- */
 footer.bottom-nav {
     position:fixed; bottom:15px; left:50%; transform:translateX(-50%);
-    width:calc(100% - 40px); max-width:400px; /* Max width diperkecil */
+    width:calc(100% - 40px); max-width:400px;
     background:rgba(255,255,255,0.9); backdrop-filter:blur(20px);
-    border-radius:50px; /* Lebih bulat (Pill Shape) */
-    padding:10px 20px; /* Padding diperkecil */
+    border-radius:50px; padding:10px 20px;
     display:flex; justify-content:space-between; align-items:center;
     box-shadow:0 10px 40px rgba(0,0,0,0.1); border:1px solid rgba(255,255,255,0.5); z-index:999;
 }
 .nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#94a3b8; font-size:9px; font-weight:600; transition:0.2s; }
-.nav-item span { font-size:18px; margin-bottom:2px; } /* Icon diperkecil */
+.nav-item span { font-size:18px; margin-bottom:2px; }
 .nav-item.active { color:var(--accent); }
 .nav-item.active span { transform:translateY(-2px); filter:drop-shadow(0 4px 10px rgba(14,165,166,0.4)); }
 
-/* --- CUSTOM MODAL PREMIUM (PENGGANTI ALERT) --- */
+/* --- CUSTOM MODAL PREMIUM --- */
 .modal-overlay {
     position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);
     z-index:9999; display:none; align-items:center; justify-content:center;
@@ -89,9 +87,7 @@ footer.bottom-nav {
 .modal-title { font-family:'Syne'; font-size:1.4em; font-weight:800; margin:0 0 10px; color:var(--text); }
 .modal-desc { font-size:0.9em; color:#64748b; line-height:1.5; margin-bottom:20px; }
 .modal-btns { display:flex; gap:10px; justify-content:center; }
-.btn-modal { 
-    flex:1; padding:12px; border-radius:12px; border:none; font-weight:700; cursor:pointer; font-size:0.9em;
-}
+.btn-modal { flex:1; padding:12px; border-radius:12px; border:none; font-weight:700; cursor:pointer; font-size:0.9em; }
 .btn-cancel { background:#f1f5f9; color:#64748b; }
 .btn-confirm { background:var(--text); color:white; }
 .btn-danger { background:var(--danger); color:white; box-shadow:0 5px 15px rgba(239,68,68,0.3); }
@@ -146,8 +142,7 @@ footer.bottom-nav {
         <span id="mIcon" class="modal-icon">🔔</span>
         <h3 id="mTitle" class="modal-title">Judul</h3>
         <p id="mDesc" class="modal-desc">Keterangan...</p>
-        <div id="mBtns" class="modal-btns">
-            </div>
+        <div id="mBtns" class="modal-btns"></div>
     </div>
 </div>
 
@@ -173,57 +168,43 @@ function showModal(type, title, desc, onConfirm) {
     document.getElementById('mDesc').innerText = desc;
     
     const btnContainer = document.getElementById('mBtns');
-    btnContainer.innerHTML = ''; // Reset buttons
+    btnContainer.innerHTML = '';
 
     if (type === 'alert') {
         document.getElementById('mIcon').innerText = "ⓘ";
         btnContainer.innerHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK</button>`;
     } else if (type === 'confirm') {
         document.getElementById('mIcon').innerText = "🤔";
-        const btnYes = document.createElement('button');
-        btnYes.className = 'btn-modal btn-confirm';
-        btnYes.innerText = "Ya, Lanjutkan";
-        btnYes.onclick = function() { closeModal(); onConfirm(); };
-        
-        const btnNo = document.createElement('button');
-        btnNo.className = 'btn-modal btn-cancel';
-        btnNo.innerText = "Batal";
-        btnNo.onclick = closeModal;
-        
-        btnContainer.appendChild(btnNo);
-        btnContainer.appendChild(btnYes);
+        const btnYes = document.createElement('button'); btnYes.className = 'btn-modal btn-confirm'; btnYes.innerText = "Ya, Lanjutkan"; btnYes.onclick = function() { closeModal(); onConfirm(); };
+        const btnNo = document.createElement('button'); btnNo.className = 'btn-modal btn-cancel'; btnNo.innerText = "Batal"; btnNo.onclick = closeModal;
+        btnContainer.appendChild(btnNo); btnContainer.appendChild(btnYes);
     } else if (type === 'sos') {
         document.getElementById('mIcon').innerText = "🚨";
-        const btnYes = document.createElement('button');
-        btnYes.className = 'btn-modal btn-danger';
-        btnYes.innerText = "KIRIM SOS SEKARANG";
-        btnYes.onclick = function() { closeModal(); onConfirm(); };
-        
-        const btnNo = document.createElement('button');
-        btnNo.className = 'btn-modal btn-cancel';
-        btnNo.innerText = "Batal";
-        btnNo.onclick = closeModal;
-        
-        btnContainer.appendChild(btnNo);
-        btnContainer.appendChild(btnYes);
+        const btnYes = document.createElement('button'); btnYes.className = 'btn-modal btn-danger'; btnYes.innerText = "KIRIM SEKARANG"; btnYes.onclick = function() { closeModal(); onConfirm(); };
+        const btnNo = document.createElement('button'); btnNo.className = 'btn-modal btn-cancel'; btnNo.innerText = "Batal"; btnNo.onclick = closeModal;
+        btnContainer.appendChild(btnNo); btnContainer.appendChild(btnYes);
     }
-
     modal.classList.add('show');
 }
-
-function closeModal() {
-    document.getElementById('customModal').classList.remove('show');
-}
+function closeModal() { document.getElementById('customModal').classList.remove('show'); }
 
 // --- MAIN LOGIC ---
 document.addEventListener("DOMContentLoaded", function() {
     if(!currentUser) { window.location.href='index.html'; return; }
 
+    // RENDER DATA USER
     document.getElementById('user-name-display').innerText = "Halo, " + currentUser.nama;
     document.getElementById('user-plate-display').innerText = currentUser.plat;
-    document.getElementById('user-avatar').innerText = currentUser.nama.charAt(0).toUpperCase();
+    
+    // RENDER AVATAR (Inisial / Foto)
+    const avatarDiv = document.getElementById('user-avatar');
+    if (currentUser.photoUrl) {
+        avatarDiv.innerText = "";
+        avatarDiv.style.backgroundImage = `url('${currentUser.photoUrl}')`;
+    } else {
+        avatarDiv.innerText = currentUser.nama.charAt(0).toUpperCase();
+    }
 
-    // Hitung Tagihan
     calculateLocalBill();
 
     // Listen Tagihan Online
@@ -253,7 +234,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function calculateLocalBill() {
     const today = new Date(); today.setHours(0,0,0,0);
-    let bill = 70000; // Dasar 70rb
+    let bill = 70000; 
     const plusData = JSON.parse(localStorage.getItem('maka_plus_data'));
     if(plusData && plusData.active) bill += 10000;
     document.getElementById('hero-tunggakan-nominal').innerText = "Rp " + bill.toLocaleString('id-ID');
