@@ -9,6 +9,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+<link rel="manifest" href="/makarental/manifest.json">
+
 <style>
 /* GLOBAL THEME */
 :root { 
@@ -23,7 +25,6 @@ body {
     margin:0; padding:0; font-family:'Inter', sans-serif; 
     background-color: var(--bg-base); color:var(--text); 
     min-height:100vh; 
-    /* Hapus center alignment, PENTING! */
     position: relative; 
     overflow-x: hidden; 
     padding-top: 50px; 
@@ -175,7 +176,8 @@ input:focus { border-color: var(--accent); background: white; }
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
+      // PATH SW.JS TETAP MENGGUNAKAN RELATIF KARENA REGISTRASI SELALU DARI ROOT
+      navigator.serviceWorker.register('./sw.js') 
         .then(reg => console.log('PWA Ready', reg))
         .catch(err => console.log('PWA Error', err));
     });
