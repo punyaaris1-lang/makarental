@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
 
 <style>
-/* ================= THEME VARIABLES (MATCHING LOKASI_FC) ================= */
+/* ================= THEME VARIABLES ================= */
 :root {
   --bg: #f6f8fb;
   --surface: #ffffff;
@@ -17,10 +17,8 @@
   --accent-2: #06b6d4;     /* Cyan sekunder */
   --text: #0f1724;
   --danger: #ef4444;
-  --card-shadow: 0 8px 30px rgba(15,23,42,0.06);
   --radius-lg: 20px;
-  --radius-md: 14px;
-  --max-width: 520px; /* Mobile width constraint */
+  --max-width: 520px;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -35,33 +33,23 @@ body {
 .app-container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 20px 20px 120px 20px; /* Padding bawah besar agar tidak tertutup nav */
+  padding: 20px 20px 120px 20px;
 }
 
 /* ================= HEADER ================= */
 .header {
   margin-bottom: 24px;
-  position: relative;
-}
-
-.admin-link {
-  position: absolute;
-  top: 0; right: 0;
-  font-size: 0.75em;
-  font-weight: 700;
-  color: var(--muted);
-  text-decoration: none;
-  background: rgba(0,0,0,0.05);
-  padding: 4px 10px;
-  border-radius: 20px;
+  /* position relative dihapus karena admin link sudah tidak ada */
 }
 
 .user-info h1 {
   font-family: 'Syne', sans-serif;
-  font-size: 1.8em;
+  /* FONT SIZE DIPERKECIL AGAR MUAT NAMA PANJANG */
+  font-size: 1.4em; 
   font-weight: 700;
   margin: 0;
   color: var(--text);
+  line-height: 1.2;
 }
 
 .user-info p {
@@ -70,35 +58,39 @@ body {
   margin: 4px 0 0 0;
 }
 
-/* ================= HERO CARD (TUNGGAKAN) ================= */
+/* ================= HERO CARD (REVISI BIRU) ================= */
 .hero-tunggakan {
   margin-top: 24px;
-  background: linear-gradient(135deg, #ffffff, #fbfdff);
+  /* BACKGROUND BERUBAH JADI GRADIENT BIRU/TEAL */
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
   border-radius: var(--radius-lg);
   padding: 24px;
-  box-shadow: var(--card-shadow);
-  border: 1px solid rgba(15,23,42,0.03);
+  /* Shadow berwarna agar menyatu */
+  box-shadow: 0 10px 25px rgba(6, 182, 212, 0.25);
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
   overflow: hidden;
+  color: #ffffff; /* Semua teks di dalam jadi putih default */
 }
 
-/* Dekorasi background halus */
+/* Dekorasi background */
 .hero-tunggakan::before {
   content: '';
   position: absolute;
   top: -20px; right: -20px;
   width: 100px; height: 100px;
-  background: radial-gradient(circle, rgba(14,165,166,0.1) 0%, transparent 70%);
+  /* Lingkaran putih transparan */
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
   border-radius: 50%;
 }
 
 .hero-content h3 {
   font-size: 0.75em;
   letter-spacing: 1px;
-  color: var(--muted);
+  /* Warna putih agak transparan */
+  color: rgba(255, 255, 255, 0.85);
   margin: 0 0 6px 0;
   text-transform: uppercase;
   font-weight: 700;
@@ -106,9 +98,10 @@ body {
 
 .hero-content p {
   margin: 0;
-  font-size: 0.85em;
-  color: var(--accent);
-  font-weight: 600;
+  font-size: 0.9em;
+  /* Warna putih solid */
+  color: #ffffff;
+  font-weight: 700;
 }
 
 .hero-tunggakan-value {
@@ -120,17 +113,24 @@ body {
   font-family: 'Syne', sans-serif;
   font-size: 1.6em;
   font-weight: 800;
-  color: var(--text);
+  /* Warna putih solid */
+  color: #ffffff;
   display: block;
+  margin-bottom: 4px;
 }
 
+/* Badge Status (Aman/Telat) */
 .hero-tunggakan-value small {
-  font-size: 0.8em;
-  color: var(--danger);
-  font-weight: 600;
-  background: rgba(239, 68, 68, 0.1);
-  padding: 4px 8px;
-  border-radius: 8px;
+  font-size: 0.75em;
+  font-weight: 700;
+  /* Background Putih agar kontras dengan kartu biru */
+  background: #ffffff;
+  /* Teks mengikuti warna aksen (atau merah jika nanti di-set JS) */
+  color: var(--accent); 
+  padding: 4px 10px;
+  border-radius: 99px;
+  display: inline-block;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .divider {
@@ -147,6 +147,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  color: var(--text);
 }
 
 .icon-grid {
@@ -187,14 +188,14 @@ body {
   margin: 0;
 }
 
-/* Highlight Khusus */
+/* Highlight Khusus SOS */
 .sos-card {
-  background: #fff5f5; /* Merah sangat muda */
+  background: #fff5f5;
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 .sos-card p { color: var(--danger); }
 
-/* ================= FLOATING BOTTOM NAV (SAMA PERSIS DENGAN FC) ================= */
+/* ================= BOTTOM NAV ================= */
 footer.bottom-nav {
   position: fixed;
   left: 50%;
@@ -237,11 +238,6 @@ footer.bottom-nav {
   font-weight: 700;
 }
 .nav-item.active span {
-  /* Hilangkan bulatan background biru tua lama, ganti style minimalis */
-  background: none;
-  width: auto; height: auto;
-  border-radius: 0;
-  margin: 0 0 2px 0;
   transform: scale(1.1);
 }
 
@@ -253,8 +249,6 @@ footer.bottom-nav {
 <div class="app-container">
 
 <header class="header">
-  <a href="admin_login.html" class="admin-link">ADMIN</a>
-
   <div class="user-info">
     <h1 id="user-name-display">Halo User</h1>
     <p>Plat Motor <strong id="user-plate-display">Loading...</strong></p>
@@ -307,11 +301,8 @@ footer.bottom-nav {
 </footer>
 
 <script>
-/* JS KAMU BIARIN PERSIS DI SINI, GA ADA YANG DIHAPUS */
-
-// Script Dummy agar tampilan tidak kosong saat di-preview tanpa login (Opsional)
+/* JS LOGIC BIARKAN SEPERTI SEMULA */
 document.addEventListener("DOMContentLoaded", function() {
-    // Cek apakah ada data user di localStorage, jika tidak ada pakai dummy
     const user = JSON.parse(localStorage.getItem('maka_user'));
     if(user) {
         document.getElementById('user-name-display').innerText = "Halo, " + user.nama.split(" ")[0];
