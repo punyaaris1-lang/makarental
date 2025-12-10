@@ -16,6 +16,7 @@
   --accent: #0ea5a6;
   --accent-2: #06b6d4;
   --text: #0f1724;
+  --danger: #ef4444;
   --radius-lg: 24px;
   --radius-md: 14px;
   --card-shadow: 0 20px 40px rgba(15,23,42,0.08);
@@ -32,7 +33,7 @@ body {
   color: var(--text);
   min-height: 100vh;
   display: flex;
-  align-items: center; /* Center Vertikal */
+  align-items: center;
   justify-content: center;
 }
 
@@ -42,14 +43,15 @@ body {
   padding: 24px;
 }
 
-/* CARD LOGIN */
-.login-card {
+/* CARD LAYOUT */
+.auth-card {
   background: var(--surface);
   border-radius: var(--radius-lg);
   padding: 32px 24px;
   box-shadow: var(--card-shadow);
   border: 1px solid rgba(255,255,255,0.6);
-  text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 /* HEADINGS */
@@ -59,26 +61,64 @@ body {
   font-weight: 800;
   color: var(--text);
   margin: 0 0 8px 0;
+  text-align: center;
   letter-spacing: -0.5px;
 }
 .brand-subtitle {
   color: var(--muted);
   font-size: 14px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
-/* FORM ELEMENTS */
+/* TABS TOGGLE */
+.tabs {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.tab-btn.active {
+  background: white;
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* FORMS */
+.form-view {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+.form-view.active {
+  display: block;
+}
+
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   text-align: left;
 }
 
 label {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--muted);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   padding-left: 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -86,16 +126,16 @@ label {
 
 input, select {
   width: 100%;
-  padding: 16px;
+  padding: 14px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background: var(--input-bg);
   font-family: 'Inter', sans-serif;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--text);
   outline: none;
   transition: 0.2s;
-  appearance: none; /* Hilangkan panah default select di beberapa browser */
+  appearance: none;
 }
 
 input:focus, select:focus {
@@ -105,22 +145,14 @@ input:focus, select:focus {
 }
 
 /* Custom Select Arrow */
-.select-wrapper {
-  position: relative;
-}
+.select-wrapper { position: relative; }
 .select-wrapper::after {
-  content: '▼';
-  font-size: 10px;
-  color: var(--muted);
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
+  content: '▼'; font-size: 10px; color: var(--muted);
+  position: absolute; right: 16px; top: 50%; transform: translateY(-50%); pointer-events: none;
 }
 
-/* BUTTON */
-button.btn-login {
+/* BUTTONS */
+.btn-primary {
   width: 100%;
   margin-top: 12px;
   padding: 16px;
@@ -132,23 +164,20 @@ button.btn-login {
   font-weight: 800;
   cursor: pointer;
   box-shadow: 0 10px 20px rgba(6, 182, 212, 0.2);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s;
+}
+.btn-primary:active { transform: scale(0.98); }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-button.btn-login:active {
-  transform: scale(0.98);
-  box-shadow: 0 4px 10px rgba(6, 182, 212, 0.15);
-}
-
-.footer-link {
-  margin-top: 24px;
-  font-size: 13px;
+.helper-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 12px;
   color: var(--muted);
-}
-.footer-link a {
-  color: var(--accent);
-  text-decoration: none;
-  font-weight: 700;
 }
 </style>
 </head>
@@ -156,81 +185,138 @@ button.btn-login:active {
 <body>
 
 <div class="app-container">
-  <div class="login-card">
-    <div class="brand-title">Login MAKA</div>
-    <div class="brand-subtitle">Silakan masuk untuk melanjutkan</div>
+  <div class="auth-card">
+    <div class="brand-title">MAKA App</div>
+    <div class="brand-subtitle">Kelola sewa motor Anda dengan mudah</div>
 
-    <div class="form-group">
-      <label>Nama User</label>
-      <input id="nama" type="text" placeholder="Masukkan nama lengkap">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('login')">MASUK</button>
+      <button class="tab-btn" onclick="switchTab('register')">DAFTAR BARU</button>
     </div>
 
-    <div class="form-group">
-      <label>Plat Nomor</label>
-      <input id="plat" type="text" placeholder="Contoh: B 1234 ABC">
-    </div>
-
-    <div class="form-group">
-      <label>Tanggal Ambil Motor</label>
-      <input id="tanggalAmbil" type="date">
-    </div>
-
-    <div class="form-group">
-      <label>Opsi DP</label>
-      <div class="select-wrapper">
-        <select id="dp">
-          <option value="355">DP 355.000 (Cicil)</option>
-          <option value="755">DP 755.000 (Langsung)</option>
-        </select>
+    <div id="view-login" class="form-view active">
+      <div class="form-group">
+        <label>Plat Nomor</label>
+        <input id="l-plat" type="text" placeholder="Contoh: B 1234 XYZ">
       </div>
+      <button class="btn-primary" onclick="handleLogin()">MASUK</button>
+      <div class="helper-text">Masukkan plat nomor yang terdaftar</div>
     </div>
 
-    <button class="btn-login" onclick="loginUser()">MASUK SEKARANG</button>
+    <div id="view-register" class="form-view">
+      <div class="form-group">
+        <label>Nama Lengkap</label>
+        <input id="r-nama" type="text" placeholder="Sesuai KTP">
+      </div>
+      
+      <div class="form-group">
+        <label>Nomor HP</label>
+        <input id="r-hp" type="tel" placeholder="08xxxxxxxxxx">
+      </div>
 
-    <div class="footer-link">
-      Belum punya akun? <a href="daftar_antrian.html">Daftar Antrian</a>
+      <div class="form-group">
+        <label>Plat Nomor</label>
+        <input id="r-plat" type="text" placeholder="Contoh: B 1234 XYZ">
+      </div>
+
+      <div class="form-group">
+        <label>Tanggal Ambil Motor</label>
+        <input id="r-tgl" type="date">
+      </div>
+
+      <div class="form-group">
+        <label>Opsi DP</label>
+        <div class="select-wrapper">
+          <select id="r-dp">
+            <option value="355">DP 355.000 (Cicil)</option>
+            <option value="755">DP 755.000 (Langsung)</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="handleRegister()">DAFTAR & MASUK</button>
     </div>
+
   </div>
 </div>
 
 <script>
-/* ================= DATABASE LOCAL ================= */
+/* ================= LOGIC ================= */
+
+function switchTab(mode) {
+  // Update Buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+
+  // Update Views
+  document.querySelectorAll('.form-view').forEach(view => view.classList.remove('active'));
+  document.getElementById('view-' + mode).classList.add('active');
+}
+
 function saveUser(data){
   localStorage.setItem('maka_user', JSON.stringify(data));
 }
 
-/* ================= LOGIN LOGIC ================= */
-function loginUser(){
-  const nama = document.getElementById('nama').value.trim();
-  const plat = document.getElementById('plat').value.trim();
-  const tanggalAmbil = document.getElementById('tanggalAmbil').value;
-  const dp = document.getElementById('dp').value;
+function handleRegister() {
+  const nama = document.getElementById('r-nama').value.trim();
+  const hp = document.getElementById('r-hp').value.trim();
+  const plat = document.getElementById('r-plat').value.trim().toUpperCase();
+  const tgl = document.getElementById('r-tgl').value;
+  const dp = document.getElementById('r-dp').value;
 
-  if(!nama || !plat || !tanggalAmbil){
-    alert('Harap lengkapi semua data login.');
+  if(!nama || !hp || !plat || !tgl) {
+    alert('Harap lengkapi semua data pendaftaran.');
     return;
   }
 
   const user = {
     nama: nama,
-    plat: plat.toUpperCase(), // Auto uppercase biar rapi
-    tanggalAmbil: tanggalAmbil,
+    hp: hp,
+    plat: plat,
+    tanggalAmbil: tgl,
     dp: dp,
-    dpTerbayar: 0,
     makaPlus: false,
     makaPlusAktifSejak: null
   };
 
   saveUser(user);
   
-  // Efek visual sedikit sebelum pindah
-  const btn = document.querySelector('.btn-login');
-  btn.innerText = "MEMPROSES...";
-  btn.style.opacity = "0.7";
-  
+  const btn = document.querySelector('#view-register .btn-primary');
+  btn.innerText = "MENYIMPAN...";
   setTimeout(() => {
-      window.location.href = 'dashboard.html';
+    alert("Pendaftaran Berhasil!");
+    window.location.href = 'dashboard.html';
   }, 500);
+}
+
+function handleLogin() {
+  const inputPlat = document.getElementById('l-plat').value.trim().toUpperCase();
+  
+  if(!inputPlat) {
+    alert("Masukkan Plat Nomor.");
+    return;
+  }
+
+  // Cek Data LocalStorage
+  const storedUser = JSON.parse(localStorage.getItem('maka_user'));
+
+  if(storedUser && storedUser.plat === inputPlat) {
+    const btn = document.querySelector('#view-login .btn-primary');
+    btn.innerText = "MEMERIKSA...";
+    setTimeout(() => {
+        window.location.href = 'dashboard.html';
+    }, 500);
+  } else {
+    // Jika tidak ada data di localstorage (demo mode), kita anggap user belum daftar
+    if(!storedUser) {
+        alert("Data tidak ditemukan di HP ini. Silakan Daftar Baru.");
+        switchTab('register');
+        // Auto fill plat di form register biar user ga ngetik ulang
+        document.getElementById('r-plat').value = inputPlat;
+    } else {
+        alert("Plat nomor tidak cocok dengan data yang tersimpan di HP ini.");
+    }
+  }
 }
 </script>
 
