@@ -4,89 +4,135 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MAKA Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* CSS SAMA SEPERTI SEBELUMNYA (PREMIUM GLASS) */
-:root { --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; --danger:#ef4444; --glass-bg:rgba(255,255,255,0.65); --glass-border:rgba(255,255,255,0.4); --glass-shadow:0 8px 32px 0 rgba(31,38,135,0.15); --backdrop-blur:blur(12px); --radius-lg:24px; --max-width:520px; }
-body { margin:0; font-family:'Inter'; background:var(--bg-base); color:var(--text); min-height:100vh; position:relative; }
+/* --- GLOBAL THEME --- */
+:root { --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; --danger:#ef4444; --radius-lg:24px; --max-width:520px; }
+body { margin:0; font-family:'Inter', sans-serif; background:var(--bg-base); color:var(--text); min-height:100vh; padding-bottom:100px; }
 body::before { content:""; position:fixed; inset:0; background:url('1763947427555.jpg') center/cover; opacity:0.15; z-index:-1; pointer-events:none; }
-.app-container { max-width:var(--max-width); margin:0 auto; padding:20px 20px 120px; }
-.glass-card { background:var(--glass-bg); box-shadow:var(--glass-shadow); backdrop-filter:var(--backdrop-blur); -webkit-backdrop-filter:var(--backdrop-blur); border-radius:var(--radius-lg); border:1px solid var(--glass-border); }
-.header { margin-bottom:24px; }
-.profile-section { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
-.profile-pic { width:55px; height:55px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:18px; display:flex; align-items:center; justify-content:center; color:white; font-family:'Syne'; font-size:1.5em; font-weight:800; }
-.hero-tunggakan { background:linear-gradient(135deg,rgba(6,182,212,0.9),rgba(14,165,166,0.9)); padding:24px; display:flex; justify-content:space-between; align-items:center; color:white; border-radius:var(--radius-lg); position:relative; overflow:hidden; }
-.hero-tunggakan span { font-family:'Syne'; font-size:1.6em; font-weight:800; display:block; }
-.icon-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:20px; }
-.icon-item { padding:18px 10px; text-align:center; display:flex; flex-direction:column; align-items:center; text-decoration:none; }
-.icon-item span { font-size:28px; margin-bottom:10px; }
-.icon-item p { font-size:0.75em; color:var(--text); font-weight:600; margin:0; }
-.sos-card { background:rgba(255,245,245,0.7)!important; border:1px solid rgba(239,68,68,0.3)!important; }
-footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:calc(100% - 40px); max-width:480px; background:rgba(255,255,255,0.8); backdrop-filter:blur(16px); border-radius:999px; padding:12px 20px; display:flex; justify-content:space-around; z-index:999; }
-.nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#64748b; font-size:11px; }
-.nav-item.active { color:var(--accent); font-weight:700; }
+.app-container { max-width:var(--max-width); margin:0 auto; padding:20px 20px 100px; }
 
-/* MODAL SOS ALARM */
-.sos-overlay { position:fixed; inset:0; background:rgba(239,68,68,0.9); z-index:9999; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:white; animation:pulseRed 1s infinite; }
-@keyframes pulseRed { 0%{opacity:1} 50%{opacity:0.8} 100%{opacity:1} }
-.sos-overlay h1 { font-family:'Syne'; font-size:3em; margin:0; }
-.sos-btn-close { margin-top:30px; padding:15px 30px; background:white; color:red; border:none; border-radius:30px; font-weight:bold; font-size:1.2em; }
+/* --- HEADER & PROFILE --- */
+.header { margin-bottom:20px; }
+.profile-section { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
+.profile-pic { 
+    width:50px; height:50px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); 
+    border-radius:14px; display:flex; align-items:center; justify-content:center; 
+    color:white; font-family:'Syne'; font-size:1.4em; font-weight:800; box-shadow:0 4px 15px rgba(14,165,166,0.3);
+}
+.user-text h1 {
+    /* FONT NAMA DIGANTI KE INTER (Lebih Rapi) & SIZE 1.2em AGAR 1 BARIS */
+    font-family: 'Inter', sans-serif; font-size: 1.2em; font-weight: 700;
+    margin: 0; color: var(--text); line-height: 1.1; letter-spacing: -0.5px;
+}
+.user-text p { color:#64748b; font-size:0.85em; margin:2px 0 0; }
+
+/* --- HERO CARD --- */
+.hero-tunggakan {
+    background:linear-gradient(135deg,rgba(6,182,212,0.95),rgba(14,165,166,0.95)); padding:20px;
+    display:flex; justify-content:space-between; align-items:center; color:white;
+    border-radius:20px; position:relative; overflow:hidden; box-shadow:0 10px 30px rgba(14,165,166,0.25);
+}
+.hero-tunggakan span { font-family:'Syne'; font-size:1.5em; font-weight:800; display:block; }
+
+/* --- SECTION TITLE --- */
+.section-title {
+    /* GANTI TEXT FITUR PREMIUM JADI MLU | MAU APE LU DGN FONT SYNE */
+    font-family: 'Syne', sans-serif; font-size: 1.1em; font-weight: 800;
+    margin: 25px 0 15px; color: var(--text); display: flex; align-items: center; gap: 8px;
+}
+
+/* --- ICON GRID --- */
+.icon-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.glass-card {
+    background:rgba(255,255,255,0.7); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,0.5); box-shadow:0 4px 20px rgba(0,0,0,0.05); border-radius:18px;
+}
+.icon-item { padding:15px 5px; text-align:center; display:flex; flex-direction:column; align-items:center; text-decoration:none; transition:0.2s; }
+.icon-item:active { transform:scale(0.95); background:rgba(255,255,255,0.9); }
+.icon-item span { font-size:24px; margin-bottom:8px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+.icon-item p { font-size:0.7em; color:var(--text); font-weight:600; margin:0; }
+.sos-card { background:rgba(255,230,230,0.8)!important; border:1px solid rgba(239,68,68,0.2)!important; }
+
+/* --- FOOTER NAV (UKURAN DIKEMBALIKAN KECIL) --- */
+footer.bottom-nav {
+    position:fixed; bottom:15px; left:50%; transform:translateX(-50%);
+    width:calc(100% - 40px); max-width:400px; /* Max width diperkecil */
+    background:rgba(255,255,255,0.9); backdrop-filter:blur(20px);
+    border-radius:50px; /* Lebih bulat (Pill Shape) */
+    padding:10px 20px; /* Padding diperkecil */
+    display:flex; justify-content:space-between; align-items:center;
+    box-shadow:0 10px 40px rgba(0,0,0,0.1); border:1px solid rgba(255,255,255,0.5); z-index:999;
+}
+.nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#94a3b8; font-size:9px; font-weight:600; transition:0.2s; }
+.nav-item span { font-size:18px; margin-bottom:2px; } /* Icon diperkecil */
+.nav-item.active { color:var(--accent); }
+.nav-item.active span { transform:translateY(-2px); filter:drop-shadow(0 4px 10px rgba(14,165,166,0.4)); }
+
+/* --- CUSTOM MODAL PREMIUM (PENGGANTI ALERT) --- */
+.modal-overlay {
+    position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);
+    z-index:9999; display:none; align-items:center; justify-content:center;
+    opacity:0; transition:opacity 0.3s;
+}
+.modal-overlay.show { display:flex; opacity:1; }
+.modal-box {
+    background:white; width:85%; max-width:320px; padding:25px; border-radius:24px;
+    text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-overlay.show .modal-box { transform:scale(1); }
+.modal-icon { font-size:40px; margin-bottom:15px; display:block; }
+.modal-title { font-family:'Syne'; font-size:1.4em; font-weight:800; margin:0 0 10px; color:var(--text); }
+.modal-desc { font-size:0.9em; color:#64748b; line-height:1.5; margin-bottom:20px; }
+.modal-btns { display:flex; gap:10px; justify-content:center; }
+.btn-modal { 
+    flex:1; padding:12px; border-radius:12px; border:none; font-weight:700; cursor:pointer; font-size:0.9em;
+}
+.btn-cancel { background:#f1f5f9; color:#64748b; }
+.btn-confirm { background:var(--text); color:white; }
+.btn-danger { background:var(--danger); color:white; box-shadow:0 5px 15px rgba(239,68,68,0.3); }
 </style>
 </head>
 <body class="dashboard">
 
-<div id="sosScreen" class="sos-overlay">
-    <div style="font-size:80px;">🚨</div>
-    <h1>DARURAT!</h1>
-    <p id="sosMsg" style="font-size:1.2em; max-width:80%;">Ada user butuh bantuan!</p>
-    <button class="sos-btn-close" onclick="closeSos()">SAYA MENGERTI</button>
-</div>
-
 <div class="app-container">
-<header class="header">
-  <div class="profile-section">
-    <div style="display:flex; gap:16px; align-items:center;">
-        <div class="profile-pic" id="user-avatar">U</div>
-        <div>
-            <h1 id="user-name-display" style="margin:0; font-family:'Syne'; font-size:1.2em;">Halo User</h1>
-            <p id="user-plate-display" style="margin:4px 0 0; color:#64748b; font-size:0.9em;">...</p>
+    <header class="header">
+        <div class="profile-section">
+            <div class="profile-pic" id="user-avatar">U</div>
+            <div class="user-text">
+                <h1 id="user-name-display">Halo...</h1>
+                <p id="user-plate-display">Loading...</p>
+            </div>
         </div>
-    </div>
-  </div>
 
-  <div class="hero-tunggakan glass-card">
-    <div>
-      <h3 style="margin:0 0 6px; font-size:0.75em; opacity:0.9;">TAGIHAN BULAN INI</h3>
-      <p style="margin:0; font-size:0.9em;">Total Yang Harus Dibayar</p>
-    </div>
-    <div style="text-align:right;">
-      <span id="hero-tunggakan-nominal">Rp 0</span>
-      <small id="hero-status-badge" style="background:white; color:var(--accent); padding:4px 10px; border-radius:20px; font-size:0.75em; font-weight:700;">Aman</small>
-    </div>
-  </div>
-</header>
+        <div class="hero-tunggakan">
+            <div>
+                <small style="opacity:0.8; font-size:0.75em; font-weight:700; letter-spacing:1px;">TAGIHAN BULAN INI</small>
+                <div style="margin-top:5px; font-size:0.85em; opacity:0.9;">Total yang harus dibayar</div>
+            </div>
+            <div style="text-align:right;">
+                <span id="hero-tunggakan-nominal">Rp 0</span>
+                <div id="hero-status-badge" style="background:white; color:var(--accent); font-size:0.7em; font-weight:800; padding:4px 10px; border-radius:20px; display:inline-block; margin-top:5px;">Aman</div>
+            </div>
+        </div>
+    </header>
 
-<section class="icon-grid-section">
-  <h2 style="font-family:'Syne'; color:var(--text);">✨MLU | Mau Ape Lu</h2>
-  <div class="icon-grid">
-    <a href="calendar.html" class="icon-item glass-card"><span>📅</span><p>Bayar</p></a>
-    <a href="history.html" class="icon-item glass-card"><span>🗒️</span><p>Riwayat</p></a>
-    <a href="part_tracker.html" class="icon-item glass-card"><span>🎁</span><p>Gratisan</p></a>
-    <a href="info_mlu.html" class="icon-item glass-card"><span>📰</span><p>Info</p></a>
-    <a href="tips_maka.html" class="icon-item glass-card"><span>💡</span><p>Tips</p></a>
-    <a href="#" onclick="window.open('https://etle-pmj.info','_blank')" class="icon-item glass-card"><span>🚓</span><p>ETLE</p></a>
-    <a href="settings.html" class="icon-item glass-card"><span>⚙️</span><p>Setting</p></a>
-    <a href="maka_plus.html" class="icon-item glass-card"><span>⭐</span><p>MAKA+</p></a>
-    
-    <div class="icon-item glass-card sos-card" onclick="triggerSOS()">
-        <span>🚨</span><p style="color:var(--danger);">SOS</p>
+    <h2 class="section-title">✨ MLU | Mau Ape Lu</h2>
+    <div class="icon-grid">
+        <a href="calendar.html" class="icon-item glass-card"><span>📅</span><p>Bayar</p></a>
+        <a href="history.html" class="icon-item glass-card"><span>🗒️</span><p>Riwayat</p></a>
+        <a href="part_tracker.html" class="icon-item glass-card"><span>🎁</span><p>Gratisan</p></a>
+        <a href="info_mlu.html" class="icon-item glass-card"><span>📰</span><p>Info</p></a>
+        <a href="tips_maka.html" class="icon-item glass-card"><span>💡</span><p>Tips</p></a>
+        <a href="#" onclick="window.open('https://etle-pmj.info','_blank')" class="icon-item glass-card"><span>🚓</span><p>ETLE</p></a>
+        <a href="settings.html" class="icon-item glass-card"><span>⚙️</span><p>Setting</p></a>
+        <a href="maka_plus.html" class="icon-item glass-card"><span>⭐</span><p>MAKA+</p></a>
+        <div class="icon-item glass-card sos-card" onclick="triggerSOS()"><span>🚨</span><p style="color:var(--danger)">SOS</p></div>
     </div>
-  </div>
-</section>
 </div>
 
 <footer class="bottom-nav">
@@ -94,6 +140,16 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
   <a href="dashboard.html" class="nav-item active"><span>🏠</span>Home</a>
   <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
 </footer>
+
+<div id="customModal" class="modal-overlay">
+    <div class="modal-box">
+        <span id="mIcon" class="modal-icon">🔔</span>
+        <h3 id="mTitle" class="modal-title">Judul</h3>
+        <p id="mDesc" class="modal-desc">Keterangan...</p>
+        <div id="mBtns" class="modal-btns">
+            </div>
+    </div>
+</div>
 
 <script>
 // --- CONFIG FIREBASE ---
@@ -110,90 +166,109 @@ const db = firebase.firestore();
 
 let currentUser = JSON.parse(localStorage.getItem('maka_user'));
 
+// --- MODAL SYSTEM ---
+function showModal(type, title, desc, onConfirm) {
+    const modal = document.getElementById('customModal');
+    document.getElementById('mTitle').innerText = title;
+    document.getElementById('mDesc').innerText = desc;
+    
+    const btnContainer = document.getElementById('mBtns');
+    btnContainer.innerHTML = ''; // Reset buttons
+
+    if (type === 'alert') {
+        document.getElementById('mIcon').innerText = "ⓘ";
+        btnContainer.innerHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK</button>`;
+    } else if (type === 'confirm') {
+        document.getElementById('mIcon').innerText = "🤔";
+        const btnYes = document.createElement('button');
+        btnYes.className = 'btn-modal btn-confirm';
+        btnYes.innerText = "Ya, Lanjutkan";
+        btnYes.onclick = function() { closeModal(); onConfirm(); };
+        
+        const btnNo = document.createElement('button');
+        btnNo.className = 'btn-modal btn-cancel';
+        btnNo.innerText = "Batal";
+        btnNo.onclick = closeModal;
+        
+        btnContainer.appendChild(btnNo);
+        btnContainer.appendChild(btnYes);
+    } else if (type === 'sos') {
+        document.getElementById('mIcon').innerText = "🚨";
+        const btnYes = document.createElement('button');
+        btnYes.className = 'btn-modal btn-danger';
+        btnYes.innerText = "KIRIM SOS SEKARANG";
+        btnYes.onclick = function() { closeModal(); onConfirm(); };
+        
+        const btnNo = document.createElement('button');
+        btnNo.className = 'btn-modal btn-cancel';
+        btnNo.innerText = "Batal";
+        btnNo.onclick = closeModal;
+        
+        btnContainer.appendChild(btnNo);
+        btnContainer.appendChild(btnYes);
+    }
+
+    modal.classList.add('show');
+}
+
+function closeModal() {
+    document.getElementById('customModal').classList.remove('show');
+}
+
+// --- MAIN LOGIC ---
 document.addEventListener("DOMContentLoaded", function() {
     if(!currentUser) { window.location.href='index.html'; return; }
 
-    // Render User Data
     document.getElementById('user-name-display').innerText = "Halo, " + currentUser.nama;
     document.getElementById('user-plate-display').innerText = currentUser.plat;
     document.getElementById('user-avatar').innerText = currentUser.nama.charAt(0).toUpperCase();
 
-    // Request Izin Notifikasi
-    if ("Notification" in window) Notification.requestPermission();
-
+    // Hitung Tagihan
     calculateLocalBill();
 
-    // 1. LISTEN NOTIFIKASI BROADCAST DARI ADMIN
-    // Jika admin kirim pesan di admin_user.html
-    const now = new Date();
-    const oneMinAgo = new Date(now.getTime() - 60000).toISOString();
-
-    db.collection('broadcasts')
-      .where('timestamp', '>', firebase.firestore.Timestamp.now()) // Listen yg baru aja
+    // Listen Tagihan Online
+    db.collection('invoices').where('plat', '==', currentUser.plat).where('status', '==', 'unpaid')
       .onSnapshot((snapshot) => {
-          snapshot.docChanges().forEach((change) => {
-              if (change.type === "added") {
-                  const data = change.doc.data();
-                  // Tampilkan Notifikasi Sistem
-                  if (Notification.permission === "granted") {
-                      navigator.vibrate([200, 100, 200]);
-                      new Notification(data.title, {
-                          body: data.body,
-                          icon: 'https://cdn-icons-png.flaticon.com/512/3602/3602145.png' // Icon Lonceng
-                      });
-                  } else {
-                      alert("🔔 " + data.title + "\n" + data.body);
-                  }
-              }
-          });
+          let totalOnline = 0;
+          snapshot.forEach(doc => totalOnline += parseInt(doc.data().amount));
+          if(totalOnline > 0) {
+              const cur = parseInt(document.getElementById('hero-tunggakan-nominal').innerText.replace(/\D/g,'')) || 0;
+              document.getElementById('hero-tunggakan-nominal').innerText = "Rp " + (cur + totalOnline).toLocaleString('id-ID');
+              document.getElementById('hero-status-badge').innerText = "Ada Tagihan";
+              document.getElementById('hero-status-badge').style.color = "var(--danger)";
+          }
       });
-
-    // 2. LISTEN SOS (SAMA SEPERTI SEBELUMNYA)
-    db.collection('sos_alerts')
-      .where('timestamp', '>', oneMinAgo)
-      .onSnapshot((snapshot) => {
-          snapshot.docChanges().forEach((change) => {
-              if (change.type === "added") {
-                  const data = change.doc.data();
-                  if (data.plat !== currentUser.plat) {
-                      showSosScreen(data.plat, data.msg);
-                  }
-              }
-          });
-      });
+      
+    // Listen SOS (Broadcast)
+    const oneMinAgo = new Date(Date.now() - 60000).toISOString();
+    db.collection('sos_alerts').where('timestamp', '>', oneMinAgo).onSnapshot(snap => {
+        snap.docChanges().forEach(c => {
+            if(c.type === 'added' && c.doc.data().plat !== currentUser.plat) {
+                showModal('alert', 'DARURAT!', `User ${c.doc.data().plat} butuh bantuan: "${c.doc.data().msg}"`);
+                if(navigator.vibrate) navigator.vibrate([1000,500,1000]);
+            }
+        });
+    });
 });
 
 function calculateLocalBill() {
-    // HARGA DASAR SUDAH 70.000
     const today = new Date(); today.setHours(0,0,0,0);
-    let bill = 70000; 
-    
-    // Cek Cicilan MAKA+
+    let bill = 70000; // Dasar 70rb
     const plusData = JSON.parse(localStorage.getItem('maka_plus_data'));
-    if(plusData && plusData.active) {
-        bill += 10000; // Jadi 80rb
-    }
+    if(plusData && plusData.active) bill += 10000;
     document.getElementById('hero-tunggakan-nominal').innerText = "Rp " + bill.toLocaleString('id-ID');
 }
 
-// KIRIM SOS
 function triggerSOS() {
-    if(!confirm("⚠️ PANGGILAN DARURAT ⚠️\n\nIni akan mengirim alarm ke SEMUA user yang sedang online. Lanjutkan?")) return;
-    const msg = prompt("Tulis pesan singkat:", "Darurat!");
-    if(!msg) return;
-
-    db.collection('sos_alerts').add({
-        plat: currentUser.plat, nama: currentUser.nama, msg: msg,
-        timestamp: new Date().toISOString()
-    }).then(() => { alert("SOS Terkirim!"); });
+    showModal('sos', 'Panggilan Darurat', 'Alarm akan dikirim ke SEMUA user yang sedang online. Gunakan hanya saat darurat!', () => {
+        const msg = prompt("Pesan singkat (Cth: Ban bocor di...)", "Darurat!");
+        if(msg) {
+            db.collection('sos_alerts').add({
+                plat: currentUser.plat, nama: currentUser.nama, msg: msg, timestamp: new Date().toISOString()
+            }).then(() => alert("SOS Terkirim!"));
+        }
+    });
 }
-
-function showSosScreen(plat, msg) {
-    document.getElementById('sosMsg').innerHTML = `User <b>${plat}</b> butuh bantuan:<br>"${msg}"`;
-    document.getElementById('sosScreen').style.display = 'flex';
-    if(navigator.vibrate) navigator.vibrate([1000, 500, 1000]);
-}
-function closeSos() { document.getElementById('sosScreen').style.display = 'none'; }
 </script>
 </body>
 </html>
