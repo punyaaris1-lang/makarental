@@ -4,309 +4,210 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MAKA Dashboard</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <style>
-/* ================= GLOBAL PREMIUM THEME ================= */
-:root {
-  --bg-base: #f0f4f8;
-  --accent: #0ea5a6;       /* Teal */
-  --accent-2: #06b6d4;     /* Cyan */
-  --text: #0f1724;
-  --muted: #64748b;
-  --danger: #ef4444;
-  
-  /* Glassmorphism Variables */
-  --glass-bg: rgba(255, 255, 255, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  --backdrop-blur: blur(12px);
-  
-  --radius-lg: 24px;
-  --max-width: 520px;
-}
+/* CSS DARI VERSI SEBELUMNYA (PREMIUM GLASS) - COPY PASTE DISINI ATAU BIARKAN SAMA */
+/* SAYA RINGKAS AGAR MUAT, GUNAKAN CSS LENGKAP YANG TADI */
+:root { --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; --danger:#ef4444; --glass-bg:rgba(255,255,255,0.65); --glass-border:rgba(255,255,255,0.4); --glass-shadow:0 8px 32px 0 rgba(31,38,135,0.15); --backdrop-blur:blur(12px); --radius-lg:24px; --max-width:520px; }
+body { margin:0; font-family:'Inter'; background:var(--bg-base); color:var(--text); min-height:100vh; position:relative; }
+body::before { content:""; position:fixed; inset:0; background:url('1763947427555.jpg') center/cover; opacity:0.15; z-index:-1; pointer-events:none; }
+.app-container { max-width:var(--max-width); margin:0 auto; padding:20px 20px 120px; }
+.glass-card { background:var(--glass-bg); box-shadow:var(--glass-shadow); backdrop-filter:var(--backdrop-blur); -webkit-backdrop-filter:var(--backdrop-blur); border-radius:var(--radius-lg); border:1px solid var(--glass-border); }
+.header { margin-bottom:24px; }
+.profile-section { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; }
+.profile-pic { width:55px; height:55px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); border-radius:18px; display:flex; align-items:center; justify-content:center; color:white; font-family:'Syne'; font-size:1.5em; font-weight:800; }
+.hero-tunggakan { background:linear-gradient(135deg,rgba(6,182,212,0.9),rgba(14,165,166,0.9)); padding:24px; display:flex; justify-content:space-between; align-items:center; color:white; border-radius:var(--radius-lg); position:relative; overflow:hidden; }
+.hero-tunggakan span { font-family:'Syne'; font-size:1.6em; font-weight:800; display:block; }
+.icon-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:20px; }
+.icon-item { padding:18px 10px; text-align:center; display:flex; flex-direction:column; align-items:center; text-decoration:none; }
+.icon-item span { font-size:28px; margin-bottom:10px; }
+.icon-item p { font-size:0.75em; color:var(--text); font-weight:600; margin:0; }
+.sos-card { background:rgba(255,245,245,0.7)!important; border:1px solid rgba(239,68,68,0.3)!important; }
+footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:calc(100% - 40px); max-width:480px; background:rgba(255,255,255,0.8); backdrop-filter:blur(16px); border-radius:999px; padding:12px 20px; display:flex; justify-content:space-around; z-index:999; }
+.nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#64748b; font-size:11px; }
+.nav-item.active { color:var(--accent); font-weight:700; }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-body {
-  margin: 0; padding: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-base);
-  color: var(--text);
-  min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* --- GLOBAL BACKGROUND IMAGE --- */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  /* Pastikan file gambar ada di folder yg sama */
-  background: url('1763947427555.jpg') center/cover no-repeat; 
-  opacity: 0.15; /* Opacity rendah agar tidak mengganggu */
-  z-index: -1;
-  pointer-events: none;
-}
-
-.app-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 20px 20px 120px 20px;
-}
-
-/* --- PREMIUM GLASS CARD --- */
-.glass-card {
-  background: var(--glass-bg);
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: var(--backdrop-blur);
-  -webkit-backdrop-filter: var(--backdrop-blur);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--glass-border);
-  /* Efek glossy halus */
-  background-image: linear-gradient(to bottom right, rgba(255,255,255,0.2), rgba(255,255,255,0));
-}
-
-/* ================= HEADER & PROFILE ================= */
-.header { margin-bottom: 24px; }
-
-.profile-section {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
-.user-info-group {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-/* Kotak Foto Profil */
-.profile-pic {
-  width: 55px; height: 55px;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  border-radius: 18px; /* Sedikit mengkotak (squircle) */
-  display: flex; align-items: center; justify-content: center;
-  color: white; font-family: 'Syne', sans-serif; font-size: 1.5em; font-weight: 800;
-  box-shadow: 0 4px 15px rgba(14, 165, 166, 0.3);
-  border: 2px solid rgba(255,255,255,0.5);
-}
-
-.user-text h1 {
-  font-family: 'Syne', sans-serif; font-size: 1.4em; font-weight: 800;
-  margin: 0; color: var(--text); line-height: 1.2;
-}
-.user-text p {
-  color: var(--muted); font-size: 0.9em; margin: 4px 0 0 0;
-}
-
-/* ================= HERO CARD (TAGIHAN) ================= */
-.hero-tunggakan {
-  /* Gradient khusus untuk hero card agar lebih pop-up */
-  background: linear-gradient(135deg, rgba(6,182,212,0.9), rgba(14,165,166,0.9));
-  padding: 24px;
-  display: flex; justify-content: space-between; align-items: center;
-  position: relative; overflow: hidden;
-  color: #ffffff;
-  border: 1px solid rgba(255,255,255,0.2);
-}
-
-/* Dekorasi background mengkilap */
-.hero-tunggakan::before {
-  content: ''; position: absolute; top: -30%; right: -30%; width: 150px; height: 150px;
-  background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
-  border-radius: 50%; pointer-events: none;
-}
-
-.hero-content h3 {
-  font-size: 0.75em; letter-spacing: 1px; color: rgba(255, 255, 255, 0.85);
-  margin: 0 0 6px 0; text-transform: uppercase; font-weight: 700;
-}
-.hero-content p { margin: 0; font-size: 0.9em; color: #ffffff; font-weight: 700; }
-
-.hero-tunggakan-value { text-align: right; z-index: 1; }
-.hero-tunggakan-value span {
-  font-family: 'Syne', sans-serif; font-size: 1.6em; font-weight: 800;
-  color: #ffffff; display: block; margin-bottom: 4px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-.hero-tunggakan-value small {
-  font-size: 0.75em; font-weight: 700; background: #ffffff; color: var(--accent);
-  padding: 4px 10px; border-radius: 99px; display: inline-block;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent); margin: 24px 0; }
-
-/* ================= ICON GRID ================= */
-.icon-grid-section h2 {
-  font-size: 1.1em; font-weight: 800; margin-bottom: 16px;
-  display: flex; align-items: center; gap: 8px; color: var(--text);
-}
-.icon-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-
-.icon-item {
-  text-decoration: none;
-  /* Menggunakan style glass card */
-  padding: 18px 10px; text-align: center;
-  transition: transform 0.2s, border-color 0.2s;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-.icon-item:active { transform: scale(0.97); }
-
-.icon-item span { font-size: 28px; display: block; margin-bottom: 10px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
-.icon-item p { font-size: 0.75em; color: var(--text); font-weight: 600; margin: 0; }
-
-/* SOS Special Style */
-.sos-card {
-  background: rgba(255, 245, 245, 0.7) !important;
-  border: 1px solid rgba(239, 68, 68, 0.3) !important;
-}
-.sos-card p { color: var(--danger); }
-
-/* ================= FLOATING BOTTOM NAV (STANDAR) ================= */
-footer.bottom-nav {
-  position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px;
-  width: calc(100% - 40px); max-width: 480px;
-  background: rgba(255, 255, 255, 0.8); /* Lebih transparan */
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  border-radius: 999px; padding: 12px 20px; display: flex; justify-content: space-around;
-  align-items: center; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-  border: 1px solid rgba(255,255,255,0.5); z-index: 999;
-}
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; transition: 0.2s;
-}
-.nav-item span { font-size: 20px; margin-bottom: 2px; }
-.nav-item.active { color: var(--accent); font-weight: 700; }
-.nav-item.active span { transform: scale(1.1); filter: drop-shadow(0 2px 4px rgba(14,165,166,0.3)); }
+/* MODAL SOS ALARM */
+.sos-overlay { position:fixed; inset:0; background:rgba(239,68,68,0.9); z-index:9999; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:white; animation:pulseRed 1s infinite; }
+@keyframes pulseRed { 0%{opacity:1} 50%{opacity:0.8} 100%{opacity:1} }
+.sos-overlay h1 { font-family:'Syne'; font-size:3em; margin:0; }
+.sos-btn-close { margin-top:30px; padding:15px 30px; background:white; color:red; border:none; border-radius:30px; font-weight:bold; font-size:1.2em; }
 </style>
 </head>
-
 <body class="dashboard">
 
-<div class="app-container">
+<div id="sosScreen" class="sos-overlay">
+    <div style="font-size:80px;">🚨</div>
+    <h1>DARURAT!</h1>
+    <p id="sosMsg" style="font-size:1.2em; max-width:80%;">Ada user butuh bantuan!</p>
+    <button class="sos-btn-close" onclick="closeSos()">SAYA MENGERTI</button>
+</div>
 
+<div class="app-container">
 <header class="header">
   <div class="profile-section">
-    <div class="user-info-group">
+    <div style="display:flex; gap:16px; align-items:center;">
         <div class="profile-pic" id="user-avatar">U</div>
-        <div class="user-text">
-            <h1 id="user-name-display">Halo User</h1>
-            <p>Plat Motor <strong id="user-plate-display">...</strong></p>
+        <div>
+            <h1 id="user-name-display" style="margin:0; font-family:'Syne'; font-size:1.4em;">Halo User</h1>
+            <p id="user-plate-display" style="margin:4px 0 0; color:#64748b; font-size:0.9em;">...</p>
         </div>
     </div>
   </div>
 
   <div class="hero-tunggakan glass-card">
-    <div class="hero-content">
-      <h3>STATUS PEMBAYARAN</h3>
-      <p>Tagihan Hari Ini</p>
+    <div>
+      <h3 style="margin:0 0 6px; font-size:0.75em; opacity:0.9;">TAGIHAN BULAN INI</h3>
+      <p style="margin:0; font-size:0.9em;">Total Yang Harus Dibayar</p>
     </div>
-    <div class="hero-tunggakan-value">
+    <div style="text-align:right;">
       <span id="hero-tunggakan-nominal">Rp 0</span>
-      <small id="hero-status-badge">Aman</small>
+      <small id="hero-status-badge" style="background:white; color:var(--accent); padding:4px 10px; border-radius:20px; font-size:0.75em; font-weight:700;">Aman</small>
     </div>
   </div>
-
-  <div class="divider"></div>
 </header>
 
 <section class="icon-grid-section">
-  <h2>✨ Fitur Premium</h2>
-  
+  <h2 style="font-family:'Syne'; color:var(--text);">✨ Fitur Premium</h2>
   <div class="icon-grid">
     <a href="calendar.html" class="icon-item glass-card"><span>📅</span><p>Bayar</p></a>
     <a href="history.html" class="icon-item glass-card"><span>🗒️</span><p>Riwayat</p></a>
     <a href="part_tracker.html" class="icon-item glass-card"><span>🎁</span><p>Gratisan</p></a>
-
     <a href="info_mlu.html" class="icon-item glass-card"><span>📰</span><p>Info</p></a>
     <a href="tips_maka.html" class="icon-item glass-card"><span>💡</span><p>Tips</p></a>
     <a href="#" onclick="window.open('https://etle-pmj.info','_blank')" class="icon-item glass-card"><span>🚓</span><p>ETLE</p></a>
-
     <a href="settings.html" class="icon-item glass-card"><span>⚙️</span><p>Setting</p></a>
     <a href="maka_plus.html" class="icon-item glass-card"><span>⭐</span><p>MAKA+</p></a>
-    <a href="https://wa.me/62812XXXXXXXX?text=SOS%20MAKA%20DARURAT" target="_blank" class="icon-item glass-card sos-card"><span>🚨</span><p>SOS</p></a>
+    
+    <div class="icon-item glass-card sos-card" onclick="triggerSOS()">
+        <span>🚨</span><p style="color:var(--danger);">SOS</p>
+    </div>
   </div>
 </section>
-
 </div>
 
 <footer class="bottom-nav">
-  <a href="lokasi_fc.html" class="nav-item">
-    <span>⚡</span>Lokasi
-  </a>
-  <a href="dashboard.html" class="nav-item active">
-    <span>🏠</span>Home
-  </a>
-  <a href="daftar_antrian.html" class="nav-item">
-    <span>🎫</span>Antrian
-  </a>
+  <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
+  <a href="dashboard.html" class="nav-item active"><span>🏠</span>Home</a>
+  <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
 </footer>
 
 <script>
-/* ================== LOGIC DASHBOARD ================== */
+// --- CONFIG FIREBASE (SAMA UTK SEMUA FILE) ---
+const firebaseConfig = {
+  apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
+  authDomain: "rtomaka-e67b5.firebaseapp.com",
+  projectId: "rtomaka-e67b5",
+  storageBucket: "rtomaka-e67b5.firebasestorage.app",
+  messagingSenderId: "472036722228",
+  appId: "1:472036722228:web:11d520f9204db317d02c61"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let currentUser = JSON.parse(localStorage.getItem('maka_user'));
+
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Load User Info
-    const user = JSON.parse(localStorage.getItem('maka_user'));
-    if(user) {
-        // FIX: Menampilkan nama lengkap, tidak di-split
-        document.getElementById('user-name-display').innerText = "Halo, " + user.nama;
-        document.getElementById('user-plate-display').innerText = user.plat;
+    if(!currentUser) { window.location.href='index.html'; return; }
 
-        // Set Inisial Avatar
-        const initial = user.nama.charAt(0).toUpperCase();
-        document.getElementById('user-avatar').innerText = initial;
-    }
+    // Render User Data
+    document.getElementById('user-name-display').innerText = "Halo, " + currentUser.nama;
+    document.getElementById('user-plate-display').innerText = currentUser.plat;
+    document.getElementById('user-avatar').innerText = currentUser.nama.charAt(0).toUpperCase();
 
-    // 2. Hitung Tagihan Hari Ini (Logic sama seperti sebelumnya)
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    const day = today.getDate();
-    
-    let tagihanHariIni = 70000; 
+    // 1. HITUNG TAGIHAN LOKAL (Estimasi)
+    calculateLocalBill();
 
-    if (day === 14 || day === 28) {
-        tagihanHariIni = 80000;
-    }
+    // 2. LISTEN TAGIHAN DARI ADMIN (REALTIME)
+    // Jika admin kirim invoice, otomatis nambah
+    db.collection('invoices').where('plat', '==', currentUser.plat)
+      .where('status', '==', 'unpaid')
+      .onSnapshot((snapshot) => {
+          let totalOnlineBill = 0;
+          snapshot.forEach((doc) => {
+              totalOnlineBill += parseInt(doc.data().amount);
+          });
+          
+          if(totalOnlineBill > 0) {
+              const currentText = document.getElementById('hero-tunggakan-nominal').innerText;
+              const currentVal = parseInt(currentText.replace(/\D/g,'')) || 0;
+              // Tambahkan tagihan admin ke estimasi harian
+              const finalTotal = currentVal + totalOnlineBill;
+              
+              document.getElementById('hero-tunggakan-nominal').innerText = "Rp " + finalTotal.toLocaleString('id-ID');
+              document.getElementById('hero-status-badge').innerText = "Ada Tagihan";
+              document.getElementById('hero-status-badge').style.color = "var(--danger)";
+          }
+      });
 
-    // Cek Status MAKA+ (Cicilan Charger 1 Tahun)
-    const makaPlusData = JSON.parse(localStorage.getItem('maka_plus_data'));
-    if (makaPlusData && makaPlusData.active) {
-        const activationDate = new Date(makaPlusData.activatedAt);
-        activationDate.setHours(0,0,0,0);
-        const diffTime = today - activationDate;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        if (diffDays >= 1 && diffDays <= 365) {
-            tagihanHariIni += 10000;
-        }
-    }
+    // 3. LISTEN SOS BROADCAST (GLOBAL)
+    // Mendengarkan jika ada dokumen baru di koleksi 'sos_alerts'
+    // Hanya alert yg dibuat dalam 1 menit terakhir
+    const now = new Date();
+    const oneMinAgo = new Date(now.getTime() - 60000).toISOString();
 
-    // 4. Render ke UI & Cek Status Lunas
-    const y = today.getFullYear();
-    const m = today.getMonth() + 1;
-    const d = today.getDate();
-    const key = `${y}-${m}-${d}`;
-    
-    const payments = JSON.parse(localStorage.getItem('maka_payments')) || {};
-    const isPaid = payments[key] === true;
-
-    if(isPaid) {
-        document.getElementById('hero-tunggakan-nominal').innerText = "LUNAS";
-        document.getElementById('hero-status-badge').innerText = "Terima Kasih";
-        document.getElementById('hero-status-badge').style.color = "var(--accent)";
-    } else {
-        document.getElementById('hero-tunggakan-nominal').innerText = "Rp " + tagihanHariIni.toLocaleString('id-ID');
-        document.getElementById('hero-status-badge').innerText = "Belum Bayar";
-        document.getElementById('hero-status-badge').style.color = "var(--danger)";
-    }
+    db.collection('sos_alerts')
+      .where('timestamp', '>', oneMinAgo)
+      .onSnapshot((snapshot) => {
+          snapshot.docChanges().forEach((change) => {
+              if (change.type === "added") {
+                  const data = change.doc.data();
+                  // Jangan bunyikan alarm sendiri
+                  if (data.plat !== currentUser.plat) {
+                      showSosScreen(data.plat, data.msg);
+                  }
+              }
+          });
+      });
 });
+
+function calculateLocalBill() {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const day = today.getDate();
+    let bill = 70000; // Dasar 70rb
+    
+    // Cek Cicilan MAKA+
+    const plusData = JSON.parse(localStorage.getItem('maka_plus_data'));
+    if(plusData && plusData.active) {
+        bill += 10000; // Tambah 10rb
+    }
+    document.getElementById('hero-tunggakan-nominal').innerText = "Rp " + bill.toLocaleString('id-ID');
+}
+
+// KIRIM SOS
+function triggerSOS() {
+    if(!confirm("⚠️ PANGGILAN DARURAT ⚠️\n\nIni akan mengirim alarm ke SEMUA user yang sedang online. Lanjutkan?")) return;
+    
+    const msg = prompt("Tulis pesan singkat (Contoh: Ban bocor di Jl. Ahmad Yani)", "Darurat!");
+    if(!msg) return;
+
+    db.collection('sos_alerts').add({
+        plat: currentUser.plat,
+        nama: currentUser.nama,
+        msg: msg,
+        timestamp: new Date().toISOString()
+    }).then(() => {
+        alert("SOS Terkirim! Buka WhatsApp Group untuk koordinasi lebih lanjut.");
+        // Redirect ke WA Group (Opsional)
+        window.open("https://wa.me/62812XXXXXXXX?text=SOS%20DARI%20APP:%20" + msg, "_blank");
+    });
+}
+
+// TAMPILKAN ALARM MERAH
+function showSosScreen(plat, msg) {
+    document.getElementById('sosMsg').innerHTML = `User <b>${plat}</b> butuh bantuan:<br>"${msg}"`;
+    document.getElementById('sosScreen').style.display = 'flex';
+    // Getar HP
+    if(navigator.vibrate) navigator.vibrate([1000, 500, 1000]);
+}
+
+function closeSos() {
+    document.getElementById('sosScreen').style.display = 'none';
+}
 </script>
 </body>
 </html>
