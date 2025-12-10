@@ -1,32 +1,30 @@
-const CACHE_NAME = "maka-rental-v1.0.8"; // Versi cache terbaru
-const FILES_TO_CACHE = [
-  // Halaman Utama
-  "./",
-  "./index.html",
-  "./dashboard.html",
-  "./calendar.html",
-  "./history.html",
-  "./settings.html",
-  "./daftar_antrian.html",
-  
-  // Halaman Menu (MLU)
-  "./part_tracker.html",
-  "./tips_maka.html",
-  "./info_mlu.html",
-  "./maka_plus.html",
-  
-  // Halaman Lokasi & SOS
-  "./lokasi_fc.html",
+const CACHE_NAME = "maka-rental-v1.1.0"; // Versi cache ditingkatkan
+const REPO_NAME = "/makarental"; // <<< SUDAH DIGANTI DENGAN NAMA REPO ANDA
 
-  // Halaman Admin
-  "./admin_login.html",
-  "./admin_user.html",
-  "./admin_finance.html",
-  // Tambahkan admin_antrian.html jika Anda masih menggunakannya sebagai file terpisah
+const FILES_TO_CACHE = [
+  // Path UTAMA harus menggunakan nama repositori
+  `${REPO_NAME}/`,
+  `${REPO_NAME}/index.html`,
   
-  // Assets & Audio (Wajib)
-  "./1763947427555.jpg" // Gambar background Anda
-  // Catatan: Audio file (white noise/siren) di-load dari URL eksternal, jadi tidak perlu di-cache di sini
+  // Halaman Aplikasi
+  `${REPO_NAME}/dashboard.html`,
+  `${REPO_NAME}/calendar.html`,
+  `${REPO_NAME}/history.html`,
+  `${REPO_NAME}/settings.html`,
+  `${REPO_NAME}/daftar_antrian.html`,
+  
+  // Halaman Menu & Admin
+  `${REPO_NAME}/part_tracker.html`,
+  `${REPO_NAME}/tips_maka.html`,
+  `${REPO_NAME}/info_mlu.html`,
+  `${REPO_NAME}/maka_plus.html`,
+  `${REPO_NAME}/lokasi_fc.html`,
+  `${REPO_NAME}/admin_login.html`,
+  `${REPO_NAME}/admin_user.html`,
+  `${REPO_NAME}/admin_finance.html`,
+  
+  // Assets
+  `${REPO_NAME}/1763947427555.jpg`
 ];
 
 // 1. Instalasi: Menyimpan semua file ke cache
@@ -35,18 +33,17 @@ self.addEventListener("install", (evt) => {
     caches.open(CACHE_NAME).then((cache) => {
       console.log("PWA: Caching semua file aplikasi.");
       return cache.addAll(FILES_TO_CACHE).catch(error => {
-        console.error('Failed to cache files:', error);
+        console.error('PWA ERROR: Gagal mencache file. Pastikan nama file di atas sudah benar.', error);
       });
     })
   );
-  self.skipWaiting(); // Memaksa service worker baru untuk segera aktif
+  self.skipWaiting(); 
 });
 
 // 2. Strategi Cache: Mengambil dari cache (offline first)
 self.addEventListener("fetch", (evt) => {
   evt.respondWith(
     caches.match(evt.request).then((res) => {
-      // Jika ada di cache, pakai cache. Jika tidak, ambil dari network (internet).
       return res || fetch(evt.request);
     })
   );
@@ -66,5 +63,5 @@ self.addEventListener("activate", (evt) => {
       );
     })
   );
-  self.clients.claim(); // Ambil alih kontrol klien yang ada
+  self.clients.claim();
 });
