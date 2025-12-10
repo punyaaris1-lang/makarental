@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kalender MAKA</title>
+<title>Kalender Tagihan</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
 
@@ -56,11 +56,7 @@ body {
   color: var(--text);
   letter-spacing: -0.5px;
 }
-.header p {
-  color: var(--muted);
-  font-size: 0.9em;
-  margin: 4px 0 0 0;
-}
+.header p { color: var(--muted); font-size: 0.9em; margin: 4px 0 0 0; }
 
 /* MONTH NAV */
 .month-nav {
@@ -93,14 +89,12 @@ body {
   font-weight: 700;
   font-size: 18px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   transition: 0.2s;
 }
 .btn-nav:active { background: #e5e7eb; transform: scale(0.95); }
 
-/* WEEK NAMES */
+/* CALENDAR GRID */
 .week {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -112,7 +106,6 @@ body {
   text-transform: uppercase;
 }
 
-/* CALENDAR GRID */
 .grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -120,46 +113,29 @@ body {
   margin-bottom: 24px;
 }
 
-.day {
-  aspect-ratio: 1/1;
-  position: relative;
-}
+.day { aspect-ratio: 1/1; position: relative; }
 
 .box {
   width: 100%; height: 100%;
   border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.95em;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.95em;
   background: var(--surface);
   border: 1px solid transparent;
   box-shadow: 0 2px 5px rgba(15,23,42,0.03);
-  color: var(--text); /* Default color */
+  color: var(--text);
   transition: transform 0.15s;
   cursor: pointer;
+  position: relative;
 }
-
 .box:active { transform: scale(0.9); }
-
 .day.empty { pointer-events: none; }
 
 /* STATUS COLORS */
-.wajib {
-  border-color: rgba(14, 165, 166, 0.3);
-  color: var(--accent);
-  background: rgba(14, 165, 166, 0.05);
-}
-.cdp {
-  border-color: rgba(139, 92, 246, 0.3);
-  color: var(--purple);
-  background: rgba(139, 92, 246, 0.05);
-}
-.libur {
-  color: var(--red);
-  opacity: 0.5;
-}
+.wajib { border-color: rgba(14, 165, 166, 0.3); color: var(--accent); background: rgba(14, 165, 166, 0.05); }
+.cdp { border-color: rgba(139, 92, 246, 0.3); color: var(--purple); background: rgba(139, 92, 246, 0.05); }
+.libur { color: var(--red); opacity: 0.5; }
 
 /* PAID & FUTURE */
 .paid {
@@ -167,107 +143,61 @@ body {
   color: #fff;
   border: none;
   box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
+.future { opacity: 0.3; pointer-events: none; filter: grayscale(1); }
 
-.future {
-  opacity: 0.3;
-  pointer-events: none;
-  filter: grayscale(1);
+/* INDIKATOR CICILAN MAKA+ */
+.plus-dot {
+  position: absolute;
+  bottom: 4px;
+  width: 4px; height: 4px;
+  background: #f59e0b; /* Warna Gold Gelap */
+  border-radius: 50%;
 }
 
 /* PREVIEW CARD */
 .preview-card {
-  background: linear-gradient(135deg, var(--accent-2), var(--accent)); /* Biru Teal */
+  background: linear-gradient(135deg, var(--accent-2), var(--accent));
   border-radius: var(--radius-lg);
   padding: 20px;
   color: white;
   box-shadow: 0 10px 25px rgba(14, 165, 166, 0.25);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: flex; justify-content: space-between; align-items: center;
 }
-.preview-card small {
-  display: block;
-  font-size: 0.8em;
-  opacity: 0.9;
-  margin-bottom: 4px;
-}
-.preview-card strong {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.6em;
-  display: block;
-}
+.preview-card small { display: block; font-size: 0.8em; opacity: 0.9; margin-bottom: 4px; }
+.preview-card strong { font-family: 'Syne', sans-serif; font-size: 1.6em; display: block; }
 
 /* MODAL */
 .modal {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(4px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  opacity: 0;
-  transition: opacity 0.3s;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+  display: none; align-items: center; justify-content: center; z-index: 2000;
 }
-.modal.active { display: flex; opacity: 1; }
+.modal.active { display: flex; }
 
 .sheet {
-  background: var(--surface);
-  width: 85%; max-width: 320px;
-  padding: 24px;
-  border-radius: 24px;
-  text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-  transform: scale(0.9);
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: var(--surface); width: 85%; max-width: 320px; padding: 24px; border-radius: 24px;
+  text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  transform: scale(0.9); transition: transform 0.2s;
 }
 .modal.active .sheet { transform: scale(1); }
-
 .sheet h3 { margin: 0 0 8px; font-family: 'Syne', sans-serif; font-size: 1.4em; }
 .sheet p { color: var(--muted); margin: 0 0 20px; font-size: 0.95em; }
 
 .btn-pay {
-  width: 100%;
-  padding: 14px;
-  border-radius: var(--radius-md);
-  background: var(--gold);
-  color: white;
-  border: none;
-  font-weight: 800;
-  font-size: 1em;
-  cursor: pointer;
+  width: 100%; padding: 14px; border-radius: var(--radius-md); background: var(--gold);
+  color: white; border: none; font-weight: 800; font-size: 1em; cursor: pointer;
   box-shadow: 0 8px 20px rgba(251, 191, 36, 0.3);
 }
 
-/* BOTTOM NAV */
+/* NAV */
 footer.bottom-nav {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 20px;
-  width: calc(100% - 40px);
-  max-width: 480px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 999px;
-  padding: 12px 20px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-  border: 1px solid rgba(255,255,255,0.5);
-  z-index: 999;
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px; width: calc(100% - 40px); max-width: 480px;
+  background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-radius: 999px; padding: 12px 20px;
+  display: flex; justify-content: space-around; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5); z-index: 999;
 }
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px;
-}
+.nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; }
 .nav-item span { font-size: 20px; margin-bottom: 2px; }
 .nav-item.active { color: var(--accent); font-weight: 700; }
-.nav-item.active span { transform: scale(1.1); }
 </style>
 </head>
 
@@ -313,13 +243,13 @@ footer.bottom-nav {
 </div>
 
 <footer class="bottom-nav">
-    <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
     <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
     <a href="calendar.html" class="nav-item active"><span>📅</span>Bayar</a>
+    <a href="maka_plus.html" class="nav-item"><span>⭐</span>MAKA+</a>
 </footer>
 
 <script>
-/* ===== CONFIG (SAMA SEPERTI FILE ASLI) ===== */
+/* ===== CONFIG ===== */
 const USER_TGL_MULAI_SEWA='2025-09-20'
 const USER_OPSI_DP='355'
 const ADMIN=JSON.parse(localStorage.getItem('maka_finance_settings'))||{hwb_rate:80000,cdp_rate:70000}
@@ -327,7 +257,7 @@ const HWB=ADMIN.hwb_rate, CDP=ADMIN.cdp_rate
 const DP_START=new Date(new Date(USER_TGL_MULAI_SEWA).getFullYear(),new Date(USER_TGL_MULAI_SEWA).getMonth()+1,1)
 const DP_END=new Date(DP_START.getFullYear(),DP_START.getMonth()+3,1)
 
-/* ===== LOGIC CORE ===== */
+/* ===== LOGIC STATUS DASAR ===== */
 function getStatus(d){
  const day=d.getDate()
  if(day===31)return'HLB'
@@ -355,7 +285,15 @@ function render(){
 
  let total=0
  const now=new Date();now.setHours(0,0,0,0)
- const pay=JSON.parse(localStorage.getItem('maka_payments'))||{}
+ const payData=JSON.parse(localStorage.getItem('maka_payments'))||{}
+ const makaPlusData=JSON.parse(localStorage.getItem('maka_plus_data'));
+
+ // Cek Tanggal Aktivasi MAKA+
+ let plusActiveDate = null;
+ if(makaPlusData && makaPlusData.active) {
+    plusActiveDate = new Date(makaPlusData.activatedAt);
+    plusActiveDate.setHours(0,0,0,0);
+ }
 
  for(let i=0;i<first;i++)grid.innerHTML+='<div class="day empty"></div>'
 
@@ -363,22 +301,44 @@ function render(){
   const date=new Date(y,m,d)
   const key=`${y}-${m+1}-${d}`
   const status=getStatus(date)
-  const paid=pay[key]
+  const paid=payData[key]
+  
   let cls='box'
   let price=0
+  let isPlusDay = false
 
+  // 1. Tentukan Harga Dasar
   if(status==='HWB'){cls+=' wajib';price=HWB}
   if(status==='CDP'){cls+=' cdp';price=CDP}
   if(status==='HLB'){cls+=' libur'}
 
+  // 2. Logic Tambahan MAKA+ (Cicilan +10rb)
+  // Berlaku H+1 s.d H+365 dari tanggal aktivasi
+  if (plusActiveDate && status !== 'HLB') { // Libur tetap gratis
+    const diffTime = date - plusActiveDate;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays >= 1 && diffDays <= 365) {
+        price += 10000;
+        isPlusDay = true;
+    }
+  }
+
+  // 3. Styling & Total
   if(paid)cls+=' paid'
   if(date>now)cls+=' future'
   if(!paid&&price>0)total+=price
 
   // Render HTML
+  // Jika ada cicilan, tambahkan titik indikator
+  const dotHtml = isPlusDay && !paid ? '<div class="plus-dot"></div>' : '';
+
   grid.innerHTML+=`
    <div class="day">
-    <div class="${cls}" onclick="openModal('${key}','${status}',${price})">${d}</div>
+    <div class="${cls}" onclick="openModal('${key}','${status}',${price})">
+      ${d}
+      ${dotHtml}
+    </div>
    </div>`
  }
  document.getElementById('total').textContent=`Rp ${total.toLocaleString('id-ID')}`
@@ -389,7 +349,7 @@ function openModal(k,s,p){
  if(p===0)return
  activeKey=k
  document.getElementById('m-date').textContent=`Tanggal ${k}`
- document.getElementById('m-desc').textContent=`Tagihan: ${s} (Rp ${p.toLocaleString('id-ID')})`
+ document.getElementById('m-desc').textContent=`Tagihan: ${s} (Total Rp ${p.toLocaleString('id-ID')})`
  document.getElementById('modal').classList.add('active')
 }
 
