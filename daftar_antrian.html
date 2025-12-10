@@ -44,16 +44,16 @@ body::before { content:""; position:fixed; top:0; left:0; right:0; bottom:0; bac
 .st-ready { color:var(--success); background:rgba(16,185,129,0.1); } .st-charging { color:var(--accent); background:rgba(14,165,166,0.1); } .st-waiting { color:var(--gold); background:rgba(251,191,36,0.1); }
 
 /* ADMIN BUTTONS INSIDE SLOT */
-.adm-slot-btn { width:90%; padding:6px; font-size:0.6em; border-radius:6px; border:none; margin-top:5px; font-weight:800; cursor:pointer; }
-.adm-red { background:#fee2e2; color:red; } .adm-green { background:#d1fae5; color:#047857; }
+.adm-slot-btn { width:95%; padding:8px 4px; font-size:0.55em; border-radius:6px; border:none; margin-top:5px; font-weight:800; cursor:pointer; color:white; }
+.adm-red { background:var(--danger); } .adm-green { background:var(--success); }
 
 /* QUEUE LIST */
-.queue-list { background:var(--glass-bg); backdrop-filter:var(--backdrop-blur); border-radius:20px; padding:10px; margin-bottom:24px; border:1px solid var(--glass-border); max-height:250px; overflow-y:auto; }
+.queue-list { background:var(--glass-bg); backdrop-filter:var(--backdrop-blur); border-radius:20px; padding:10px; margin-bottom:24px; border:1px solid var(--glass-border); max-height:300px; overflow-y:auto; }
 .q-item { display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid rgba(0,0,0,0.05); font-size:0.9em; } 
 .q-item:last-child { border-bottom:none; }
 .q-plat { font-weight:700; } .q-bat { color:var(--muted); font-size:0.8em; }
 .q-actions { display:flex; gap:5px; } 
-.adm-mini { padding:4px 8px; font-size:0.6em; border-radius:4px; border:none; font-weight:bold; cursor:pointer; }
+.adm-mini { padding:6px 10px; font-size:0.7em; border-radius:6px; border:none; font-weight:bold; cursor:pointer; color:white; }
 
 /* FORM */
 .reg-card { background:var(--glass-bg); backdrop-filter:var(--backdrop-blur); border-radius:24px; padding:24px; box-shadow:var(--glass-shadow); border:1px solid var(--glass-border); }
@@ -171,7 +171,7 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
 </div>
 
 <script>
-// --- FIREBASE CONFIG (PASTE PUNYA ANDA) ---
+// --- CONFIG (PASTE CONFIG FIREBASE ANDA) ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -198,8 +198,6 @@ window.addEventListener('load', () => {
     initFirebase();
     if("Notification" in window) Notification.requestPermission();
     if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ userLat=p.coords.latitude; }, e=>{}, {enableHighAccuracy:true});
-    
-    // Auto fill user
     const u = JSON.parse(localStorage.getItem('maka_user'));
     if(u && u.plat) document.getElementById('uPlat').value = u.plat;
 });
@@ -250,19 +248,18 @@ function initFirebase() {
                 let start = x.startTime.toMillis ? x.startTime.toMillis() : new Date(x.startTime).getTime();
                 let end = start + (x.duration*60000);
                 if(Date.now() > end) {
-                    txt = "SELESAI"; css = "st-ready";
+                    txt = "SELESAI"; css = "st-ready"; h = x.target || 100;
                     if(!triggered.has(x.name) && myPlat === x.name) {
                         triggered.add(x.name); triggerFullAlert();
                     }
                 } else {
-                    h = 100;
+                    h = 100; // Visual effect charging
                 }
             }
 
-            // IF ADMIN: SHOW BUTTONS
             if(isAdmin) {
                 if(isRun) {
-                    adminControls = `<button class="adm-slot-btn adm-red" onclick="emptySlot(${i})">KOSONGKAN / SELESAI</button>`;
+                    adminControls = `<button class="adm-slot-btn adm-red" onclick="emptySlot(${i})">SELESAI / RESET</button>`;
                 } else {
                     adminControls = `<button class="adm-slot-btn adm-green" onclick="startCharge(${i})">MULAI CAS</button>
                                      <button class="adm-slot-btn adm-red" onclick="emptySlot(${i})">BATAL</button>`;
@@ -273,7 +270,7 @@ function initFirebase() {
             <div class="slot-card ${isRun?'active':''}">
                 <div class="slot-label">${SLOT_NAMES[i]}</div>
                 <div class="bat-body"><div class="bat-head"></div><div class="bat-liquid" style="height:${h}%"></div></div>
-                <div class="slot-user">${x.name}</div>
+                <div class="slot-user">${x.name} <br> <span style="font-size:0.8em;opacity:0.8">Target: ${x.target||100}%</span></div>
                 <div class="slot-status ${css}">${txt}</div>
                 ${adminControls}
             </div>`;
@@ -302,7 +299,7 @@ function initFirebase() {
         }
     });
 
-    // DAFTAR USER
+    // BUTTON DAFTAR
     document.getElementById('btnDaftar').onclick = () => {
         const p = document.getElementById('uPlat').value.toUpperCase().trim();
         const w = document.getElementById('uWa').value;
@@ -320,7 +317,7 @@ function initFirebase() {
 
         if(!userLat && !isAdmin) { 
             btn.disabled=false; btn.innerText="DAFTAR";
-            showModal('GPS Diperlukan', 'Mohon aktifkan GPS untuk mendaftar.'); return;
+            showModal('GPS Diperlukan', 'Mohon aktifkan GPS.'); return;
         }
 
         db.runTransaction(async t => {
@@ -329,7 +326,6 @@ function initFirebase() {
             let q = d.waitingQueue || [];
             if(s.some(x=>x?.name===p) || q.some(x=>x?.name===p)) throw "Sudah terdaftar.";
             
-            // Auto Masuk Slot jika kosong
             let empty = s.findIndex(x => !x);
             if(empty !== -1) {
                 s[empty] = { name:p, phone:w, startBattery:b, target:100, startTime:null, duration:(100-b)*1.5 };
@@ -355,15 +351,12 @@ function loginAdmin() {
         document.getElementById('adminModal').classList.remove('show');
         document.getElementById('adminResetArea').style.display='block';
         showModal("Mode Operator", "Anda masuk sebagai Admin.");
-        // Trigger re-render
-        const ref = db.collection("antrian").doc("utama");
-        ref.get(); 
+        db.collection("antrian").doc("utama").get();
     } else {
         showModal("Error", "PIN Salah");
     }
 }
 
-// Admin Actions
 function emptySlot(i) {
     if(!confirm("Kosongkan slot ini?")) return;
     updateDB(d => { d.chargingSlots[i] = null; return d; });
@@ -371,24 +364,51 @@ function emptySlot(i) {
 function startCharge(i) {
     updateDB(d => { d.chargingSlots[i].startTime = new Date().toISOString(); return d; });
 }
-function moveQueueToSlot(qIdx) {
-    updateDB(d => {
-        let empty = d.chargingSlots.findIndex(x => !x);
-        if(empty === -1) throw "Slot Penuh!";
-        let u = d.waitingQueue[qIdx];
-        d.waitingQueue.splice(qIdx, 1);
-        u.duration = (100 - u.startBattery) * 1.5;
-        u.startTime = null;
-        d.chargingSlots[empty] = u;
-        return d;
-    });
-}
 function deleteQueue(i) {
     if(!confirm("Hapus?")) return;
     updateDB(d => { d.waitingQueue.splice(i, 1); return d; });
 }
 function resetAll() {
     if(confirm("RESET TOTAL?")) db.collection("antrian").doc("utama").set({chargingSlots:[null,null,null], waitingQueue:[]});
+}
+
+// --- LOGIC PINDAH ANTRIAN (AUTO RULE LIMIT) ---
+function moveQueueToSlot(qIdx) {
+    db.runTransaction(async t => {
+        const ref = db.collection("antrian").doc("utama");
+        const d = (await t.get(ref)).data();
+        let s = d.chargingSlots;
+        let q = d.waitingQueue;
+        
+        let emptyIdx = s.findIndex(x => !x);
+        if(emptyIdx === -1) throw "Slot Penuh!";
+        
+        // 1. HITUNG ANTRIAN & TARGET
+        let totalQueue = q.length;
+        let targetBat = 100;
+        if (totalQueue >= 3 && totalQueue <= 5) targetBat = 95;
+        else if (totalQueue >= 6 && totalQueue <= 10) targetBat = 90;
+        else if (totalQueue > 10) targetBat = 85;
+
+        // 2. PINDAHKAN & SET DURASI
+        let user = q[qIdx];
+        q.splice(qIdx, 1);
+        let percentNeeded = targetBat - user.startBattery;
+        if(percentNeeded < 0) percentNeeded = 0;
+
+        user.target = targetBat; 
+        user.duration = percentNeeded * 1.5; 
+        user.startTime = null; 
+        
+        s[emptyIdx] = user;
+        t.update(ref, {chargingSlots: s, waitingQueue: q});
+        return targetBat;
+    }).then((target) => {
+        let msg = "✅ User masuk slot.\n";
+        if(target < 100) msg += `⚠️ ANTRIAN RAMAI! Batas cas otomatis diset ke ${target}%. Harap info ke user.`;
+        else msg += "Antrian aman. Target 100%.";
+        showModal("Info", msg);
+    }).catch(e => showModal("Gagal", e));
 }
 
 function updateDB(callback) {
