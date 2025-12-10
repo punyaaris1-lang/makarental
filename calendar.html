@@ -3,127 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kalender Pembayaran - MAKA</title>
+<title>Kalender - MAKA</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* GLOBAL THEME */
-:root { 
-    --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
-    --danger:#ef4444; --success:#10b981; --warning:#fbbf24;
-    --glass-bg:rgba(255,255,255,0.85); --glass-border:rgba(255,255,255,0.6); 
-    --radius-lg:24px;
-}
-* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+:root { --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; --danger:#ef4444; --success:#10b981; }
+body { margin:0; font-family:'Inter'; background:var(--bg-base); color:var(--text); padding-bottom:100px; }
+body::before { content:""; position:fixed; inset:0; background:url('1763947427555.jpg') center/cover; opacity:0.15; z-index:-1; pointer-events:none; }
+.app-container { max-width:520px; margin:0 auto; padding:20px; }
 
-body { 
-    margin:0; font-family:'Inter', sans-serif; 
-    background:var(--bg-base); color:var(--text); 
-    min-height:100vh; position:relative; padding-bottom:100px;
-}
+/* HEADER & GRID */
+.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background:white; padding:10px 20px; border-radius:99px; box-shadow:0 4px 15px rgba(0,0,0,0.05); }
+.btn-nav { border:none; background:#f1f5f9; width:36px; height:36px; border-radius:50%; font-weight:bold; cursor:pointer; }
+.calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin-bottom:25px; }
+.day-name { text-align:center; font-size:0.75em; font-weight:800; color:#64748b; margin-bottom:10px; }
 
-/* BACKGROUND */
-body::before {
-    content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: url('1763947427555.jpg') center/cover no-repeat; 
-    opacity: 0.15; z-index: -1; pointer-events: none;
+/* DATE CELL */
+.date-cell { 
+    aspect-ratio:1; display:flex; flex-direction:column; align-items:center; justify-content:center; 
+    border-radius:14px; font-weight:700; font-size:0.9em; background:rgba(255,255,255,0.6); position:relative;
 }
-
-.app-container { max-width:520px; margin:0 auto; padding:20px 20px 100px; }
-
-/* HEADER & NAVIGASI BULAN */
-.header { 
-    display: flex; justify-content: space-between; align-items: center; 
-    margin-bottom: 20px; background: white; padding: 10px 20px; 
-    border-radius: 99px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
-.month-title { font-family: 'Syne'; font-size: 1.2em; font-weight: 800; text-transform: uppercase; }
-.btn-nav { 
-    background: #f1f5f9; border: none; width: 36px; height: 36px; 
-    border-radius: 50%; font-weight: bold; cursor: pointer; color: var(--text);
-}
-
-/* KALENDER GRID */
-.calendar-grid { 
-    display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; 
-    margin-bottom: 25px; 
-}
-.day-name { 
-    text-align: center; font-size: 0.75em; font-weight: 800; 
-    color: var(--muted); margin-bottom: 10px; text-transform: uppercase;
-}
-.date-cell {
-    aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    border-radius: 14px; font-weight: 700; font-size: 0.9em;
-    background: rgba(255,255,255,0.6); position: relative;
-    transition: 0.2s; border: 1px solid transparent;
-}
-
-/* STATUS WARNA KALENDER */
-.date-cell.lunas { background: #dcfce7; color: var(--success); border-color: var(--success); }
+.date-cell.lunas { background:#dcfce7; color:var(--success); border:1px solid var(--success); }
 .date-cell.tunggak { 
-    background: #fee2e2; color: var(--danger); border-color: var(--danger); 
-    box-shadow: 0 4px 10px rgba(239,68,68,0.2); 
-    cursor: pointer; /* Bisa diklik */
+    background:#fee2e2; color:var(--danger); border:1px solid var(--danger); 
+    box-shadow:0 4px 10px rgba(239,68,68,0.2); cursor:pointer; 
 }
-.date-cell.tunggak:active { transform: scale(0.95); opacity: 0.8; }
+.date-cell.today { border:2px solid var(--text); background:white; }
+.date-cell.dp { background:#fef9c3; color:#b45309; border:1px solid #fbbf24; }
+.small-lbl { font-size:0.5em; text-transform:uppercase; margin-top:-2px; }
 
-.date-cell.today { border: 2px solid var(--text); background: white; }
-.date-cell.empty { background: transparent; border: none; }
+/* HERO SUMMARY */
+.hero-card { background:linear-gradient(135deg,var(--accent),#06b6d4); color:white; padding:20px; border-radius:20px; text-align:center; box-shadow:0 10px 30px rgba(14,165,166,0.3); }
+.hero-card.alert { background:linear-gradient(135deg,#ef4444,#b91c1c); box-shadow:0 10px 30px rgba(239,68,68,0.3); }
+.hero-amount { font-family:'Inter'; font-size:2.5em; font-weight:900; margin:5px 0; }
 
-/* WARNA KHUSUS (MARKER) */
-.date-cell.dp { background: #fef9c3; color: #b45309; border: 1px solid #fbbf24; } 
-.date-cell.libur { color: var(--danger); font-weight: 900; } 
-
-.small-label { font-size: 0.5em; margin-top: -2px; opacity: 0.8; font-weight: 600; text-transform: uppercase; }
-
-/* HERO CARD */
-.hero-card {
-    background: linear-gradient(135deg, #ef4444, #b91c1c); /* Merah */
-    color: white; padding: 24px; border-radius: 24px;
-    box-shadow: 0 15px 40px rgba(239, 68, 68, 0.3);
-    position: relative; overflow: hidden; text-align: center;
-    transition: 0.3s;
-}
-.hero-card.aman {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2)); /* Biru Tema */
-    box-shadow: 0 15px 40px rgba(14, 165, 166, 0.3);
-}
-
-.hero-label { font-size: 0.8em; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.9; margin-bottom: 5px; }
-.hero-amount { font-family: 'Inter'; font-size: 2.8em; font-weight: 900; margin: 0; line-height: 1; letter-spacing: -1px; }
-.hero-desc { font-size: 0.9em; margin-top: 10px; font-weight: 600; opacity: 0.9; }
-.money-icon { font-size: 3em; position: absolute; right: 20px; bottom: 10px; opacity: 0.2; transform: rotate(-20deg); }
-
-/* FOOTER NAV */
-footer.bottom-nav {
-    position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-    width: auto; min-width: 260px; 
-    background: rgba(255, 255, 255, 0.95); 
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-radius: 50px; padding: 10px 30px; 
-    display: flex; justify-content: space-between; align-items: center; gap: 40px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5); z-index: 999;
-}
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #94a3b8; font-size: 9px; font-weight: 700; transition: 0.2s; }
-.nav-item span { font-size: 22px; margin-bottom: 2px; }
-.nav-item.active { color: var(--accent); }
+/* NAV */
+footer.bottom-nav { position:fixed; bottom:25px; left:50%; transform:translateX(-50%); width:auto; min-width:260px; background:rgba(255,255,255,0.95); backdrop-filter:blur(20px); border-radius:50px; padding:10px 30px; display:flex; justify-content:space-between; gap:40px; box-shadow:0 10px 40px rgba(0,0,0,0.15); z-index:999; }
+.nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#94a3b8; font-size:9px; font-weight:700; }
+.nav-item.active { color:var(--accent); } .nav-item span { font-size:22px; }
 
 /* MODAL */
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:9999; display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s; }
-.modal-overlay.show { display:flex; opacity:1; }
-.modal-box { background:white; width:80%; max-width:300px; padding:25px; border-radius:24px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s; }
-.modal-overlay.show .modal-box { transform:scale(1); }
-.modal-icon { font-size:40px; margin-bottom:15px; display:block; }
-.modal-title { font-family:'Inter'; font-size:1.3em; font-weight:800; margin:0 0 10px; color:var(--text); }
-.modal-desc { font-size:0.9em; color:#64748b; line-height:1.5; margin-bottom:20px; }
-.modal-btns { display:flex; gap:10px; justify-content:center; }
-.btn-modal { flex:1; padding:12px; border-radius:12px; border:none; font-weight:700; cursor:pointer; font-size:0.9em; }
-.btn-confirm { background:var(--text); color:white; }
-.btn-cancel { background:#f1f5f9; color:#64748b; }
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:none; align-items:center; justify-content:center; }
+.modal-box { background:white; width:80%; max-width:300px; padding:25px; border-radius:20px; text-align:center; }
+.btn-modal { width:100%; padding:12px; margin-top:10px; border-radius:10px; border:none; font-weight:bold; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -131,28 +56,20 @@ footer.bottom-nav {
 <div class="app-container">
     <div class="header">
         <button class="btn-nav" onclick="changeMonth(-1)">‹</button>
-        <div class="month-title" id="monthDisplay">DESEMBER 2025</div>
+        <div id="monthDisplay" style="font-family:'Syne';font-weight:800;">...</div>
         <button class="btn-nav" onclick="changeMonth(1)">›</button>
     </div>
 
-    <div class="calendar-grid" id="calendarGrid">
-        <div class="day-name">MIN</div><div class="day-name">SEN</div><div class="day-name">SEL</div>
-        <div class="day-name">RAB</div><div class="day-name">KAM</div><div class="day-name">JUM</div><div class="day-name">SAB</div>
-    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
 
     <div id="heroCard" class="hero-card">
-        <div class="hero-label">TOTAL TUNGGAKAN BULAN INI</div>
+        <div style="font-size:0.8em;font-weight:800;opacity:0.9;">TOTAL TUNGGAKAN</div>
         <div id="totalDebt" class="hero-amount">Rp 0</div>
-        <div id="debtDesc" class="hero-desc">Data sedang dimuat...</div>
-        <div class="money-icon">💰</div>
+        <div id="debtDesc" style="font-size:0.85em;">Aman</div>
     </div>
     
-    <div style="text-align:center; margin-top:20px; font-size:0.7em; color:#64748b; line-height: 1.6;">
-        <span style="display:inline-block; width:8px; height:8px; background:#fee2e2; border:1px solid red; border-radius:2px;"></span> Belum Bayar (Klik utk Lunas)
-        &nbsp;&nbsp;
-        <span style="display:inline-block; width:8px; height:8px; background:#dcfce7; border:1px solid green; border-radius:2px;"></span> Lunas
-        &nbsp;&nbsp;
-        <span style="display:inline-block; width:8px; height:8px; background:#fef9c3; border:1px solid orange; border-radius:2px;"></span> Jadwal DP
+    <div style="text-align:center;margin-top:20px;font-size:0.7em;color:#64748b;">
+        🔴 Belum (Klik Bayar) &nbsp; 🟢 Lunas &nbsp; 🟡 Jadwal DP
     </div>
 </div>
 
@@ -164,22 +81,15 @@ footer.bottom-nav {
 
 <div id="customModal" class="modal-overlay">
     <div class="modal-box">
-        <span id="mIcon" class="modal-icon">🔔</span>
-        <h3 id="mTitle" class="modal-title">Judul</h3>
-        <p id="mDesc" class="modal-desc">Keterangan...</p>
-        <div id="mBtns" class="modal-btns"></div>
+        <h3 id="mTitle">Konfirmasi</h3>
+        <p id="mDesc">...</p>
+        <div id="mBtns"></div>
     </div>
 </div>
 
 <script>
-// --- PWA ---
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
-    });
-}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'))}
 
-// --- CONFIG FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -202,115 +112,90 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function loadInvoices() {
-    db.collection('invoices')
-      .where('plat', '==', currentUser.plat)
-      .onSnapshot(snap => {
-          invoiceData = [];
-          snap.forEach(doc => {
-              const d = doc.data();
-              let start = new Date(d.startDate);
-              let end = new Date(d.endDate);
-              let diffTime = Math.abs(end - start);
-              let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; 
-              let dailyPrice = d.amount / diffDays;
+    db.collection('invoices').where('plat', '==', currentUser.plat).onSnapshot(snap => {
+        invoiceData = [];
+        snap.forEach(doc => {
+            const d = doc.data();
+            let start = new Date(d.startDate);
+            let end = new Date(d.endDate);
+            let diffDays = Math.ceil(Math.abs(end - start)/(1000*60*60*24)) + 1;
+            let dailyPrice = d.amount / diffDays;
 
-              for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
-                  invoiceData.push({
-                      id: doc.id, // Simpan ID agar bisa diupdate
-                      dateStr: dt.toISOString().split('T')[0],
-                      status: d.status,
-                      amount: dailyPrice
-                  });
-              }
-          });
-          renderCalendar();
-      });
+            for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
+                invoiceData.push({ id: doc.id, dateStr: dt.toISOString().split('T')[0], status: d.status, amount: dailyPrice });
+            }
+        });
+        renderCalendar();
+    });
 }
 
 function renderCalendar() {
     const grid = document.getElementById('calendarGrid');
-    grid.innerHTML = '<div class="day-name">MIN</div><div class="day-name">SEN</div><div class="day-name">SEL</div><div class="day-name">RAB</div><div class="day-name">KAM</div><div class="day-name">JUM</div><div class="day-name">SAB</div>';
+    grid.innerHTML = '<div class="day-name">M</div><div class="day-name">S</div><div class="day-name">S</div><div class="day-name">R</div><div class="day-name">K</div><div class="day-name">J</div><div class="day-name">S</div>';
     
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const todayStr = new Date().toISOString().split('T')[0];
 
-    document.getElementById('monthDisplay').innerText = 
-        new Date(currentYear, currentMonth).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+    document.getElementById('monthDisplay').innerText = new Date(currentYear, currentMonth).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }).toUpperCase();
 
-    for(let i=0; i<firstDay; i++) {
-        grid.innerHTML += `<div class="date-cell empty"></div>`;
-    }
+    for(let i=0; i<firstDay; i++) grid.innerHTML += `<div class="date-cell empty"></div>`;
 
-    let totalTunggakanBulanIni = 0;
-    let countTunggak = 0;
+    let totalUnpaid = 0;
 
     for(let d=1; d<=daysInMonth; d++) {
-        let mStr = (currentMonth+1).toString().padStart(2, '0');
-        let dStr = d.toString().padStart(2, '0');
-        let dateKey = `${currentYear}-${mStr}-${dStr}`;
+        let m = (currentMonth+1).toString().padStart(2,'0');
+        let da = d.toString().padStart(2,'0');
+        let dateKey = `${currentYear}-${m}-${da}`;
         
-        let statusClass = "";
-        let label = "";
-        let clickEvent = ""; // Event klik
-        
-        let dataFound = invoiceData.find(x => x.dateStr === dateKey);
-        
-        if (dataFound) {
-            if (dataFound.status === 'paid') {
-                statusClass = "lunas";
-            } else {
-                if (dateKey <= todayStr) {
-                    statusClass = "tunggak";
-                    totalTunggakanBulanIni += dataFound.amount;
-                    countTunggak++;
-                    // Enable Click untuk Tanggal Merah
-                    clickEvent = `onclick="markSelfPaid('${dataFound.id}', '${d} ${document.getElementById('monthDisplay').innerText}')"`;
-                }
+        let cls = ""; let lbl = ""; let click = "";
+        let found = invoiceData.find(x => x.dateStr === dateKey);
+
+        if(found) {
+            if(found.status === 'paid') cls = "lunas";
+            else if(dateKey <= todayStr) {
+                cls = "tunggak"; 
+                totalUnpaid += found.amount;
+                // KLIK EVENT UNTUK TANGGAL MERAH
+                click = `onclick="paySelf('${found.id}', '${d}')"`;
             }
         } else {
-            if (d === 14 || d === 28) { statusClass = "dp"; label = `<div class="small-label">DP</div>`; } 
-            else if (d === 31) { statusClass = "libur"; label = `<div class="small-label" style="color:red">OFF</div>`; }
+            if(d===14 || d===28) { cls="dp"; lbl=`<div class="small-lbl">DP</div>`; }
+            else if(d===31) { lbl=`<div class="small-lbl" style="color:red">OFF</div>`; }
         }
-
-        if (dateKey === todayStr) statusClass += " today";
-
-        grid.innerHTML += `<div class="date-cell ${statusClass}" ${clickEvent}>${d} ${label}</div>`;
+        
+        if(dateKey === todayStr) cls += " today";
+        grid.innerHTML += `<div class="date-cell ${cls}" ${click}>${d} ${lbl}</div>`;
     }
 
-    updateHeroCard(totalTunggakanBulanIni, countTunggak);
-}
-
-// LOGIC USER BAYAR SENDIRI
-function markSelfPaid(invoiceId, dateLabel) {
-    showModalConfirm(
-        "Konfirmasi Pembayaran", 
-        `Apakah Anda sudah melakukan transfer/setor tunai untuk tanggal <b>${dateLabel}</b>?`,
-        () => {
-            // Update Firebase
-            db.collection('invoices').doc(invoiceId).update({ status: 'paid' })
-            .then(() => {
-                showModal("Berhasil", "Status telah diperbarui menjadi LUNAS. Terima kasih!", "✅");
-            })
-            .catch(err => showModal("Gagal", "Error: " + err.message));
-        }
-    );
-}
-
-function updateHeroCard(amount, count) {
-    const card = document.getElementById('heroCard');
-    const txtAmount = document.getElementById('totalDebt');
-    const txtDesc = document.getElementById('debtDesc');
-
-    if (amount > 0) {
-        card.className = "hero-card"; // Merah
-        txtAmount.innerText = "Rp " + Math.round(amount).toLocaleString('id-ID');
-        txtDesc.innerText = `Anda menunggak ${count} hari. Klik tanggal merah untuk bayar.`;
+    // Update Hero
+    const hero = document.getElementById('heroCard');
+    if(totalUnpaid > 0) {
+        hero.className = "hero-card alert";
+        document.getElementById('totalDebt').innerText = "Rp " + Math.round(totalUnpaid).toLocaleString('id-ID');
+        document.getElementById('debtDesc').innerText = "Segera lunasi tunggakan!";
     } else {
-        card.className = "hero-card aman"; // Biru Teal
-        txtAmount.innerText = "Rp 0";
-        txtDesc.innerText = "Status pembayaran aman. Mantap! 👍";
+        hero.className = "hero-card";
+        document.getElementById('totalDebt').innerText = "Rp 0";
+        document.getElementById('debtDesc').innerText = "Status Aman. Mantap! 👍";
     }
+}
+
+function paySelf(id, date) {
+    document.getElementById('customModal').style.display = 'flex';
+    document.getElementById('mTitle').innerText = "Bayar Tanggal " + date + "?";
+    document.getElementById('mDesc').innerText = "Pastikan Anda sudah transfer.";
+    document.getElementById('mBtns').innerHTML = `
+        <button class="btn-modal" onclick="document.getElementById('customModal').style.display='none'" style="background:#eee;color:#555">Batal</button>
+        <button class="btn-modal" style="background:#10b981;color:white" onclick="doPay('${id}')">Ya, Sudah Bayar</button>
+    `;
+}
+
+function doPay(id) {
+    db.collection('invoices').doc(id).update({ status: 'paid' }).then(() => {
+        document.getElementById('customModal').style.display = 'none';
+        alert("Berhasil dilunasi!");
+    });
 }
 
 function changeMonth(n) {
@@ -319,31 +204,6 @@ function changeMonth(n) {
     else if(currentMonth < 0) { currentMonth=11; currentYear--; }
     renderCalendar();
 }
-
-// MODAL HELPER
-function showModal(title, desc, icon="🔔") {
-    document.getElementById('mTitle').innerText = title;
-    document.getElementById('mDesc').innerHTML = desc;
-    document.getElementById('mIcon').innerText = icon;
-    const btns = document.getElementById('mBtns');
-    btns.innerHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK</button>`;
-    document.getElementById('customModal').classList.add('show');
-}
-
-function showModalConfirm(title, desc, onYes) {
-    document.getElementById('mTitle').innerText = title;
-    document.getElementById('mDesc').innerHTML = desc;
-    document.getElementById('mIcon').innerText = "🤔";
-    const btns = document.getElementById('mBtns');
-    btns.innerHTML = `
-        <button class="btn-modal btn-cancel" onclick="closeModal()">Batal</button>
-        <button class="btn-modal btn-confirm" id="btnYes">Ya, Sudah</button>
-    `;
-    document.getElementById('btnYes').onclick = () => { closeModal(); onYes(); };
-    document.getElementById('customModal').classList.add('show');
-}
-
-function closeModal() { document.getElementById('customModal').classList.remove('show'); }
 </script>
 </body>
 </html>
