@@ -46,14 +46,14 @@ body::before { content:""; position:fixed; top:0; left:0; right:0; bottom:0; bac
 /* SLOT CHARGING */
 .section-head { font-family:'Inter'; font-size:0.85em; font-weight:800; color:#64748b; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; }
 .slot-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:25px; }
-.slot-card { background:rgba(255,255,255,0.8); border:1px solid rgba(255,255,255,0.6); border-radius:18px; padding:15px 5px; text-align:center; min-height:160px; position:relative; box-shadow:0 4px 15px rgba(0,0,0,0.05); }
+.slot-card { background:rgba(255,255,255,0.8); border:1px solid rgba(255,255,255,0.6); border-radius:18px; padding:15px 5px; text-align:center; min-height:170px; position:relative; box-shadow:0 4px 15px rgba(0,0,0,0.05); }
 .slot-card.active { background:white; border:2px solid var(--accent); }
 .slot-label { font-size:0.65em; font-weight:800; color:#64748b; margin-bottom:8px; }
 .bat-body { width:34px; height:60px; border:2px solid #cbd5e1; border-radius:8px; margin:0 auto 8px; position:relative; display:flex; align-items:flex-end; padding:2px; }
 .bat-head { width:12px; height:3px; background:#cbd5e1; position:absolute; top:-5px; left:50%; transform:translateX(-50%); border-radius:2px 2px 0 0; }
 .bat-liquid { width:100%; background:linear-gradient(to top, #0ea5a6, #06b6d4); border-radius:4px; transition:height 0.5s; }
 .slot-user { font-weight:800; font-size:0.85em; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
-.slot-target { font-size:0.7em; font-weight:bold; color:var(--danger); display:block; }
+.slot-timer { font-family:'Inter'; font-weight:900; font-size:0.85em; color:var(--danger); display:block; margin-top:2px; }
 .slot-status { font-size:0.6em; font-weight:800; padding:4px 6px; border-radius:6px; margin-top:4px; display:inline-block; }
 .st-ready { background:#dcfce7; color:#166534; } 
 .st-charging { background:#cffafe; color:#0e7490; } 
@@ -214,7 +214,7 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
 </div>
 
 <script>
-// --- CONFIG FIREBASE (PASTIKAN SUDAH BUAT DATABASE DI CONSOLE) ---
+// --- CONFIG (PASTE CONFIG FIREBASE ANDA) ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -228,10 +228,12 @@ const db = firebase.firestore();
 
 // --- VARIABLES ---
 const SLOT_NAMES = ["SLOT 1", "SLOT 2", "SLOT 3"];
+const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
+const MAX_DIST = 200; 
 let isAdmin = false;
 let userLat=null;
 let triggered = new Set();
-let announced = new Set();
+let chargingSlotsData = []; // Store data locally for timer
 
 const silentAudio = document.getElementById('silentAudio');
 const alarmAudio = document.getElementById('alarmAudio');
@@ -243,6 +245,34 @@ window.addEventListener('load', () => {
     const u = JSON.parse(localStorage.getItem('maka_user'));
     if(u && u.plat) document.getElementById('uPlat').value = u.plat;
 });
+
+// --- TIMER TICKER (EVERY SECOND) ---
+setInterval(() => {
+    chargingSlotsData.forEach((slot, i) => {
+        if (slot && slot.startTime) {
+            const start = new Date(slot.startTime).getTime();
+            const end = start + (slot.duration * 60000);
+            const diff = end - Date.now();
+            
+            const timerEl = document.getElementById(`timer-${i}`);
+            const myPlat = localStorage.getItem('myPlat') || "";
+
+            if (diff <= 0) {
+                if(timerEl) timerEl.innerText = "SELESAI!";
+                // Trigger Alarm Logic
+                if (!triggered.has(slot.name) && myPlat === slot.name) {
+                    triggered.add(slot.name);
+                    triggerFullAlert();
+                }
+            } else {
+                // Update Timer Visual
+                const m = Math.floor(diff / 60000);
+                const s = Math.floor((diff % 60000) / 1000);
+                if(timerEl) timerEl.innerText = `${m}m ${s}s`;
+            }
+        }
+    });
+}, 1000); // Update every 1 second
 
 // --- HELPER ---
 function showModal(title, desc, onOk) {
@@ -266,7 +296,9 @@ function initFirebase() {
         const d = snap.data() || {};
         const s = d.chargingSlots || [null,null,null];
         const q = d.waitingQueue || [];
-        const myPlat = localStorage.getItem('myPlat') || ""; // Plat User di HP Ini
+        const myPlat = localStorage.getItem('myPlat') || "";
+
+        chargingSlotsData = s; // Update global data for ticker
 
         // UPDATE HERO COUNT
         document.getElementById('qCountDisplay').innerText = q.length;
@@ -289,36 +321,28 @@ function initFirebase() {
             </div>`;
 
             const isRun = !!x.startTime;
-            let txt = isRun ? "MENGISI" : "MENUNGGU";
             let css = isRun ? "st-charging" : "st-waiting";
             let h = x.startBattery;
             let targetLabel = "";
             let controls = "";
+            let timerHtml = "";
 
             if(isRun) {
-                let start = x.startTime.toMillis ? x.startTime.toMillis() : new Date(x.startTime).getTime();
-                let end = start + (x.duration*60000);
-                if(Date.now() > end) {
-                    txt = "SELESAI"; css = "st-ready"; h = x.target || 100;
-                    if(!triggered.has(x.name) && myPlat === x.name) {
-                        triggered.add(x.name); triggerFullAlert();
-                    }
-                } else {
-                    h = 100;
-                }
+                h = 100; // Visual full
+                timerHtml = `<span id="timer-${i}" class="slot-timer">Menghitung...</span>`;
+            } else {
+                timerHtml = `<span class="slot-status ${css}">MENUNGGU</span>`;
             }
             
             if(x.target && x.target < 100) targetLabel = `<span class="slot-target">Batas: ${x.target}%</span>`;
 
-            // === LOGIC TOMBOL START/STOP (USER SENDIRI ATAU ADMIN) ===
-            const isMySlot = (x.name === myPlat); // Apakah slot ini milik saya?
+            // === LOGIC TOMBOL START/STOP (SELF SERVICE + ADMIN) ===
+            const isMySlot = (x.name === myPlat); 
             
             if (isAdmin || isMySlot) {
                 if(isRun) {
-                    // Jika sedang berjalan -> Tombol SELESAI
                     controls = `<button class="ctrl-btn btn-red" onclick="emptySlot(${i})">⏹️ SELESAI / CABUT</button>`;
                 } else {
-                    // Jika menunggu -> Tombol MULAI
                     controls = `<button class="ctrl-btn btn-green" onclick="startCharge(${i})">▶️ MULAI CAS</button>`;
                     if(isAdmin) controls += `<button class="ctrl-btn btn-red" onclick="emptySlot(${i})" style="margin-top:5px;font-size:0.5em;">BATAL</button>`;
                 }
@@ -329,7 +353,7 @@ function initFirebase() {
                 <div class="slot-label">${SLOT_NAMES[i]}</div>
                 <div class="bat-body"><div class="bat-head"></div><div class="bat-liquid" style="height:${h}%"></div></div>
                 <div class="slot-user">${x.name} <br> ${targetLabel}</div>
-                <div class="slot-status ${css}">${txt}</div>
+                ${timerHtml}
                 ${controls}
             </div>`;
         }).join('');
@@ -384,7 +408,6 @@ function initFirebase() {
             let q = d.waitingQueue || [];
             if(s.some(x=>x?.name===p) || q.some(x=>x?.name===p)) throw "Sudah terdaftar.";
             
-            // Auto Masuk Slot jika kosong
             let empty = s.findIndex(x => !x);
             let targetBat = 100;
             
@@ -427,7 +450,6 @@ function loginAdmin() {
     }
 }
 
-// ACTIONS (START/STOP)
 function emptySlot(i) {
     if(!confirm("Selesai & Kosongkan Slot?")) return;
     updateDB(d => { d.chargingSlots[i] = null; return d; });
