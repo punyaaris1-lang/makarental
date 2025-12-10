@@ -10,28 +10,30 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* --- GLOBAL THEME PREMIUM --- */
-:root { 
-    --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
-    --muted:#64748b; --danger:#ef4444; --success:#10b981; --gold:#fbbf24; 
-    --glass-bg:rgba(255,255,255,0.65); --glass-border:rgba(255,255,255,0.4); 
-    --glass-shadow:0 8px 32px 0 rgba(31,38,135,0.15); --backdrop-blur:blur(12px); 
-    --radius-lg:24px; --max-width:520px; 
-}
+/* GLOBAL THEME */
+:root { --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; --muted:#64748b; --danger:#ef4444; --success:#10b981; --gold:#fbbf24; --glass-bg:rgba(255,255,255,0.65); --glass-border:rgba(255,255,255,0.4); --glass-shadow:0 8px 32px 0 rgba(31,38,135,0.15); --backdrop-blur:blur(12px); --radius-lg:24px; --max-width:520px; }
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { margin:0; padding:0; font-family:'Inter', sans-serif; background:var(--bg-base); color:var(--text); min-height:100vh; position:relative; overflow-x:hidden; }
 body::before { content:""; position:fixed; top:0; left:0; right:0; bottom:0; background:url('1763947427555.jpg') center/cover no-repeat; opacity:0.15; z-index:-1; pointer-events:none; }
 .app-container { max-width:var(--max-width); margin:0 auto; padding:20px 20px 50px; }
 
 /* HEADER */
-.header { margin-bottom:24px; display:flex; align-items:center; justify-content:space-between; }
-.header h1 { font-family:'Inter'; font-size:1.6em; font-weight:800; margin:0; color:var(--text); line-height:1; }
-.header p { color:var(--muted); font-size:0.8em; margin:4px 0 0; font-weight:600; }
+.header { margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; }
+.header h1 { font-family:'Inter'; font-size:1.4em; font-weight:800; margin:0; color:var(--text); line-height:1; }
+.header p { color:var(--muted); font-size:0.75em; margin:4px 0 0; font-weight:600; }
 .live-badge { background:var(--muted); color:white; font-weight:800; font-size:0.65em; padding:6px 12px; border-radius:20px; transition:0.3s; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
 .live-badge.online { background:var(--success); animation:pulseGreen 2s infinite; }
 @keyframes pulseGreen { 0%{box-shadow:0 0 0 0 rgba(16,185,129,0.7)} 70%{box-shadow:0 0 0 10px rgba(16,185,129,0)} 100%{box-shadow:0 0 0 0 rgba(16,185,129,0)} }
 
-/* SLOT SYSTEM */
+/* FORM (POSISI ATAS) */
+.reg-card { background:var(--glass-bg); backdrop-filter:var(--backdrop-blur); border-radius:24px; padding:20px; box-shadow:var(--glass-shadow); border:1px solid var(--glass-border); margin-bottom: 30px; }
+.form-input { width:100%; padding:14px; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:12px; font-family:'Inter'; font-size:1em; background:rgba(255,255,255,0.8); outline:none; transition:0.2s; }
+.form-input:focus { border-color:var(--accent); background:#fff; }
+.btn-submit { width:100%; padding:16px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; border:none; border-radius:16px; font-weight:800; font-size:1em; cursor:pointer; box-shadow:0 10px 20px rgba(14,165,166,0.2); transition:0.2s; font-family:'Inter'; }
+.btn-submit:active { transform:scale(0.98); } .btn-submit:disabled { background:#cbd5e1; box-shadow:none; }
+
+/* SLOT GRID */
+.section-head { font-family:'Inter'; font-size:0.9em; font-weight:800; color:var(--text); margin-bottom:12px; letter-spacing:0.5px; opacity:0.8; border-bottom:2px solid rgba(0,0,0,0.05); padding-bottom:5px; }
 .slot-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px; }
 .slot-card { background:var(--glass-bg); backdrop-filter:var(--backdrop-blur); border:1px solid var(--glass-border); border-radius:20px; padding:15px 5px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:space-between; min-height:180px; position:relative; overflow:hidden; box-shadow:var(--glass-shadow); transition:0.3s; }
 .slot-card.active { background:rgba(255,255,255,0.9); border-color:var(--accent); box-shadow:0 0 25px rgba(14,165,166,0.3); }
@@ -40,10 +42,11 @@ body::before { content:""; position:fixed; top:0; left:0; right:0; bottom:0; bac
 .bat-head { width:12px; height:3px; background:#cbd5e1; position:absolute; top:-5px; left:50%; transform:translateX(-50%); border-radius:2px 2px 0 0; }
 .bat-liquid { width:100%; background:linear-gradient(to top,var(--accent),var(--accent-2)); border-radius:4px; transition:height 0.5s; box-shadow:0 0 15px rgba(14,165,166,0.4); }
 .slot-user { font-family:'Inter'; font-weight:800; font-size:0.8em; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.slot-target { font-size:0.7em; font-weight:bold; color:var(--danger); display:block; margin-top:2px; }
 .slot-status { font-size:0.6em; font-weight:700; padding:4px 6px; border-radius:6px; margin-top:4px; }
 .st-ready { color:var(--success); background:rgba(16,185,129,0.1); } .st-charging { color:var(--accent); background:rgba(14,165,166,0.1); } .st-waiting { color:var(--gold); background:rgba(251,191,36,0.1); }
 
-/* ADMIN BUTTONS INSIDE SLOT */
+/* ADMIN BUTTONS */
 .adm-slot-btn { width:95%; padding:8px 4px; font-size:0.55em; border-radius:6px; border:none; margin-top:5px; font-weight:800; cursor:pointer; color:white; }
 .adm-red { background:var(--danger); } .adm-green { background:var(--success); }
 
@@ -55,19 +58,12 @@ body::before { content:""; position:fixed; top:0; left:0; right:0; bottom:0; bac
 .q-actions { display:flex; gap:5px; } 
 .adm-mini { padding:6px 10px; font-size:0.7em; border-radius:6px; border:none; font-weight:bold; cursor:pointer; color:white; }
 
-/* FORM */
-.reg-card { background:var(--glass-bg); backdrop-filter:var(--backdrop-blur); border-radius:24px; padding:24px; box-shadow:var(--glass-shadow); border:1px solid var(--glass-border); }
-.form-input { width:100%; padding:14px; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:12px; font-family:'Inter'; font-size:1em; background:rgba(255,255,255,0.8); outline:none; transition:0.2s; }
-.form-input:focus { border-color:var(--accent); background:#fff; }
-.btn-submit { width:100%; padding:16px; background:linear-gradient(90deg,var(--accent),var(--accent-2)); color:white; border:none; border-radius:16px; font-weight:800; font-size:1em; cursor:pointer; box-shadow:0 10px 20px rgba(14,165,166,0.2); transition:0.2s; font-family:'Inter'; }
-.btn-submit:active { transform:scale(0.98); } .btn-submit:disabled { background:#cbd5e1; box-shadow:none; }
-
 /* ALARM SCREEN */
 .alarm-overlay { position:fixed; inset:0; background:rgba(220,20,60,0.98); z-index:9999; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:white; animation:shake 0.5s infinite; }
 @keyframes shake { 0%{transform:translate(1px,1px)} 50%{transform:translate(-1px,-1px)} 100%{transform:translate(1px,-1px)} }
 .btn-stop { background:white; color:red; border:none; padding:20px 50px; border-radius:50px; font-weight:900; font-size:1.5em; cursor:pointer; box-shadow:0 0 30px rgba(255,255,255,0.8); margin-top:40px; }
 
-/* MODAL OVERLAY (GLOBAL) */
+/* MODAL OVERLAY */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:9999; display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s; }
 .modal-overlay.show { display:flex; opacity:1; }
 .modal-box { background:white; padding:25px; border-radius:24px; width:85%; max-width:320px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s; }
@@ -107,21 +103,6 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
         <div id="connStatus" class="live-badge">OFFLINE</div>
     </header>
 
-    <div class="slot-grid" id="slots">
-        <div class="slot-card"><div class="slot-status">Loading...</div></div>
-        <div class="slot-card"><div class="slot-status">Loading...</div></div>
-        <div class="slot-card"><div class="slot-status">Loading...</div></div>
-    </div>
-
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h3 style="margin:0; font-family:'Inter'; color:var(--text); font-weight:800;">Daftar Tunggu</h3>
-        <span id="qCount" style="background:var(--text); color:white; padding:2px 8px; border-radius:10px; font-size:0.8em; font-weight:bold;">0</span>
-    </div>
-    
-    <div class="queue-list" id="qListContainer">
-        <div style="text-align:center;padding:20px;color:#999;font-size:0.8em;">Belum ada antrian.</div>
-    </div>
-
     <div class="reg-card">
         <h3 style="margin:0 0 16px 0;font-family:'Inter';font-weight:800;font-size:1.2em;">Ambil Antrian</h3>
         <input id="uPlat" class="form-input" placeholder="Plat Nomor" style="text-transform:uppercase;">
@@ -131,14 +112,29 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
         <button id="btnDaftar" class="btn-submit">DAFTAR & AKTIFKAN MONITORING</button>
         
         <p id="monitorStatus" style="text-align:center; font-size:0.75em; color:var(--success); font-weight:700; margin-top:15px; display:none; background:#ecfdf5; padding:10px; border-radius:10px; border:1px solid #10b981;">
-            🔊 <b>MONITORING AKTIF</b><br>Jangan tutup tab ini.
+            🔊 <b>MONITORING AKTIF</b><br>Jangan tutup tab ini. Aplikasi akan "berteriak" saat giliran Anda.
         </p>
+    </div>
+
+    <div class="section-head">STATUS CHARGING</div>
+    <div class="slot-grid" id="slots">
+        <div class="slot-card"><div class="slot-status">Loading...</div></div>
+        <div class="slot-card"><div class="slot-status">Loading...</div></div>
+        <div class="slot-card"><div class="slot-status">Loading...</div></div>
+    </div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h3 class="section-head" style="margin:0; border:none;">DAFTAR TUNGGU</h3>
+        <span id="qCount" style="background:var(--text); color:white; padding:2px 8px; border-radius:10px; font-size:0.8em; font-weight:bold;">0</span>
+    </div>
+    
+    <div class="queue-list" id="qListContainer">
+        <div style="text-align:center;padding:20px;color:#999;font-size:0.8em;">Belum ada antrian.</div>
     </div>
 
     <div style="text-align:center; margin-top:40px;">
         <span onclick="openAdmin()" style="font-size:0.7em; color:#ccc; cursor:pointer;">🔒 Admin Login</span>
     </div>
-    
     <div id="adminResetArea" style="display:none; text-align:center; margin-top:20px;">
         <button onclick="resetAll()" style="background:#fee2e2; color:red; border:1px solid red; padding:10px; border-radius:10px; font-weight:bold; font-size:0.8em;">⚠️ RESET SEMUA DATA</button>
     </div>
@@ -171,7 +167,7 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
 </div>
 
 <script>
-// --- CONFIG (PASTE CONFIG FIREBASE ANDA) ---
+// --- FIREBASE CONFIG ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -184,12 +180,13 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // --- VARIABLES ---
-const SLOT_NAMES = ["SLOT 3", "SLOT 2", "SLOT 1"];
+const SLOT_NAMES = ["SLOT 1", "SLOT 2", "SLOT 3"];
 const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
 const MAX_DIST = 200; 
 let isAdmin = false;
 let userLat=null;
 let triggered = new Set();
+let announced = new Set(); // Set untuk mencatat siapa yg sudah dapat "Announce"
 
 const silentAudio = document.getElementById('silentAudio');
 const alarmAudio = document.getElementById('alarmAudio');
@@ -202,7 +199,7 @@ window.addEventListener('load', () => {
     if(u && u.plat) document.getElementById('uPlat').value = u.plat;
 });
 
-// --- MODAL HELPER ---
+// --- HELPER ---
 function showModal(title, desc, onOk) {
     document.getElementById('mTitle').innerText = title;
     document.getElementById('mDesc').innerHTML = desc;
@@ -242,7 +239,19 @@ function initFirebase() {
             let txt = isRun ? "MENGISI" : "MENUNGGU";
             let css = isRun ? "st-charging" : "st-waiting";
             let h = x.startBattery;
+            let targetLabel = "";
             let adminControls = "";
+
+            // LOGIC "ANNOUNCE" SAAT USER MASUK SLOT (REPLACE TERIAKAN ADMIN)
+            // Jika user adalah saya, dan statusnya menunggu (baru masuk), dan belum diumumin
+            if(!isRun && x.name === myPlat && !announced.has(x.name)) {
+                announced.add(x.name);
+                // Trigger Getar & Modal Instruksi
+                if(navigator.vibrate) navigator.vibrate([200,100,200]);
+                showModal("📢 GILIRAN ANDA!", 
+                    `Silakan masuk ke <b>${SLOT_NAMES[i]}</b>.<br><br>
+                     ⚠️ Karena antrian ramai, batas cas otomatis diset ke <b style="color:red;font-size:1.2em;">${x.target||100}%</b>.`);
+            }
 
             if(isRun) {
                 let start = x.startTime.toMillis ? x.startTime.toMillis() : new Date(x.startTime).getTime();
@@ -253,10 +262,16 @@ function initFirebase() {
                         triggered.add(x.name); triggerFullAlert();
                     }
                 } else {
-                    h = 100; // Visual effect charging
+                    h = 100;
                 }
             }
+            
+            // Tampilan Target Baterai (Merah jika dibatasi)
+            if(x.target && x.target < 100) {
+                targetLabel = `<span class="slot-target">Batas: ${x.target}%</span>`;
+            }
 
+            // ADMIN BUTTONS
             if(isAdmin) {
                 if(isRun) {
                     adminControls = `<button class="adm-slot-btn adm-red" onclick="emptySlot(${i})">SELESAI / RESET</button>`;
@@ -270,7 +285,7 @@ function initFirebase() {
             <div class="slot-card ${isRun?'active':''}">
                 <div class="slot-label">${SLOT_NAMES[i]}</div>
                 <div class="bat-body"><div class="bat-head"></div><div class="bat-liquid" style="height:${h}%"></div></div>
-                <div class="slot-user">${x.name} <br> <span style="font-size:0.8em;opacity:0.8">Target: ${x.target||100}%</span></div>
+                <div class="slot-user">${x.name} <br> ${targetLabel}</div>
                 <div class="slot-status ${css}">${txt}</div>
                 ${adminControls}
             </div>`;
@@ -299,7 +314,7 @@ function initFirebase() {
         }
     });
 
-    // BUTTON DAFTAR
+    // DAFTAR
     document.getElementById('btnDaftar').onclick = () => {
         const p = document.getElementById('uPlat').value.toUpperCase().trim();
         const w = document.getElementById('uWa').value;
@@ -326,9 +341,23 @@ function initFirebase() {
             let q = d.waitingQueue || [];
             if(s.some(x=>x?.name===p) || q.some(x=>x?.name===p)) throw "Sudah terdaftar.";
             
+            // Logic Auto-Masuk Slot (Tanpa Admin) - Opsional jika kosong
             let empty = s.findIndex(x => !x);
+            // Default target
+            let targetBat = 100;
+            
+            // Jika ada slot kosong, langsung masuk dengan Rule
             if(empty !== -1) {
-                s[empty] = { name:p, phone:w, startBattery:b, target:100, startTime:null, duration:(100-b)*1.5 };
+                // Terapkan Rule Langsung saat daftar
+                let totalUser = s.filter(x=>x).length + q.length; // Total user aktif
+                if (totalUser >= 3 && totalUser <= 5) targetBat = 95;
+                else if (totalUser >= 6 && totalUser <= 10) targetBat = 90;
+                else if (totalUser > 10) targetBat = 85;
+
+                let percentNeeded = targetBat - b;
+                if(percentNeeded < 0) percentNeeded = 0;
+
+                s[empty] = { name:p, phone:w, startBattery:b, target:targetBat, startTime:null, duration:percentNeeded*1.5 };
             } else {
                 q.push({ name:p, phone:w, startBattery:b, target:100, duration:0 });
             }
@@ -336,7 +365,7 @@ function initFirebase() {
         }).then(() => {
             localStorage.setItem('myPlat', p);
             btn.innerText = "MONITORING AKTIF";
-            showModal("Berhasil Masuk Antrian", "<b>Monitoring Aktif!</b><br>Alarm akan berbunyi saat giliran Anda tiba. Jangan tutup tab ini.");
+            showModal("Berhasil Masuk", "<b>Monitoring Aktif!</b><br>Tunggu giliran Anda.");
         }).catch(e => {
             showModal("Gagal", e); btn.disabled=false; btn.innerText="DAFTAR";
         });
@@ -351,12 +380,13 @@ function loginAdmin() {
         document.getElementById('adminModal').classList.remove('show');
         document.getElementById('adminResetArea').style.display='block';
         showModal("Mode Operator", "Anda masuk sebagai Admin.");
-        db.collection("antrian").doc("utama").get();
+        db.collection("antrian").doc("utama").get(); 
     } else {
         showModal("Error", "PIN Salah");
     }
 }
 
+// Admin Actions
 function emptySlot(i) {
     if(!confirm("Kosongkan slot ini?")) return;
     updateDB(d => { d.chargingSlots[i] = null; return d; });
@@ -364,15 +394,8 @@ function emptySlot(i) {
 function startCharge(i) {
     updateDB(d => { d.chargingSlots[i].startTime = new Date().toISOString(); return d; });
 }
-function deleteQueue(i) {
-    if(!confirm("Hapus?")) return;
-    updateDB(d => { d.waitingQueue.splice(i, 1); return d; });
-}
-function resetAll() {
-    if(confirm("RESET TOTAL?")) db.collection("antrian").doc("utama").set({chargingSlots:[null,null,null], waitingQueue:[]});
-}
 
-// --- LOGIC PINDAH ANTRIAN (AUTO RULE LIMIT) ---
+// --- LOGIC PINDAH ANTRIAN (AUTO RULE & ANNOUNCE) ---
 function moveQueueToSlot(qIdx) {
     db.runTransaction(async t => {
         const ref = db.collection("antrian").doc("utama");
@@ -383,16 +406,17 @@ function moveQueueToSlot(qIdx) {
         let emptyIdx = s.findIndex(x => !x);
         if(emptyIdx === -1) throw "Slot Penuh!";
         
-        // 1. HITUNG ANTRIAN & TARGET
-        let totalQueue = q.length;
+        // 1. HITUNG ANTRIAN & TARGET (RE-CHECK SAAT PINDAH)
+        let totalActive = s.filter(x=>x).length + q.length;
         let targetBat = 100;
-        if (totalQueue >= 3 && totalQueue <= 5) targetBat = 95;
-        else if (totalQueue >= 6 && totalQueue <= 10) targetBat = 90;
-        else if (totalQueue > 10) targetBat = 85;
+        if (totalActive >= 3 && totalActive <= 5) targetBat = 95;
+        else if (totalActive >= 6 && totalActive <= 10) targetBat = 90;
+        else if (totalActive > 10) targetBat = 85;
 
-        // 2. PINDAHKAN & SET DURASI
+        // 2. PINDAHKAN
         let user = q[qIdx];
         q.splice(qIdx, 1);
+        
         let percentNeeded = targetBat - user.startBattery;
         if(percentNeeded < 0) percentNeeded = 0;
 
@@ -402,13 +426,18 @@ function moveQueueToSlot(qIdx) {
         
         s[emptyIdx] = user;
         t.update(ref, {chargingSlots: s, waitingQueue: q});
-        return targetBat;
-    }).then((target) => {
-        let msg = "✅ User masuk slot.\n";
-        if(target < 100) msg += `⚠️ ANTRIAN RAMAI! Batas cas otomatis diset ke ${target}%. Harap info ke user.`;
-        else msg += "Antrian aman. Target 100%.";
-        showModal("Info", msg);
+        return targetBat; // Return nilai untuk info admin
+    }).then((t) => {
+        showModal("Sukses", `User dipindahkan. Target otomatis: ${t}%`);
     }).catch(e => showModal("Gagal", e));
+}
+
+function deleteQueue(i) {
+    if(!confirm("Hapus?")) return;
+    updateDB(d => { d.waitingQueue.splice(i, 1); return d; });
+}
+function resetAll() {
+    if(confirm("RESET TOTAL?")) db.collection("antrian").doc("utama").set({chargingSlots:[null,null,null], waitingQueue:[]});
 }
 
 function updateDB(callback) {
