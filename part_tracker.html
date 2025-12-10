@@ -3,36 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MAKA Part Tracker</title>
+<title>Gratisan Part</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
 
 <style>
-/* ================= THEME VARIABLES ================= */
+/* ================= GLOBAL PREMIUM THEME ================= */
 :root {
-  --bg: #f6f8fb;
-  --surface: #ffffff;
-  --muted: #9ca3af;
+  --bg-base: #f0f4f8;
+  --accent: #0ea5a6;
+  --accent-2: #06b6d4;
   --text: #0f1724;
+  --muted: #64748b;
+  --danger: #ef4444;
+  --success: #10b981;
   
-  --accent: #0ea5a6;       /* Teal Utama */
-  --accent-2: #06b6d4;     /* Cyan */
-  --gold: #fbbf24;         /* Gold untuk highlight */
-  --danger: #ef4444;       /* Merah jika habis */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --backdrop-blur: blur(12px);
   
-  --radius-lg: 20px;
-  --radius-md: 14px;
-  --card-shadow: 0 8px 25px rgba(15,23,42,0.06);
+  --radius-lg: 24px;
   --max-width: 520px;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
 body {
   margin: 0; padding: 0;
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%);
+  background-color: var(--bg-base);
   color: var(--text);
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: url('1763947427555.jpg') center/cover no-repeat; 
+  opacity: 0.15; z-index: -1; pointer-events: none;
 }
 
 .app-container {
@@ -41,363 +52,248 @@ body {
   padding: 20px 20px 120px 20px;
 }
 
-/* ================= HEADER ================= */
-.header {
-  margin-bottom: 24px;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  padding-bottom: 16px;
-}
+/* HEADER */
+.header { margin-bottom: 24px; }
 .header h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.8em;
-  font-weight: 800;
-  margin: 0;
-  color: var(--text);
-  letter-spacing: -0.5px;
+  font-family: 'Syne', sans-serif; font-size: 1.8em; font-weight: 800;
+  margin: 0; color: var(--text); letter-spacing: -0.5px;
 }
-.header p {
-  color: var(--muted);
-  font-size: 0.9em;
-  margin: 4px 0 0 0;
-}
+.header p { color: var(--muted); font-size: 0.9em; margin: 4px 0 0 0; }
 
-/* ================= TRACKER GRID ================= */
+/* GRID CARD */
 .part-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 24px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;
 }
 
 .part-card {
-  background: var(--surface);
-  border-radius: var(--radius-md);
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
   padding: 16px;
-  box-shadow: var(--card-shadow);
-  border: 1px solid rgba(15,23,42,0.03);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: transform 0.2s;
+  display: flex; flex-direction: column; justify-content: space-between;
 }
 
-.part-card:active { transform: scale(0.98); }
-
-.part-name {
-  font-weight: 700;
-  font-size: 0.95em;
-  margin: 0 0 8px 0;
-  color: var(--text);
-}
-
-.part-limit-info {
-  font-size: 0.75em;
-  color: var(--muted);
-  margin-bottom: 8px;
-}
-.highlight-num {
-  font-weight: 800;
-  font-size: 1.1em;
-  color: var(--accent);
-}
+.part-name { font-weight: 700; font-size: 0.9em; margin: 0 0 8px 0; color: var(--text); }
+.part-limit { font-size: 0.75em; color: var(--muted); margin-bottom: 8px; }
+.highlight-num { font-weight: 800; font-size: 1.2em; color: var(--accent); }
 
 /* PROGRESS BAR */
 .progress-track {
-  width: 100%;
-  height: 8px;
-  background: #f1f5f9;
-  border-radius: 99px;
-  overflow: hidden;
-  margin-bottom: 8px;
+  width: 100%; height: 6px; background: rgba(0,0,0,0.05);
+  border-radius: 99px; overflow: hidden; margin-bottom: 8px;
 }
 .progress-fill {
   height: 100%;
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  border-radius: 99px;
-  transition: width 0.5s ease;
+  border-radius: 99px; transition: width 0.5s ease;
 }
-
-/* Habis = Merah */
 .progress-fill.empty { background: var(--danger); }
-
-.last-used {
-  font-size: 0.7em;
-  color: var(--muted);
-  border-top: 1px dashed rgba(0,0,0,0.05);
-  padding-top: 8px;
-  margin-top: auto; /* Push ke bawah */
-}
 
 /* BUTTON ACTION */
 .btn-action {
-  width: 100%;
-  padding: 16px;
-  border-radius: var(--radius-md);
+  width: 100%; padding: 16px; border-radius: 16px;
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: white;
-  border: none;
-  font-weight: 800;
-  font-size: 1em;
-  cursor: pointer;
-  box-shadow: 0 10px 20px rgba(14, 165, 166, 0.2);
-  display: block;
-  text-align: center;
-  text-decoration: none;
-  transition: 0.2s;
+  color: white; border: none; font-weight: 800; font-size: 1em; cursor: pointer;
+  box-shadow: 0 8px 20px rgba(14, 165, 166, 0.2);
+  display: flex; justify-content: center; align-items: center; gap: 8px;
+  text-decoration: none; margin-bottom: 30px;
 }
-.btn-action:active { transform: scale(0.98); box-shadow: none; }
+.btn-action:active { transform: scale(0.98); }
 
-/* ================= MODAL ================= */
+/* LOG RIWAYAT SECTION */
+.log-section h3 { font-family: 'Syne'; font-size: 1.2em; margin-bottom: 12px; }
+.log-list {
+  background: var(--glass-bg);
+  backdrop-filter: var(--backdrop-blur);
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  padding: 10px;
+}
+.log-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.9em;
+}
+.log-item:last-child { border-bottom: none; }
+.log-date { font-size: 0.8em; color: var(--muted); display: block; }
+.log-part { font-weight: 700; color: var(--text); }
+
+/* MODAL */
 .modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,0.4);
-  backdrop-filter: blur(4px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+  display: none; align-items: center; justify-content: center; z-index: 2000;
 }
-
 .modal-content {
-  background: var(--surface);
-  width: 85%; max-width: 360px;
-  padding: 24px;
-  border-radius: 24px;
-  text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-  animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: #fff; width: 85%; max-width: 320px; padding: 24px;
+  border-radius: 24px; text-align: center;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
 }
-
-@keyframes popUp {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
+.modal-content h3 { font-family: 'Syne'; margin: 0 0 10px; font-size: 1.4em; }
+select {
+  width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd;
+  background: #f8fafc; margin-bottom: 20px; font-size: 1em; outline: none;
 }
+.btn-row { display: flex; gap: 10px; }
+.btn-ok { flex: 1; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 700; }
+.btn-cancel { flex: 1; padding: 12px; background: #f1f5f9; color: var(--muted); border: none; border-radius: 12px; font-weight: 700; }
 
-.modal-content h3 {
-  margin: 0 0 12px;
-  font-family: 'Syne', sans-serif;
-  font-size: 1.3em;
-  color: var(--text);
-}
-.modal-content p { color: var(--muted); font-size: 0.9em; margin-bottom: 20px; }
-
-select.custom-select {
-  width: 100%;
-  padding: 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.1);
-  background: #f9fafb;
-  margin-bottom: 16px;
-  font-size: 14px;
-  outline: none;
-}
-select.custom-select:focus { border-color: var(--accent); background: white; }
-
-.modal-btns { display: flex; gap: 10px; }
-.btn-confirm { flex: 1; background: var(--accent); color: white; border:none; padding: 12px; border-radius: 12px; font-weight:700; }
-.btn-cancel { flex: 1; background: #f3f4f6; color: var(--muted); border:none; padding: 12px; border-radius: 12px; font-weight:700; }
-
-/* ================= BOTTOM NAV ================= */
+/* NAV STANDAR */
 footer.bottom-nav {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 20px;
-  width: calc(100% - 40px);
-  max-width: 480px;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 999px;
-  padding: 12px 20px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
-  border: 1px solid rgba(255,255,255,0.5);
-  z-index: 999;
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px;
+  width: calc(100% - 40px); max-width: 480px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-radius: 999px; padding: 12px 20px; display: flex; justify-content: space-around;
+  align-items: center; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.5); z-index: 999;
 }
 .nav-item {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px;
+  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; transition: 0.2s;
 }
 .nav-item span { font-size: 20px; margin-bottom: 2px; }
 .nav-item.active { color: var(--accent); font-weight: 700; }
-.nav-item.active span { transform: scale(1.1); }
-
+.nav-item.active span { transform: scale(1.1); filter: drop-shadow(0 2px 4px rgba(14,165,166,0.3)); }
 </style>
 </head>
 
 <body>
-    <div class="app-container">
-        
-        <header class="header">
-            <div class="user-info">
-                <h1>Cek Gratisan</h1>
-                <p>Lacak sisa jatah penggantian suku cadang gratis.</p>
-            </div>
-        </header>
+<div class="app-container">
+    <header class="header">
+        <h1>Cek Gratisan</h1>
+        <p>Jatah part gratis 3 tahun</p>
+    </header>
 
-        <section>
-            <div id="part-tracker" class="part-grid">
-                </div>
-            
-            <a href="#" class="btn-action" onclick="openMarkUsageModal(); return false;">
-                📝 CATAT PENGGUNAAN BARU
-            </a>
-        </section>
+    <div id="part-tracker" class="part-grid"></div>
 
-    </div>
+    <button class="btn-action" onclick="openModal()">
+        <span>📝</span> CATAT PENGGUNAAN BARU
+    </button>
     
-    <div id="markUsageModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3>Catat Penggantian</h3>
-            <p>Pilih suku cadang yang diganti hari ini:</p>
-            
-            <form id="usage-form">
-                <select id="part-select" class="custom-select">
-                    <option value="">-- Pilih Suku Cadang --</option>
-                </select>
-                
-                <div class="modal-btns">
-                    <button type="button" class="btn-cancel" onclick="closeMarkUsageModal()">Batal</button>
-                    <button type="submit" class="btn-confirm">Konfirmasi</button>
-                </div>
-            </form>
+    <div class="log-section">
+        <h3>Riwayat Penggantian</h3>
+        <div id="log-list" class="log-list">
+            <div style="text-align:center; padding:15px; color:#999; font-size:0.8em;">Belum ada data.</div>
         </div>
     </div>
+</div>
 
-    <footer class="bottom-nav">
-        <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
-        <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
-        <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
-    </footer>
+<div id="modal" class="modal-overlay">
+    <div class="modal-content">
+        <h3>Catat Penggantian</h3>
+        <p style="color:#666; font-size:0.9em; margin-bottom:15px;">Pilih part yang diganti hari ini:</p>
+        <select id="partSelect">
+            <option value="">-- Pilih Part --</option>
+        </select>
+        <div class="btn-row">
+            <button class="btn-cancel" onclick="closeModal()">Batal</button>
+            <button class="btn-ok" onclick="saveUsage()">Konfirmasi</button>
+        </div>
+    </div>
+</div>
 
-    <script>
-        // Mengambil PART_LIMITS dari Admin Panel atau default
-        let PART_LIMITS = JSON.parse(localStorage.getItem('maka_part_limits')) || {
-            ban_depan: 3, 
-            ban_belakang: 3, 
-            kampas_depan: 3,
-            kampas_belakang: 3
-        };
+<footer class="bottom-nav">
+  <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
+  <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
+  <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
+</footer>
 
-        let partUsage = JSON.parse(localStorage.getItem('maka_part_usage')) || {
-            ban_depan: 0,
-            ban_belakang: 0,
-            kampas_depan: 0,
-            kampas_belakang: 0,
-            last_used: {} 
-        };
+<script>
+// Data
+let PART_LIMITS = JSON.parse(localStorage.getItem('maka_part_limits')) || {
+    ban_depan: 3, ban_belakang: 3, kampas_depan: 3, kampas_belakang: 3
+};
+let partUsage = JSON.parse(localStorage.getItem('maka_part_usage')) || {
+    ban_depan: 0, ban_belakang: 0, kampas_depan: 0, kampas_belakang: 0, 
+    history: [] // New: Array untuk menyimpan log riwayat
+};
+
+function getParts() {
+    return [
+        { key: 'ban_depan', name: 'Ban Depan' },
+        { key: 'ban_belakang', name: 'Ban Belakang' },
+        { key: 'kampas_depan', name: 'Kampas Depan' },
+        { key: 'kampas_belakang', name: 'Kampas Belakang' }
+    ];
+}
+
+function render() {
+    // 1. Render Cards
+    const container = document.getElementById('part-tracker');
+    const select = document.getElementById('partSelect');
+    container.innerHTML = '';
+    select.innerHTML = '<option value="">-- Pilih Part --</option>';
+
+    getParts().forEach(p => {
+        const limit = PART_LIMITS[p.key] || 3;
+        const used = partUsage[p.key] || 0;
+        const remaining = limit - used;
+        const percent = (used / limit) * 100;
         
-        function getAvailableParts() {
-            const defaultParts = [
-                { key: 'ban_depan', name: 'Ban Depan' },
-                { key: 'ban_belakang', name: 'Ban Belakang' },
-                { key: 'kampas_depan', name: 'Kampas Depan' },
-                { key: 'kampas_belakang', name: 'Kampas Belakang' }
-            ];
-            
-            const adminPartList = JSON.parse(localStorage.getItem('maka_admin_parts')) || [];
-            
-            const finalParts = [...defaultParts];
-            const existingKeys = defaultParts.map(p => p.key);
+        const barClass = remaining <= 0 ? 'progress-fill empty' : 'progress-fill';
+        const color = remaining <= 0 ? 'var(--danger)' : 'var(--accent)';
 
-            adminPartList.forEach(p => {
-                if (!existingKeys.includes(p.key)) {
-                    finalParts.push(p);
-                    existingKeys.push(p.key);
-                }
-            });
-
-            return finalParts;
-        }
-
-        function renderPartTracker() {
-            PART_LIMITS = JSON.parse(localStorage.getItem('maka_part_limits')) || PART_LIMITS; 
-            
-            const container = document.getElementById('part-tracker');
-            const selectElement = document.getElementById('part-select');
-            container.innerHTML = '';
-            selectElement.innerHTML = '<option value="">-- Pilih Suku Cadang --</option>';
-
-            const parts = getAvailableParts();
-            
-            parts.forEach(part => {
-                const limit = PART_LIMITS[part.key] || 3; 
-                const totalUsed = partUsage[part.key] || 0;
-                
-                const remaining = limit - totalUsed;
-                // Hitung lebar bar: Jika remaining 0, width 100% (tapi merah). Jika masih ada, hitung persen terpakai.
-                // Logika: Bar menunjukkan "Usage". 
-                const percentageUsed = (totalUsed / limit) * 100;
-                
-                const lastDate = partUsage.last_used[part.key] || '-';
-                
-                // Warna
-                const isEmpty = remaining <= 0;
-                const highlightColor = isEmpty ? 'var(--danger)' : 'var(--accent)';
-                const barClass = isEmpty ? 'progress-fill empty' : 'progress-fill';
-
-                container.innerHTML += `
-                    <div class="part-card">
-                        <div>
-                            <p class="part-name">${part.name}</p>
-                            <div class="part-limit-info">
-                                Sisa: <span class="highlight-num" style="color:${highlightColor}">${remaining}</span> / ${limit}
-                            </div>
-                            <div class="progress-track">
-                                <div class="${barClass}" style="width: ${percentageUsed}%;"></div>
-                            </div>
-                        </div>
-                        <small class="last-used">
-                            Terakhir: ${lastDate}
-                        </small>
-                    </div>
-                `;
-                 // Isi Opsi Select Modal
-                 if(remaining > 0) {
-                     selectElement.innerHTML += `<option value="${part.key}">${part.name} (Sisa: ${remaining})</option>`;
-                 }
-            });
-        }
-
-        document.getElementById('usage-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const partKey = document.getElementById('part-select').value;
-            const limit = PART_LIMITS[partKey] || 3;
-            
-            if (!partKey) {
-                alert('Pilih suku cadang yang diganti.');
-                return;
-            }
-
-            if (partUsage[partKey] >= limit) {
-                alert('Jatah suku cadang ini sudah habis.');
-                return;
-            }
-
-            partUsage[partKey] = (partUsage[partKey] || 0) + 1;
-            partUsage.last_used[partKey] = new Date().toLocaleDateString('id-ID');
-            
-            localStorage.setItem('maka_part_usage', JSON.stringify(partUsage));
-
-            alert(`Sukses! ${partKey} berhasil dicatat.`);
-            
-            closeMarkUsageModal();
-            renderPartTracker(); 
-        });
-
-        // Modal Controls
-        function openMarkUsageModal() {
-            document.getElementById('markUsageModal').style.display = 'flex';
-        }
-
-        function closeMarkUsageModal() {
-            document.getElementById('markUsageModal').style.display = 'none';
-        }
+        container.innerHTML += `
+            <div class="part-card">
+                <div>
+                    <div class="part-name">${p.name}</div>
+                    <div class="progress-track"><div class="${barClass}" style="width:${percent}%"></div></div>
+                </div>
+                <div class="part-limit">Sisa: <span class="highlight-num" style="color:${color}">${remaining}</span> / ${limit}</div>
+            </div>`;
         
-        document.addEventListener('DOMContentLoaded', renderPartTracker);
-    </script>
+        if (remaining > 0) {
+            select.innerHTML += `<option value="${p.key}">${p.name}</option>`;
+        }
+    });
+
+    // 2. Render History Log
+    const logContainer = document.getElementById('log-list');
+    const history = partUsage.history || [];
+    
+    if(history.length === 0) {
+        logContainer.innerHTML = '<div style="text-align:center; padding:15px; color:#999; font-size:0.8em;">Belum ada data.</div>';
+    } else {
+        // Urutkan dari yang terbaru (reverse)
+        logContainer.innerHTML = history.slice().reverse().map(h => {
+            // Cari nama part cantik
+            const pName = getParts().find(x => x.key === h.key)?.name || h.key;
+            return `
+            <div class="log-item">
+                <div class="log-part">${pName}</div>
+                <small class="log-date">${h.date}</small>
+            </div>`;
+        }).join('');
+    }
+}
+
+function openModal() { document.getElementById('modal').style.display = 'flex'; }
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+function saveUsage() {
+    const key = document.getElementById('partSelect').value;
+    if (!key) return alert("Pilih part dulu!");
+    
+    // Update Counter
+    partUsage[key] = (partUsage[key] || 0) + 1;
+    
+    // Update History Log with Date
+    const today = new Date().toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'
+    });
+    
+    if(!partUsage.history) partUsage.history = [];
+    partUsage.history.push({ key: key, date: today });
+    
+    localStorage.setItem('maka_part_usage', JSON.stringify(partUsage));
+    closeModal();
+    render();
+    alert("Berhasil dicatat!");
+}
+
+document.addEventListener('DOMContentLoaded', render);
+</script>
 </body>
 </html>
