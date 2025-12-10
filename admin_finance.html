@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Admin Finance - MAKA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+/* CSS VARIABLES & LAYOUT */
+:root { --bg:#f6f8fb; --surface:#ffffff; --text:#0f1724; --accent:#0ea5a6; --radius-lg:20px; }
+body { margin:0; padding:20px; font-family:'Inter'; background:var(--bg); color:var(--text); }
+.container { max-width:700px; margin:0 auto; padding-bottom:50px; }
+
+h2 { font-family:'Syne'; border-bottom:1px solid #ddd; padding-bottom:10px; display:flex; justify-content:space-between; }
+.card { background:var(--surface); padding:20px; border-radius:var(--radius-lg); margin-bottom:15px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
+
+/* FORMS */
+.form-row { display:flex; gap:10px; margin-bottom:15px; }
+.form-col { flex:1; }
+label { display:block; font-size:0.7em; font-weight:700; margin-bottom:5px; color:#64748b; text-transform:uppercase; }
+input, select { width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; font-family:'Inter'; }
+
+button { width:100%; padding:12px; background:var(--text); color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer; margin-top:5px; }
+button.print { background: #0ea5a6; }
+button.excel { background: #10b981; }
+
+/* INVOICE TABLE */
+table { width:100%; border-collapse:collapse; margin-top:10px; font-size:0.9em; }
+th { text-align:left; background:#f1f5f9; padding:8px; font-size:0.8em; }
+td { border-bottom:1px solid #eee; padding:8px; }
+.total-row td { font-weight:800; font-size:1.1em; background:#f8fafc; }
+
+/* QRIS MOCKUP */
+.qris-box {
+    display:none; text-align:center; background:white; padding:20px; border:1px dashed #aaa; margin-top:20px;
+}
+.qris-box.active { display:block; animation:pop 0.3s; }
+@keyframes pop { from{transform:scale(0.8)} to{transform:scale(1)} }
+#qrcode { display:flex; justify-content:center; margin:15px 0; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>
+        <span>💰 Admin Finance</span>
+        <a href="admin_login.html" style="font-size:0.5em; color:red; text-decoration:none; align-self:center;">LOGOUT</a>
+    </h2>
+
+    <div class="card">
+        <div class="form-row">
+            <div class="form-col">
+                <label>Nama User (Simulasi)</label>
+                <input id="invName" value="User Demo" readonly style="background:#f1f5f9;">
+            </div>
+            <div class="form-col">
+                <label>Plat Nomor</label>
+                <input id="invPlat" value="Loading..." readonly style="background:#f1f5f9;">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-col">
+                <label>Dari Tanggal</label>
+                <input type="date" id="startDate">
+            </div>
+            <div class="form-col">
+                <label>Sampai Tanggal</label>
+                <input type="date" id="endDate">
+            </div>
+        </div>
+        <button onclick="generateInvoice()">GENERATE INVOICE</button>
+    </div>
+
+    <div id="invoiceResult" style="display:none;">
+        <div class="card" id="printArea">
+            <div style="text-align:center; border-bottom:2px dashed #eee; padding-bottom:15px; margin-bottom:15px;">
+                <h3 style="margin:0; font-family:'Syne';">MAKA RENTAL</h3>
+                <small>Invoice Tagihan Sewa & Cicilan</small>
+            </div>
+
+            <table id="invTable">
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Keterangan</th>
+                        <th style="text-align:right;">Biaya</th>
+                    </tr>
+                </thead>
+                <tbody id="invBody"></tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="2">TOTAL TAGIHAN</td>
+                        <td style="text-align:right;" id="invTotal">Rp 0</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div id="qrisSection" class="qris-box">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png" style="width:150px; opacity:0.1; position:absolute;"> 
+                <div id="qrcode"></div>
+                <strong>SCAN QRIS</strong><br>
+                <small>NMID: ID102003004005</small><br>
+                <strong id="qrisAmount" style="font-size:1.2em; color:#0ea5a6;">Rp 0</strong>
+                <p style="font-size:0.7em; color:#666; margin-top:10px;">
+                    *Simulasi: Scan QR ini akan otomatis mengupdate status pembayaran user di kalender.
+                </p>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <button class="print" onclick="window.print()">🖨️ PRINT</button>
+            <button class="excel" onclick="exportExcel()">📊 EXCEL</button>
+        </div>
+        
+        <button onclick="toggleQris()" style="background:#333; margin-top:10px;">tampilkan QRIS TAGIHAN</button>
+    </div>
+
+</div>
+
+<script>
+// CONFIG
+const HWB_RATE = 80000; 
+const CDP_RATE = 70000;
+const MAKA_PLUS_RATE = 10000;
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Load data user dummy dari localStorage user
+    const u = JSON.parse(localStorage.getItem('maka_user'));
+    if(u) {
+        document.getElementById('invName').value = u.nama;
+        document.getElementById('invPlat').value = u.plat;
+    }
+    
+    // Default date: Hari ini
+    document.getElementById('endDate').valueAsDate = new Date();
+    // Start date: 7 hari lalu
+    const d = new Date(); d.setDate(d.getDate()-7);
+    document.getElementById('startDate').valueAsDate = d;
+});
+
+function generateInvoice() {
+    const start = new Date(document.getElementById('startDate').value);
+    const end = new Date(document.getElementById('endDate').value);
+    const tbody = document.getElementById('invBody');
+    tbody.innerHTML = '';
+    
+    let total = 0;
+    
+    // Cek Data MAKA+ User
+    const makaPlus = JSON.parse(localStorage.getItem('maka_plus_data'));
+    let plusStart = null;
+    if(makaPlus && makaPlus.active) {
+        plusStart = new Date(makaPlus.activatedAt);
+        plusStart.setHours(0,0,0,0);
+    }
+
+    // Loop Date
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const day = d.getDate();
+        let desc = "Sewa Harian (HWB)";
+        let cost = HWB_RATE; // Default
+        
+        // Cek Logic 14 & 28 (Contoh sederhana)
+        if(day === 14 || day === 28) {
+            desc = "Cicilan DP (CDP)";
+            cost = CDP_RATE; // Misal lebih murah/beda
+        }
+
+        // Cek MAKA+
+        if(plusStart && d > plusStart) {
+            // Cek apakah masih dalam masa 1 tahun (opsional, disederhanakan)
+            desc += " + Cicilan Charger";
+            cost += MAKA_PLUS_RATE;
+        }
+
+        // Add Row
+        const dateStr = d.toLocaleDateString('id-ID');
+        total += cost;
+        
+        tbody.innerHTML += `
+            <tr>
+                <td>${dateStr}</td>
+                <td>${desc}</td>
+                <td style="text-align:right;">${cost.toLocaleString('id-ID')}</td>
+            </tr>
+        `;
+    }
+    
+    document.getElementById('invTotal').innerText = "Rp " + total.toLocaleString('id-ID');
+    document.getElementById('qrisAmount').innerText = "Rp " + total.toLocaleString('id-ID');
+    
+    // Generate QR Code Mockup
+    document.getElementById('qrcode').innerHTML = "";
+    new QRCode(document.getElementById("qrcode"), {
+        text: "MAKA_INVOICE_" + total + "_" + Date.now(),
+        width: 128, height: 128
+    });
+
+    document.getElementById('invoiceResult').style.display = 'block';
+}
+
+function toggleQris() {
+    const q = document.getElementById('qrisSection');
+    q.classList.toggle('active');
+}
+
+function exportExcel() {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.table_to_sheet(document.getElementById('invTable'));
+    XLSX.utils.book_append_sheet(wb, ws, "Invoice");
+    XLSX.writeFile(wb, "Invoice_MAKA.xlsx");
+}
+</script>
+</body>
+</html>
