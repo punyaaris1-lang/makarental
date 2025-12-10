@@ -1,8 +1,8 @@
-const CACHE_NAME = "maka-rental-v1.1.1"; // Versi cache DITINGKATKAN
-const REPO_NAME = "/makarental"; // Nama repositori Anda
+const CACHE_NAME = "maka-rental-v1.1.2"; // VERSI DITINGKATKAN LAGI
+const REPO_NAME = "/makarental"; // Pastikan ini benar
 
 const FILES_TO_CACHE = [
-  // Path UTAMA harus menggunakan nama repositori
+  // Path UTAMA
   `${REPO_NAME}/`,
   `${REPO_NAME}/index.html`,
   
@@ -12,20 +12,17 @@ const FILES_TO_CACHE = [
   `${REPO_NAME}/history.html`,
   `${REPO_NAME}/settings.html`,
   `${REPO_NAME}/daftar_antrian.html`,
-  
-  // Halaman Menu & Admin
-  `${REPO_NAME}/part_tracker.html`,
-  `${REPO_NAME}/tips_maka.html`,
-  `${REPO_NAME}/info_mlu.html`,
-  `${REPO_NAME}/maka_plus.html`,
   `${REPO_NAME}/lokasi_fc.html`,
-  `${REPO_NAME}/admin_login.html`,
-  `${REPO_NAME}/admin_user.html`,
-  `${REPO_NAME}/admin_finance.html`,
   
-  // Assets
+  // Files yang ADA di folder Anda
+  `${REPO_NAME}/icon-512.png`, 
+  `${REPO_NAME}/manifest.json`,
   `${REPO_NAME}/1763947427555.jpg`,
-  `${REPO_NAME}/manifest.json` // Tambahkan manifest agar terjamin di-cache
+  
+  // Pastikan file CSS/JS yang tidak terpisah sudah tercover (jika ada)
+  `${REPO_NAME}/app.js`,
+  `${REPO_NAME}/index.js`,
+  // ... Tambahkan file CSS/JS lain jika ada link eksternal di HTML.
 ];
 
 // 1. Instalasi: Menyimpan semua file ke cache
@@ -34,7 +31,7 @@ self.addEventListener("install", (evt) => {
     caches.open(CACHE_NAME).then((cache) => {
       console.log("PWA: Caching semua file aplikasi.");
       return cache.addAll(FILES_TO_CACHE).catch(error => {
-        // Jika ada error di sini, berarti file hilang atau path salah
+        // Ini akan menangkap error jika path salah
         console.error('PWA ERROR: Gagal mencache file. Cek nama file di atas!', error);
       });
     })
@@ -42,16 +39,25 @@ self.addEventListener("install", (evt) => {
   self.skipWaiting(); 
 });
 
-// 2. Strategi Cache: Mengambil dari cache (offline first)
+// 2. Strategi Cache: Cache First, Network Fallback
 self.addEventListener("fetch", (evt) => {
-  // Hanya melayani permintaan dari cache untuk file-file statis yang kita butuhkan
-  if (FILES_TO_CACHE.includes(new URL(evt.request.url).pathname)) {
-      evt.respondWith(
-          caches.match(evt.request).then((res) => {
-              return res || fetch(evt.request);
-          })
-      );
-  }
+    // Abaikan requests eksternal (Firebase SDK, Fonts)
+    if (evt.request.url.startsWith('http') && !evt.request.url.startsWith(self.location.origin)) return;
+
+    // Untuk semua file internal, coba dari Cache dulu
+    evt.respondWith(
+        caches.match(evt.request).then((response) => {
+            // Jika ada di cache, langsung kembalikan
+            if (response) {
+                return response;
+            }
+            // Jika tidak ada di cache, coba dari network (Internet)
+            return fetch(evt.request);
+        }).catch(() => {
+            // Jika cache dan network gagal (offline), bisa kembalikan halaman offline khusus
+            // Di sini kita biarkan browser menampilkan error koneksi.
+        })
+    );
 });
 
 // 3. Aktivasi: Menghapus cache lama
@@ -70,3 +76,4 @@ self.addEventListener("activate", (evt) => {
   );
   self.clients.claim();
 });
+                       
