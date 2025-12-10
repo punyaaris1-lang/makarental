@@ -6,32 +6,41 @@
 <title>Admin Ops - MAKA Online</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
 
+<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* CSS GLOBAL THEME (Sama seperti sebelumnya) */
-:root { --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; --danger:#ef4444; --glass-bg:rgba(255,255,255,0.85); --glass-border:rgba(255,255,255,0.6); --glass-shadow:0 8px 32px 0 rgba(31,38,135,0.1); --backdrop-blur:blur(12px); --radius-lg:20px; }
+/* GLOBAL THEME */
+:root { --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; --danger:#ef4444; --glass-bg:rgba(255,255,255,0.85); --glass-border:rgba(255,255,255,0.6); --radius-lg:20px; }
 body { margin:0; padding:20px; font-family:'Inter'; background:var(--bg-base); color:var(--text); min-height:100vh; }
 body::before { content:""; position:fixed; inset:0; background:url('1763947427555.jpg') center/cover; opacity:0.15; z-index:-1; pointer-events:none; }
 .container { max-width:650px; margin:0 auto; padding-bottom:50px; }
-h2 { font-family:'Syne'; margin-bottom:20px; display:flex; justify-content:space-between; }
+
+h2 { font-family:'Syne'; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; }
+
+/* TABS */
 .tabs { display:flex; gap:10px; margin-bottom:20px; overflow-x:auto; padding-bottom:5px; }
 .tab-btn { padding:10px 20px; border-radius:12px; border:none; background:rgba(255,255,255,0.6); font-weight:700; cursor:pointer; white-space:nowrap; transition:0.2s; }
 .tab-btn.active { background:var(--text); color:#fff; box-shadow:0 5px 15px rgba(0,0,0,0.2); }
-.section { display:none; animation:fadeIn 0.3s; }
-.section.active { display:block; }
-@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-.glass-card { background:var(--glass-bg); backdrop-filter:var(--backdrop-blur); border:1px solid var(--glass-border); border-radius:var(--radius-lg); padding:24px; margin-bottom:20px; box-shadow:var(--glass-shadow); }
-label { display:block; font-size:0.8em; font-weight:700; margin-bottom:6px; color:#64748b; text-transform:uppercase; }
+
+/* CARDS & INPUTS */
+.section { display:none; } .section.active { display:block; }
+.glass-card { background:var(--glass-bg); backdrop-filter:blur(12px); border:1px solid var(--glass-border); border-radius:var(--radius-lg); padding:24px; margin-bottom:20px; box-shadow:0 8px 32px rgba(0,0,0,0.05); }
 input, textarea, select { width:100%; padding:12px; border-radius:12px; border:1px solid #cbd5e1; margin-bottom:15px; font-family:'Inter'; background:rgba(255,255,255,0.9); }
-button { width:100%; padding:14px; background:var(--accent); color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; box-shadow:0 5px 15px rgba(14,165,166,0.3); transition:0.2s; }
-button:active { transform:scale(0.98); }
-button.danger { background:var(--danger); box-shadow:0 5px 15px rgba(239, 68, 68, 0.3); }
+label { display:block; font-size:0.8em; font-weight:700; margin-bottom:6px; color:#64748b; text-transform:uppercase; }
+
+/* BUTTONS */
+button { width:100%; padding:14px; background:var(--accent); color:white; border:none; border-radius:12px; font-weight:700; cursor:pointer; margin-bottom:10px; }
+.btn-excel { background:#10b981; margin-bottom:20px; box-shadow:0 5px 15px rgba(16,185,129,0.3); }
+.btn-small { width:auto; padding:8px 16px; font-size:0.8em; margin:0; }
+.danger { background:var(--danger); }
+
+/* USER LIST */
 .user-item { display:flex; justify-content:space-between; align-items:center; padding:15px; border-bottom:1px solid rgba(0,0,0,0.05); background:rgba(255,255,255,0.5); margin-bottom:8px; border-radius:12px; }
 .u-info h4 { margin:0; font-size:1em; font-weight:700; }
 .u-info p { margin:4px 0 0; font-size:0.8em; color:#666; }
-.btn-small { width:auto; padding:8px 16px; font-size:0.8em; }
 </style>
 </head>
 <body>
@@ -50,7 +59,10 @@ button.danger { background:var(--danger); box-shadow:0 5px 15px rgba(239, 68, 68
 
     <div id="sec-1" class="section active">
         <div class="glass-card">
-            <h3>Database User Realtime</h3>
+            <h3>Database User</h3>
+            
+            <button onclick="exportToExcel()" class="btn-excel">📥 DOWNLOAD DATA (EXCEL)</button>
+            
             <input type="text" id="searchUser" placeholder="Cari Plat Nomor..." onkeyup="loadUsers()">
             <div id="userListContainer">
                 <p style="text-align:center; color:#999;">Memuat data...</p>
@@ -74,17 +86,11 @@ button.danger { background:var(--danger); box-shadow:0 5px 15px rgba(239, 68, 68
     <div id="sec-3" class="section">
         <div class="glass-card" style="border:1px solid #fcd34d; background:rgba(255,251,235,0.9);">
             <h3>🔔 Kirim Notifikasi HP</h3>
-            <p style="font-size:0.8em; color:#b45309; margin-bottom:15px;">Pesan ini akan muncul seperti notifikasi WA di HP semua user yang sedang online.</p>
-            
-            <label>Judul Notifikasi</label>
-            <input id="notifTitle" placeholder="Cth: INFO PENTING!">
-            
-            <label>Pesan Singkat</label>
-            <input id="notifBody" placeholder="Cth: Lokasi FC Baru sudah dibuka di...">
-            
-            <button onclick="sendBroadcast()" style="background:#d97706; box-shadow:0 5px 15px rgba(217,119,6,0.3);">KIRIM NOTIFIKASI 🚀</button>
+            <label>Judul Notifikasi</label><input id="notifTitle" placeholder="INFO PENTING!">
+            <label>Pesan Singkat</label><input id="notifBody" placeholder="Isi pesan...">
+            <button onclick="sendBroadcast()" style="background:#d97706;">KIRIM NOTIFIKASI 🚀</button>
         </div>
-
+        
         <div class="glass-card">
             <h3>Posting Artikel (Info/Tips)</h3>
             <label>Kategori</label>
@@ -98,7 +104,6 @@ button.danger { background:var(--danger); box-shadow:0 5px 15px rgba(239, 68, 68
             <button onclick="publishContent()">PUBLISH SEKARANG</button>
         </div>
     </div>
-
 </div>
 
 <script>
@@ -114,6 +119,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// --- TABS ---
 function sw(id){
     document.querySelectorAll('.section').forEach(d=>d.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -121,30 +127,74 @@ function sw(id){
     event.target.classList.add('active');
 }
 
-// === 1. USER MANAGEMENT ===
+// === 1. USER MANAGEMENT & EXCEL ===
+let allUsersCache = []; // Simpan data di sini untuk export
+
 function loadUsers() {
     const search = document.getElementById('searchUser').value.toUpperCase();
     const container = document.getElementById('userListContainer');
+    
     db.collection('users').get().then(snap => {
+        allUsersCache = []; // Reset cache
         let html = '';
+        
         snap.forEach(doc => {
             const u = doc.data();
+            allUsersCache.push(u); // Masukkan ke cache untuk excel
+            
             if(u.plat.includes(search) || u.nama.toUpperCase().includes(search)) {
                 const isBanned = u.isBanned === true;
                 const btnAction = isBanned 
                     ? `<button class="btn-small" style="background:#10b981;" onclick="toggleBan('${u.plat}', false)">UN-BAN ✅</button>`
                     : `<button class="btn-small danger" onclick="toggleBan('${u.plat}', true)">BAN 🚫</button>`;
-                html += `<div class="user-item">
-                    <div class="u-info"><h4>${u.nama} (${u.plat}) ${isBanned?'<span style="color:red;font-size:0.8em">[BLOKIR]</span>':''}</h4><p>${u.hp}</p></div>
-                    <div>${btnAction}</div></div>`;
+                
+                html += `
+                <div class="user-item">
+                    <div class="u-info">
+                        <h4>${u.nama} (${u.plat}) ${isBanned?'<span style="color:red">[BLOKIR]</span>':''}</h4>
+                        <p>${u.hp} • Join: ${formatDate(u.joinedAt)}</p>
+                    </div>
+                    <div>${btnAction}</div>
+                </div>`;
             }
         });
         container.innerHTML = html || '<p style="text-align:center">Tidak ada user ditemukan.</p>';
     });
 }
+
+function formatDate(isoStr) {
+    if(!isoStr) return "-";
+    const d = new Date(isoStr);
+    return d.toLocaleDateString('id-ID');
+}
+
 function toggleBan(plat, status) {
     if(!confirm(status ? "Blokir user ini?" : "Buka blokir user ini?")) return;
-    db.collection('users').doc(plat).update({ isBanned: status }).then(() => { alert("Status diubah!"); loadUsers(); });
+    db.collection('users').doc(plat).update({ isBanned: status }).then(() => { loadUsers(); });
+}
+
+// --- FUNGSI EXPORT EXCEL ---
+function exportToExcel() {
+    if(allUsersCache.length === 0) return alert("Belum ada data user!");
+    
+    // 1. Format Data agar rapi di Excel
+    const dataToExport = allUsersCache.map(u => ({
+        "Nama Lengkap": u.nama,
+        "Plat Nomor": u.plat,
+        "No. WhatsApp": u.hp,
+        "Tgl. Gabung": formatDate(u.joinedAt),
+        "Tgl. Ambil Motor": u.tglAmbil || "-",
+        "Opsi DP": u.dp || "-",
+        "Status Blokir": u.isBanned ? "YA" : "TIDAK"
+    }));
+
+    // 2. Buat Worksheet
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data Member");
+
+    // 3. Download File
+    XLSX.writeFile(workbook, "Data_Member_MAKA.xlsx");
 }
 
 // === 2. PART MASTER ===
@@ -168,26 +218,18 @@ function loadParts() {
     });
 }
 
-// === 3. BROADCAST NOTIFIKASI ===
+// === 3. BROADCAST & KONTEN ===
 function sendBroadcast() {
     const title = document.getElementById('notifTitle').value;
     const body = document.getElementById('notifBody').value;
-    if(!title || !body) return alert("Isi judul dan pesan notifikasi!");
-
-    if(!confirm("Kirim notifikasi ini ke SEMUA user?")) return;
+    if(!title || !body) return alert("Isi lengkap!");
+    if(!confirm("Kirim notifikasi ke SEMUA user?")) return;
 
     db.collection('broadcasts').add({
-        title: title,
-        body: body,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-        alert("📢 Notifikasi terkirim!");
-        document.getElementById('notifTitle').value = '';
-        document.getElementById('notifBody').value = '';
-    });
+        title: title, body: body, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => alert("Notifikasi terkirim!"));
 }
 
-// === 4. PUBLISH KONTEN ===
 function publishContent() {
     const type = document.getElementById('postType').value;
     const title = document.getElementById('postTitle').value;
@@ -195,12 +237,12 @@ function publishContent() {
     const img = document.getElementById('postImg').value;
     if(!title || !content) return alert("Isi lengkap!");
     
-    const collectionName = type === 'info' ? 'info_mlu' : 'tips_maka';
-    const today = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'});
+    const collection = type === 'info' ? 'info_mlu' : 'tips_maka';
+    const date = new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'});
     
-    db.collection(collectionName).add({
-        title: title, content: content, photos: img ? [img] : [], date: today, timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => { alert("Artikel Terbit!"); });
+    db.collection(collection).add({
+        title: title, content: content, photos: img ? [img] : [], date: date, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => alert("Artikel Terbit!"));
 }
 
 loadUsers(); loadParts();
