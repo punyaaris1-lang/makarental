@@ -2,31 +2,69 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Login</title>
-<link rel="stylesheet" href="css/app.css">
-</head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MAKA Admin Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<style>
+/* THEME VARIABLES */
+:root { --bg:#f6f8fb; --surface:#ffffff; --accent:#0ea5a6; --text:#0f1724; --radius-lg:24px; --radius-md:14px; }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { margin:0; padding:0; font-family:'Inter', sans-serif; background:linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%); color:var(--text); height:100vh; display:flex; align-items:center; justify-content:center; }
 
+.login-card {
+  background: var(--surface); width: 90%; max-width: 360px; padding: 32px;
+  border-radius: var(--radius-lg); box-shadow: 0 20px 40px rgba(15,23,42,0.08);
+  text-align: center; border: 1px solid rgba(255,255,255,0.6);
+}
+h1 { font-family:'Syne'; font-size:1.5em; margin:0 0 5px; color:var(--text); }
+p { color:#6b7280; font-size:0.9em; margin-bottom:24px; }
+
+input {
+  width: 100%; padding: 16px; border-radius: var(--radius-md); border: 1px solid #e2e8f0;
+  background: #f8fafc; font-size: 1.2em; text-align: center; letter-spacing: 5px; outline: none; margin-bottom: 16px;
+}
+input:focus { border-color: var(--accent); background: #fff; }
+
+button {
+  width: 100%; padding: 16px; border: none; border-radius: var(--radius-md);
+  background: var(--text); color: white; font-weight: 800; cursor: pointer;
+  transition: 0.2s;
+}
+button:active { transform: scale(0.98); }
+
+.error { color: #ef4444; font-size: 0.8em; margin-top: 10px; display: none; }
+</style>
+</head>
 <body>
-<div class="card" style="max-width:320px;margin:auto;margin-top:80px;">
-    <h2>🔐 Admin Login</h2>
-    <input type="password" id="pass" placeholder="Password Admin" class="card">
-    <button class="btn-primary" onclick="login()">MASUK</button>
-    <div id="error" style="color:#ff3b30;margin-top:10px;display:none;">Password salah</div>
+
+<div class="login-card">
+    <div style="font-size:3em; margin-bottom:10px;">🛡️</div>
+    <h1>Admin Portal</h1>
+    <p>Masukkan PIN Akses</p>
+    
+    <input type="tel" id="pin" placeholder="••••" maxlength="4" oninput="checkAutoLogin()">
+    <button onclick="login()">MASUK</button>
+    <div id="error" class="error">PIN Tidak Dikenali</div>
 </div>
 
 <script>
-const ADMIN_PASS = "1131";
 function login(){
-    const pass = document.getElementById('pass').value;
-    if(pass === ADMIN_PASS){
-        localStorage.setItem("admin_login","yes");
-        window.location.href = "admin.html";
-    }else{
-        document.getElementById('error').style.display = "block";
+    const p = document.getElementById('pin').value;
+    const err = document.getElementById('error');
+    
+    if(p === '1131') {
+        // ADMIN USER (Opsional/Konten)
+        localStorage.setItem('maka_admin_role', 'user');
+        window.location.href = 'admin_user.html';
+    } else if (p === '1132') {
+        // ADMIN FINANCE (Keuangan)
+        localStorage.setItem('maka_admin_role', 'finance');
+        window.location.href = 'admin_finance.html';
+    } else {
+        err.style.display = 'block';
+        document.getElementById('pin').value = '';
     }
 }
 </script>
-
 </body>
 </html>
