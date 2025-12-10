@@ -11,32 +11,45 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* ================= THEME VARIABLES ================= */
+/* ================= GLOBAL PREMIUM THEME ================= */
 :root {
-  --bg: #f6f8fb;
-  --surface: #ffffff;
-  --muted: #9ca3af;
-  --text: #0f1724;
-  
-  --accent: #0ea5a6;       /* Teal Utama */
+  --bg-base: #f0f4f8;
+  --accent: #0ea5a6;       /* Teal */
   --accent-2: #06b6d4;     /* Cyan */
-  --gold: #fbbf24;         /* Status Menunggu */
-  --danger: #ef4444;       /* Status Error/Penuh */
-  --green: #10b981;        /* Status Ready */
+  --text: #0f1724;
+  --muted: #64748b;
+  --danger: #ef4444;
+  --success: #10b981;
+  --gold: #fbbf24;
   
-  --radius-lg: 20px;
-  --radius-md: 14px;
-  --card-shadow: 0 8px 30px rgba(15,23,42,0.06);
+  /* Glassmorphism Variables */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --backdrop-blur: blur(12px);
+  
+  --radius-lg: 24px;
   --max-width: 520px;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
 body {
   margin: 0; padding: 0;
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%);
+  background-color: var(--bg-base);
   color: var(--text);
   min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* BACKGROUND IMAGE GLOBAL */
+body::before {
+  content: "";
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: url('1763947427555.jpg') center/cover no-repeat; 
+  opacity: 0.15; z-index: -1; pointer-events: none;
 }
 
 .app-container {
@@ -47,211 +60,175 @@ body {
 
 /* HEADER */
 .header {
-  margin-bottom: 20px;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-  padding-bottom: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  margin-bottom: 24px;
+  display: flex; align-items: center; justify-content: space-between;
 }
-.header-text h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: 1.6em;
-  font-weight: 800;
-  margin: 0;
-  color: var(--text);
+.header h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.6em; font-weight: 800;
+  margin: 0; color: var(--text); line-height: 1;
 }
-.header-text p {
-  color: var(--muted);
-  font-size: 0.8em;
-  margin: 4px 0 0 0;
-  font-weight: 600;
-}
+.header p { color: var(--muted); font-size: 0.8em; margin: 4px 0 0 0; font-weight: 600; }
+
 .live-badge {
-  background: #red;
-  color: white;
-  font-weight: 800;
-  font-size: 10px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  animation: pulseRed 1.5s infinite;
+  background: var(--muted); color: white; font-weight: 800; font-size: 0.65em;
+  padding: 6px 12px; border-radius: 20px; transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-@keyframes pulseRed { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+.live-badge.online {
+  background: var(--success);
+  animation: pulseGreen 2s infinite;
+}
+@keyframes pulseGreen { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
 
 /* SLOT GRID */
 .slot-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 24px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px;
 }
 
 .slot-card {
-  background: var(--surface);
-  border-radius: var(--radius-md);
-  padding: 12px 6px;
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 15px 5px;
   text-align: center;
-  box-shadow: var(--card-shadow);
-  border: 1px solid rgba(15,23,42,0.03);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 160px;
-  position: relative;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  min-height: 170px;
   transition: 0.3s;
+  position: relative; overflow: hidden;
 }
 
+/* Active Slot Effect */
 .slot-card.active {
-  border: 1px solid var(--accent);
-  box-shadow: 0 0 15px rgba(14, 165, 166, 0.15);
+  background: rgba(255,255,255,0.85);
+  border-color: var(--accent);
+  box-shadow: 0 0 20px rgba(14, 165, 166, 0.2);
 }
 
-.slot-label { font-size: 0.7em; font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+.slot-label { font-size: 0.65em; font-weight: 700; color: var(--muted); margin-bottom: 10px; letter-spacing: 1px; }
 
-/* BATTERY ANIMATION (LIGHT THEME) */
+/* BATTERY ANIMATION */
 .bat-body {
-  width: 32px;
-  height: 60px;
-  border: 2px solid #cbd5e1; /* Grey border */
-  border-radius: 6px;
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-  padding: 2px;
-  background: #f1f5f9;
+  width: 36px; height: 65px;
+  border: 2px solid #cbd5e1; border-radius: 8px;
+  position: relative; display: flex; align-items: flex-end; padding: 3px;
+  background: rgba(255,255,255,0.5);
+  margin-bottom: 10px;
 }
 .bat-head {
   width: 14px; height: 4px; background: #cbd5e1;
-  position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+  position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
   border-radius: 2px 2px 0 0;
 }
 .bat-liquid {
   width: 100%;
   background: linear-gradient(to top, var(--accent), var(--accent-2));
-  border-radius: 2px;
-  transition: height 0.5s ease;
-  box-shadow: 0 0 10px rgba(14, 165, 166, 0.3);
-}
-
-.slot-user {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 0.85em;
-  color: var(--text);
-  margin-top: 8px;
-}
-
-.slot-status {
-  font-size: 0.7em;
-  font-weight: 700;
-  padding: 4px 8px;
   border-radius: 4px;
-  margin-top: 4px;
+  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 15px rgba(14, 165, 166, 0.4);
 }
-.st-ready { color: var(--green); background: rgba(16, 185, 129, 0.1); }
+
+.slot-user { font-family: 'Syne'; font-weight: 800; font-size: 0.85em; color: var(--text); }
+.slot-status { font-size: 0.65em; font-weight: 700; padding: 4px 8px; border-radius: 6px; margin-top: 4px; }
+
+.st-ready { color: var(--success); background: rgba(16, 185, 129, 0.1); }
 .st-charging { color: var(--accent); background: rgba(14, 165, 166, 0.1); }
 .st-waiting { color: var(--gold); background: rgba(251, 191, 36, 0.1); }
 
 /* QUEUE INFO CARD */
 .queue-info-card {
-  background: linear-gradient(135deg, var(--text), #1a2333);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background: linear-gradient(135deg, var(--text), #1e293b);
+  border-radius: 20px; padding: 20px; color: white;
+  display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 24px;
-  box-shadow: 0 10px 25px rgba(15,23,42,0.2);
+  box-shadow: 0 15px 30px rgba(15, 23, 42, 0.25);
+  position: relative; overflow: hidden;
 }
-.q-count { font-size: 2.5em; font-family: 'Syne', sans-serif; font-weight: 800; line-height: 1; }
+.queue-info-card::after {
+  content:''; position: absolute; right: -20px; bottom: -20px; width: 100px; height: 100px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); border-radius: 50%;
+}
+
+.q-count { font-size: 2.5em; font-family: 'Syne'; font-weight: 800; line-height: 1; margin-bottom: 5px; }
 .q-label { font-size: 0.8em; opacity: 0.7; }
 
 /* LIST QUEUE */
 .queue-list {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 10px;
-  box-shadow: var(--card-shadow);
-  margin-bottom: 24px;
-  max-height: 200px;
-  overflow-y: auto;
+  background: var(--glass-bg); backdrop-filter: var(--backdrop-blur);
+  border-radius: 20px; padding: 10px; margin-bottom: 24px;
+  border: 1px solid var(--glass-border);
+  max-height: 200px; overflow-y: auto;
 }
 .q-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px;
-  border-bottom: 1px solid #f1f5f9;
-  font-size: 0.9em;
+  display: flex; justify-content: space-between; padding: 12px 15px;
+  border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.9em;
 }
 .q-item:last-child { border-bottom: none; }
 .q-plat { font-weight: 700; color: var(--text); }
-.q-bat { color: var(--muted); font-size: 0.9em; }
+.q-bat { color: var(--muted); font-size: 0.9em; font-weight: 600; }
 
 /* FORM REGISTRATION */
 .reg-card {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  box-shadow: var(--card-shadow);
-  border: 1px solid var(--accent);
+  background: var(--glass-bg); backdrop-filter: var(--backdrop-blur);
+  border-radius: 24px; padding: 24px;
+  box-shadow: var(--glass-shadow);
+  border: 1px solid var(--glass-border);
 }
 .form-input {
-  width: 100%;
-  padding: 14px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  margin-bottom: 12px;
-  font-family: 'Inter', sans-serif;
-  font-size: 1em;
-  background: #f8fafc;
-  outline: none;
-  text-transform: uppercase;
+  width: 100%; padding: 14px; border: 1px solid #e2e8f0; border-radius: 12px;
+  margin-bottom: 12px; font-family: 'Inter'; font-size: 1em;
+  background: rgba(255,255,255,0.8); outline: none; transition: 0.2s;
 }
-.form-input:focus { border-color: var(--accent); background: #fff; }
+.form-input:focus { border-color: var(--accent); background: #fff; box-shadow: 0 0 0 3px rgba(14,165,166,0.1); }
 
 .btn-submit {
-  width: 100%;
-  padding: 16px;
+  width: 100%; padding: 16px;
   background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-weight: 800;
-  font-size: 1em;
-  cursor: pointer;
+  color: white; border: none; border-radius: 16px;
+  font-weight: 800; font-size: 1em; cursor: pointer;
   box-shadow: 0 10px 20px rgba(14, 165, 166, 0.2);
-  transition: 0.2s;
+  transition: 0.2s; font-family: 'Syne'; letter-spacing: 0.5px;
 }
 .btn-submit:active { transform: scale(0.98); }
-.btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; }
+.btn-submit:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; }
 
-/* MODAL ALERT */
+/* MODAL ALERT PREMIUM */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
   display: none; align-items: center; justify-content: center; z-index: 2000;
+  opacity: 0; transition: opacity 0.3s;
 }
-.modal-box {
-  background: white; width: 80%; max-width: 320px; padding: 24px; border-radius: 20px; text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
+.modal-overlay.active { display: flex; opacity: 1; }
 
-/* BOTTOM NAV */
+.modal-content {
+  background: #fff; width: 85%; max-width: 320px; padding: 30px;
+  border-radius: 28px; text-align: center;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.3); transform: scale(0.9); transition: transform 0.3s;
+}
+.modal-overlay.active .modal-content { transform: scale(1); }
+
+.modal-content h3 { font-family: 'Syne'; margin: 0 0 10px; font-size: 1.4em; }
+.modal-content p { color: var(--muted); margin: 0 0 20px; font-size: 0.95em; line-height: 1.5; }
+
+/* NAV STANDAR */
 footer.bottom-nav {
   position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px;
   width: calc(100% - 40px); max-width: 480px;
-  background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
   border-radius: 999px; padding: 12px 20px; display: flex; justify-content: space-around;
-  align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5); z-index: 999;
+  align-items: center; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.5); z-index: 999;
 }
 .nav-item {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px;
+  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; transition: 0.2s;
 }
 .nav-item span { font-size: 20px; margin-bottom: 2px; }
 .nav-item.active { color: var(--accent); font-weight: 700; }
-.nav-item.active span { transform: scale(1.1); }
+.nav-item.active span { transform: scale(1.1); filter: drop-shadow(0 2px 4px rgba(14,165,166,0.3)); }
 </style>
 </head>
 
@@ -266,9 +243,9 @@ footer.bottom-nav {
     <header class="header">
         <div class="header-text">
             <h1>FC Kelapa Gading</h1>
-            <p>Antrian Real-time</p>
+            <p>Antrian Real-time & Monitoring</p>
         </div>
-        <div class="live-badge" id="connStatus">CONNECTING...</div>
+        <div id="connStatus" class="live-badge">OFFLINE</div>
     </header>
 
     <div class="slot-grid" id="slots">
@@ -293,9 +270,9 @@ footer.bottom-nav {
     </div>
 
     <div class="reg-card">
-        <h3 style="margin:0 0 16px 0; font-family:'Syne';">Ambil Antrian</h3>
+        <h3 style="margin:0 0 16px 0; font-family:'Syne'; font-size:1.2em;">Ambil Antrian</h3>
         
-        <input id="uPlat" class="form-input" placeholder="Plat Nomor (Contoh: B 1234 XYZ)">
+        <input id="uPlat" class="form-input" placeholder="Plat Nomor (Cth: B 1234 XYZ)">
         <input id="uWa" type="number" class="form-input" placeholder="Nomor WhatsApp">
         <input id="uBat" type="number" class="form-input" placeholder="Sisa Baterai (%)">
         
@@ -308,10 +285,10 @@ footer.bottom-nav {
 </div>
 
 <div id="modal-alert" class="modal-overlay">
-    <div class="modal-box">
-        <h3 id="alertTitle" style="margin-top:0;">INFO</h3>
-        <p id="alertMsg" style="color:#666; margin-bottom:20px;">Pesan...</p>
-        <button onclick="document.getElementById('modal-alert').style.display='none'" class="btn-submit" style="padding:10px;">OK</button>
+    <div class="modal-content">
+        <h3 id="alertTitle">INFO</h3>
+        <p id="alertMsg">Pesan...</p>
+        <button onclick="closeAlert()" class="btn-submit" style="padding:12px;">OK</button>
     </div>
 </div>
 
@@ -335,9 +312,14 @@ let wakeLock = null;
 // --- INITIALIZATION ---
 window.addEventListener('load', () => {
     initFirebase();
-    reqNotifPermission(); // Minta izin notifikasi saat load
+    reqNotifPermission(); 
     
-    // GPS Tracker
+    // Auto fill plat if user logged in
+    const user = JSON.parse(localStorage.getItem('maka_user'));
+    if(user && user.plat) {
+        document.getElementById('uPlat').value = user.plat;
+    }
+
     if(navigator.geolocation) {
         navigator.geolocation.watchPosition(
             p => { userLat = p.coords.latitude; userLng = p.coords.longitude; },
@@ -345,8 +327,6 @@ window.addEventListener('load', () => {
             { enableHighAccuracy:true }
         );
     }
-    
-    // Request Screen Wake Lock (biar layar ga mati pas ngantri)
     requestWakeLock();
 });
 
@@ -359,21 +339,15 @@ async function requestWakeLock() {
 // --- NOTIFICATION LOGIC ---
 function reqNotifPermission() {
     if (!("Notification" in window)) return;
-    if (Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
+    if (Notification.permission !== "granted") Notification.requestPermission();
 }
 
 function sendPushNotification(title, body) {
     if (Notification.permission === "granted") {
-        // Getar HP
         if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
-        
         new Notification(title, {
-            body: body,
-            icon: 'https://cdn-icons-png.flaticon.com/512/3112/3112946.png', // Icon Petir/Listrik
-            vibrate: [500, 200, 500],
-            tag: 'mlu-notif' // Biar ga numpuk
+            body: body, icon: 'https://cdn-icons-png.flaticon.com/512/3112/3112946.png',
+            vibrate: [500, 200, 500], tag: 'mlu-notif'
         });
     }
 }
@@ -387,18 +361,19 @@ function initFirebase() {
 
     // Listener Realtime
     ref.onSnapshot(snap => {
-        document.getElementById('connStatus').innerText = "LIVE ●";
-        document.getElementById('connStatus').style.background = "#10b981";
+        const badge = document.getElementById('connStatus');
+        badge.innerText = "LIVE ●";
+        badge.classList.add('online');
 
         const d = snap.data() || {};
         const s = d.chargingSlots || [null,null,null];
         const q = d.waitingQueue || [];
-        const myPlat = localStorage.getItem('myPlat');
+        const myPlat = localStorage.getItem('myPlat') || (JSON.parse(localStorage.getItem('maka_user'))?.plat) || "";
 
         // Render Queue Info
         document.getElementById('qCount').innerText = q.length;
         document.getElementById('limitInfo').innerText = (q.length > 5) ? "Antrian Padat" : "Kapasitas Aman";
-        document.getElementById('limitInfo').style.color = (q.length > 5) ? "var(--danger)" : "var(--green)";
+        document.getElementById('limitInfo').style.color = (q.length > 5) ? "var(--gold)" : "var(--success)";
 
         // Render Slots
         document.getElementById('slots').innerHTML = s.map((x,i) => {
@@ -406,11 +381,10 @@ function initFirebase() {
                 // SLOT KOSONG
                 return `
                 <div class="slot-card">
-                    <div class="bat-head"></div>
-                    <div class="bat-body"><div class="bat-liquid" style="height:0%"></div></div>
+                    <div class="slot-label">${SLOT_NAMES[i]}</div>
+                    <div class="bat-body"><div class="bat-head"></div><div class="bat-liquid" style="height:0%"></div></div>
                     <div class="slot-user">-</div>
                     <div class="slot-status st-ready">READY</div>
-                    <div class="slot-label">${SLOT_NAMES[i]}</div>
                 </div>`;
             }
 
@@ -428,44 +402,40 @@ function initFirebase() {
                 
                 if(left > 0) {
                     h = 100; // Efek visual penuh saat ngecas
-                    // Cek Notifikasi Selesai
                 } else {
                     txt = "SELESAI";
                     css = "st-ready";
-                    
-                    // Trigger Notifikasi jika itu motor saya & belum dinotif
+                    // Trigger Notifikasi
                     if(Date.now() > end && !triggered.has(x.name)) {
                         if(myPlat === x.name) {
                             triggered.add(x.name);
-                            aud.play().catch(e=>console.log(e));
-                            sendPushNotification("⚡ PENGECASAN SELESAI!", `Motor ${x.name} baterai sudah penuh.`);
+                            aud.play().catch(e=>{});
+                            sendPushNotification("⚡ SELESAI!", `Motor ${x.name} sudah penuh.`);
                             showAlert("SELESAI", "Motor Anda sudah selesai dicas!");
                         }
                     }
                 }
             } else {
-                // Masih Menunggu di Slot (Baru naik dari antrian)
-                // Cek notifikasi giliran
+                // Notif Giliran
                 if(myPlat === x.name && !triggered.has(x.name + "_turn")) {
                     triggered.add(x.name + "_turn");
-                    sendPushNotification("⚡ GILIRAN ANDA!", `Silakan masukkan motor ${x.name} ke ${SLOT_NAMES[i]}.`);
+                    sendPushNotification("⚡ GILIRAN ANDA!", `Masukkan motor ke ${SLOT_NAMES[i]}.`);
                 }
             }
 
             return `
             <div class="slot-card ${isRun?'active':''}">
-                <div class="bat-head"></div>
-                <div class="bat-body"><div class="bat-liquid" style="height:${h}%"></div></div>
+                <div class="slot-label">${SLOT_NAMES[i]}</div>
+                <div class="bat-body"><div class="bat-head"></div><div class="bat-liquid" style="height:${h}%"></div></div>
                 <div class="slot-user">${x.name}</div>
                 <div class="slot-status ${css}">${txt}</div>
-                <div class="slot-label">${SLOT_NAMES[i]}</div>
             </div>`;
         }).join('');
 
         // Render List Antrian
         const listContainer = document.getElementById('qListContainer');
         if(q.length === 0) {
-            listContainer.innerHTML = '<div style="text-align:center; padding:15px; color:#999; font-size:0.8em;">Antrian Kosong</div>';
+            listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#999; font-size:0.8em;">Antrian Kosong</div>';
         } else {
             listContainer.innerHTML = q.map((x,i) => `
                 <div class="q-item">
@@ -478,7 +448,6 @@ function initFirebase() {
 
     // Handle Button Daftar
     document.getElementById('btnDaftar').onclick = () => {
-        // Unlock audio context di mobile
         aud.play().then(() => aud.pause()).catch(e=>{}); 
         reqNotifPermission();
 
@@ -488,75 +457,54 @@ function initFirebase() {
         const btn = document.getElementById('btnDaftar');
         const stat = document.getElementById('locStatus');
 
-        if(!p || !w || isNaN(b)) {
-            showAlert('ERROR', 'Harap isi Plat Nomor, WA, dan Sisa Baterai.');
-            return;
-        }
+        if(!p || !w || isNaN(b)) return showAlert('ERROR', 'Lengkapi semua data.');
 
         btn.disabled = true;
         btn.innerText = "CEK LOKASI...";
         stat.style.display = 'block';
 
-        // Cek Lokasi (Wajib GPS)
         if(!userLat) {
-            btn.disabled = false;
-            btn.innerText = "DAFTAR SEKARANG";
-            stat.style.display = 'none';
-            showAlert('GPS', 'Mohon aktifkan GPS & izinkan akses lokasi browser.');
-            return;
+            btn.disabled = false; btn.innerText = "DAFTAR SEKARANG"; stat.style.display = 'none';
+            return showAlert('GPS', 'Mohon aktifkan GPS.');
         }
 
-        // Hitung Jarak
         const R=6371; 
         const dLat=(STATION_LOC.lat-userLat)*Math.PI/180; 
         const dLon=(STATION_LOC.lng-userLng)*Math.PI/180; 
         const a=Math.sin(dLat/2)**2+Math.cos(userLat*Math.PI/180)*Math.cos(STATION_LOC.lat*Math.PI/180)*Math.sin(dLon/2)**2; 
         const dist = (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))) * 1000;
 
-        // Validasi Jarak (Admin bypass dihapus karena tidak ada login admin di sini)
+        // Validasi Jarak
         if(dist > MAX_DIST) {
-            btn.disabled = false;
-            btn.innerText = "DAFTAR SEKARANG";
-            stat.style.display = 'none';
-            showAlert('KEJAUHAN', `Anda berjarak ${dist.toFixed(0)}m dari lokasi. Maksimal ${MAX_DIST}m.`);
-            return;
+            btn.disabled = false; btn.innerText = "DAFTAR SEKARANG"; stat.style.display = 'none';
+            return showAlert('KEJAUHAN', `Jarak Anda ${dist.toFixed(0)}m. Harus < ${MAX_DIST}m.`);
         }
 
         // Push ke Firebase
         db.runTransaction(async t => {
             const d = (await t.get(ref)).data() || {};
             const block = d.blockedList || [];
-            if(block.includes(p)) throw "Plat nomor Anda diblokir.";
+            if(block.includes(p)) throw "Plat nomor diblokir.";
 
             let s = d.chargingSlots || [null,null,null];
             let q = d.waitingQueue || [];
 
-            // Cek Duplikat
-            if(s.some(x=>x?.name===p) || q.some(x=>x?.name===p)) throw "Anda sudah terdaftar dalam antrian/slot.";
+            if(s.some(x=>x?.name===p) || q.some(x=>x?.name===p)) throw "Sudah terdaftar.";
 
-            // Cek Slot Kosong
             let empty = s.findIndex(x => !x);
             if(empty !== -1) {
-                // Masuk Slot Langsung
                 s[empty] = { name:p, phone:w, startBattery:b, target:100, startTime:null, duration:(100-b)*1.5 };
             } else {
-                // Masuk Antrian
                 q.push({ name:p, phone:w, startBattery:b, target:100, duration:0 });
             }
-
             t.set(ref, {chargingSlots:s, waitingQueue:q, blockedList:block}, {merge:true});
         }).then(() => {
-            showAlert('SUKSES', 'Berhasil masuk antrian! Jangan tutup tab ini agar alarm berbunyi.');
-            document.getElementById('uPlat').value = '';
+            showAlert('SUKSES', 'Berhasil masuk antrian!');
             localStorage.setItem('myPlat', p);
-            btn.disabled = false;
-            btn.innerText = "DAFTAR SEKARANG";
-            stat.style.display = 'none';
+            btn.disabled = false; btn.innerText = "DAFTAR SEKARANG"; stat.style.display = 'none';
         }).catch(e => {
             showAlert('GAGAL', e);
-            btn.disabled = false;
-            btn.innerText = "DAFTAR SEKARANG";
-            stat.style.display = 'none';
+            btn.disabled = false; btn.innerText = "DAFTAR SEKARANG"; stat.style.display = 'none';
         });
     };
 }
@@ -564,7 +512,10 @@ function initFirebase() {
 function showAlert(title, msg) {
     document.getElementById('alertTitle').innerText = title;
     document.getElementById('alertMsg').innerText = msg;
-    document.getElementById('modal-alert').style.display = 'flex';
+    document.getElementById('modal-alert').classList.add('active');
+}
+function closeAlert() {
+    document.getElementById('modal-alert').classList.remove('active');
 }
 </script>
 
