@@ -1,82 +1,144 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAKA Tips</title>
-    <link rel="stylesheet" href="styles.css"> 
-    <link rel="stylesheet" href="styles/theme.css">
-    <link rel="stylesheet" href="styles/components.css">
-    
-    <style>
-        /* (Style yang sama dengan info_mlu.html) */
-        .article-container {
-            padding: 20px;
-        }
-        .article-card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            margin-bottom: 25px;
-            padding: 15px;
-            border: 1px solid rgba(0, 223, 255, 0.1);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        }
-        .article-card h3 {
-            font-size: 1.3em;
-            color: var(--primary-neon);
-            margin-bottom: 5px;
-        }
-        .article-meta {
-            font-size: 0.8em;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            display: block;
-        }
-        .article-content {
-            font-size: 0.9em;
-            line-height: 1.5;
-            margin-bottom: 15px;
-        }
-        .article-photo {
-            width: 100%;
-            height: 200px; /* Placeholder tinggi */
-            object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tips MAKA</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+
+<style>
+/* ================= GLOBAL PREMIUM THEME ================= */
+:root {
+  --bg-base: #f0f4f8;
+  --accent: #0ea5a6;
+  --accent-2: #06b6d4;
+  --text: #0f1724;
+  --muted: #64748b;
+  
+  /* Glassmorphism Variables */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  --backdrop-blur: blur(12px);
+  
+  --radius-lg: 24px;
+  --max-width: 520px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  margin: 0; padding: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: url('1763947427555.jpg') center/cover no-repeat; 
+  opacity: 0.15; z-index: -1; pointer-events: none;
+}
+
+.app-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 20px 20px 120px 20px;
+}
+
+/* HEADER */
+.header { margin-bottom: 24px; }
+.header h1 {
+  font-family: 'Syne', sans-serif; font-size: 1.8em; font-weight: 800;
+  margin: 0; color: var(--text); letter-spacing: -0.5px;
+}
+.header p { color: var(--muted); font-size: 0.9em; margin: 4px 0 0 0; }
+
+/* ARTICLE LIST */
+.article-container { display: flex; flex-direction: column; gap: 20px; }
+
+.article-card {
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  padding: 20px;
+  transition: transform 0.2s;
+}
+.article-card:active { transform: scale(0.99); }
+
+.article-card h3 {
+  font-family: 'Syne', sans-serif; font-size: 1.25em; color: var(--accent);
+  margin: 0 0 8px 0; line-height: 1.3;
+}
+
+.article-meta {
+  display: inline-block; font-size: 0.75em; color: var(--muted);
+  background: rgba(255,255,255,0.5); padding: 4px 8px; border-radius: 6px;
+  margin-bottom: 15px; border: 1px solid rgba(0,0,0,0.05);
+}
+
+.article-photo {
+  width: 100%; height: 200px; object-fit: cover;
+  border-radius: 12px; margin-bottom: 15px;
+  background: #cbd5e1;
+}
+
+.article-content {
+  font-size: 0.95em; line-height: 1.6; color: #334155; margin: 0;
+  white-space: pre-line;
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center; padding: 40px; color: var(--muted);
+  background: rgba(255,255,255,0.4); border-radius: 20px;
+}
+
+/* NAV STANDAR */
+footer.bottom-nav {
+  position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px;
+  width: calc(100% - 40px); max-width: 480px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-radius: 999px; padding: 12px 20px; display: flex; justify-content: space-around;
+  align-items: center; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.5); z-index: 999;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; transition: 0.2s;
+}
+.nav-item span { font-size: 20px; margin-bottom: 2px; }
+.nav-item.active { color: var(--accent); font-weight: 700; }
+.nav-item.active span { transform: scale(1.1); filter: drop-shadow(0 2px 4px rgba(14,165,166,0.3)); }
+</style>
 </head>
 <body>
     <div class="app-container">
-        
         <header class="header">
-            <div class="user-info">
-                <h1>💡 Tips MAKA</h1>
-                <p>Tips penggunaan dan perawatan motor MAKA.</p>
-            </div>
+            <h1>Tips & Trik</h1>
+            <p>Panduan perawatan motor MAKA.</p>
         </header>
 
         <section class="article-container" id="article-list">
-            <p style="text-align: center; margin-top: 50px; color: var(--text-secondary);">Memuat tips...</p>
+            <div class="empty-state">Memuat tips...</div>
         </section>
-
-
-        <footer class="bottom-nav">
-            <a href="lokasi_fc.html" class="nav-item">
-                <span style="color: var(--primary-neon);">⚡</span>
-                Lokasi FC
-            </a>
-            <a href="dashboard.html" class="nav-item">
-                <span>🏠</span>
-                Home
-            </a>
-            <a href="daftar_antrian.html" class="nav-item">
-                <span style="color: var(--paid-gold);">🎫</span>
-                Antrian
-            </a>
-        </footer>
     </div>
-    
+
+    <footer class="bottom-nav">
+        <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
+        <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
+        <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
+    </footer>
+
     <script>
         function renderArticles() {
             const articles = JSON.parse(localStorage.getItem('maka_tips_articles')) || [];
@@ -84,30 +146,29 @@
             container.innerHTML = '';
 
             if (articles.length === 0) {
-                container.innerHTML = `<p style="text-align: center; margin-top: 50px; color: var(--text-secondary);">Belum ada tips MAKA yang diposting Admin.</p>`;
+                container.innerHTML = `<div class="empty-state">Belum ada tips yang diposting Admin.</div>`;
                 return;
             }
 
-            articles.forEach(article => {
-                let photosHTML = article.photos.map(url => 
-                    `<img src="${url}" alt="Foto Artikel" class="article-photo">`
-                ).join('');
-
-                if (photosHTML === '') {
-                    photosHTML = `<div class="article-photo" style="background: #333; display: flex; align-items: center; justify-content: center; color: #777;">[Tidak Ada Foto]</div>`;
+            // Urutkan terbaru diatas
+            articles.slice().reverse().forEach(article => {
+                let photosHTML = '';
+                if(article.photos && article.photos.length > 0) {
+                     photosHTML = article.photos.map(url => 
+                        `<img src="${url}" alt="Foto" class="article-photo" onerror="this.style.display='none'">`
+                    ).join('');
                 }
 
                 container.innerHTML += `
                     <div class="article-card">
                         <h3>${article.title}</h3>
-                        <span class="article-meta">Diposting: ${article.date}</span>
+                        <span class="article-meta">📅 ${article.date}</span>
                         ${photosHTML}
                         <p class="article-content">${article.content}</p>
                     </div>
                 `;
             });
         }
-
         document.addEventListener('DOMContentLoaded', renderArticles);
     </script>
 </body>
