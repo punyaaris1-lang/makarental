@@ -33,7 +33,8 @@ body::before {
     opacity: 0.15; z-index: -1; pointer-events: none;
 }
 
-.app-container { width:100%; max-width:460px; padding:24px; }
+/* PERBAIKAN: Menambah padding bawah agar konten terangkat */
+.app-container { width:100%; max-width:460px; padding:24px; padding-bottom: 200px; /* AGGRESSIVE FIX */ }
 
 /* CARD LOGIN */
 .auth-card { 
@@ -46,7 +47,7 @@ body::before {
 /* JUDUL BARU (FONT KECIL) */
 .brand-title { 
     font-family:'Syne', sans-serif; 
-    font-size:2.0em; /* Dikecilkan dari 2.2em */
+    font-size:2.0em; 
     font-weight:800; 
     text-align:center; margin:0 0 8px; color: var(--text);
     letter-spacing: -1px;
