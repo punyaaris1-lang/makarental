@@ -3,415 +3,286 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kalender Tagihan</title>
+<title>Kalender Pembayaran - MAKA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* ================= GLOBAL PREMIUM THEME ================= */
-:root {
-  --bg-base: #f0f4f8;
-  --accent: #0ea5a6;       /* Teal */
-  --accent-2: #06b6d4;     /* Cyan */
-  --purple: #8b5cf6;       /* CDP */
-  --red: #ef4444;          /* Libur */
-  --gold: #f59e0b;         /* Paid/Waiting */
-  --text: #0f1724;
-  --muted: #64748b;
+/* GLOBAL THEME */
+:root { 
+    --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; 
+    --danger:#ef4444; --success:#10b981; --warning:#fbbf24;
+    --glass-bg:rgba(255,255,255,0.85); --glass-border:rgba(255,255,255,0.6); 
+    --radius-lg:24px;
+}
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
-  /* Glassmorphism Variables */
-  --glass-bg: rgba(255, 255, 255, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  --backdrop-blur: blur(12px);
-  
-  --radius-lg: 24px;
-  --max-width: 520px;
+body { 
+    margin:0; font-family:'Inter', sans-serif; 
+    background:var(--bg-base); color:var(--text); 
+    min-height:100vh; position:relative; padding-bottom:100px;
 }
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-body {
-  margin: 0; padding: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-base);
-  color: var(--text);
-  min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* --- GLOBAL BACKGROUND IMAGE --- */
+/* BACKGROUND */
 body::before {
-  content: "";
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: url('1763947427555.jpg') center/cover no-repeat; 
-  opacity: 0.15;
-  z-index: -1;
-  pointer-events: none;
+    content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: url('1763947427555.jpg') center/cover no-repeat; 
+    opacity: 0.15; z-index: -1; pointer-events: none;
 }
 
-.app-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 20px 20px 120px 20px;
+.app-container { max-width:520px; margin:0 auto; padding:20px 20px 100px; }
+
+/* HEADER & NAVIGASI BULAN */
+.header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    margin-bottom: 20px; background: white; padding: 10px 20px; 
+    border-radius: 99px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.month-title { font-family: 'Syne'; font-size: 1.2em; font-weight: 800; text-transform: uppercase; }
+.btn-nav { 
+    background: #f1f5f9; border: none; width: 36px; height: 36px; 
+    border-radius: 50%; font-weight: bold; cursor: pointer; color: var(--text);
 }
 
-/* ================= HEADER ================= */
-.header {
-  margin-bottom: 24px;
-  display: flex; justify-content: space-between; align-items: flex-end;
+/* KALENDER GRID */
+.calendar-grid { 
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; 
+    margin-bottom: 25px; 
 }
-.header h1 {
-  font-family: 'Syne', sans-serif; font-size: 1.8em; font-weight: 800;
-  margin: 0; color: var(--text); letter-spacing: -0.5px;
+.day-name { 
+    text-align: center; font-size: 0.75em; font-weight: 800; 
+    color: var(--muted); margin-bottom: 10px; text-transform: uppercase;
 }
-.header p { color: var(--muted); font-size: 0.9em; margin: 4px 0 0 0; }
-
-/* ================= MONTH NAV ================= */
-.month-nav {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 16px; padding: 12px 16px;
-  /* Glass Effect */
-  background: var(--glass-bg);
-  backdrop-filter: var(--backdrop-blur);
-  -webkit-backdrop-filter: var(--backdrop-blur);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--glass-shadow);
-  border: 1px solid var(--glass-border);
+.date-cell {
+    aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    border-radius: 14px; font-weight: 700; font-size: 0.9em;
+    background: rgba(255,255,255,0.6); position: relative;
+    transition: 0.2s; border: 1px solid transparent;
 }
 
-.month-nav h2 {
-  font-size: 1.1em; font-weight: 800; margin: 0; color: var(--text);
-  text-transform: uppercase; letter-spacing: 0.5px;
+/* STATUS WARNA KALENDER */
+.date-cell.lunas { background: #dcfce7; color: var(--success); border-color: var(--success); }
+.date-cell.tunggak { background: #fee2e2; color: var(--danger); border-color: var(--danger); box-shadow: 0 4px 10px rgba(239,68,68,0.2); }
+.date-cell.today { border: 2px solid var(--text); background: white; }
+.date-cell.empty { background: transparent; border: none; }
+
+/* HERO CARD (TOTAL TUNGGAKAN) */
+.hero-card {
+    background: linear-gradient(135deg, #ef4444, #b91c1c); /* Merah Utang */
+    color: white; padding: 24px; border-radius: 24px;
+    box-shadow: 0 15px 40px rgba(239, 68, 68, 0.3);
+    position: relative; overflow: hidden; text-align: center;
+    transition: 0.3s;
+}
+.hero-card.aman {
+    background: linear-gradient(135deg, #10b981, #059669); /* Hijau Aman */
+    box-shadow: 0 15px 40px rgba(16, 185, 129, 0.3);
 }
 
-.btn-nav {
-  background: rgba(255,255,255,0.5); border: 1px solid rgba(0,0,0,0.05);
-  width: 36px; height: 36px; border-radius: 12px;
-  color: var(--text); font-weight: 700; font-size: 18px;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: 0.2s;
-}
-.btn-nav:active { transform: scale(0.9); background: #fff; }
+.hero-label { font-size: 0.8em; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.9; margin-bottom: 5px; }
+.hero-amount { font-family: 'Inter'; font-size: 2.8em; font-weight: 900; margin: 0; line-height: 1; letter-spacing: -1px; }
+.hero-desc { font-size: 0.9em; margin-top: 10px; font-weight: 600; opacity: 0.9; }
+.money-icon { font-size: 3em; position: absolute; right: 20px; bottom: 10px; opacity: 0.2; transform: rotate(-20deg); }
 
-/* ================= CALENDAR GRID ================= */
-.week {
-  display: grid; grid-template-columns: repeat(7, 1fr);
-  text-align: center; font-size: 0.75em; font-weight: 700;
-  color: var(--muted); margin-bottom: 12px; text-transform: uppercase;
-}
-
-.grid {
-  display: grid; grid-template-columns: repeat(7, 1fr);
-  gap: 8px; margin-bottom: 24px;
-}
-
-.day { aspect-ratio: 1/1; position: relative; }
-
-.box {
-  width: 100%; height: 100%;
-  border-radius: 14px;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  font-weight: 700; font-size: 0.95em;
-  
-  /* Glass Item */
-  background: rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255,255,255,0.4);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  
-  color: var(--text);
-  transition: transform 0.15s;
-  cursor: pointer;
-  position: relative;
-}
-.box:active { transform: scale(0.9); }
-.day.empty { pointer-events: none; }
-
-/* STATUS COLORS & INDICATORS */
-.wajib { border-color: rgba(14, 165, 166, 0.3); color: var(--accent); background: rgba(14, 165, 166, 0.05); }
-.cdp { border-color: rgba(139, 92, 246, 0.3); color: var(--purple); background: rgba(139, 92, 246, 0.05); }
-.libur { color: var(--red); opacity: 0.5; }
-
-/* Paid = Gold Gradient */
-.paid {
-  background: linear-gradient(135deg, #fbbf24, #d97706);
-  color: #fff; border: none;
-  box-shadow: 0 4px 10px rgba(251, 191, 36, 0.4);
-}
-
-/* Future = Tetap bisa diklik, hanya visual agak transparan */
-.future { opacity: 0.6; filter: grayscale(0.5); }
-
-/* Indikator Cicilan MAKA+ */
-.plus-dot {
-  position: absolute; bottom: 4px; width: 4px; height: 4px;
-  background: var(--text); border-radius: 50%; opacity: 0.5;
-}
-.paid .plus-dot { background: #fff; opacity: 0.8; }
-
-/* ================= PREVIEW CARD ================= */
-.preview-card {
-  /* High Contrast Gradient agar teks putih terbaca */
-  background: linear-gradient(135deg, var(--accent-2), var(--accent));
-  border-radius: var(--radius-lg);
-  padding: 24px;
-  color: white;
-  box-shadow: 0 15px 30px rgba(14, 165, 166, 0.25);
-  display: flex; justify-content: space-between; align-items: center;
-  border: 1px solid rgba(255,255,255,0.2);
-  position: relative; overflow: hidden;
-}
-
-/* Efek Glossy pada kartu */
-.preview-card::after {
-  content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
-  pointer-events: none;
-}
-
-.preview-card small { display: block; font-size: 0.85em; opacity: 0.9; margin-bottom: 4px; font-weight: 600; }
-.preview-card strong { font-family: 'Syne', sans-serif; font-size: 1.8em; display: block; z-index: 2; position: relative; }
-.preview-card span.icon { font-size: 2.5em; opacity: 0.8; z-index: 2; }
-
-/* ================= PREMIUM MODAL (POP UP) ================= */
-.modal-overlay {
-  position: fixed; inset: 0; 
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-  display: none; align-items: center; justify-content: center; z-index: 2000;
-  opacity: 0; transition: opacity 0.3s;
-}
-.modal-overlay.active { display: flex; opacity: 1; }
-
-.modal-content {
-  background: #ffffff;
-  width: 85%; max-width: 320px; padding: 24px; border-radius: 28px;
-  text-align: center;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: relative;
-}
-.modal-overlay.active .modal-content { transform: scale(1); }
-
-.modal-content h3 { margin: 10px 0 5px; font-family: 'Syne', sans-serif; font-size: 1.4em; }
-.modal-content p { color: var(--muted); margin: 0 0 25px; font-size: 0.95em; line-height: 1.5; }
-
-/* Tombol Modal */
-.btn-pay {
-  width: 100%; padding: 14px; border-radius: 16px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: white; border: none; font-weight: 800; font-size: 1em; cursor: pointer;
-  box-shadow: 0 8px 20px rgba(14, 165, 166, 0.25);
-  transition: 0.2s;
-}
-.btn-pay:active { transform: scale(0.98); }
-
-.btn-close {
-  position: absolute; top: 15px; right: 15px;
-  background: #f1f5f9; color: #64748b; border: none;
-  width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;
-}
-
-/* ================= BOTTOM NAV (STANDAR) ================= */
+/* FOOTER NAV (Fixed Kapsul) */
 footer.bottom-nav {
-  position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px;
-  width: calc(100% - 40px); max-width: 480px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  border-radius: 999px; padding: 12px 20px; display: flex; justify-content: space-around;
-  align-items: center; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-  border: 1px solid rgba(255,255,255,0.5); z-index: 999;
+    position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+    width: auto; min-width: 260px; 
+    background: rgba(255, 255, 255, 0.95); 
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-radius: 50px; padding: 10px 30px; 
+    display: flex; justify-content: space-between; align-items: center; gap: 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5); z-index: 999;
 }
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; transition: 0.2s;
-}
-.nav-item span { font-size: 20px; margin-bottom: 2px; }
-.nav-item.active { color: var(--accent); font-weight: 700; }
-.nav-item.active span { transform: scale(1.1); filter: drop-shadow(0 2px 4px rgba(14,165,166,0.3)); }
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #94a3b8; font-size: 9px; font-weight: 700; transition: 0.2s; }
+.nav-item span { font-size: 22px; margin-bottom: 2px; }
+.nav-item.active { color: var(--accent); }
+
+/* MODAL */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:9999; display:none; align-items:center; justify-content:center; }
+.modal-overlay.show { display:flex; }
+.modal-box { background:white; width:80%; max-width:300px; padding:25px; border-radius:24px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.3); }
 </style>
 </head>
-
 <body>
+
 <div class="app-container">
+    <div class="header">
+        <button class="btn-nav" onclick="changeMonth(-1)">‹</button>
+        <div class="month-title" id="monthDisplay">DESEMBER 2025</div>
+        <button class="btn-nav" onclick="changeMonth(1)">›</button>
+    </div>
 
-<header class="header">
- <div>
-   <h1>Kalender</h1>
-   <p>Jadwal & Status Pembayaran</p>
- </div>
-</header>
+    <div class="calendar-grid" id="calendarGrid">
+        <div class="day-name">MIN</div><div class="day-name">SEN</div><div class="day-name">SEL</div>
+        <div class="day-name">RAB</div><div class="day-name">KAM</div><div class="day-name">JUM</div><div class="day-name">SAB</div>
+        </div>
 
-<div class="month-nav">
- <button class="btn-nav" onclick="nav(-1)">‹</button>
- <h2 id="label">Loading...</h2>
- <button class="btn-nav" onclick="nav(1)">›</button>
-</div>
-
-<div class="week">
- <div>Min</div><div>Sen</div><div>Sel</div>
- <div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
-</div>
-
-<div class="grid" id="grid"></div>
-
-<div class="preview-card">
- <div>
-   <small>Total Tagihan Bulan Ini</small>
-   <strong id="total">Rp 0</strong>
- </div>
- <span class="icon">💰</span>
-</div>
-
-</div>
-
-<div class="modal-overlay" id="modal" onclick="closeModal(event)">
- <div class="modal-content">
-  <button class="btn-close" onclick="forceClose()">✕</button>
-  <div style="font-size:3em; margin-bottom:10px;">🧾</div>
-  <h3 id="m-date">Tanggal</h3>
-  <p id="m-desc">Keterangan</p>
-  <button class="btn-pay" onclick="pay()">TANDAI SUDAH BAYAR</button>
- </div>
+    <div id="heroCard" class="hero-card">
+        <div class="hero-label">TOTAL TUNGGAKAN BULAN INI</div>
+        <div id="totalDebt" class="hero-amount">Rp 0</div>
+        <div id="debtDesc" class="hero-desc">Data sedang dimuat...</div>
+        <div class="money-icon">💰</div>
+    </div>
+    
+    <div style="text-align:center; margin-top:20px; font-size:0.8em; color:#64748b;">
+        <span style="display:inline-block; width:10px; height:10px; background:#fee2e2; border:1px solid red; border-radius:2px;"></span> Belum Bayar
+        &nbsp;&nbsp;
+        <span style="display:inline-block; width:10px; height:10px; background:#dcfce7; border:1px solid green; border-radius:2px;"></span> Lunas
+    </div>
 </div>
 
 <footer class="bottom-nav">
-  <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
-  <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
-  <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
+    <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
+    <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
+    <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
 </footer>
 
 <script>
-/* ===== CONFIG ===== */
-const USER_TGL_MULAI_SEWA='2025-09-20'
-const USER_OPSI_DP='355'
-// Default rates
-const HWB=80000; 
-const CDP=70000;
-const DP_START=new Date(new Date(USER_TGL_MULAI_SEWA).getFullYear(),new Date(USER_TGL_MULAI_SEWA).getMonth()+1,1)
-const DP_END=new Date(DP_START.getFullYear(),DP_START.getMonth()+3,1)
-
-/* ===== LOGIC STATUS DASAR ===== */
-function getStatus(d){
- const day=d.getDate()
- if(day===31)return'HLB'
- if(USER_OPSI_DP==='355'){
-  if(d>=DP_START&&d<DP_END&&(day==14||day==28))return'CDP'
-  if(d>=DP_END&&(day==14||day==28))return'HLB'
- }
- return'HWB'
-}
-
-/* ===== RENDER ===== */
-let view=new Date()
-let activeKey=null
-
-function nav(n){view.setMonth(view.getMonth()+n);render()}
-
-function render(){
- const y=view.getFullYear(),m=view.getMonth()
- document.getElementById('label').textContent=view.toLocaleDateString('id-ID',{month:'long',year:'numeric'})
-
- const first=new Date(y,m,1).getDay()
- const days=new Date(y,m+1,0).getDate()
- const grid=document.getElementById('grid')
- grid.innerHTML=''
-
- let total=0
- const now=new Date(); now.setHours(0,0,0,0);
- const payData=JSON.parse(localStorage.getItem('maka_payments'))||{}
- const makaPlusData=JSON.parse(localStorage.getItem('maka_plus_data'));
-
- // Cek Tanggal Aktivasi MAKA+ (Cicilan Charger)
- let plusActiveDate = null;
- if(makaPlusData && makaPlusData.active) {
-    plusActiveDate = new Date(makaPlusData.activatedAt);
-    plusActiveDate.setHours(0,0,0,0);
- }
-
- for(let i=0;i<first;i++)grid.innerHTML+='<div class="day empty"></div>'
-
- for(let d=1;d<=days;d++){
-  const date=new Date(y,m,d)
-  const key=`${y}-${m+1}-${d}`
-  const status=getStatus(date)
-  const paid=payData[key]
-  
-  let cls='box'
-  let price=0
-  let isPlusDay = false
-
-  // 1. Tentukan Harga Dasar
-  if(status==='HWB'){cls+=' wajib';price=HWB}
-  if(status==='CDP'){cls+=' cdp';price=CDP}
-  if(status==='HLB'){cls+=' libur'}
-
-  // 2. Logic Tambahan MAKA+ (Cicilan +10rb selama 365 hari)
-  if (plusActiveDate && status !== 'HLB') {
-    const diffTime = date - plusActiveDate;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    // Tagihan +10rb hanya berlaku H+1 s.d H+365
-    if (diffDays >= 1 && diffDays <= 365) {
-        price += 10000;
-        isPlusDay = true;
-    }
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log('PWA Error', err));
+    });
   }
+</script>
 
-  // 3. Styling & Total
-  if(paid)cls+=' paid'
-  if(date>now)cls+=' future' // Future sekarang tetap bisa diklik (hanya visual opacity)
-  
-  if(!paid && price>0) total+=price
+<script>
+// --- CONFIG FIREBASE ---
+const firebaseConfig = {
+  apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
+  authDomain: "rtomaka-e67b5.firebaseapp.com",
+  projectId: "rtomaka-e67b5",
+  storageBucket: "rtomaka-e67b5.firebasestorage.app",
+  messagingSenderId: "472036722228",
+  appId: "1:472036722228:web:11d520f9204db317d02c61"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-  // Render HTML
-  const dotHtml = isPlusDay && !paid ? '<div class="plus-dot"></div>' : '';
+let currentUser = JSON.parse(localStorage.getItem('maka_user'));
+let currentYear = new Date().getFullYear();
+let currentMonth = new Date().getMonth();
+let invoiceData = [];
 
-  grid.innerHTML+=`
-   <div class="day">
-    <div class="${cls}" onclick="openModal('${key}','${status}',${price},${isPlusDay})">
-      ${d}
-      ${dotHtml}
-    </div>
-   </div>`
- }
- document.getElementById('total').textContent=`Rp ${total.toLocaleString('id-ID')}`
+document.addEventListener("DOMContentLoaded", () => {
+    if(!currentUser) { window.location.href='index.html'; return; }
+    loadInvoices();
+});
+
+// 1. TARIK DATA INVOICE DARI FIREBASE
+function loadInvoices() {
+    db.collection('invoices')
+      .where('plat', '==', currentUser.plat)
+      .onSnapshot(snap => {
+          invoiceData = [];
+          snap.forEach(doc => {
+              const d = doc.data();
+              // Konversi Range Tanggal menjadi Array Tanggal Satuan
+              // Contoh: Invoice 10-12 Des, pecah jadi: [10, 11, 12]
+              let start = new Date(d.startDate);
+              let end = new Date(d.endDate);
+              
+              // Hitung harga per hari (Rata-rata)
+              let diffTime = Math.abs(end - start);
+              let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; 
+              let dailyPrice = d.amount / diffDays;
+
+              for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
+                  invoiceData.push({
+                      dateStr: dt.toISOString().split('T')[0], // YYYY-MM-DD
+                      status: d.status, // paid / unpaid
+                      amount: dailyPrice
+                  });
+              }
+          });
+          renderCalendar();
+      });
 }
 
-/* ===== MODAL ===== */
-function openModal(k,s,p,plus){
- if(p===0)return // Skip jika harga 0 (libur)
- activeKey=k
- document.getElementById('m-date').textContent=`${k}`
- 
- let desc = `Biaya Sewa: ${s}`;
- if(plus) desc += `\n+ Cicilan Charger (10rb)`;
- desc += `\n\nTotal: Rp ${p.toLocaleString('id-ID')}`;
- 
- document.getElementById('m-desc').innerText = desc;
- document.getElementById('modal').classList.add('active');
+// 2. RENDER KALENDER
+function renderCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '<div class="day-name">MIN</div><div class="day-name">SEN</div><div class="day-name">SEL</div><div class="day-name">RAB</div><div class="day-name">KAM</div><div class="day-name">JUM</div><div class="day-name">SAB</div>';
+    
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    document.getElementById('monthDisplay').innerText = 
+        new Date(currentYear, currentMonth).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+
+    // Empty Slots
+    for(let i=0; i<firstDay; i++) {
+        grid.innerHTML += `<div class="date-cell empty"></div>`;
+    }
+
+    let totalTunggakanBulanIni = 0;
+    let countTunggak = 0;
+
+    // Date Slots
+    for(let d=1; d<=daysInMonth; d++) {
+        // Format YYYY-MM-DD (Perhatikan Timezone +7 biar akurat, disini pakai simple string)
+        // Agar aman, kita pakai string manual
+        let mStr = (currentMonth+1).toString().padStart(2, '0');
+        let dStr = d.toString().padStart(2, '0');
+        let dateKey = `${currentYear}-${mStr}-${dStr}`;
+        
+        // Cek Status di Data Invoice
+        let statusClass = "";
+        let dataFound = invoiceData.find(x => x.dateStr === dateKey);
+        
+        if (dataFound) {
+            if (dataFound.status === 'paid') {
+                statusClass = "lunas";
+            } else {
+                // Hanya hitung tunggakan jika tanggal SUDAH LEWAT atau HARI INI
+                if (dateKey <= todayStr) {
+                    statusClass = "tunggak";
+                    totalTunggakanBulanIni += dataFound.amount;
+                    countTunggak++;
+                } else {
+                    // Belum jatuh tempo (Invoice masa depan)
+                    statusClass = ""; 
+                }
+            }
+        }
+
+        // Cek Hari Ini
+        if (dateKey === todayStr) statusClass += " today";
+
+        grid.innerHTML += `<div class="date-cell ${statusClass}">${d}</div>`;
+    }
+
+    updateHeroCard(totalTunggakanBulanIni, countTunggak);
 }
 
-function closeModal(e){
-    if(e.target.id === 'modal') {
-        document.getElementById('modal').classList.remove('active');
+// 3. UPDATE HERO CARD
+function updateHeroCard(amount, count) {
+    const card = document.getElementById('heroCard');
+    const txtAmount = document.getElementById('totalDebt');
+    const txtDesc = document.getElementById('debtDesc');
+
+    if (amount > 0) {
+        // Ada Tunggakan
+        card.className = "hero-card"; // Merah
+        txtAmount.innerText = "Rp " + Math.round(amount).toLocaleString('id-ID');
+        txtDesc.innerText = `Anda menunggak ${count} hari. Segera lunasi!`;
+    } else {
+        // Aman
+        card.className = "hero-card aman"; // Hijau
+        txtAmount.innerText = "Rp 0";
+        txtDesc.innerText = "Tidak ada tunggakan bulan ini. Mantap! 👍";
     }
 }
-function forceClose(){
-    document.getElementById('modal').classList.remove('active');
-}
 
-function pay(){
- let payData=JSON.parse(localStorage.getItem('maka_payments'))||{}
- payData[activeKey]=true
- localStorage.setItem('maka_payments',JSON.stringify(payData))
- document.getElementById('modal').classList.remove('active')
- render()
+function changeMonth(n) {
+    currentMonth += n;
+    if(currentMonth > 11) { currentMonth=0; currentYear++; }
+    else if(currentMonth < 0) { currentMonth=11; currentYear--; }
+    renderCalendar();
 }
-
-render()
 </script>
 </body>
 </html>
