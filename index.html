@@ -22,8 +22,12 @@
 body { 
     margin:0; padding:0; font-family:'Inter', sans-serif; 
     background-color: var(--bg-base); color:var(--text); 
-    min-height:100vh; display:flex; align-items:center; justify-content:center; 
-    position: relative; overflow: hidden;
+    min-height:100vh; 
+    /* Dihapus: display:flex; align-items:center; justify-content:center; untuk memastikan tombol bisa di-scroll */
+    position: relative; 
+    overflow-x: hidden; /* Hanya melarang scroll horizontal */
+    padding-top: 50px; /* Padding atas agar tidak terlalu mepet */
+    padding-bottom: 50px;
 }
 
 /* BACKGROUND IMAGE */
@@ -33,8 +37,8 @@ body::before {
     opacity: 0.15; z-index: -1; pointer-events: none;
 }
 
-/* PERBAIKAN: Menambah padding bawah agar konten terangkat */
-.app-container { width:100%; max-width:460px; padding:24px; padding-bottom: 200px; /* AGGRESSIVE FIX */ }
+/* PERBAIKAN: Menambah padding bawah agar konten terangkat dan bisa di-scroll */
+.app-container { width:100%; max-width:460px; padding:24px; padding-bottom: 150px; /* Ruang ekstra untuk keyboard */ }
 
 /* CARD LOGIN */
 .auth-card { 
@@ -44,37 +48,38 @@ body::before {
     box-shadow:var(--glass-shadow); border:1px solid var(--glass-border); 
 }
 
-/* JUDUL BARU (FONT KECIL) */
+/* JUDUL BARU (FONT KECIL & SATU BARIS) */
 .brand-title { 
     font-family:'Syne', sans-serif; 
-    font-size:2.0em; 
+    font-size:1.6em; /* Dikecilkan lagi */
     font-weight:800; 
-    text-align:center; margin:0 0 8px; color: var(--text);
+    text-align:center; margin:0 0 4px; color: var(--text);
     letter-spacing: -1px;
+    white-space: nowrap; /* Mencegah pemisahan baris */
 }
 .brand-subtitle { 
-    color:#64748b; font-size:0.9em; text-align:center; 
-    margin-bottom:24px; font-weight: 500; 
+    color:#64748b; font-size:0.85em; /* Dikecilkan */
+    text-align:center; 
+    margin-bottom:20px; /* Margin dikurangi */
+    font-weight: 500; 
 }
 
 /* TABS */
-.tabs { display:flex; background:rgba(255,255,255,0.5); padding:5px; border-radius:16px; margin-bottom:24px; }
+.tabs { display:flex; background:rgba(255,255,255,0.5); padding:5px; border-radius:16px; margin-bottom:20px; /* Margin dikurangi */ }
 .tab-btn { 
-    flex:1; padding:12px; border:none; background:transparent; 
+    flex:1; padding:10px; /* Padding dikurangi */
+    border:none; background:transparent; 
     color:#64748b; font-weight:700; border-radius:12px; cursor:pointer; 
     font-family: 'Inter'; transition: 0.3s;
 }
 .tab-btn.active { background:white; color:var(--accent); box-shadow:0 4px 10px rgba(0,0,0,0.05); }
 
-/* FORM */
-.form-view { display:none; animation: fadeIn 0.4s ease; } 
-.form-view.active { display:block; }
-@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-
-.form-group { margin-bottom:16px; }
-label { display:block; font-size:0.75em; font-weight:800; color:#64748b; margin-bottom:8px; text-transform:uppercase; letter-spacing: 0.5px; }
+/* FORM KOMPAK */
+.form-group { margin-bottom:12px; /* Margin dikurangi */ }
+label { display:block; font-size:0.75em; font-weight:800; color:#64748b; margin-bottom:6px; /* Margin dikurangi */ text-transform:uppercase; letter-spacing: 0.5px; }
 input, select { 
-    width:100%; padding:16px; border-radius:var(--radius-md); 
+    width:100%; padding:12px; /* Padding dikurangi */
+    border-radius:var(--radius-md); 
     border:1px solid #cbd5e1; background:rgba(255,255,255,0.8); 
     outline:none; font-size: 1em; font-family: 'Inter'; transition: 0.2s;
 }
@@ -82,7 +87,9 @@ input:focus { border-color: var(--accent); background: white; }
 
 /* BUTTON */
 .btn-primary { 
-    width:100%; margin-top:12px; padding:18px; border:none; 
+    width:100%; margin-top:10px; /* Margin dikurangi */
+    padding:16px; /* Padding dikurangi */
+    border:none; 
     border-radius:var(--radius-md); 
     background:linear-gradient(90deg, var(--accent), var(--accent-2)); 
     color:white; font-weight:800; font-size: 1em; cursor:pointer; 
