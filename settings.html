@@ -14,7 +14,7 @@
 :root { 
     --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
     --danger:#ef4444; --success:#10b981; --muted:#64748b;
-    --glass-bg:rgba(255,255,255,0.75); --glass-border:rgba(255,255,255,0.6); 
+    --glass-bg:rgba(255,255,255,0.85); --glass-border:rgba(255,255,255,0.6); 
     --glass-shadow:0 8px 32px 0 rgba(31, 38, 135, 0.15); --backdrop-blur:blur(12px);
     --radius-lg:24px;
 }
@@ -26,7 +26,7 @@ body {
     min-height:100vh; position:relative; overflow-x:hidden;
 }
 
-/* BACKGROUND IMAGE */
+/* BACKGROUND IMAGE (Pastikan file jpg ada di folder) */
 body::before {
     content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: url('1763947427555.jpg') center/cover no-repeat; 
@@ -36,53 +36,62 @@ body::before {
 .app-container { max-width:520px; margin:0 auto; padding:20px 20px 100px; }
 
 /* HEADER */
-.header { margin-bottom:20px; text-align: center; }
-.header h1 { font-family:'Syne'; font-size:1.8em; font-weight:800; margin:0; color:var(--text); letter-spacing:-1px; }
+.header { margin-bottom:25px; text-align: center; }
+.header h1 { font-family:'Syne'; font-size:1.8em; font-weight:800; margin:0; color:var(--text); letter-spacing:-0.5px; }
 
 /* PROFILE CARD */
 .profile-card { 
     background:var(--glass-bg); backdrop-filter:var(--backdrop-blur);
     border:1px solid var(--glass-border); border-radius:var(--radius-lg); 
-    padding:25px; display:flex; align-items:center; gap:20px; 
-    box-shadow:var(--glass-shadow); margin-bottom: 25px;
+    padding:25px; display:flex; flex-direction:column; align-items:center; gap:15px; 
+    box-shadow:var(--glass-shadow); margin-bottom: 25px; text-align: center;
 }
-.avatar-box { position:relative; width:80px; height:80px; flex-shrink: 0; }
+.avatar-box { position:relative; width:90px; height:90px; }
 .avatar { 
     width:100%; height:100%; border-radius:50%; object-fit:cover; 
     background:linear-gradient(135deg,var(--accent),var(--accent-2)); 
     display:flex; align-items:center; justify-content:center; 
-    font-size:2em; font-weight:800; color:white; font-family: 'Syne';
-    box-shadow: 0 5px 15px rgba(14,165,166,0.3);
+    font-size:2.5em; font-weight:800; color:white; font-family: 'Syne';
+    box-shadow: 0 5px 15px rgba(14,165,166,0.3); border: 3px solid white;
 }
 .btn-edit-pic { 
     position:absolute; bottom:0; right:0; 
-    background:var(--text); color:white; width:28px; height:28px; 
+    background:var(--text); color:white; width:30px; height:30px; 
     border-radius:50%; display:flex; align-items:center; justify-content:center; 
     font-size:14px; cursor:pointer; border: 2px solid white;
 }
-.profile-info h2 { margin:0; font-family:'Inter'; font-weight: 800; font-size: 1.2em; line-height: 1.2; }
+.profile-info h2 { margin:0; font-family:'Inter'; font-weight: 800; font-size: 1.3em; color:var(--text); }
 .profile-info p { margin:5px 0 0; color:var(--muted); font-size: 0.9em; font-weight: 600; }
 
-/* SETTINGS GROUP */
-.section-title { font-size: 0.8em; font-weight: 800; color: var(--muted); margin: 20px 0 10px; text-transform: uppercase; letter-spacing: 1px; padding-left: 10px; }
-
-.settings-group { 
-    background:rgba(255,255,255,0.8); border-radius:20px; 
-    overflow:hidden; border:1px solid rgba(255,255,255,0.5);
+/* MENU LIST */
+.menu-group { 
+    background:white; border-radius:20px; 
+    overflow:hidden; border:1px solid rgba(0,0,0,0.05); margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
 }
-.settings-item { 
-    padding:16px 20px; border-bottom:1px solid rgba(0,0,0,0.05); 
+.menu-item { 
+    padding:18px 20px; border-bottom:1px solid #f1f5f9; 
     display:flex; justify-content:space-between; align-items:center; 
-    font-size: 0.95em; font-weight: 600;
+    font-size: 0.95em; font-weight: 600; color: #334155;
+    transition: 0.2s; cursor: pointer;
 }
-.settings-item:last-child { border-bottom: none; }
-.settings-item:active { background: rgba(0,0,0,0.02); }
+.menu-item:last-child { border-bottom: none; }
+.menu-item:active { background: #f8fafc; }
+.menu-icon { margin-right: 12px; font-size: 1.1em; }
+.menu-arrow { color: #cbd5e1; font-weight: 800; }
+
+/* DATA ROW (READ ONLY) */
+.data-row { 
+    display: flex; justify-content: space-between; 
+    font-size: 0.85em; color: var(--muted); margin-top: 4px;
+}
+.data-val { font-weight: 700; color: var(--text); }
 
 /* SWITCH TOGGLE */
 .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
 .switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #e2e8f0; transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 input:checked + .slider { background-color: var(--accent); }
 input:checked + .slider:before { transform: translateX(18px); }
 
@@ -118,45 +127,50 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
     </div>
     <div class="profile-info">
       <h2 id="uName">Loading...</h2>
-      <p id="uPlat">...</p>
-      <p style="font-size:0.75em; color:var(--accent); margin-top:4px;">● Member Aktif</p>
+      <p id="uPlat" style="background:rgba(0,0,0,0.05); padding:4px 10px; border-radius:8px; display:inline-block; margin-top:8px;">...</p>
     </div>
   </div>
 
-  <div class="section-title">Preferensi Aplikasi</div>
-  <div class="settings-group">
-    <div class="settings-item">
-        <span>Suara Alarm</span>
-        <label class="switch"><input type="checkbox" checked disabled><span class="slider"></span></label>
-    </div>
-    <div class="settings-item">
-        <span>Getaran (Vibration)</span>
-        <label class="switch"><input type="checkbox" checked disabled><span class="slider"></span></label>
+  <div style="padding-left:15px; margin-bottom:8px; font-weight:800; font-size:0.8em; color:var(--muted);">INFORMASI AKUN</div>
+  <div class="menu-group">
+    <div class="menu-item" style="display:block;">
+        <div class="data-row"><span>Nomor WhatsApp</span> <span class="data-val" id="dWa">-</span></div>
+        <div class="data-row"><span>Tgl Bergabung</span> <span class="data-val" id="dJoin">-</span></div>
+        <div class="data-row"><span>Status</span> <span class="data-val" style="color:var(--success);">Aktif</span></div>
     </div>
   </div>
 
-  <div class="section-title">Bantuan & Info</div>
-  <div class="settings-group">
-    <div class="settings-item" onclick="window.open('https://wa.me/6281234567890?text=Halo%20Admin%20MAKA,%20saya%20butuh%20bantuan', '_blank')">
-        <span>📞 Hubungi Admin (WA)</span>
-        <span style="font-size:1.2em;">›</span>
+  <div style="padding-left:15px; margin-bottom:8px; font-weight:800; font-size:0.8em; color:var(--muted);">PREFERENSI</div>
+  <div class="menu-group">
+    <div class="menu-item">
+        <span>🔔 Suara Notifikasi</span>
+        <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
     </div>
-    <div class="settings-item">
-        <span>📄 Syarat & Ketentuan</span>
-        <span style="font-size:1.2em;">›</span>
-    </div>
-    <div class="settings-item">
-        <span>Versi Aplikasi</span>
-        <b style="color:var(--accent);">1.0.2 (PWA)</b>
+    <div class="menu-item">
+        <span>📳 Getaran Sistem</span>
+        <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
     </div>
   </div>
 
-  <div class="section-title">Akun</div>
-  <div class="settings-group">
-    <div class="settings-item" onclick="handleLogout()" style="background:#fff1f2;">
-        <span style="color:red; font-weight:800;">🚪 Keluar (Logout)</span>
+  <div style="padding-left:15px; margin-bottom:8px; font-weight:800; font-size:0.8em; color:var(--muted);">PUSAT BANTUAN</div>
+  <div class="menu-group">
+    <div class="menu-item" onclick="chatAdmin()">
+        <span>💬 Chat Admin / Mekanik</span>
+        <span class="menu-arrow">›</span>
+    </div>
+    <div class="menu-item" onclick="window.location.href='tips_maka.html'">
+        <span>📖 Panduan Aplikasi</span>
+        <span class="menu-arrow">›</span>
     </div>
   </div>
+
+  <div class="menu-group" style="margin-top:30px; border:1px solid #fee2e2;">
+    <div class="menu-item" onclick="handleLogout()" style="background:#fff1f2;">
+        <span style="color:var(--danger); width:100%; text-align:center;">🚪 KELUAR (LOGOUT)</span>
+    </div>
+  </div>
+  
+  <p style="text-align:center; font-size:0.7em; color:#cbd5e1; margin-top:20px;">Versi 1.0.5 (PWA) • MAKA Rental</p>
 </div>
 
 <footer class="bottom-nav">
@@ -177,15 +191,13 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('PWA OK'))
-        .catch(err => console.log('PWA Fail', err));
+      navigator.serviceWorker.register('./sw.js').catch(err => console.log(err));
     });
   }
 </script>
 
 <script>
-// --- CONFIG FIREBASE (PASTE PUNYA ANDA) ---
+// --- CONFIG FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -203,6 +215,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if(currentUser) {
         document.getElementById('uName').innerText = currentUser.nama;
         document.getElementById('uPlat').innerText = currentUser.plat;
+        document.getElementById('dWa').innerText = currentUser.hp || "-";
+        
+        // Format Tanggal
+        if(currentUser.joinedAt) {
+            const d = new Date(currentUser.joinedAt);
+            document.getElementById('dJoin').innerText = d.toLocaleDateString('id-ID');
+        }
+        
         loadCurrentPhoto();
     } else {
         window.location.href='index.html';
@@ -215,7 +235,7 @@ function loadCurrentPhoto() {
             document.getElementById('imgAvatar').src = doc.data().photoUrl;
             document.getElementById('imgAvatar').style.display = 'block';
             document.getElementById('txtAvatar').style.display = 'none';
-            // Update local storage
+            // Update local
             currentUser.photoUrl = doc.data().photoUrl;
             localStorage.setItem('maka_user', JSON.stringify(currentUser));
         } else {
@@ -228,18 +248,18 @@ function uploadPhoto() {
     const file = document.getElementById('fileInp').files[0];
     if(!file) return;
 
-    // Tampilkan Loading
-    showModal("Mengupload...", "Mohon tunggu sebentar, sedang memproses gambar.", "⏳");
+    // Show Loading
+    showModal("Mengupload...", "Sedang mengompres & mengupload foto. Tunggu sebentar...", "⏳");
 
     const reader = new FileReader();
     reader.onload = function(e) {
         const img = new Image();
         img.src = e.target.result;
         img.onload = function() {
-            // Resize Client Side (Agar ringan di database)
+            // Resize (Max 250px biar enteng)
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            const MAX_SIZE = 200; // Kompres ke 200px
+            const MAX_SIZE = 250; 
             let w = img.width; let h = img.height;
             
             if (w > h) { if (w > MAX_SIZE) { h *= MAX_SIZE / w; w = MAX_SIZE; } } 
@@ -248,35 +268,66 @@ function uploadPhoto() {
             canvas.width = w; canvas.height = h;
             ctx.drawImage(img, 0, 0, w, h);
             
-            // Convert ke Base64 Low Quality
-            const base64 = canvas.toDataURL('image/jpeg', 0.6);
+            // Kompres JPG 50%
+            const base64 = canvas.toDataURL('image/jpeg', 0.5);
             
-            // Simpan ke Firebase
-            db.collection('users').doc(currentUser.plat).update({ photoUrl: base64 })
+            // Simpan ke Firestore (Merge:True agar data lain aman)
+            db.collection('users').doc(currentUser.plat).set({ photoUrl: base64 }, { merge: true })
             .then(() => {
-                showModal("Berhasil", "Foto profil telah diperbarui!", "✅");
+                showModal("Berhasil", "Foto profil baru telah disimpan!", "✅");
                 loadCurrentPhoto();
             })
             .catch(err => {
-                showModal("Gagal", "Error upload: " + err.message, "❌");
+                showModal("Gagal", "Error: " + err.message, "❌");
             });
         }
     }
     reader.readAsDataURL(file);
 }
 
-function handleLogout() {
-    if(confirm("Yakin ingin keluar akun?")) {
-        localStorage.removeItem('maka_user');
-        window.location.href='index.html';
-    }
+function chatAdmin() {
+    // Ganti nomor WA Admin di sini
+    window.open('https://wa.me/6281234567890?text=Halo%20Admin%20MAKA,%20saya%20butuh%20bantuan', '_blank');
 }
 
-// MODAL HELPER
+function handleLogout() {
+    // Custom Confirm Modal
+    const modal = document.getElementById('customModal');
+    document.getElementById('mTitle').innerText = "Keluar Akun?";
+    document.getElementById('mDesc').innerText = "Anda harus login ulang nanti.";
+    document.getElementById('mIcon').innerText = "🚪";
+    
+    // Ganti tombol jadi 2 (Batal / Ya)
+    const btns = modal.querySelector('.modal-box');
+    const oldBtn = btns.querySelector('.btn-modal');
+    if(oldBtn) oldBtn.remove();
+    
+    // Cek jika tombol sudah ada (biar ga double)
+    if(!document.getElementById('btnYes')) {
+        btns.innerHTML += `
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button onclick="closeModal()" style="flex:1; padding:12px; border:none; background:#f1f5f9; color:#64748b; border-radius:12px; font-weight:bold;">Batal</button>
+                <button id="btnYes" onclick="processLogout()" style="flex:1; padding:12px; border:none; background:var(--danger); color:white; border-radius:12px; font-weight:bold;">Ya, Keluar</button>
+            </div>
+        `;
+    }
+    modal.classList.add('show');
+}
+
+function processLogout() {
+    localStorage.removeItem('maka_user');
+    window.location.href='index.html';
+}
+
 function showModal(title, msg, icon="🔔") {
-    document.getElementById('mTitle').innerText = title;
-    document.getElementById('mDesc').innerText = msg;
-    document.getElementById('mIcon').innerText = icon;
+    // Reset isi modal standar
+    const box = document.querySelector('.modal-box');
+    box.innerHTML = `
+        <span id="mIcon" class="modal-icon">${icon}</span>
+        <h3 id="mTitle" class="modal-title">${title}</h3>
+        <p id="mDesc" class="modal-desc">${msg}</p>
+        <button class="btn-modal" onclick="closeModal()">OK</button>
+    `;
     document.getElementById('customModal').classList.add('show');
 }
 function closeModal() { document.getElementById('customModal').classList.remove('show'); }
