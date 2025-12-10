@@ -3,43 +3,98 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Admin Finance - MAKA</title>
+<title>Admin Finance - MAKA Online</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <style>
-/* CSS VARIABLES & LAYOUT */
-:root { --bg:#f6f8fb; --surface:#ffffff; --text:#0f1724; --accent:#0ea5a6; --radius-lg:20px; }
-body { margin:0; padding:20px; font-family:'Inter'; background:var(--bg); color:var(--text); }
-.container { max-width:700px; margin:0 auto; padding-bottom:50px; }
-
-h2 { font-family:'Syne'; border-bottom:1px solid #ddd; padding-bottom:10px; display:flex; justify-content:space-between; }
-.card { background:var(--surface); padding:20px; border-radius:var(--radius-lg); margin-bottom:15px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
-
-/* FORMS */
-.form-row { display:flex; gap:10px; margin-bottom:15px; }
-.form-col { flex:1; }
-label { display:block; font-size:0.7em; font-weight:700; margin-bottom:5px; color:#64748b; text-transform:uppercase; }
-input, select { width:100%; padding:10px; border-radius:8px; border:1px solid #cbd5e1; font-family:'Inter'; }
-
-button { width:100%; padding:12px; background:var(--text); color:white; border:none; border-radius:8px; font-weight:700; cursor:pointer; margin-top:5px; }
-button.print { background: #0ea5a6; }
-button.excel { background: #10b981; }
-
-/* INVOICE TABLE */
-table { width:100%; border-collapse:collapse; margin-top:10px; font-size:0.9em; }
-th { text-align:left; background:#f1f5f9; padding:8px; font-size:0.8em; }
-td { border-bottom:1px solid #eee; padding:8px; }
-.total-row td { font-weight:800; font-size:1.1em; background:#f8fafc; }
-
-/* QRIS MOCKUP */
-.qris-box {
-    display:none; text-align:center; background:white; padding:20px; border:1px dashed #aaa; margin-top:20px;
+/* ================= GLOBAL THEME ================= */
+:root {
+  --bg-base: #f0f4f8;
+  --accent: #0ea5a6;
+  --text: #0f1724;
+  --danger: #ef4444;
+  --success: #10b981;
+  
+  --radius-lg: 20px;
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  --backdrop-blur: blur(12px);
 }
-.qris-box.active { display:block; animation:pop 0.3s; }
-@keyframes pop { from{transform:scale(0.8)} to{transform:scale(1)} }
-#qrcode { display:flex; justify-content:center; margin:15px 0; }
+
+body {
+  margin: 0; padding: 20px; font-family: 'Inter', sans-serif;
+  background-color: var(--bg-base); color: var(--text);
+  min-height: 100vh;
+}
+
+body::before {
+  content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: url('1763947427555.jpg') center/cover no-repeat; 
+  opacity: 0.15; z-index: -1; pointer-events: none;
+}
+
+.container { max-width: 750px; margin: 0 auto; padding-bottom: 50px; }
+
+h2 {
+  font-family: 'Syne'; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+
+/* CARDS */
+.glass-card {
+  background: var(--glass-bg); backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
+  padding: 24px; margin-bottom: 20px; box-shadow: var(--glass-shadow);
+}
+
+.form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+.form-col { flex: 1; }
+
+label { display: block; font-size: 0.75em; font-weight: 700; margin-bottom: 6px; color: #64748b; text-transform: uppercase; }
+input, select {
+  width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1;
+  font-family: 'Inter'; background: rgba(255,255,255,0.8); outline: none;
+}
+
+button {
+  width: 100%; padding: 14px; background: var(--text); color: white;
+  border: none; border-radius: 10px; font-weight: 700; cursor: pointer;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: 0.2s;
+}
+button:active { transform: scale(0.98); }
+button.send-online { background: var(--success); }
+button.print { background: var(--accent); }
+
+/* TABLE */
+table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9em; }
+th { text-align: left; background: rgba(0,0,0,0.05); padding: 10px; border-radius: 6px; }
+td { border-bottom: 1px solid rgba(0,0,0,0.05); padding: 10px; }
+.total-row td { font-weight: 800; font-size: 1.2em; background: rgba(255,255,255,0.5); }
+
+/* QRIS BOX */
+.qris-area {
+  display: none; text-align: center; margin-top: 20px; padding: 20px;
+  border: 2px dashed #cbd5e1; border-radius: 15px; background: #fff;
+}
+.qris-area.active { display: block; animation: pop 0.3s; }
+@keyframes pop { from{transform:scale(0.9)} to{transform:scale(1)} }
+#qrcode { display: flex; justify-content: center; margin: 15px 0; }
+
+/* SEARCH RESULT */
+.search-res {
+  position: absolute; background: white; width: 100%; max-height: 200px;
+  overflow-y: auto; border: 1px solid #ccc; border-radius: 0 0 10px 10px;
+  z-index: 10; display: none;
+}
+.search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+.search-item:hover { background: #f0f9ff; }
 </style>
 </head>
 <body>
@@ -47,20 +102,24 @@ td { border-bottom:1px solid #eee; padding:8px; }
 <div class="container">
     <h2>
         <span>💰 Admin Finance</span>
-        <a href="admin_login.html" style="font-size:0.5em; color:red; text-decoration:none; align-self:center;">LOGOUT</a>
+        <a href="admin_login.html" style="color:var(--danger); text-decoration:none; font-size:0.6em;">LOGOUT</a>
     </h2>
 
-    <div class="card">
+    <div class="glass-card" style="position:relative;">
         <div class="form-row">
-            <div class="form-col">
-                <label>Nama User (Simulasi)</label>
-                <input id="invName" value="User Demo" readonly style="background:#f1f5f9;">
+            <div class="form-col" style="position:relative;">
+                <label>Cari User (Plat / Nama)</label>
+                <input id="searchInp" placeholder="Ketik plat nomor..." onkeyup="searchUser()" autocomplete="off">
+                <div id="searchList" class="search-res"></div>
             </div>
             <div class="form-col">
-                <label>Plat Nomor</label>
-                <input id="invPlat" value="Loading..." readonly style="background:#f1f5f9;">
+                <label>Nama User</label>
+                <input id="invName" readonly style="background:#e2e8f0;">
             </div>
         </div>
+    </div>
+
+    <div class="glass-card">
         <div class="form-row">
             <div class="form-col">
                 <label>Dari Tanggal</label>
@@ -71,14 +130,14 @@ td { border-bottom:1px solid #eee; padding:8px; }
                 <input type="date" id="endDate">
             </div>
         </div>
-        <button onclick="generateInvoice()">GENERATE INVOICE</button>
+        <button onclick="previewInvoice()">PREVIEW INVOICE</button>
     </div>
 
-    <div id="invoiceResult" style="display:none;">
-        <div class="card" id="printArea">
-            <div style="text-align:center; border-bottom:2px dashed #eee; padding-bottom:15px; margin-bottom:15px;">
+    <div id="previewArea" style="display:none;">
+        <div class="glass-card" id="printSection">
+            <div style="text-align:center; border-bottom:2px dashed #ccc; padding-bottom:15px; margin-bottom:15px;">
                 <h3 style="margin:0; font-family:'Syne';">MAKA RENTAL</h3>
-                <small>Invoice Tagihan Sewa & Cicilan</small>
+                <small>Invoice Tagihan Resmi</small>
             </div>
 
             <table id="invTable">
@@ -98,87 +157,107 @@ td { border-bottom:1px solid #eee; padding:8px; }
                 </tfoot>
             </table>
 
-            <div id="qrisSection" class="qris-box">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/QR_code_for_mobile_English_Wikipedia.svg/1200px-QR_code_for_mobile_English_Wikipedia.svg.png" style="width:150px; opacity:0.1; position:absolute;"> 
+            <div id="qrisBox" class="qris-area">
+                <div style="font-weight:bold; color:var(--text);">SCAN UNTUK BAYAR</div>
                 <div id="qrcode"></div>
-                <strong>SCAN QRIS</strong><br>
-                <small>NMID: ID102003004005</small><br>
-                <strong id="qrisAmount" style="font-size:1.2em; color:#0ea5a6;">Rp 0</strong>
-                <p style="font-size:0.7em; color:#666; margin-top:10px;">
-                    *Simulasi: Scan QR ini akan otomatis mengupdate status pembayaran user di kalender.
-                </p>
+                <div id="qrisNominal" style="font-size:1.2em; font-weight:800; color:var(--accent);">Rp 0</div>
+                <small>NMID: MAKA-RENTAL-OFFICIAL</small>
             </div>
         </div>
 
         <div class="form-row">
+            <button class="send-online" onclick="sendToUser()">🚀 KIRIM KE USER</button>
             <button class="print" onclick="window.print()">🖨️ PRINT</button>
-            <button class="excel" onclick="exportExcel()">📊 EXCEL</button>
         </div>
-        
-        <button onclick="toggleQris()" style="background:#333; margin-top:10px;">tampilkan QRIS TAGIHAN</button>
+        <button onclick="toggleQris()" style="background:#334155; margin-top:5px;">TAMPILKAN QRIS</button>
     </div>
 
 </div>
 
 <script>
-// CONFIG
-const HWB_RATE = 80000; 
+// --- CONFIG FIREBASE ---
+const firebaseConfig = {
+  apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
+  authDomain: "rtomaka-e67b5.firebaseapp.com",
+  projectId: "rtomaka-e67b5",
+  storageBucket: "rtomaka-e67b5.firebasestorage.app",
+  messagingSenderId: "472036722228",
+  appId: "1:472036722228:web:11d520f9204db317d02c61"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// --- VARIABLES ---
+const HWB_RATE = 70000; // HARGA SUDAH 70.000
 const CDP_RATE = 70000;
-const MAKA_PLUS_RATE = 10000;
+const MAKA_PLUS_RATE = 10000; // Cicilan
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Load data user dummy dari localStorage user
-    const u = JSON.parse(localStorage.getItem('maka_user'));
-    if(u) {
-        document.getElementById('invName').value = u.nama;
-        document.getElementById('invPlat').value = u.plat;
-    }
+let selectedUser = null;
+let currentTotal = 0;
+
+// --- 1. SEARCH USER ---
+function searchUser() {
+    const key = document.getElementById('searchInp').value.toUpperCase();
+    const list = document.getElementById('searchList');
     
-    // Default date: Hari ini
-    document.getElementById('endDate').valueAsDate = new Date();
-    // Start date: 7 hari lalu
-    const d = new Date(); d.setDate(d.getDate()-7);
-    document.getElementById('startDate').valueAsDate = d;
-});
+    if(key.length < 2) { list.style.display='none'; return; }
 
-function generateInvoice() {
+    db.collection('users').get().then(snap => {
+        let html = '';
+        snap.forEach(doc => {
+            const u = doc.data();
+            if(u.plat.includes(key) || u.nama.toUpperCase().includes(key)) {
+                // Simpan data user lengkap di atribut data
+                const userJson = JSON.stringify(u).replace(/"/g, '&quot;');
+                html += `<div class="search-item" onclick="selectUser('${userJson}')">
+                            <b>${u.plat}</b> - ${u.nama}
+                         </div>`;
+            }
+        });
+        list.innerHTML = html;
+        list.style.display = html ? 'block' : 'none';
+    });
+}
+
+function selectUser(jsonStr) {
+    selectedUser = JSON.parse(jsonStr);
+    document.getElementById('searchInp').value = selectedUser.plat;
+    document.getElementById('invName').value = selectedUser.nama;
+    document.getElementById('searchList').style.display = 'none';
+    
+    // Auto set start date (hari ini)
+    document.getElementById('startDate').valueAsDate = new Date();
+    document.getElementById('endDate').valueAsDate = new Date();
+}
+
+// --- 2. GENERATE PREVIEW ---
+function previewInvoice() {
+    if(!selectedUser) return alert("Pilih user dulu!");
+    
     const start = new Date(document.getElementById('startDate').value);
     const end = new Date(document.getElementById('endDate').value);
     const tbody = document.getElementById('invBody');
     tbody.innerHTML = '';
-    
-    let total = 0;
-    
-    // Cek Data MAKA+ User
-    const makaPlus = JSON.parse(localStorage.getItem('maka_plus_data'));
-    let plusStart = null;
-    if(makaPlus && makaPlus.active) {
-        plusStart = new Date(makaPlus.activatedAt);
-        plusStart.setHours(0,0,0,0);
-    }
+    currentTotal = 0;
 
-    // Loop Date
+    // Cek apakah user punya MAKA+ aktif
+    // Note: Di sistem real, admin harusnya fetch data makaPlus user dari server.
+    // Di sini kita asumsikan admin tau atau user sudah sync.
+    // Untuk demo ini, kita hitung murni HWB.
+    
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
         const day = d.getDate();
         let desc = "Sewa Harian (HWB)";
-        let cost = HWB_RATE; // Default
-        
-        // Cek Logic 14 & 28 (Contoh sederhana)
+        let cost = HWB_RATE;
+
         if(day === 14 || day === 28) {
             desc = "Cicilan DP (CDP)";
-            cost = CDP_RATE; // Misal lebih murah/beda
-        }
-
-        // Cek MAKA+
-        if(plusStart && d > plusStart) {
-            // Cek apakah masih dalam masa 1 tahun (opsional, disederhanakan)
-            desc += " + Cicilan Charger";
-            cost += MAKA_PLUS_RATE;
+            cost = CDP_RATE;
         }
 
         // Add Row
         const dateStr = d.toLocaleDateString('id-ID');
-        total += cost;
+        currentTotal += cost;
         
         tbody.innerHTML += `
             <tr>
@@ -188,30 +267,55 @@ function generateInvoice() {
             </tr>
         `;
     }
+
+    document.getElementById('invTotal').innerText = "Rp " + currentTotal.toLocaleString('id-ID');
+    document.getElementById('qrisNominal').innerText = "Rp " + currentTotal.toLocaleString('id-ID');
+    document.getElementById('previewArea').style.display = 'block';
     
-    document.getElementById('invTotal').innerText = "Rp " + total.toLocaleString('id-ID');
-    document.getElementById('qrisAmount').innerText = "Rp " + total.toLocaleString('id-ID');
-    
-    // Generate QR Code Mockup
+    // Generate QR
     document.getElementById('qrcode').innerHTML = "";
     new QRCode(document.getElementById("qrcode"), {
-        text: "MAKA_INVOICE_" + total + "_" + Date.now(),
+        text: `MAKA_PAY:${selectedUser.plat}:${currentTotal}`,
         width: 128, height: 128
     });
-
-    document.getElementById('invoiceResult').style.display = 'block';
 }
 
 function toggleQris() {
-    const q = document.getElementById('qrisSection');
-    q.classList.toggle('active');
+    document.getElementById('qrisBox').classList.toggle('active');
 }
 
-function exportExcel() {
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.table_to_sheet(document.getElementById('invTable'));
-    XLSX.utils.book_append_sheet(wb, ws, "Invoice");
-    XLSX.writeFile(wb, "Invoice_MAKA.xlsx");
+// --- 3. KIRIM KE USER (FIREBASE) ---
+function sendToUser() {
+    if(!selectedUser || currentTotal <= 0) return;
+    
+    if(!confirm(`Kirim tagihan Rp ${currentTotal.toLocaleString('id-ID')} ke user ${selectedUser.nama}?`)) return;
+
+    // Kirim ke koleksi 'invoices'
+    db.collection('invoices').add({
+        plat: selectedUser.plat,
+        nama: selectedUser.nama,
+        amount: currentTotal,
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value,
+        status: 'unpaid',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        alert("✅ Tagihan Terkirim! User akan melihatnya di Dashboard.");
+        
+        // Kirim Notifikasi Sistem juga (opsional)
+        db.collection('broadcasts').add({
+            title: "Tagihan Baru",
+            body: `Hai ${selectedUser.nama}, ada tagihan baru sebesar Rp ${currentTotal.toLocaleString('id-ID')}`,
+            targetPlat: selectedUser.plat,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        document.getElementById('previewArea').style.display = 'none';
+        document.getElementById('searchInp').value = '';
+        selectedUser = null;
+    }).catch(err => {
+        alert("Gagal kirim: " + err.message);
+    });
 }
 </script>
 </body>
