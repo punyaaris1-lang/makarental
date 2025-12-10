@@ -1,5 +1,5 @@
-const CACHE_NAME = "maka-rental-v1.1.0"; // Versi cache ditingkatkan
-const REPO_NAME = "/makarental"; // <<< SUDAH DIGANTI DENGAN NAMA REPO ANDA
+const CACHE_NAME = "maka-rental-v1.1.1"; // Versi cache DITINGKATKAN
+const REPO_NAME = "/makarental"; // Nama repositori Anda
 
 const FILES_TO_CACHE = [
   // Path UTAMA harus menggunakan nama repositori
@@ -24,7 +24,8 @@ const FILES_TO_CACHE = [
   `${REPO_NAME}/admin_finance.html`,
   
   // Assets
-  `${REPO_NAME}/1763947427555.jpg`
+  `${REPO_NAME}/1763947427555.jpg`,
+  `${REPO_NAME}/manifest.json` // Tambahkan manifest agar terjamin di-cache
 ];
 
 // 1. Instalasi: Menyimpan semua file ke cache
@@ -33,7 +34,8 @@ self.addEventListener("install", (evt) => {
     caches.open(CACHE_NAME).then((cache) => {
       console.log("PWA: Caching semua file aplikasi.");
       return cache.addAll(FILES_TO_CACHE).catch(error => {
-        console.error('PWA ERROR: Gagal mencache file. Pastikan nama file di atas sudah benar.', error);
+        // Jika ada error di sini, berarti file hilang atau path salah
+        console.error('PWA ERROR: Gagal mencache file. Cek nama file di atas!', error);
       });
     })
   );
@@ -42,11 +44,14 @@ self.addEventListener("install", (evt) => {
 
 // 2. Strategi Cache: Mengambil dari cache (offline first)
 self.addEventListener("fetch", (evt) => {
-  evt.respondWith(
-    caches.match(evt.request).then((res) => {
-      return res || fetch(evt.request);
-    })
-  );
+  // Hanya melayani permintaan dari cache untuk file-file statis yang kita butuhkan
+  if (FILES_TO_CACHE.includes(new URL(evt.request.url).pathname)) {
+      evt.respondWith(
+          caches.match(evt.request).then((res) => {
+              return res || fetch(evt.request);
+          })
+      );
+  }
 });
 
 // 3. Aktivasi: Menghapus cache lama
