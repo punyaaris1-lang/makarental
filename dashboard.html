@@ -4,14 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MAKA Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
 /* --- GLOBAL THEME --- */
-:root { --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; --danger:#ef4444; --radius-lg:24px; --max-width:520px; }
+:root { 
+    --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
+    --danger:#ef4444; --radius-lg:24px; --max-width:520px; 
+}
 body { margin:0; font-family:'Inter', sans-serif; background:var(--bg-base); color:var(--text); min-height:100vh; padding-bottom:100px; }
 body::before { content:""; position:fixed; inset:0; background:url('1763947427555.jpg') center/cover; opacity:0.15; z-index:-1; pointer-events:none; }
 .app-container { max-width:var(--max-width); margin:0 auto; padding:20px 20px 100px; }
@@ -22,27 +25,39 @@ body::before { content:""; position:fixed; inset:0; background:url('176394742755
 .profile-pic { 
     width:50px; height:50px; background:linear-gradient(135deg,var(--accent),var(--accent-2)); 
     border-radius:14px; display:flex; align-items:center; justify-content:center; 
-    color:white; font-family:'Syne'; font-size:1.4em; font-weight:800; box-shadow:0 4px 15px rgba(14,165,166,0.3);
-    background-size: cover; background-position: center; /* Untuk Foto Custom */
+    color:white; font-family:'Inter'; font-size:1.4em; font-weight:800; box-shadow:0 4px 15px rgba(14,165,166,0.3);
+    background-size: cover; background-position: center;
 }
 .user-text h1 {
-    font-family: 'Inter', sans-serif; font-size: 1.2em; font-weight: 700;
+    font-family: 'Inter', sans-serif; font-size: 1.2em; font-weight: 800;
     margin: 0; color: var(--text); line-height: 1.1; letter-spacing: -0.5px;
 }
 .user-text p { color:#64748b; font-size:0.85em; margin:2px 0 0; }
 
-/* --- HERO CARD --- */
+/* --- HERO CARD (TAGIHAN) --- */
 .hero-tunggakan {
     background:linear-gradient(135deg,rgba(6,182,212,0.95),rgba(14,165,166,0.95)); padding:20px;
     display:flex; justify-content:space-between; align-items:center; color:white;
     border-radius:20px; position:relative; overflow:hidden; box-shadow:0 10px 30px rgba(14,165,166,0.25);
 }
-.hero-tunggakan span { font-family:'Syne'; font-size:1.5em; font-weight:800; display:block; }
+.hero-tunggakan span { 
+    /* FONT DIGANTI JADI INTER (Sesuai Request) */
+    font-family:'Inter', sans-serif; font-size:1.6em; font-weight:800; display:block; letter-spacing: -1px;
+}
 
-/* --- SECTION TITLE --- */
+/* --- SECTION TITLE (MLU API) --- */
 .section-title {
-    font-family: 'Syne', sans-serif; font-size: 1.1em; font-weight: 800;
-    margin: 25px 0 15px; color: var(--text); display: flex; align-items: center; gap: 8px;
+    font-family: 'Inter', sans-serif; font-size: 1.2em; font-weight: 900;
+    margin: 25px 0 15px; color: var(--text); display: flex; align-items: center; gap: 6px;
+}
+/* Efek Teks Api untuk MLU */
+.text-fire {
+    background: linear-gradient(to top, #d97706 0%, #ef4444 50%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-style: italic;
+    letter-spacing: -1px;
+    filter: drop-shadow(0 2px 4px rgba(239,68,68,0.2));
 }
 
 /* --- ICON GRID --- */
@@ -54,24 +69,26 @@ body::before { content:""; position:fixed; inset:0; background:url('176394742755
 .icon-item { padding:15px 5px; text-align:center; display:flex; flex-direction:column; align-items:center; text-decoration:none; transition:0.2s; }
 .icon-item:active { transform:scale(0.95); background:rgba(255,255,255,0.9); }
 .icon-item span { font-size:24px; margin-bottom:8px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
-.icon-item p { font-size:0.7em; color:var(--text); font-weight:600; margin:0; }
+.icon-item p { font-size:0.75em; color:var(--text); font-weight:700; margin:0; }
 .sos-card { background:rgba(255,230,230,0.8)!important; border:1px solid rgba(239,68,68,0.2)!important; }
 
-/* --- FOOTER NAV --- */
+/* --- FOOTER NAV (RAMPING & RAPAT) --- */
 footer.bottom-nav {
-    position:fixed; bottom:15px; left:50%; transform:translateX(-50%);
-    width:calc(100% - 40px); max-width:400px;
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    /* Ukuran Auto menyesuaikan isi, tidak lebar full */
+    width: auto; min-width: 280px; 
     background:rgba(255,255,255,0.9); backdrop-filter:blur(20px);
-    border-radius:50px; padding:10px 20px;
-    display:flex; justify-content:space-between; align-items:center;
+    border-radius: 99px; /* Bentuk Pill */
+    padding:12px 30px; 
+    display:flex; justify-content: space-between; align-items:center; gap: 30px;
     box-shadow:0 10px 40px rgba(0,0,0,0.1); border:1px solid rgba(255,255,255,0.5); z-index:999;
 }
-.nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#94a3b8; font-size:9px; font-weight:600; transition:0.2s; }
-.nav-item span { font-size:18px; margin-bottom:2px; }
+.nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#94a3b8; font-size:10px; font-weight:700; transition:0.2s; }
+.nav-item span { font-size:20px; margin-bottom:2px; }
 .nav-item.active { color:var(--accent); }
 .nav-item.active span { transform:translateY(-2px); filter:drop-shadow(0 4px 10px rgba(14,165,166,0.4)); }
 
-/* --- CUSTOM MODAL PREMIUM --- */
+/* --- CUSTOM MODAL (MENGGANTIKAN ALERT BAWAAN) --- */
 .modal-overlay {
     position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);
     z-index:9999; display:none; align-items:center; justify-content:center;
@@ -79,12 +96,12 @@ footer.bottom-nav {
 }
 .modal-overlay.show { display:flex; opacity:1; }
 .modal-box {
-    background:white; width:85%; max-width:320px; padding:25px; border-radius:24px;
+    background:white; width:80%; max-width:300px; padding:25px; border-radius:24px;
     text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .modal-overlay.show .modal-box { transform:scale(1); }
 .modal-icon { font-size:40px; margin-bottom:15px; display:block; }
-.modal-title { font-family:'Syne'; font-size:1.4em; font-weight:800; margin:0 0 10px; color:var(--text); }
+.modal-title { font-family:'Inter'; font-size:1.3em; font-weight:800; margin:0 0 10px; color:var(--text); }
 .modal-desc { font-size:0.9em; color:#64748b; line-height:1.5; margin-bottom:20px; }
 .modal-btns { display:flex; gap:10px; justify-content:center; }
 .btn-modal { flex:1; padding:12px; border-radius:12px; border:none; font-weight:700; cursor:pointer; font-size:0.9em; }
@@ -117,7 +134,10 @@ footer.bottom-nav {
         </div>
     </header>
 
-    <h2 class="section-title">✨ MLU | Mau Ape Lu</h2>
+    <h2 class="section-title">
+        ✨ <span class="text-fire">MLU</span> <span style="font-weight:700; color:var(--text);">| Mau Ape Lu</span>
+    </h2>
+    
     <div class="icon-grid">
         <a href="calendar.html" class="icon-item glass-card"><span>📅</span><p>Bayar</p></a>
         <a href="history.html" class="icon-item glass-card"><span>🗒️</span><p>Riwayat</p></a>
@@ -161,11 +181,11 @@ const db = firebase.firestore();
 
 let currentUser = JSON.parse(localStorage.getItem('maka_user'));
 
-// --- MODAL SYSTEM ---
+// --- MODAL SYSTEM (MENGGANTIKAN ALERT) ---
 function showModal(type, title, desc, onConfirm) {
     const modal = document.getElementById('customModal');
     document.getElementById('mTitle').innerText = title;
-    document.getElementById('mDesc').innerText = desc;
+    document.getElementById('mDesc').innerHTML = desc; // Support HTML
     
     const btnContainer = document.getElementById('mBtns');
     btnContainer.innerHTML = '';
@@ -192,11 +212,11 @@ function closeModal() { document.getElementById('customModal').classList.remove(
 document.addEventListener("DOMContentLoaded", function() {
     if(!currentUser) { window.location.href='index.html'; return; }
 
-    // RENDER DATA USER
+    // Render User
     document.getElementById('user-name-display').innerText = "Halo, " + currentUser.nama;
     document.getElementById('user-plate-display').innerText = currentUser.plat;
     
-    // RENDER AVATAR (Inisial / Foto)
+    // Foto Profil
     const avatarDiv = document.getElementById('user-avatar');
     if (currentUser.photoUrl) {
         avatarDiv.innerText = "";
@@ -225,7 +245,7 @@ document.addEventListener("DOMContentLoaded", function() {
     db.collection('sos_alerts').where('timestamp', '>', oneMinAgo).onSnapshot(snap => {
         snap.docChanges().forEach(c => {
             if(c.type === 'added' && c.doc.data().plat !== currentUser.plat) {
-                showModal('alert', 'DARURAT!', `User ${c.doc.data().plat} butuh bantuan: "${c.doc.data().msg}"`);
+                showModal('alert', 'DARURAT!', `User <b>${c.doc.data().plat}</b> butuh bantuan:<br>"${c.doc.data().msg}"`);
                 if(navigator.vibrate) navigator.vibrate([1000,500,1000]);
             }
         });
@@ -234,7 +254,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 function calculateLocalBill() {
     const today = new Date(); today.setHours(0,0,0,0);
-    let bill = 70000; 
+    let bill = 70000; // Dasar 70rb
     const plusData = JSON.parse(localStorage.getItem('maka_plus_data'));
     if(plusData && plusData.active) bill += 10000;
     document.getElementById('hero-tunggakan-nominal').innerText = "Rp " + bill.toLocaleString('id-ID');
@@ -246,7 +266,10 @@ function triggerSOS() {
         if(msg) {
             db.collection('sos_alerts').add({
                 plat: currentUser.plat, nama: currentUser.nama, msg: msg, timestamp: new Date().toISOString()
-            }).then(() => alert("SOS Terkirim!"));
+            }).then(() => {
+                // Notifikasi sukses kecil (bukan alert native)
+                showModal('alert', 'Terkirim', 'Sinyal SOS telah disebarkan.');
+            });
         }
     });
 }
