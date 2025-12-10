@@ -1,70 +1,146 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MAKA+ Premium</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MAKA+ Portable Charger</title>
 
-  <link rel="stylesheet" href="app.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+
+<style>
+/* ================= THEME VARIABLES ================= */
+:root {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --muted: #9ca3af;
+  --text: #0f1724;
+  --accent: #0ea5a6;
+  --gold: #fbbf24;
+  --success: #10b981;
+  --radius-lg: 24px;
+  --radius-md: 14px;
+  --card-shadow: 0 10px 30px rgba(15,23,42,0.06);
+  --max-width: 520px;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%); color: var(--text); min-height: 100vh; }
+.app-container { max-width: var(--max-width); margin: 0 auto; padding: 20px 20px 120px 20px; }
+
+/* HEADER */
+.header { margin-bottom: 24px; text-align: center; }
+.header h1 { font-family: 'Syne', sans-serif; font-size: 1.8em; font-weight: 800; margin: 0; color: var(--text); }
+.header p { color: var(--muted); margin: 6px 0 0 0; font-size: 0.9em; }
+
+/* PRODUCT CARD */
+.product-card { background: white; border-radius: var(--radius-lg); padding: 24px; text-align: center; box-shadow: var(--card-shadow); border: 1px solid rgba(0,0,0,0.05); margin-bottom: 24px; }
+.prod-icon { font-size: 60px; margin-bottom: 16px; display: inline-block; background: #f0fdf4; width: 100px; height: 100px; line-height: 100px; border-radius: 50%; border: 1px dashed var(--success); }
+.prod-title { font-weight: 800; font-size: 1.2em; margin-bottom: 8px; font-family: 'Syne'; }
+.prod-desc { color: var(--muted); font-size: 0.9em; line-height: 1.5; margin-bottom: 20px; }
+
+/* PRICE BOX */
+.price-box { background: linear-gradient(135deg, var(--text), #1a2333); color: white; padding: 16px; border-radius: var(--radius-md); margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+.price-label { font-size: 0.8em; opacity: 0.8; }
+.price-val { font-size: 1.4em; font-weight: 800; font-family: 'Syne'; color: var(--gold); }
+.price-note { font-size: 0.7em; opacity: 0.6; margin-top: 2px; }
+
+/* STATUS INFO */
+.status-info { background: #fffbeb; border: 1px solid #fcd34d; color: #92400e; padding: 16px; border-radius: var(--radius-md); font-size: 0.85em; margin-bottom: 24px; line-height: 1.5; display: none; }
+.status-info.active { display: block; }
+
+/* BUTTON */
+.btn-buy { width: 100%; padding: 18px; border: none; border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--accent), #06b6d4); color: white; font-size: 1em; font-weight: 800; cursor: pointer; box-shadow: 0 10px 25px rgba(14, 165, 166, 0.3); font-family: 'Syne', sans-serif; transition: 0.2s; }
+.btn-buy:active { transform: scale(0.98); }
+.btn-buy:disabled { background: #e2e8f0; color: #94a3b8; box-shadow: none; cursor: default; }
+
+/* NAV */
+footer.bottom-nav { position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px; width: calc(100% - 40px); max-width: 480px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px); border-radius: 999px; padding: 12px 20px; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 10px 40px rgba(0,0,0,0.08); border: 1px solid rgba(255,255,255,0.5); z-index: 999; }
+.nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; }
+.nav-item span { font-size: 20px; margin-bottom: 2px; }
+.nav-item.active { color: var(--accent); font-weight: 700; }
+</style>
 </head>
+
 <body>
-
-<div class="container">
-
-  <header class="header-light">
-    <h1>⭐ MAKA+</h1>
-    <p>Layanan premium bantuan & toleransi khusus MAKA Rental</p>
+<div class="app-container">
+  <header class="header">
+    <h1>MAKA+</h1>
+    <p>Program Kepemilikan Charger</p>
   </header>
 
-  <div class="card-light">
-    <div class="row-between">
-      <span class="text-label">Status Langganan</span>
-      <strong id="plus-status-text" class="text-gold">BELUM AKTIF</strong>
+  <div class="product-card">
+    <div class="prod-icon">🔌</div>
+    <div class="prod-title">Fast Charger Portable</div>
+    <div class="prod-desc">
+      Miliki charger pribadi agar bisa cas di rumah. Cicilan ringan, otomatis berhenti setelah 1 tahun.
     </div>
 
-    <ul class="list-benefit">
-      <li>Prioritas bantuan darurat (SOS)</li>
-      <li>Toleransi keterlambatan tertentu</li>
-      <li>Akses layanan khusus FC</li>
-      <li>Gratis benefit dari event MAKA</li>
-    </ul>
-
-    <div class="box-info">
-      📌 Biaya MAKA+:
-      <br>• Aktif mulai <b>H+1</b> setelah konfirmasi
-      <br>• Tambahan <b>Rp 10.000 / hari</b>
-      <br>• Otomatis masuk ke perhitungan tunggakan
+    <div class="price-box">
+      <div>
+        <div class="price-label">Biaya Cicilan</div>
+        <div class="price-note">Selama 365 Hari (1 Thn)</div>
+      </div>
+      <div style="text-align: right;">
+        <div class="price-val">+ Rp 10.000</div>
+        <div class="price-label">per Hari</div>
+      </div>
     </div>
+
+    <div id="active-status-area" class="status-info">
+      ✅ <b>CICILAN AKTIF</b><br>
+      Mulai: <span id="lbl-date">-</span><br>
+      Selesai: <span id="lbl-end-date">-</span><br>
+      <small style="display:block; margin-top:5px; color:#b45309;">
+        Tagihan +10rb berjalan otomatis sampai tanggal selesai.
+      </small>
+    </div>
+
+    <button id="btnActivate" class="btn-buy" onclick="activateMakaPlus()">
+      AMBIL CICILAN SEKARANG
+    </button>
   </div>
-
-  <button
-    id="activatePlusBtn"
-    class="btn-primary"
-    onclick="activateMakaPlus()">
-    AKTIFKAN MAKA+
-  </button>
-
 </div>
+
+<footer class="bottom-nav">
+    <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
+    <a href="calendar.html" class="nav-item"><span>📅</span>Bayar</a>
+    <a href="maka_plus.html" class="nav-item active"><span>⭐</span>MAKA+</a>
+</footer>
 
 <script>
   const MAKA_PLUS_KEY = 'maka_plus_data';
 
   function loadMakaPlus() {
     const data = JSON.parse(localStorage.getItem(MAKA_PLUS_KEY));
-    const statusText = document.getElementById('plus-status-text');
-    const btn = document.getElementById('activatePlusBtn');
+    const statusArea = document.getElementById('active-status-area');
+    const lblDate = document.getElementById('lbl-date');
+    const lblEndDate = document.getElementById('lbl-end-date');
+    const btn = document.getElementById('btnActivate');
 
     if (data && data.active) {
-      const activeDate = new Date(data.activatedAt);
-      statusText.textContent =
-        'AKTIF sejak ' + activeDate.toLocaleDateString('id-ID');
+      const startDate = new Date(data.activatedAt);
+      
+      // Hitung tanggal selesai (Start + 365 hari)
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 365);
+
+      const fmtStart = startDate.toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
+      const fmtEnd = endDate.toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
+
+      statusArea.classList.add('active');
+      lblDate.textContent = fmtStart;
+      lblEndDate.textContent = fmtEnd;
 
       btn.disabled = true;
-      btn.textContent = 'MAKA+ AKTIF';
+      btn.textContent = 'CICILAN SEDANG BERJALAN';
+      btn.style.background = '#f1f5f9';
+      btn.style.color = '#64748b';
+      btn.style.boxShadow = 'none';
     }
   }
 
   function activateMakaPlus() {
+    if(!confirm("Ambil cicilan Charger Portable?\n\nTagihan +10.000/hari selama 1 TAHUN (365 hari).")) return;
+
     const today = new Date();
     today.setHours(0,0,0,0);
 
@@ -76,11 +152,10 @@
     localStorage.setItem(MAKA_PLUS_KEY, JSON.stringify(makaPlusData));
     loadMakaPlus();
 
-    alert('✅ MAKA+ berhasil diaktifkan.\nTagihan +10rb mulai BESOK (H+1).');
+    alert('✅ Cicilan Aktif!\nTagihan akan bertambah mulai BESOK (H+1) sampai 1 tahun ke depan.');
   }
 
   document.addEventListener('DOMContentLoaded', loadMakaPlus);
 </script>
-
 </body>
 </html>
