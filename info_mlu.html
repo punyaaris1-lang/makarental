@@ -1,84 +1,279 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAKA Info MLU</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MAKA Info MLU</title>
 
-    <!-- Hapus semua CSS lama → ganti dengan app.css -->
-    <link rel="stylesheet" href="app.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+
+<style>
+/* ================= THEME VARIABLES ================= */
+:root {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --muted: #6b7280;
+  --accent: #0ea5a6;
+  --accent-2: #06b6d4;
+  --text: #0f1724;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --card-shadow: 0 8px 30px rgba(15,23,42,0.06);
+  --max-width: 520px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0; padding: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.app-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 20px 20px 120px 20px;
+}
+
+/* ================= HEADER ================= */
+.header {
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.header h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.8em;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+.header p {
+  color: var(--muted);
+  font-size: 0.95em;
+  margin: 6px 0 0 0;
+}
+
+/* ================= ARTICLE LIST ================= */
+.article-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ARTICLE CARD */
+.article-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(15,23,42,0.03);
+  transition: transform 0.2s;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.article-card:active {
+  transform: scale(0.99);
+}
+
+.article-header {
+  margin-bottom: 12px;
+}
+
+.article-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.2em;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.article-meta {
+  font-size: 0.75em;
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(14, 165, 166, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+/* IMAGE HANDLING */
+.photo-grid {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin: 12px 0;
+  scroll-snap-type: x mandatory;
+  border-radius: var(--radius-md);
+}
+
+.photo-grid::-webkit-scrollbar { display: none; }
+
+.article-photo {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  background-color: #f0f0f0; /* Placeholder color */
+}
+
+/* CONTENT TEXT */
+.article-content {
+  font-size: 0.95em;
+  line-height: 1.6;
+  color: #4b5563; /* Sedikit lebih abu dari hitam pekat agar mata nyaman */
+  margin: 0;
+  white-space: pre-line; /* Agar enter/baris baru terbaca */
+}
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+}
+.empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+  display: block;
+  opacity: 0.5;
+}
+.empty-text {
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================= BOTTOM NAV ================= */
+footer.bottom-nav {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 20px;
+  width: calc(100% - 40px);
+  max-width: 480px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 999px;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.5);
+  z-index: 999;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 11px;
+  gap: 4px;
+}
+
+.nav-item span { font-size: 20px; margin-bottom: 2px; transition: transform 0.2s; }
+.nav-item.active { color: var(--accent); font-weight: 700; }
+.nav-item.active span { transform: scale(1.1); }
+
+</style>
 </head>
+
 <body>
-    <div class="app-container">
-        
-        <header class="header">
-            <div class="user-info">
-                <h1>📰 Info MLU</h1>
-                <p>Artikel kegiatan dan pengumuman terbaru.</p>
-            </div>
-        </header>
 
-        <section class="article-container" id="article-list">
-            <p style="text-align: center; margin-top: 50px; color: var(--text-secondary);">Memuat artikel...</p>
-        </section>
-
-        <footer class="bottom-nav">
-            <a href="lokasi_fc.html" class="nav-item">
-                <span style="color: var(--primary-neon);">⚡</span>
-                Lokasi FC
-            </a>
-            <a href="dashboard.html" class="nav-item">
-                <span>🏠</span>
-                Home
-            </a>
-            <a href="daftar_antrian.html" class="nav-item">
-                <span style="color: var(--paid-gold);">🎫</span>
-                Antrian
-            </a>
-        </footer>
-    </div>
+<div class="app-container">
     
-    <script>
-        function renderArticles() {
-            const articles = JSON.parse(localStorage.getItem('mlu_info_articles')) || [];
-            const container = document.getElementById('article-list');
-            container.innerHTML = '';
+    <header class="header">
+        <h1>📰 Info MLU</h1>
+        <p>Berita & pengumuman resmi terbaru.</p>
+    </header>
 
-            if (articles.length === 0) {
-                container.innerHTML = `<p style="text-align: center; margin-top: 50px; color: var(--text-secondary);">Belum ada artikel MLU Info yang diposting Admin.</p>`;
-                return;
-            }
+    <div id="article-list" class="article-container">
+        <div class="empty-state">
+           <span class="empty-icon">⏳</span>
+           <span class="empty-text">Memuat artikel...</span>
+        </div>
+    </div>
 
-            articles.forEach(article => {
-                let photosHTML = article.photos.map(url => 
-                    `<img src="${url}" alt="Foto Artikel" class="article-photo">`
-                ).join('');
+</div>
 
-                if (photosHTML === '') {
-                    photosHTML = `
-                        <div class="article-photo" style="
-                            background:#333;
-                            display:flex;
-                            align-items:center;
-                            justify-content:center;
-                            color:#777;
-                        ">
-                        [Tidak Ada Foto]
-                        </div>`;
-                }
+<footer class="bottom-nav">
+    <a href="lokasi_fc.html" class="nav-item">
+        <span>⚡</span>Lokasi
+    </a>
+    <a href="dashboard.html" class="nav-item active">
+        <span>🏠</span>Home
+    </a>
+    <a href="daftar_antrian.html" class="nav-item">
+        <span>🎫</span>Antrian
+    </a>
+</footer>
 
-                container.innerHTML += `
-                    <div class="article-card">
-                        <h3>${article.title}</h3>
-                        <span class="article-meta">Diposting: ${article.date}</span>
-                        ${photosHTML}
-                        <p class="article-content">${article.content}</p>
-                    </div>
-                `;
-            });
+<script>
+    function renderArticles() {
+        const articles = JSON.parse(localStorage.getItem('mlu_info_articles')) || [];
+        const container = document.getElementById('article-list');
+        container.innerHTML = '';
+
+        if (articles.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <span class="empty-icon">📭</span>
+                    <p class="empty-text">Belum ada info terbaru dari Admin.</p>
+                </div>`;
+            return;
         }
 
-        document.addEventListener('DOMContentLoaded', renderArticles);
-    </script>
+        // Urutkan artikel dari yang terbaru (asumsi array di-push berurutan, kita reverse)
+        // Atau jika admin sudah handle urutan, bisa dihapus .reverse()
+        articles.slice().reverse().forEach(article => {
+            
+            let photosHTML = '';
+            if (article.photos && article.photos.length > 0) {
+                photosHTML = '<div class="photo-grid">';
+                article.photos.forEach(url => {
+                   photosHTML += `<img src="${url}" alt="Foto" class="article-photo" onerror="this.style.display='none'">`;
+                });
+                photosHTML += '</div>';
+            }
+
+            container.innerHTML += `
+                <article class="article-card">
+                    <div class="article-header">
+                        <h3 class="article-title">${article.title}</h3>
+                        <span class="article-meta">${article.date}</span>
+                    </div>
+                    ${photosHTML}
+                    <p class="article-content">${article.content}</p>
+                </article>
+            `;
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', renderArticles);
+</script>
+
 </body>
 </html>
