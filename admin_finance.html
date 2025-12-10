@@ -11,7 +11,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* CSS ADMIN FINANCE (SAMA SEPERTI SEBELUMNYA) */
 :root { --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; --success:#10b981; --glass-bg:rgba(255,255,255,0.9); --radius-lg:20px; }
 body{margin:0;padding:20px;font-family:'Inter';background:var(--bg-base);color:var(--text);min-height:100vh;}
 .container{max-width:750px;margin:0 auto;padding-bottom:50px;}
@@ -19,12 +18,21 @@ body{margin:0;padding:20px;font-family:'Inter';background:var(--bg-base);color:v
 h2{font-family:'Syne';display:flex;justify-content:space-between;border-bottom:1px solid #ccc;padding-bottom:10px;margin-bottom:20px;}
 .form-row{display:flex;gap:15px;margin-bottom:15px;} .form-col{flex:1;}
 label{display:block;font-size:0.7em;font-weight:700;margin-bottom:6px;color:#64748b;text-transform:uppercase;}
-input{width:100%;padding:12px;border-radius:10px;border:1px solid #cbd5e1;}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #cbd5e1;box-sizing:border-box;}
 button{width:100%;padding:12px;background:var(--text);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;}
 table{width:100%;border-collapse:collapse;font-size:0.9em;} th,td{padding:10px;text-align:left;border-bottom:1px solid #eee;}
 .status-unpaid{color:red;background:#fee2e2;padding:4px 8px;border-radius:6px;font-size:0.8em;font-weight:bold;}
 .status-paid{color:green;background:#d1fae5;padding:4px 8px;border-radius:6px;font-size:0.8em;font-weight:bold;}
 .btn-lunas{padding:6px 12px;background:var(--success);font-size:0.8em;width:auto;}
+
+/* SEARCH RESULTS */
+#searchResult { position:absolute; background:white; width:100%; max-height:150px; overflow-y:auto; border:1px solid #ddd; z-index:10; display:none; }
+.search-item { padding:10px; border-bottom:1px solid #eee; cursor:pointer; }
+.search-item:hover { background:#f0f9ff; }
+
+/* USER DEBT SUMMARY */
+.debt-card { background:linear-gradient(135deg, #ef4444, #b91c1c); color:white; padding:20px; border-radius:15px; margin-top:15px; display:none; }
+.debt-total { font-family:'Syne'; font-size:2em; font-weight:800; margin:5px 0; }
 </style>
 </head>
 <body>
@@ -32,8 +40,41 @@ table{width:100%;border-collapse:collapse;font-size:0.9em;} th,td{padding:10px;t
 <div class="container">
     <h2><span>💰 Admin Finance</span> <a href="admin_login.html" style="font-size:0.6em;color:red;text-decoration:none;">LOGOUT</a></h2>
 
+    <div class="glass-card" style="border:2px solid var(--accent);">
+        <h3 style="margin-top:0;">🔍 Cek & Tagih User</h3>
+        <div style="position:relative;">
+            <input id="checkUserInp" placeholder="Ketik Plat Nomor..." onkeyup="searchUserForCheck()" autocomplete="off">
+            <div id="checkResultList" style="position:absolute; background:white; width:100%; z-index:10; border:1px solid #ccc; display:none;"></div>
+        </div>
+
+        <div id="userDebtInfo" class="debt-card">
+            <div style="font-size:0.8em; opacity:0.9;">TOTAL TUNGGAKAN: <span id="debtUserPlat"></span></div>
+            <div id="debtAmount" class="debt-total">Rp 0</div>
+            <div id="debtDates" style="font-size:0.9em; margin-bottom:15px;">Detail Tgl: -</div>
+            <button onclick="payAllDebt()" style="background:white; color:#b91c1c;">✅ LUNASI SEMUA SEKARANG</button>
+        </div>
+    </div>
+
     <div class="glass-card">
-        <h3 style="margin-top:0;">Daftar Tagihan (Invoice)</h3>
+        <h3>Buat Tagihan Manual</h3>
+        <div class="form-row">
+            <div class="form-col" style="position:relative;">
+                <label>Cari Plat</label>
+                <input id="searchInp" placeholder="Ketik Plat..." onkeyup="searchUser()" autocomplete="off">
+                <div id="searchResult"></div>
+            </div>
+            <div class="form-col"><label>Nama</label><input id="invName" readonly style="background:#eee;"></div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-col"><label>Mulai</label><input type="date" id="startDate"></div>
+            <div class="form-col"><label>Selesai</label><input type="date" id="endDate"></div>
+        </div>
+        <button onclick="sendInvoice()">KIRIM TAGIHAN</button>
+    </div>
+
+    <div class="glass-card">
+        <h3>Monitoring Transaksi (Terbaru)</h3>
         <div style="overflow-x:auto;">
             <table>
                 <thead>
@@ -51,25 +92,10 @@ table{width:100%;border-collapse:collapse;font-size:0.9em;} th,td{padding:10px;t
             </table>
         </div>
     </div>
-
-    <div class="glass-card">
-        <h3>Buat Tagihan Baru</h3>
-        <div class="form-row">
-            <div class="form-col"><label>Cari Plat</label><input id="searchInp" placeholder="Ketik Plat..." onkeyup="searchUser()"></div>
-            <div class="form-col"><label>Nama</label><input id="invName" readonly style="background:#eee;"></div>
-        </div>
-        <div id="searchResult" style="background:#fff;border:1px solid #eee;display:none;margin-bottom:15px;"></div>
-        
-        <div class="form-row">
-            <div class="form-col"><label>Mulai</label><input type="date" id="startDate"></div>
-            <div class="form-col"><label>Selesai</label><input type="date" id="endDate"></div>
-        </div>
-        <button onclick="sendInvoice()">KIRIM TAGIHAN</button>
-    </div>
 </div>
 
 <script>
-// --- PASTE CONFIG FIREBASE ANDA DI SINI ---
+// --- FIREBASE CONFIG (PASTE PUNYA ANDA) ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -82,18 +108,103 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 let selectedUser = null;
+let checkingUser = null; // User yg sedang dicek utangnya
+let pendingInvoices = []; // Simpan ID invoice yg belum lunas user tsb
 
-// 1. LOAD INVOICES (MONITORING)
+// --- 1. LOGIC CEK TUNGGAKAN USER ---
+function searchUserForCheck() {
+    const key = document.getElementById('checkUserInp').value.toUpperCase();
+    if(key.length<2) { document.getElementById('checkResultList').style.display='none'; return; }
+    
+    db.collection('users').get().then(snap => {
+        let h=''; 
+        snap.forEach(doc=>{ 
+            const u=doc.data(); 
+            if(u.plat.includes(key)||u.nama.toUpperCase().includes(key)) 
+                h+=`<div class="search-item" onclick='selectCheckUser(${JSON.stringify(u)})'>${u.plat} - ${u.nama}</div>`; 
+        });
+        const res = document.getElementById('checkResultList');
+        res.innerHTML=h; res.style.display='block';
+    });
+}
+
+function selectCheckUser(u) {
+    checkingUser = u;
+    document.getElementById('checkUserInp').value = u.plat;
+    document.getElementById('checkResultList').style.display = 'none';
+    calculateUserDebt(u.plat);
+}
+
+function calculateUserDebt(plat) {
+    db.collection('invoices')
+      .where('plat', '==', plat)
+      .where('status', '==', 'unpaid')
+      .get().then(snap => {
+          let total = 0;
+          let dates = [];
+          pendingInvoices = []; // Reset
+
+          snap.forEach(doc => {
+              const d = doc.data();
+              total += parseInt(d.amount);
+              pendingInvoices.push(doc.id); // Simpan ID utk pelunasan massal
+              
+              // Ambil tanggal
+              const dt = new Date(d.startDate);
+              dates.push(dt.getDate() + "/" + (dt.getMonth()+1));
+          });
+
+          // Tampilkan di Kartu Merah
+          const card = document.getElementById('userDebtInfo');
+          if(total > 0) {
+              card.style.display = "block";
+              card.style.background = "linear-gradient(135deg, #ef4444, #b91c1c)"; // Merah
+              document.getElementById('debtUserPlat').innerText = plat;
+              document.getElementById('debtAmount').innerText = "Rp " + total.toLocaleString('id-ID');
+              document.getElementById('debtDates').innerText = "Tunggakan Tgl: " + dates.join(", ");
+          } else {
+              card.style.display = "block";
+              card.style.background = "linear-gradient(135deg, #10b981, #059669)"; // Hijau
+              document.getElementById('debtUserPlat').innerText = plat;
+              document.getElementById('debtAmount').innerText = "AMAN (LUNAS)";
+              document.getElementById('debtDates').innerText = "Tidak ada tunggakan.";
+          }
+      });
+}
+
+function payAllDebt() {
+    if(pendingInvoices.length === 0) return alert("User ini sudah lunas!");
+    if(!confirm(`Lunasi ${pendingInvoices.length} tagihan untuk user ini?`)) return;
+
+    // Batch Update (Biar sekalian)
+    const batch = db.batch();
+    pendingInvoices.forEach(id => {
+        const ref = db.collection('invoices').doc(id);
+        batch.update(ref, { status: 'paid' });
+    });
+
+    batch.commit().then(() => {
+        alert("✅ Berhasil! Semua tagihan user ini sudah LUNAS.");
+        calculateUserDebt(checkingUser.plat); // Refresh tampilan
+        loadInvoices(); // Refresh tabel bawah
+    });
+}
+
+
+// --- 2. LOGIC MONITORING TABEL ---
 function loadInvoices() {
-    db.collection('invoices').orderBy('createdAt', 'desc').onSnapshot(snap => {
+    db.collection('invoices').orderBy('createdAt', 'desc').limit(20).onSnapshot(snap => {
         let html = '';
         snap.forEach(doc => {
             const d = doc.data();
             const date = new Date(d.createdAt.seconds * 1000).toLocaleDateString('id-ID');
+            
+            // Status Badge
             const statusBadge = d.status === 'paid' 
                 ? `<span class="status-paid">LUNAS</span>` 
-                : `<span class="status-unpaid">BELUM BAYAR</span>`;
+                : `<span class="status-unpaid">BELUM</span>`;
             
+            // Tombol Aksi
             const actionBtn = d.status === 'unpaid'
                 ? `<button class="btn-lunas" onclick="markPaid('${doc.id}')">LUNAS ✅</button>`
                 : `<span style="color:#aaa;">-</span>`;
@@ -111,15 +222,15 @@ function loadInvoices() {
     });
 }
 
-// 2. MARK AS PAID (AKSI ADMIN)
 function markPaid(docId) {
     if(!confirm("Tandai tagihan ini sebagai LUNAS?")) return;
     db.collection('invoices').doc(docId).update({ status: 'paid' }).then(() => {
-        alert("Status berhasil diperbarui!");
+        // Gak perlu alert biar cepet
     });
 }
 
-// 3. SEARCH & SEND (SAMA SEPERTI SEBELUMNYA)
+
+// --- 3. LOGIC BUAT TAGIHAN (LAMA) ---
 function searchUser() {
     const key = document.getElementById('searchInp').value.toUpperCase();
     if(key.length<2) { document.getElementById('searchResult').style.display='none'; return; }
@@ -129,7 +240,7 @@ function searchUser() {
         snap.forEach(doc=>{ 
             const u=doc.data(); 
             if(u.plat.includes(key)||u.nama.toUpperCase().includes(key)) 
-                h+=`<div style="padding:10px;cursor:pointer;border-bottom:1px solid #eee;" onclick='selUser(${JSON.stringify(u)})'>${u.plat} - ${u.nama}</div>`; 
+                h+=`<div class="search-item" onclick='selUser(${JSON.stringify(u)})'>${u.plat} - ${u.nama}</div>`; 
         });
         const res = document.getElementById('searchResult');
         res.innerHTML=h; res.style.display='block';
@@ -144,18 +255,33 @@ function selUser(u){
 
 function sendInvoice(){
     if(!selectedUser) return alert("Pilih user!");
-    // Hitung sederhana untuk demo (logic 70rb/hari)
+    
     const s=new Date(document.getElementById('startDate').value);
     const e=new Date(document.getElementById('endDate').value);
-    const diff = Math.ceil((e-s)/(1000*60*60*24)) + 1;
-    const amount = diff * 70000; // Dasar 70rb
+    
+    // Hitung Hari
+    const diffTime = Math.abs(e - s);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; 
+    
+    if(isNaN(diffDays)) return alert("Isi tanggal dengan benar!");
+
+    // Rumus: (70.000 HWB + 10.000 MAKA+) * Hari
+    // Cek apakah user ikut MAKA+ (Asumsi Admin tau atau user data punya flag)
+    // Disini kita default 80rb per hari agar aman
+    const amount = diffDays * 80000; 
+
+    if(!confirm(`Kirim tagihan Rp ${amount.toLocaleString()} (${diffDays} hari) ke ${selectedUser.nama}?`)) return;
 
     db.collection('invoices').add({
         plat: selectedUser.plat, nama: selectedUser.nama, amount: amount,
         startDate: document.getElementById('startDate').value,
         endDate: document.getElementById('endDate').value,
         status: 'unpaid', createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(()=>{ alert("Tagihan Terkirim!"); });
+    }).then(()=>{ 
+        alert("Tagihan Terkirim!"); 
+        document.getElementById('searchInp').value = '';
+        selectedUser = null;
+    });
 }
 
 loadInvoices(); // Jalankan saat load
