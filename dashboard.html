@@ -71,12 +71,12 @@ footer.bottom-nav {
     </div>
 
     <div id="heroCard" class="hero-card">
-        <div class="hero-label" id="bill-date">TAGIHAN HARI INI</div>
+        <div class="hero-label" id="bill-date">STATUS TUNGGAKAN</div>
         <div id="hero-amount" class="hero-amount">Rp 0</div>
-        <div id="hero-desc" class="hero-desc">Status Pembayaran Aman</div>
+        <div id="hero-desc" class="hero-desc">...</div>
         
         <div class="progress-container">
-            <div class="progress-info"><span>PROGRESS KEPEMILIKAN</span><span id="rto-days">Hari 0 / 1095</span></div>
+            <div class="progress-info"><span>PROGRESS KEPEMILIKAN</span><span id="rto-days">Hari 0 / 1009</span></div>
             <div class="progress-track"><div id="rto-bar" class="progress-fill"></div></div>
         </div>
     </div>
@@ -103,6 +103,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.se
 </script>
 
 <script>
+// --- FIREBASE CONFIG (PASTE PUNYA ANDA) ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -113,12 +114,15 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-let currentUser = JSON.parse(localStorage.getItem('maka_user'));
 
+let currentUser = JSON.parse(localStorage.getItem('maka_user'));
+let plusData = JSON.parse(localStorage.getItem('maka_plus_data')) || { active: false };
+
+// --- MAIN LOGIC ---
 document.addEventListener("DOMContentLoaded", function() {
     if(!currentUser) { window.location.href='index.html'; return; }
     
-    // Render Info
+    // 1. Render Info
     document.getElementById('user-name-display').innerText = currentUser.nama;
     document.getElementById('user-plate-display').innerText = currentUser.plat;
     if(currentUser.photoUrl) {
@@ -126,44 +130,89 @@ document.addEventListener("DOMContentLoaded", function() {
         av.innerText = ""; av.style.backgroundImage = `url('${currentUser.photoUrl}')`;
     }
 
-    // Set Tanggal
-    const today = new Date();
-    document.getElementById('bill-date').innerText = "STATUS: " + today.toLocaleDateString('id-ID', {day:'numeric', month:'long'}).toUpperCase();
+    // 2. Load Payments & Update Hero
+    loadPaymentsAndDebt();
+});
 
-    // Hitung RTO
-    if(currentUser.joinedAt) {
-        const diff = Math.ceil(Math.abs(today - new Date(currentUser.joinedAt)) / (86400000));
-        document.getElementById('rto-days').innerText = `Hari ${diff} / 1095`;
-        document.getElementById('rto-bar').style.width = Math.min((diff/1095)*100, 100) + "%";
+// --- LOGIKA HARGA DINAMIS (DIULANG DARI CALENDAR.HTML) ---
+function getDailyPrice(dateObj) {
+    if (dateObj.getDate() === 31) return 0;
+
+    const joinDate = new Date(currentUser.joinedAt);
+    const diffTime = Math.abs(dateObj - joinDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+    let price = 70000; 
+    
+    // MAKA+ hanya 1 tahun pertama (365 hari)
+    if (plusData.active && diffDays <= 365) {
+        price += 10000;
     }
+    return price;
+}
 
-    // LIVE DATA INVOICE (TANPA ESTIMASI)
-    db.collection('invoices')
+function calculateTotalDebt(paidDates) {
+    const joinDate = new Date(currentUser.joinedAt);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    let totalHutang = 0;
+    let daysLate = 0;
+    let checkDate = new Date(joinDate);
+    checkDate.setHours(0,0,0,0);
+    
+    const maxDaysContract = 1009; // 1009 hari kontrak
+    let currentDay = 0;
+    
+    while (checkDate <= today && currentDay < maxDaysContract) {
+        const dateStr = checkDate.toISOString().split('T')[0];
+        const price = getDailyPrice(checkDate);
+
+        // Hanya hitung hutang jika harga > 0 (bukan tgl 31) dan belum dibayar
+        if (price > 0 && !paidDates.includes(dateStr)) {
+            totalHutang += price;
+            daysLate++;
+        }
+        
+        currentDay++;
+        checkDate.setDate(checkDate.getDate() + 1);
+    }
+    return { amount: totalHutang, days: daysLate, currentDay: Math.min(currentDay, maxDaysContract) };
+}
+
+function loadPaymentsAndDebt() {
+    db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
-      .where('status', '==', 'unpaid')
-      .onSnapshot((snapshot) => {
-          let total = 0;
-          let dates = [];
-          snapshot.forEach(doc => {
-              total += parseInt(doc.data().amount);
-              dates.push(new Date(doc.data().startDate).getDate());
-          });
+      .onSnapshot(snap => {
+          let paidDates = [];
+          snap.forEach(doc => { paidDates.push(doc.data().date); });
+          
+          const debt = calculateTotalDebt(paidDates);
 
           const card = document.getElementById('heroCard');
           const amountEl = document.getElementById('hero-amount');
           const descEl = document.getElementById('hero-desc');
 
-          if(total > 0) {
+          if(debt.amount > 0) {
               card.className = "hero-card warning"; // Merah
-              amountEl.innerText = "Rp " + total.toLocaleString('id-ID');
-              descEl.innerText = "Belum Lunas Tgl: " + dates.join(", ");
+              amountEl.innerText = "Rp " + debt.amount.toLocaleString('id-ID');
+              descEl.innerText = `Anda menunggak ${debt.days} hari. Segera lunasi!`;
           } else {
               card.className = "hero-card"; // Teal
               amountEl.innerText = "Rp 0";
               descEl.innerText = "Tidak ada tagihan tertunggak.";
           }
+          
+          // Update Progress RTO
+          document.getElementById('rto-days').innerText = `Hari ${debt.currentDay} / 1009`;
+          document.getElementById('rto-bar').style.width = (debt.currentDay / 1009) * 100 + "%";
       });
-});
+}
+
+function triggerSOS() {
+    // Logic SOS (disederhanakan untuk dashboard)
+    alert("Fungsi SOS diaktifkan. Harap hubungi admin!");
+}
 </script>
 </body>
 </html>
