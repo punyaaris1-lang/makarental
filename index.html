@@ -2,34 +2,194 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Login MAKA</title>
 
-<!-- ✔ inject app.css -->
-<link rel="stylesheet" href="app.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+
+<style>
+/* ================= THEME VARIABLES ================= */
+:root {
+  --bg: #f6f8fb;
+  --surface: #ffffff;
+  --muted: #6b7280;
+  --accent: #0ea5a6;
+  --accent-2: #06b6d4;
+  --text: #0f1724;
+  --radius-lg: 24px;
+  --radius-md: 14px;
+  --card-shadow: 0 20px 40px rgba(15,23,42,0.08);
+  --input-bg: #fbfdff;
+  --border: rgba(15,23,42,0.08);
+  --max-width: 460px;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body {
+  margin: 0; padding: 0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center; /* Center Vertikal */
+  justify-content: center;
+}
+
+.app-container {
+  width: 100%;
+  max-width: var(--max-width);
+  padding: 24px;
+}
+
+/* CARD LOGIN */
+.login-card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 32px 24px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(255,255,255,0.6);
+  text-align: center;
+}
+
+/* HEADINGS */
+.brand-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+}
+.brand-subtitle {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 32px;
+}
+
+/* FORM ELEMENTS */
+.form-group {
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-bottom: 8px;
+  padding-left: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+input, select {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--input-bg);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  outline: none;
+  transition: 0.2s;
+  appearance: none; /* Hilangkan panah default select di beberapa browser */
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+}
+
+/* Custom Select Arrow */
+.select-wrapper {
+  position: relative;
+}
+.select-wrapper::after {
+  content: '▼';
+  font-size: 10px;
+  color: var(--muted);
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* BUTTON */
+button.btn-login {
+  width: 100%;
+  margin-top: 12px;
+  padding: 16px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: white;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(6, 182, 212, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button.btn-login:active {
+  transform: scale(0.98);
+  box-shadow: 0 4px 10px rgba(6, 182, 212, 0.15);
+}
+
+.footer-link {
+  margin-top: 24px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.footer-link a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 700;
+}
+</style>
 </head>
 
 <body>
-<div class="app">
-  <div class="card">
-    <h1>Login MAKA</h1>
 
-    <label>Nama User</label>
-    <input id="nama" type="text" placeholder="Nama lengkap">
+<div class="app-container">
+  <div class="login-card">
+    <div class="brand-title">Login MAKA</div>
+    <div class="brand-subtitle">Silakan masuk untuk melanjutkan</div>
 
-    <label>Plat Nomor</label>
-    <input id="plat" type="text" placeholder="B 1234 ABC">
+    <div class="form-group">
+      <label>Nama User</label>
+      <input id="nama" type="text" placeholder="Masukkan nama lengkap">
+    </div>
 
-    <label>Tanggal Ambil Motor</label>
-    <input id="tanggalAmbil" type="date">
+    <div class="form-group">
+      <label>Plat Nomor</label>
+      <input id="plat" type="text" placeholder="Contoh: B 1234 ABC">
+    </div>
 
-    <label>Opsi DP</label>
-    <select id="dp">
-      <option value="355">DP 355.000 (Cicil)</option>
-      <option value="755">DP 755.000 (Langsung)</option>
-    </select>
+    <div class="form-group">
+      <label>Tanggal Ambil Motor</label>
+      <input id="tanggalAmbil" type="date">
+    </div>
 
-    <button onclick="loginUser()">MASUK</button>
+    <div class="form-group">
+      <label>Opsi DP</label>
+      <div class="select-wrapper">
+        <select id="dp">
+          <option value="355">DP 355.000 (Cicil)</option>
+          <option value="755">DP 755.000 (Langsung)</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-login" onclick="loginUser()">MASUK SEKARANG</button>
+
+    <div class="footer-link">
+      Belum punya akun? <a href="daftar_antrian.html">Daftar Antrian</a>
+    </div>
   </div>
 </div>
 
@@ -47,13 +207,13 @@ function loginUser(){
   const dp = document.getElementById('dp').value;
 
   if(!nama || !plat || !tanggalAmbil){
-    alert('Lengkapi semua data');
+    alert('Harap lengkapi semua data login.');
     return;
   }
 
   const user = {
     nama: nama,
-    plat: plat,
+    plat: plat.toUpperCase(), // Auto uppercase biar rapi
     tanggalAmbil: tanggalAmbil,
     dp: dp,
     dpTerbayar: 0,
@@ -62,7 +222,15 @@ function loginUser(){
   };
 
   saveUser(user);
-  window.location.href = 'dashboard.html';
+  
+  // Efek visual sedikit sebelum pindah
+  const btn = document.querySelector('.btn-login');
+  btn.innerText = "MEMPROSES...";
+  btn.style.opacity = "0.7";
+  
+  setTimeout(() => {
+      window.location.href = 'dashboard.html';
+  }, 500);
 }
 </script>
 
