@@ -48,12 +48,9 @@ body::before { content:""; position:fixed; top:0; left:0; right:0; bottom:0; bac
 /* SLOT CHARGING (STRUKTUR ASLI) */
 .section-head { font-family:'Inter'; font-size:0.85em; font-weight:800; color:#64748b; margin-bottom:10px; text-transform:uppercase; letter-spacing:1px; }
 .slot-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:25px; }
-.slot-card { 
-    background:rgba(255,255,255,0.8); border:1px solid rgba(255,255,255,0.6); border-radius:18px; padding:15px 5px; text-align:center; min-height:170px; position:relative; box-shadow:0 4px 15px rgba(0,0,0,0.05);
-    /* Tambahan Styling Admin */
-    min-height: 200px;
-}
+.slot-card { background:rgba(255,255,255,0.8); border:1px solid rgba(255,255,255,0.6); border-radius:18px; padding:15px 5px; text-align:center; min-height:170px; position:relative; box-shadow:0 4px 15px rgba(0,0,0,0.05); }
 .slot-card.active { background:white; border:2px solid var(--accent); }
+.slot-card.my-slot { border:2px solid var(--gold); } /* Tambahan style untuk slot sendiri */
 .slot-label { font-size:0.65em; font-weight:800; color:#64748b; margin-bottom:8px; }
 .bat-body { width:34px; height:60px; border:2px solid #cbd5e1; border-radius:8px; margin:0 auto 8px; position:relative; display:flex; align-items:flex-end; padding:2px; }
 .bat-head { width:12px; height:3px; background:#cbd5e1; position:absolute; top:-5px; left:50%; transform:translateX(-50%); border-radius:2px 2px 0 0; }
@@ -146,7 +143,7 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
         <div id="connStatus" class="live-badge">OFFLINE</div>
     </header>
 
-    <div class="reg-card">
+    <div class="reg-card" id="reg-card">
         <h3 style="margin:0 0 16px 0;font-family:'Inter';font-weight:800;font-size:1.2em;">Ambil Antrian</h3>
         <input id="uPlat" class="form-input" placeholder="Plat Nomor" style="text-transform:uppercase;">
         <input id="uWa" type="number" class="form-input" placeholder="WhatsApp">
@@ -231,7 +228,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // --- VARIABLES ---
-const SLOTS_COUNT = 3; // Jumlah Slot Anda
+const SLOTS_COUNT = 3; 
 const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
 const MAX_DIST = 0.2; // 200 meter dalam KM
 let isAdmin = false;
@@ -261,8 +258,8 @@ setInterval(() => {
     chargingSlotsData.forEach((slot, i) => {
         if (slot && slot.startTime) {
             const start = new Date(slot.startTime).getTime();
-            // Durasi 1 jam default untuk contoh
-            const durationMs = 60 * 60 * 1000; // Asumsi 1 jam = 60 menit
+            // Durasi 1 jam default (60 menit)
+            const durationMs = 60 * 60 * 1000; 
             const end = start + durationMs; 
             const diff = end - Date.now();
             
@@ -271,7 +268,7 @@ setInterval(() => {
 
             if (diff <= 0) {
                 if(timerEl) timerEl.innerText = "SELESAI!";
-                if (!triggered.has(slot.plat) && myPlat === slot.plat) { // Cek plat, bukan nama slot
+                if (!triggered.has(slot.plat) && myPlat === slot.plat) {
                     triggered.add(slot.plat);
                     myActiveSlotIndex = i; 
                     triggerFullAlert();
@@ -285,16 +282,14 @@ setInterval(() => {
     });
 }, 1000);
 
-// --- FIREBASE LOGIC ---
+// --- FIREBASE LISTENER & RENDER ---
 function initFirebase() {
     const currentUser = JSON.parse(localStorage.getItem('maka_user'));
     if(!currentUser || !currentUser.plat) { 
-        // Cek login harus di awal skrip berjalan
         window.location.href='index.html'; 
         return; 
     }
     
-    // Inisialisasi GPS
     if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ userLat=p.coords.latitude; userLng=p.coords.longitude; }, e=>{}, {enableHighAccuracy:true});
     
     // Cek Admin dari local storage
@@ -304,18 +299,23 @@ function initFirebase() {
     }
 
     refAntrian.onSnapshot(snap => {
+        // PERBAIKAN: Set status koneksi LIVE
         document.getElementById('connStatus').innerText = "LIVE ●";
         document.getElementById('connStatus').classList.add('online');
         document.getElementById('connStatus').classList.remove('error');
 
         const d = snap.data() || {};
-        const s = d.chargingSlots || Array(SLOTS_COUNT).fill(null);
+        // Inisialisasi slot kosong jika data belum ada
+        const s = d.chargingSlots && Array.isArray(d.chargingSlots) ? d.chargingSlots : Array(SLOTS_COUNT).fill(null);
         const q = d.waitingQueue || [];
         const myPlat = localStorage.getItem('myPlat') || (currentUser ? currentUser.plat : '');
         
         chargingSlotsData = s; 
+        
+        // Update user status
         myActiveSlotIndex = s.findIndex(slot => slot && slot.plat === myPlat);
         myActiveQueueId = q.find(item => item.plat === myPlat) ? q.find(item => item.plat === myPlat).id : null;
+
 
         // HERO COUNT & MAX CAS LOGIC
         document.getElementById('qCountDisplay').innerText = q.length;
@@ -325,24 +325,21 @@ function initFirebase() {
         else if(q.length > 10) limit = 85;
         document.getElementById('maxCasDisplay').innerText = limit + "%";
 
-        // RENDER SLOTS
+        // RENDER UI
         renderSlots(s, myPlat);
-
-        // RENDER QUEUE
         renderQueue(q, myPlat);
-        
-        // Update Status Admin/User UI
-        updateAdminUI();
         updateFormVisibility(myPlat, s, q);
 
     }, error => {
+        // Error Listener (Jika gagal konek)
         console.error("Firestore Listener Error:", error);
         document.getElementById('connStatus').innerText = "ERROR ⚠️";
         document.getElementById('connStatus').classList.remove('online');
         document.getElementById('connStatus').classList.add('error');
-        document.getElementById('slots').innerHTML = '<div style="grid-column: span 3; padding: 30px; color: var(--danger);">Gagal terhubung ke server.</div>';
     });
 }
+
+// --- RENDER FUNCTIONS (REVERTED LAYOUT) ---
 
 function renderSlots(slots, myPlat) {
     const container = document.getElementById('slots');
@@ -360,7 +357,7 @@ function renderSlots(slots, myPlat) {
         let controls = '';
 
         if (isOccupied) {
-            slotClass = isCharging ? 'active' : 'active standby';
+            slotClass = 'active';
             statusText = isCharging ? 'CHARGING' : 'STANDBY (Selesai/Belum Mulai)';
             
             if (isCharging) {
@@ -368,17 +365,17 @@ function renderSlots(slots, myPlat) {
             } else {
                  timerHtml = `<span class="slot-status st-waiting">SIAP CAS/SELESAI</span>`;
             }
-
-            // User controls
-            if (isMySlot) {
-                controls = `<button class="ctrl-btn btn-red" onclick="confirmEmptySlot(${i}, true)">⏹️ SAYA SUDAH CABUT</button>`;
-            }
         } else {
             statusText = 'KOSONG';
             slotClass = '';
         }
         
-        // Admin controls
+        // User controls (di bawah timer/status)
+        if (isMySlot && isOccupied) {
+            controls = `<button class="ctrl-btn btn-red" onclick="confirmEmptySlot(${i}, true)">⏹️ SAYA SUDAH CABUT</button>`;
+        }
+        
+        // Admin controls (di bagian bawah slot)
         if (isAdmin) {
             let btnAdmin = '';
             if (isOccupied) {
@@ -449,6 +446,7 @@ function updateFormVisibility(myPlat, slots, queue) {
     document.getElementById('reg-card').style.display = inSystem ? 'none' : 'block';
     
     // Tampilkan tombol leave jika sedang dalam sistem
+    // Ini adalah tombol untuk user keluar dari Slot/Antrian
     document.getElementById('leaveQueueSection').style.display = inSystem ? 'block' : 'none';
 
     if (inSystem) {
@@ -484,7 +482,7 @@ document.getElementById('btnDaftar').onclick = () => {
 
     db.runTransaction(async t => {
         const d = (await t.get(refAntrian)).data() || {};
-        let s = d.chargingSlots || Array(SLOTS_COUNT).fill(null);
+        let s = d.chargingSlots && Array.isArray(d.chargingSlots) ? d.chargingSlots : Array(SLOTS_COUNT).fill(null);
         let q = d.waitingQueue || [];
         
         if(s.some(x=>x?.plat===p) || q.some(x=>x?.plat===p)) throw "Sudah terdaftar.";
@@ -516,11 +514,12 @@ document.getElementById('btnDaftar').onclick = () => {
     });
 };
 
-// --- USER/ADMIN COMMON ACTIONS ---
+
+// --- ADMIN/USER COMMON ACTIONS ---
 function emptySlot(i, isUserLeaving) {
     db.runTransaction(async t => {
         const d = (await t.get(refAntrian)).data() || {};
-        let s = d.chargingSlots || Array(SLOTS_COUNT).fill(null);
+        let s = d.chargingSlots && Array.isArray(d.chargingSlots) ? d.chargingSlots : Array(SLOTS_COUNT).fill(null);
         let q = d.waitingQueue || [];
         
         s[i] = null; // Kosongkan slot
@@ -528,8 +527,8 @@ function emptySlot(i, isUserLeaving) {
         // Cek antrian, jika ada, pindahkan yang pertama
         if (q.length > 0) {
             const nextUser = q.shift(); // Ambil dari depan & hapus
-            s[i] = { ...nextUser, startTime: new Date().toISOString() };
-            // NOTIFIKASI KE USER BARU HARUS DI SINI (VIA WHATSAPP API/FCM)
+            // Pastikan data yang dimasukkan ke slot memiliki ID yang konsisten
+            s[i] = { ...nextUser, startTime: new Date().toISOString() }; 
         }
         
         t.set(refAntrian, {chargingSlots: s, waitingQueue: q}, {merge:true});
@@ -553,19 +552,24 @@ function confirmEmptySlot(i, isUserLeaving) {
 // --- ADMIN CONTROLS ---
 function updateAdminUI() {
     if (isAdmin) {
-        document.getElementById('adminStatus').innerText = "✅ Admin Aktif";
-        document.getElementById('adminStatus').style.color = var('--success');
         document.getElementById('adminResetArea').style.display = 'block';
     }
 }
-function openAdmin() { document.getElementById('adminModal').classList.add('show'); }
+function openAdmin() { 
+    // Ganti button login dengan form jika belum login
+    if (isAdmin) {
+        document.getElementById('adminModal').classList.remove('show');
+        return;
+    }
+    document.getElementById('adminModal').classList.add('show'); 
+}
 function loginAdmin() {
-    if(document.getElementById('adminPin').value === 'MAKAADMIN123') { // PIN disamakan dengan Admin Code di fungsi daftar
+    if(document.getElementById('adminPin').value === 'MAKAADMIN123') { 
         localStorage.setItem('maka_is_admin', 'true');
         isAdmin = true;
         document.getElementById('adminModal').classList.remove('show');
         updateAdminUI();
-        initFirebase(); // Reload data dan UI
+        initFirebase(); 
     } else {
         showModal("Error", "PIN Salah", '❌');
     }
@@ -594,7 +598,7 @@ function adminStopCharging(i) {
 function adminMoveToSlot(queueId, slotIndex) {
     db.runTransaction(async t => {
         const d = (await t.get(refAntrian)).data() || {};
-        let s = d.chargingSlots || Array(SLOTS_COUNT).fill(null);
+        let s = d.chargingSlots && Array.isArray(d.chargingSlots) ? d.chargingSlots : Array(SLOTS_COUNT).fill(null);
         let q = d.waitingQueue || [];
 
         const queueIndex = q.findIndex(item => item.id === queueId);
@@ -602,6 +606,7 @@ function adminMoveToSlot(queueId, slotIndex) {
 
         const userToMove = q.splice(queueIndex, 1)[0];
         
+        // Slot sekarang diisi dengan user antrian, dan langsung START charging
         s[slotIndex] = { ...userToMove, startTime: new Date().toISOString() };
 
         t.set(refAntrian, {chargingSlots: s, waitingQueue: q}, {merge:true});
@@ -621,6 +626,51 @@ function confirmDeleteQueue(queueId) {
         .catch(e => showModal("Error", "Gagal hapus antrian: " + e.message, '❌'));
     });
 }
+
+// --- ALARM & MODAL ---
+function triggerFullAlert() {
+    keepAliveAudio.pause(); 
+    alarmAudio.play().catch(e => console.log("Alarm blocked")); 
+    
+    document.getElementById('alarmScreen').style.display='flex';
+    if(navigator.vibrate) navigator.vibrate([1000,500,1000]);
+    if(Notification.permission==="granted") new Notification("SELESAI!", {body:"Motor Penuh!", tag:"alarm", icon:"/makarental/icon-512.png"});
+}
+
+function stopAlarmAndClear() {
+    alarmAudio.pause(); 
+    alarmAudio.currentTime=0;
+    document.getElementById('alarmScreen').style.display='none';
+    keepAliveAudio.play().catch(e => console.log("Keep alive restart failed")); 
+    
+    if (myActiveSlotIndex !== -1) {
+        emptySlot(myActiveSlotIndex, true); 
+        myActiveSlotIndex = -1;
+    }
+}
+
+// HELPER MODAL
+function showModal(title, desc, icon="🔔", onConfirm) {
+    document.getElementById('mTitle').innerText = title;
+    document.getElementById('mDesc').innerHTML = desc;
+    
+    let iconText = (icon === '❌' || icon === '⚠️' || title.includes('Gagal')) ? '⚠️' : icon;
+    document.getElementById('mIcon').innerText = iconText;
+    
+    const btns = document.getElementById('mBtns');
+    if (icon === "confirm" && onConfirm) {
+        const funcName = onConfirm.name;
+        btns.innerHTML = `
+            <button class="btn-modal btn-cancel" onclick="closeModal()">Batal</button>
+            <button class="btn-modal btn-confirm" style="background:var(--danger);" onclick="closeModal(); ${funcName}()">YA, LANJUT</button>
+        `;
+    } else {
+        btns.innerHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK, SIAP</button>`;
+    }
+    
+    document.getElementById('customModal').classList.add('show');
+}
+function closeModal() { document.getElementById('customModal').classList.remove('show'); }
 
 // --- INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", initFirebase);
