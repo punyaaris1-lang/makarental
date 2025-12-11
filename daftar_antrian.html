@@ -226,27 +226,33 @@ const db = firebase.firestore();
 // --- VARIABLES ---
 const SLOT_NAMES = ["SLOT 1", "SLOT 2", "SLOT 3"];
 const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
-const MAX_DIST = 200; 
+const MAX_DIST = 0.2; // PERBAIKAN: Ubah MAX_DIST dari meter (200) ke KM (0.2)
 let isAdmin = false;
 let userLat=null;
+let userLng=null; // Tambahkan userLng
 let triggered = new Set();
-let myActiveSlotIndex = -1; // Slot mana yang sedang dipakai user ini
+let myActiveSlotIndex = -1; 
 let chargingSlotsData = []; 
 
 const keepAliveAudio = document.getElementById('keepAliveAudio');
-// Set volume sangat kecil (5%) agar tidak mengganggu tapi tetap dideteksi browser
 keepAliveAudio.volume = 0.05; 
 const alarmAudio = document.getElementById('alarmAudio');
+
+// PERBAIKAN: Fungsi hitung jarak (disalin dari lokasi_fc.html)
+function getDist(lat1, lon1, lat2, lon2) {
+    const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
+    const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))); // Hasil dalam KM
+}
 
 window.addEventListener('load', () => {
     initFirebase();
     if("Notification" in window) Notification.requestPermission();
-    if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ userLat=p.coords.latitude; }, e=>{}, {enableHighAccuracy:true});
+    // PERBAIKAN: Tangkap userLng
+    if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ userLat=p.coords.latitude; userLng=p.coords.longitude; }, e=>{}, {enableHighAccuracy:true});
     const u = JSON.parse(localStorage.getItem('maka_user'));
-    // PERBAIKAN: Jika user login, isi plat otomatis
     if(u && u.plat) document.getElementById('uPlat').value = u.plat; 
     
-    // PWA Register (Pastikan ada)
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').catch(err => console.log('PWA Error', err));
     }
@@ -265,10 +271,9 @@ setInterval(() => {
 
             if (diff <= 0) {
                 if(timerEl) timerEl.innerText = "SELESAI!";
-                // ALARM TRIGGER
                 if (!triggered.has(slot.name) && myPlat === slot.name) {
                     triggered.add(slot.name);
-                    myActiveSlotIndex = i; // Tandai slot ini milik saya
+                    myActiveSlotIndex = i; 
                     triggerFullAlert();
                 }
             } else {
@@ -295,7 +300,7 @@ function initFirebase() {
         
         chargingSlotsData = s; 
 
-        // HERO COUNT
+        // HERO COUNT & MAX CAS LOGIC
         document.getElementById('qCountDisplay').innerText = q.length;
         let limit = 100;
         if(q.length >= 3 && q.length <= 5) limit = 95;
@@ -303,7 +308,7 @@ function initFirebase() {
         else if(q.length > 10) limit = 85;
         document.getElementById('maxCasDisplay').innerText = limit + "%";
 
-        // RENDER SLOTS
+        // RENDER SLOTS (Logika Rendering Tetap Sama)
         document.getElementById('slots').innerHTML = s.map((x,i) => {
             if(!x) return `
             <div class="slot-card">
@@ -329,11 +334,9 @@ function initFirebase() {
             
             if(x.target && x.target < 100) targetLabel = `<span class="slot-target">Batas: ${x.target}%</span>`;
 
-            // BUTTON LOGIC
             const isMySlot = (x.name === myPlat); 
             if (isAdmin || isMySlot) {
                 if(isRun) {
-                    // Tombol untuk matikan manual
                     controls = `<button class="ctrl-btn btn-red" onclick="emptySlot(${i})">⏹️ SELESAI / CABUT</button>`;
                 } else {
                     controls = `<button class="ctrl-btn btn-green" onclick="startCharge(${i})">▶️ MULAI CAS</button>`;
@@ -351,7 +354,7 @@ function initFirebase() {
             </div>`;
         }).join('');
 
-        // RENDER QUEUE
+        // RENDER QUEUE (Logika Rendering Tetap Sama)
         const qc = document.getElementById('qListContainer');
         if(q.length===0) {
             qc.innerHTML = '<div style="text-align:center;color:#999;font-size:0.8em;padding:20px;">Antrian Kosong</div>';
@@ -373,7 +376,7 @@ function initFirebase() {
             }).join('');
         }
     }, error => {
-        // PERBAIKAN: Error Handler Koneksi
+        // Error Handler Koneksi
         console.error("Firestore Listener Error:", error);
         document.getElementById('connStatus').innerText = "ERROR ⚠️";
         document.getElementById('connStatus').classList.remove('online');
@@ -391,6 +394,22 @@ function initFirebase() {
         if(!p || !w || isNaN(b)) return showModal('Error', 'Lengkapi data!');
         if(b < 0 || b > 100) return showModal('Error', 'Sisa Baterai tidak valid!');
 
+        // PERBAIKAN 2: GPS LOCK LOGIC
+        if (!isAdmin) {
+            if (!userLat || !userLng) {
+                btn.disabled=false; btn.innerText="DAFTAR & AKTIFKAN MONITORING";
+                return showModal('GPS Diperlukan', 'Mohon tunggu lokasi terdeteksi dan pastikan izin GPS aktif.', '⚠️'); 
+            }
+            
+            const distance = getDist(userLat, userLng, STATION_LOC.lat, STATION_LOC.lng);
+            
+            if (distance > MAX_DIST) {
+                btn.disabled=false; btn.innerText="DAFTAR & AKTIFKAN MONITORING";
+                return showModal('Di Luar Jangkauan', `Anda ${distance.toFixed(2)} KM dari FC. Batas max adalah ${MAX_DIST} KM.`, '❌');
+            }
+        }
+        // END GPS LOCK
+
         // PLAY WHITE NOISE
         keepAliveAudio.play().then(()=>{
             document.getElementById('monitorStatus').style.display='block';
@@ -399,16 +418,8 @@ function initFirebase() {
 
         btn.disabled=true; btn.innerText="MEMPROSES...";
 
-        // PERBAIKAN: Pengecekan lokasi hanya untuk non-admin
-        // Logika aslinya meminta GPS jika userLat=null. Asumsi lokasi hanya perlu di-check saat pendaftaran
-        if(!userLat && !isAdmin) { 
-            // Cek apakah lokasi cukup dekat (sesuai MAX_DIST)
-            // LOMPATI LOKASI CHECK KARENA KODE ANDA TIDAK ADA LOGIKA HITUNG JARAK DI SINI
-            // JIKA MAU ADA CHECK LOKASI, ANDA PERLU FUNGSI getDist DARI lokasi_fc.html
-            // Contoh Cepat (Abaikan check lokasi untuk mempercepat perbaikan)
-        }
-
         db.runTransaction(async t => {
+            const ref = db.collection("antrian").doc("utama");
             const d = (await t.get(ref)).data() || {};
             let s = d.chargingSlots || [null,null,null];
             let q = d.waitingQueue || [];
@@ -428,7 +439,6 @@ function initFirebase() {
                 let percentNeeded = targetBat - b;
                 if(percentNeeded < 0) percentNeeded = 0;
                 
-                // Rumus: <20% lambat (1.5x), >50% cepat (0.85x), Normal (1.0x)
                 let multiplier = 1.0; 
                 if(percentNeeded > 50) multiplier = 0.85; 
                 else if(percentNeeded < 20) multiplier = 1.5;
@@ -445,16 +455,15 @@ function initFirebase() {
             btn.innerText = "MONITORING AKTIF";
             showModal("Berhasil Masuk", "<b>Monitoring Aktif!</b><br>Sistem akan berdesis pelan agar browser tidak tidur.");
         }).catch(e => {
-            // PERBAIKAN: Error Handling untuk Transaksi (Pendaftaran)
             let errorMsg = typeof e === 'string' ? e : "Gagal Pendaftaran. Cek koneksi Anda.";
             if(e.code && e.code.includes('unavailable')) errorMsg = "Koneksi ke server Firebase gagal. Periksa internet Anda.";
-            showModal("Gagal", errorMsg); 
+            showModal("Gagal", errorMsg, '❌'); 
             btn.disabled=false; btn.innerText="DAFTAR & AKTIFKAN MONITORING";
         });
     };
 }
 
-// --- ADMIN LOGIC ---
+// --- ADMIN LOGIC (TETAP SAMA) ---
 function openAdmin() { document.getElementById('adminModal').classList.add('show'); }
 function loginAdmin() {
     if(document.getElementById('adminPin').value === '1131') {
@@ -462,10 +471,9 @@ function loginAdmin() {
         document.getElementById('adminModal').classList.remove('show');
         document.getElementById('adminResetArea').style.display='block';
         showModal("Mode Operator", "Anda masuk sebagai Admin.");
-        // Ambil data untuk refresh tampilan admin
         db.collection("antrian").doc("utama").get().catch(e => console.error("Admin check failed:", e));
     } else {
-        showModal("Error", "PIN Salah");
+        showModal("Error", "PIN Salah", '❌');
     }
 }
 
@@ -496,7 +504,6 @@ function moveQueueToSlot(qIdx) {
         let percentNeeded = targetBat - user.startBattery;
         if(percentNeeded < 0) percentNeeded = 0;
 
-        // RUMUS TIMER DINAMIS JUGA DISINI
         let multiplier = 1.0; 
         if(percentNeeded > 50) multiplier = 0.85; 
         else if(percentNeeded < 20) multiplier = 1.5;
@@ -512,10 +519,9 @@ function moveQueueToSlot(qIdx) {
         if(t < 100) msg += `⚠️ Batas Cas: <b style="color:red">${t}%</b>`;
         showModal("Info", msg);
     }).catch(e => {
-        // PERBAIKAN: Error Handling untuk Transaksi Admin
         let errorMsg = typeof e === 'string' ? e : "Gagal memproses. Cek koneksi Anda.";
         if(e.code && e.code.includes('unavailable')) errorMsg = "Koneksi ke server Firebase gagal.";
-        showModal("Gagal", errorMsg);
+        showModal("Gagal", errorMsg, '❌');
     });
 }
 
@@ -530,7 +536,7 @@ function resetAll() {
             .catch(e => {
                 let errorMsg = "Gagal reset. Cek koneksi Anda.";
                 if(e.code && e.code.includes('unavailable')) errorMsg = "Koneksi ke server Firebase gagal.";
-                showModal("Error", errorMsg);
+                showModal("Error", errorMsg, '❌');
             });
     }
 }
@@ -542,47 +548,44 @@ function updateDB(callback) {
         const newData = callback(doc.data());
         t.update(ref, newData);
     }).catch(e => {
-        // PERBAIKAN: Error Handling untuk Update DB
         let errorMsg = "Gagal update. Cek koneksi Anda.";
         if(e.code && e.code.includes('unavailable')) errorMsg = "Koneksi ke server Firebase gagal.";
-        showModal("Error", errorMsg);
+        showModal("Error", errorMsg, '❌');
     });
 }
 
-// --- ALERT SYSTEM ---
+// --- ALERT SYSTEM & HELPER ---
 function triggerFullAlert() {
-    keepAliveAudio.pause(); // Stop desis
+    keepAliveAudio.pause(); 
     alarmAudio.volume=1.0; 
-    alarmAudio.play().catch(e => console.log("Alarm blocked")); // Mainkan sirine
+    alarmAudio.play().catch(e => console.log("Alarm blocked")); 
     
     document.getElementById('alarmScreen').style.display='flex';
     if(navigator.vibrate) navigator.vibrate([1000,500,1000]);
     if(Notification.permission==="granted") new Notification("SELESAI!", {body:"Motor Penuh!", tag:"alarm"});
 }
 
-// STOP ALARM & AUTO-CLEAR SLOT
 function stopAlarmAndClear() {
     alarmAudio.pause(); 
     alarmAudio.currentTime=0;
     document.getElementById('alarmScreen').style.display='none';
-    keepAliveAudio.play().catch(e => console.log("Keep alive restart failed")); // Balik ke mode standby
+    keepAliveAudio.play().catch(e => console.log("Keep alive restart failed")); 
     
-    // Auto kosongkan slot milik user
     if (myActiveSlotIndex !== -1) {
         emptySlot(myActiveSlotIndex);
-        localStorage.removeItem('myPlat'); // Hapus tag penanda
+        localStorage.removeItem('myPlat'); 
         myActiveSlotIndex = -1;
     }
 }
 
-// HELPER
-function showModal(title, desc, onOk) {
+function showModal(title, desc, icon="🔔") {
     document.getElementById('mTitle').innerText = title;
     document.getElementById('mDesc').innerHTML = desc;
-    document.getElementById('mIcon').innerText = title.includes('Gagal') || title.includes('Error') ? "⚠️" : "🔔";
+    // Tentukan ikon berdasarkan judul
+    document.getElementById('mIcon').innerText = title.includes('Gagal') || title.includes('Error') || icon === '❌' || icon === '⚠️' ? '⚠️' : icon;
     const btns = document.getElementById('mBtns');
-    btns.innerHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK</button>`;
-    if(onOk) btns.querySelector('button').onclick = function(){ closeModal(); onOk(); };
+    btns.innerHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK, SIAP</button>`;
+    
     document.getElementById('customModal').classList.add('show');
 }
 function closeModal() { document.getElementById('customModal').classList.remove('show'); }
