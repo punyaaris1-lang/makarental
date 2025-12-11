@@ -446,7 +446,6 @@ function updateFormVisibility(myPlat, slots, queue) {
     document.getElementById('reg-card').style.display = inSystem ? 'none' : 'block';
     
     // Tampilkan tombol leave jika sedang dalam sistem
-    // Ini adalah tombol untuk user keluar dari Slot/Antrian
     document.getElementById('leaveQueueSection').style.display = inSystem ? 'block' : 'none';
 
     if (inSystem) {
@@ -465,7 +464,7 @@ document.getElementById('btnDaftar').onclick = () => {
     const btn = document.getElementById('btnDaftar');
 
     if(!p || !w || isNaN(b)) return showModal('Error', 'Lengkapi data!');
-    if(b < 0 || b > 100) return showModal('Error', 'Sisa Baterai tidak valid!');
+    if(b < 0 || b > 100) return showModal('Error', 'Sisa Baterai tidak valid!', '❌');
 
     // 1. GPS LOCK CHECK
     if (!isAdmin) {
@@ -482,7 +481,7 @@ document.getElementById('btnDaftar').onclick = () => {
 
     db.runTransaction(async t => {
         const d = (await t.get(refAntrian)).data() || {};
-        let s = d.chargingSlots && Array.isArray(d.chargingSlots) ? d.chargingSlots : Array(SLOTS_COUNT).fill(null);
+        const s = d.chargingSlots && Array.isArray(d.chargingSlots) ? d.chargingSlots : Array(SLOTS_COUNT).fill(null);
         let q = d.waitingQueue || [];
         
         if(s.some(x=>x?.plat===p) || q.some(x=>x?.plat===p)) throw "Sudah terdaftar.";
@@ -519,7 +518,7 @@ document.getElementById('btnDaftar').onclick = () => {
 function emptySlot(i, isUserLeaving) {
     db.runTransaction(async t => {
         const d = (await t.get(refAntrian)).data() || {};
-        let s = d.chargingSlots && Array.isArray(d.chargingSlots) ? d.chargingSlots : Array(SLOTS_COUNT).fill(null);
+        const s = d.chargingSlots && Array.isArray(d.chargingSlots) ? d.chargingSlots : Array(SLOTS_COUNT).fill(null);
         let q = d.waitingQueue || [];
         
         s[i] = null; // Kosongkan slot
@@ -598,7 +597,7 @@ function adminStopCharging(i) {
 function adminMoveToSlot(queueId, slotIndex) {
     db.runTransaction(async t => {
         const d = (await t.get(refAntrian)).data() || {};
-        let s = d.chargingSlots && Array.isArray(d.chargingSlots) ? d.chargingSlots : Array(SLOTS_COUNT).fill(null);
+        const s = d.chargingSlots && Array.isArray(d.chargingSlots) ? d.chargingSlots : Array(SLOTS_COUNT).fill(null);
         let q = d.waitingQueue || [];
 
         const queueIndex = q.findIndex(item => item.id === queueId);
@@ -659,12 +658,14 @@ function showModal(title, desc, icon="🔔", onConfirm) {
     
     const btns = document.getElementById('mBtns');
     if (icon === "confirm" && onConfirm) {
+        // Logika untuk konfirmasi (YES/NO)
         const funcName = onConfirm.name;
         btns.innerHTML = `
             <button class="btn-modal btn-cancel" onclick="closeModal()">Batal</button>
             <button class="btn-modal btn-confirm" style="background:var(--danger);" onclick="closeModal(); ${funcName}()">YA, LANJUT</button>
         `;
     } else {
+        // Logika untuk info/error (OK, SIAP)
         btns.innerHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK, SIAP</button>`;
     }
     
