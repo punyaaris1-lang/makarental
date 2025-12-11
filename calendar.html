@@ -66,8 +66,13 @@ body::before {
 .date-cell.lunas { background: #dcfce7; color: var(--success); border-color: var(--success); }
 .date-cell.tunggak { 
     background: #fee2e2; color: var(--danger); border-color: var(--danger); 
-    box-shadow: 0 4px 10px rgba(239,68,68,0.2); cursor: pointer; animation: pulseRed 2s infinite;
+    box-shadow: 0 4px 10px rgba(239,68,68,0.2); animation: pulseRed 2s infinite;
 }
+/* PERBAIKAN: Tambahkan kursor untuk memastikan tanggal tunggak bisa diklik */
+.date-cell.clickable-tunggak {
+    cursor: pointer !important;
+}
+
 .date-cell.disabled { background: #e2e8f0; color: #94a3b8; opacity: 0.5; pointer-events: none; }
 .date-cell.future { background: rgba(255,255,255,0.4); color: #94a3b8; pointer-events: none; }
 /* TANGGAL 31 (LIBUR) */
@@ -334,9 +339,9 @@ function renderCalendar() {
             if (paidDates.includes(dateKey)) {
                 cls = "lunas"; 
             } else {
-                cls = "tunggak"; // Merah
-                // PERBAIKAN: Memastikan pointer-events di-override jika ada onclick
-                click = `onclick="paySelf('${dateKey}', ${price})" style="cursor:pointer;"`; 
+                cls = "tunggak clickable-tunggak"; // Merah + Class kursor
+                // Memasang event listener untuk paySelf
+                click = `onclick="paySelf('${dateKey}', ${price})"`; 
             }
         }
 
