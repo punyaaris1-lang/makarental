@@ -38,7 +38,8 @@ body::before { content:""; position:fixed; inset:0; background:url('176394742755
 
 /* MENU GRID */
 .section-title { font-family: 'Inter'; font-size: 1.2em; font-weight: 900; margin: 30px 0 15px; color: var(--text); }
-.icon-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+/* Diubah ke grid 4x2 agar menu info dan tips masuk */
+.icon-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
 .glass-card { background:rgba(255,255,255,0.7); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.5); box-shadow:0 4px 20px rgba(0,0,0,0.05); border-radius:20px; text-decoration:none; color:var(--text); padding:18px 5px; text-align:center; display:flex; flex-direction:column; align-items:center; transition:0.2s; }
 .glass-card:active { transform:scale(0.95); }
 .glass-card span { font-size:26px; margin-bottom:8px; }
@@ -103,12 +104,15 @@ footer.bottom-nav {
 
         <h2 class="section-title">✨ Menu Utama</h2>
         <div class="icon-grid">
-            <a href="calendar.html" class="glass-card"><span>📅</span><p>Bayar</p></a>
-            <a href="history.html" class="glass-card"><span>🗒️</span><p>Riwayat</p></a>
+            <a href="calendar.html" class="glass-card"><span>📆</span><p>Bayar</p></a>
+            <a href="history.html" class="glass-card"><span>🧾</span><p>Riwayat</p></a>
             <a href="part_tracker.html" class="glass-card"><span>🎁</span><p>Gratisan</p></a>
-            <a href="settings.html" class="glass-card"><span>⚙️</span><p>Setting</p></a>
-            <a href="maka_plus.html" class="glass-card"><span>⭐</span><p>MAKA+</p></a>
-            <a href="daftar_antrian.html" class="glass-card" style="background:#fee2e2; border-color:#fca5a5;"><span>🚨</span><p style="color:red">SOS</p></a>
+            <a href="settings.html" class="glass-card"><span>🔧</span><p>Setting</p></a>
+            
+            <a href="info_mlu.html" class="glass-card"><span>💡</span><p>MLU Info</p></a>
+            <a href="tips_maka.html" class="glass-card"><span>📝</span><p>Tips MAKA</p></a>
+            <a href="maka_plus.html" class="glass-card"><span>✨</span><p>MAKA+</p></a>
+            <button onclick="triggerSOS()" class="glass-card" style="background:#fee2e2; border-color:#fca5a5;"><span>🚨</span><p style="color:red">SOS</p></button>
         </div>
     </div>
 </div>
@@ -144,7 +148,6 @@ let plusData = JSON.parse(localStorage.getItem('maka_plus_data')) || { active: f
 document.addEventListener("DOMContentLoaded", function() {
     // PERBAIKAN 1: Cek Sesi di Awal
     if(!currentUser || !currentUser.plat) { 
-        // Jika data login tidak ada atau tidak valid, redirect ke login
         window.location.href='index.html'; 
         return; 
     }
@@ -253,8 +256,8 @@ function loadPaymentsAndDebt() {
 }
 
 function triggerSOS() {
-    // Logic SOS (disederhanakan untuk dashboard)
-    alert("Fungsi SOS diaktifkan. Harap hubungi admin!");
+    // Membuka daftar antrian dengan mode SOS
+    window.location.href = 'daftar_antrian.html?mode=SOS'; 
 }
 </script>
 </body>
