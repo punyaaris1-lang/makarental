@@ -68,7 +68,6 @@ body::before {
     background: #fee2e2; color: var(--danger); border-color: var(--danger); 
     box-shadow: 0 4px 10px rgba(239,68,68,0.2); animation: pulseRed 2s infinite;
 }
-/* PERBAIKAN: Tambahkan kursor untuk memastikan tanggal tunggak bisa diklik */
 .date-cell.clickable-tunggak {
     cursor: pointer !important;
 }
@@ -310,6 +309,8 @@ function renderCalendar() {
     document.getElementById('monthDisplay').innerText = new Date(currentYear, currentMonth).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }).toUpperCase();
 
     for(let i=0; i<firstDay; i++) grid.innerHTML += `<div class="date-cell empty"></div>`;
+    
+    const fragment = document.createDocumentFragment();
 
     for(let d=1; d<=daysInMonth; d++) {
         let m = (currentMonth+1).toString().padStart(2,'0');
@@ -318,13 +319,18 @@ function renderCalendar() {
         let currentDate = new Date(dateKey);
         currentDate.setHours(0,0,0,0);
         
-        let cls = ""; let lbl = ""; let click = "";
+        let cls = ""; let lbl = ""; 
+        let isClickable = false;
         
         // Cek Harga hari ini
         let price = getDailyPrice(currentDate);
+        
+        const cell = document.createElement('div');
+        cell.className = 'date-cell';
+        cell.innerText = d;
 
         if (d === 31) {
-            // TGL 31 SELALU LIBUR (Tidak bisa diklik, warna abu)
+            // TGL 31 SELALU LIBUR
             cls = "libur-ok"; 
             lbl = `<div class="small-lbl">LIBUR</div>`;
         } 
@@ -340,8 +346,7 @@ function renderCalendar() {
                 cls = "lunas"; 
             } else {
                 cls = "tunggak clickable-tunggak"; // Merah + Class kursor
-                // Memasang event listener untuk paySelf
-                click = `onclick="paySelf('${dateKey}', ${price})"`; 
+                isClickable = true; // Tandai agar bisa dipasang event listener
             }
         }
 
@@ -355,8 +360,19 @@ function renderCalendar() {
         
         if (dateKey === today.toISOString().split('T')[0]) cls += " today";
 
-        grid.innerHTML += `<div class="date-cell ${cls}" ${click}>${d} ${lbl}</div>`;
+        cell.className += ` ${cls}`;
+        if(lbl) cell.innerHTML += lbl; 
+        
+        // Memasang Event Listener setelah elemen dibuat (FIX KLIK)
+        if (isClickable) {
+            cell.style.cursor = 'pointer';
+            cell.addEventListener('click', () => paySelf(dateKey, price));
+        }
+
+        fragment.appendChild(cell);
     }
+    
+    grid.appendChild(fragment);
 }
 
 // 4. KLIK BAYAR (SELF SERVICE DGN HARGA DINAMIS)
