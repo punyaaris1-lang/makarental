@@ -109,10 +109,15 @@ footer.bottom-nav {
 .nav-item span { font-size: 22px; margin-bottom: 2px; }
 .nav-item.active { color: var(--accent); }
 
-/* MODAL */
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:none; align-items:center; justify-content:center; }
-.modal-box { background:white; width:80%; max-width:300px; padding:25px; border-radius:24px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.3); }
-.btn-modal { width:100%; padding:12px; margin-top:10px; border-radius:10px; border:none; font-weight:bold; cursor:pointer; }
+/* MODAL KUSTOM (Tambahan) */
+.modal-overlay-kustom { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:9999; display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s; }
+.modal-overlay-kustom.show { display:flex; opacity:1; }
+.modal-box-kustom { background:white; width:85%; max-width:320px; padding:25px; border-radius:24px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s; }
+.modal-overlay-kustom.show .modal-box-kustom { transform:scale(1); }
+.modal-icon-kustom { font-size:40px; margin-bottom:15px; display:block; }
+.btn-modal-kustom { width:100%; padding:12px; margin-top:10px; border-radius:12px; border:none; font-weight:bold; cursor:pointer; }
+.modal-title-kustom { font-family:'Inter'; font-size:1.3em; font-weight:800; margin:0 0 10px; color:var(--text); }
+.modal-desc-kustom { font-size:0.9em; color:#64748b; line-height:1.5; margin-bottom:20px; }
 </style>
 </head>
 <body>
@@ -143,17 +148,38 @@ footer.bottom-nav {
     <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
 </footer>
 
-<div id="customModal" class="modal-overlay">
-    <div class="modal-box">
+<div id="customModalConfirm" class="modal-overlay-kustom">
+    <div class="modal-box-kustom">
         <h3 id="mTitle">Bayar?</h3>
         <p id="mDesc" style="color:#666;font-size:0.9em;margin:10px 0;">Konfirmasi</p>
         <div id="mBtns"></div>
     </div>
 </div>
 
+<div id="customModalInfo" class="modal-overlay-kustom">
+    <div class="modal-box-kustom">
+        <span id="mIconInfo" class="modal-icon-kustom">🔔</span>
+        <h3 id="mTitleInfo" class="modal-title-kustom">Info</h3>
+        <p id="mDescInfo" class="modal-desc-kustom">Pesan...</p>
+        <button class="btn-modal-kustom" onclick="closeModalInfo()">OK</button>
+    </div>
+</div>
+
 <script>
 // PWA ANTI LOADING
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'))}
+
+// --- FUNGSI MODAL KUSTOM BARU ---
+function showModalInfo(title, msg, icon="🔔") {
+    document.getElementById('mTitleInfo').innerText = title;
+    document.getElementById('mDescInfo').innerText = msg;
+    document.getElementById('mIconInfo').innerText = icon;
+    document.getElementById('customModalInfo').classList.add('show');
+}
+function closeModalInfo() {
+    document.getElementById('customModalInfo').classList.remove('show');
+}
+// --- END MODAL KUSTOM ---
 
 // --- CONFIG FIREBASE ---
 const firebaseConfig = {
@@ -174,7 +200,7 @@ let currentMonth = new Date().getMonth();
 let paidDates = []; 
 
 document.addEventListener("DOMContentLoaded", () => {
-    // PERBAIKAN 1: Pengecekan Login
+    // Pengecekan Login
     if(!currentUser) { window.location.href='index.html'; return; }
     loadPayments();
 });
@@ -203,7 +229,7 @@ function updateHeroCard(amount, count, error=false) {
 }
 
 function loadPayments() {
-    // PERBAIKAN 2: Tambahkan Error Handler pada onSnapshot
+    // Tambahkan Error Handler pada onSnapshot
     db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
       .onSnapshot(snap => {
@@ -332,16 +358,17 @@ function paySelf(dateStr, price) {
     const d = new Date(dateStr);
     const dateFmt = d.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
     
-    document.getElementById('customModal').style.display = 'flex';
+    document.getElementById('customModalConfirm').classList.add('show');
     document.getElementById('mTitle').innerText = "Bayar Tanggal Ini?";
     document.getElementById('mDesc').innerHTML = `Tgl: <b>${dateFmt}</b><br>Nominal: <b>Rp ${price.toLocaleString('id-ID')}</b>`;
     document.getElementById('mBtns').innerHTML = `
-        <button class="btn-modal" onclick="document.getElementById('customModal').style.display='none'" style="background:#eee;color:#555">Batal</button>
-        <button class="btn-modal" style="background:#10b981;color:white" onclick="processPayment('${dateStr}', ${price})">Ya, Sudah Bayar</button>
+        <button class="btn-modal-kustom" onclick="document.getElementById('customModalConfirm').classList.remove('show')" style="background:#eee;color:#555">Batal</button>
+        <button class="btn-modal-kustom" style="background:#10b981;color:white" onclick="processPayment('${dateStr}', ${price})">Ya, Sudah Bayar</button>
     `;
 }
 
 function processPayment(dateStr, amount) {
+    document.getElementById('customModalConfirm').classList.remove('show');
     const docId = currentUser.plat + "_" + dateStr;
     db.collection('daily_payments').doc(docId).set({
         plat: currentUser.plat,
@@ -350,12 +377,12 @@ function processPayment(dateStr, amount) {
         amount: amount,
         paidAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
-        document.getElementById('customModal').style.display = 'none';
-        alert("Lunas! ✅");
+        // PERBAIKAN: Ganti alert() dengan showModalInfo()
+        showModalInfo("Lunas!", "Pembayaran Berhasil Dicatat.", "✅");
     }).catch(error => {
         console.error("Payment Error:", error);
-        alert("Gagal memproses pembayaran. Cek koneksi Anda.");
-        document.getElementById('customModal').style.display = 'none';
+        // PERBAIKAN: Ganti alert() dengan showModalInfo()
+        showModalInfo("Gagal", "Gagal memproses pembayaran. Cek koneksi Anda.", "❌");
     });
 }
 
