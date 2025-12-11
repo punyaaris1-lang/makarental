@@ -67,7 +67,6 @@ footer.bottom-nav {
     z-index: 100; font-size: 2.5em; color: var(--accent);
 }
 .hidden-content { display: none !important; }
-
 </style>
 </head>
 <body>
@@ -137,16 +136,22 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// Variabel didefinisikan di sini
 let currentUser = JSON.parse(localStorage.getItem('maka_user'));
 let plusData = JSON.parse(localStorage.getItem('maka_plus_data')) || { active: false };
 
 // --- MAIN LOGIC ---
 document.addEventListener("DOMContentLoaded", function() {
-    if(!currentUser) { window.location.href='index.html'; return; }
+    // PERBAIKAN 1: Cek Sesi di Awal
+    if(!currentUser || !currentUser.plat) { 
+        // Jika data login tidak ada atau tidak valid, redirect ke login
+        window.location.href='index.html'; 
+        return; 
+    }
     
     // 1. Render Info Awal
-    document.getElementById('user-name-display').innerText = currentUser.nama;
-    document.getElementById('user-plate-display').innerText = currentUser.plat;
+    document.getElementById('user-name-display').innerText = currentUser.nama || 'Pengguna';
+    document.getElementById('user-plate-display').innerText = currentUser.plat || 'N/A';
     if(currentUser.photoUrl) {
         const av = document.getElementById('user-avatar');
         av.innerText = ""; av.style.backgroundImage = `url('${currentUser.photoUrl}')`;
@@ -229,7 +234,7 @@ function loadPaymentsAndDebt() {
           document.getElementById('rto-days').innerText = `Hari ${debt.currentDay} / 1009`;
           document.getElementById('rto-bar').style.width = (debt.currentDay / 1009) * 100 + "%";
 
-          // BARU: Sembunyikan loading, tampilkan konten utama
+          // Sembunyikan loading, tampilkan konten utama
           document.getElementById('loading-overlay').style.display = 'none';
           document.getElementById('main-content').classList.remove('hidden-content');
 
@@ -241,7 +246,7 @@ function loadPaymentsAndDebt() {
           document.getElementById('hero-desc').innerText = "Gagal memuat data. Periksa koneksi internet Anda.";
           card.className = "hero-card warning";
 
-          // BARU: Sembunyikan loading, tampilkan konten utama dengan pesan error
+          // Sembunyikan loading, tampilkan konten utama dengan pesan error
           document.getElementById('loading-overlay').style.display = 'none';
           document.getElementById('main-content').classList.remove('hidden-content');
       });
