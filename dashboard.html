@@ -184,7 +184,7 @@ function calculateTotalDebt(paidDates) {
 function loadPaymentsAndDebt() {
     db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
-      .onSnapshot(snap => {
+      .onSnapshot(snap => { // Callback sukses
           let paidDates = [];
           snap.forEach(doc => { paidDates.push(doc.data().date); });
           
@@ -207,6 +207,22 @@ function loadPaymentsAndDebt() {
           // Update Progress RTO
           document.getElementById('rto-days').innerText = `Hari ${debt.currentDay} / 1009`;
           document.getElementById('rto-bar').style.width = (debt.currentDay / 1009) * 100 + "%";
+          
+      }, error => { // Callback error (PENANGANAN KONEKSI)
+          console.error("Firestore Snapshot Error:", error);
+          
+          if (error.code === 'unavailable') {
+              // Menampilkan pesan error di card utama
+              const card = document.getElementById('heroCard');
+              const amountEl = document.getElementById('hero-amount');
+              const descEl = document.getElementById('hero-desc');
+              
+              card.className = "hero-card warning"; // Menggunakan warning (merah)
+              amountEl.innerText = "⚠️ KONEKSI GAGAL";
+              descEl.innerText = "Gagal menghubungi server. Periksa koneksi internet Anda atau coba lagi nanti.";
+          } else {
+              console.error("Error lain saat memuat data:", error);
+          }
       });
 }
 
