@@ -116,19 +116,47 @@ const firebaseConfig = {
   messagingSenderId: "472036722228",
   appId: "1:472036722228:web:11d520f9204db317d02c61"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 
+let db;
 let currentUser = JSON.parse(localStorage.getItem('maka_user'));
+let isInitialized = false;
 
-document.addEventListener('DOMContentLoaded', () => {
-    // PERBAIKAN 1: Pengecekan Login
+// FIX: Initialization function untuk mengatasi White Screen saat kembali
+function initializeApp() {
+    if (!isInitialized) {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            isInitialized = true;
+        } catch (e) {
+            if (e.code !== 'app/duplicate-app') {
+                console.error("Firebase init error:", e);
+                return;
+            }
+        }
+    }
+    
+    // Cek Login
+    currentUser = JSON.parse(localStorage.getItem('maka_user'));
     if(!currentUser) { window.location.href='index.html'; return; }
+    
     document.getElementById('platDisplay').innerText = currentUser.plat;
     loadPaymentHistory();
+}
+
+document.addEventListener('DOMContentLoaded', initializeApp);
+
+// FIX: Listener untuk mengatasi White Screen/State Loss
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        initializeApp(); 
+    }
 });
 
+
 function loadPaymentHistory() {
+    if (!db) return; // Pastikan db sudah terinisialisasi
+    
     const container = document.getElementById('historyList');
     
     // Tarik data dari collection 'daily_payments'
