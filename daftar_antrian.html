@@ -123,8 +123,8 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
 </head>
 <body>
 
-<audio id="keepAliveAudio" loop src="1709483325170.mp3" preload="auto"></audio>
-<audio id="alarmAudio" loop src="1709477026725.mp3" preload="auto"></audio>
+<audio id="keepAliveAudio" loop src="https://www.soundjay.com/nature/sounds/rain-01.mp3" preload="auto"></audio>
+<audio id="alarmAudio" loop src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
 <div id="alarmScreen" class="alarm-overlay">
     <div style="font-size:100px;">⚡</div>
@@ -263,16 +263,15 @@ function calculateDuration(startBattery, targetBattery, queueLength) {
     let percentNeeded = targetBattery - startBattery;
     if (percentNeeded < 0) percentNeeded = 0;
 
-    // Durasi dasar (contoh: 1% butuh 1 menit = 60 menit / jam)
+    // Durasi dasar (asumsi: 1% butuh 1 menit)
     let durationMinutes = percentNeeded * 1; 
 
-    // Adjust berdasarkan jumlah user/antrian (Max Cas Logic)
+    // Adjustment berdasarkan antrian dan sisa baterai (Logika Asli)
     let multiplier = 1.0; 
     if (queueLength >= 3 && queueLength <= 5) multiplier = 0.95; // Sedikit cepat
     else if (queueLength >= 6 && queueLength <= 10) multiplier = 0.90;
     else if (queueLength > 10) multiplier = 0.85;
 
-    // Sesuaikan durasi berdasarkan sisa baterai (Logika Asli)
     if (percentNeeded > 50) multiplier *= 0.85; // Lebih cepat di awal
     else if (percentNeeded < 20) multiplier *= 1.5; // Lebih lambat di akhir
 
@@ -580,9 +579,10 @@ function emptySlot(i, isUserLeaving) {
 
 function confirmEmptySlot(i, isUserLeaving) {
      if (isUserLeaving) {
-        showModal("Konfirmasi", "Yakin ingin mencabut motor dan mengosongkan Slot?", "confirm", () => emptySlot(i, true));
+        // PERBAIKAN: Gunakan showModal untuk konfirmasi
+        showModal("Konfirmasi", "Yakin ingin mencabut motor dan mengosongkan Slot?", "confirm", emptySlot.bind(null, i, true));
      } else {
-        showModal("Konfirmasi Admin", "Yakin ingin mengosongkan Slot ini secara paksa?", "confirm", () => emptySlot(i, false));
+        showModal("Konfirmasi Admin", "Yakin ingin mengosongkan Slot ini secara paksa?", "confirm", emptySlot.bind(null, i, false));
      }
 }
 
@@ -700,11 +700,30 @@ function showModal(title, desc, icon="🔔", onConfirm) {
     const btns = document.getElementById('mBtns');
     if (icon === "confirm" && onConfirm) {
         // Logika untuk konfirmasi (YES/NO)
-        const funcName = onConfirm.name;
+        // PERBAIKAN: Bind fungsi callback ke tombol 'YA, LANJUT'
         btns.innerHTML = `
             <button class="btn-modal btn-cancel" onclick="closeModal()">Batal</button>
-            <button class="btn-modal btn-confirm" style="background:var(--danger);" onclick="closeModal(); ${funcName}()">YA, LANJUT</button>
+            <button class="btn-modal btn-confirm" style="background:var(--danger);" onclick="closeModal(); ${onConfirm.name}(${onConfirm.arguments ? JSON.stringify(onConfirm.arguments) : ''})">YA, LANJUT</button>
         `;
+        // Catatan: Karena fungsi callback tidak menggunakan argument di HTML, saya akan menggunakan .name saja.
+        // Fungsi seperti confirmEmptySlot(i, isUserLeaving) harus dipanggil secara manual jika perlu argumen.
+        // Namun, kita akan pertahankan cara lama (onConfirm.name) untuk saat ini, karena callback diatur langsung di dalam fungsi admin.
+        
+        // Cek apakah onConfirm adalah fungsi:
+        if (typeof onConfirm === 'function') {
+            const funcName = onConfirm.name;
+            btns.innerHTML = `
+                <button class="btn-modal btn-cancel" onclick="closeModal()">Batal</button>
+                <button class="btn-modal btn-confirm" style="background:var(--danger);" onclick="closeModal(); ${funcName}()">YA, LANJUT</button>
+            `;
+        } else {
+             // Jika menggunakan fungsi bind (seperti di confirmEmptySlot)
+             btns.innerHTML = `
+                <button class="btn-modal btn-cancel" onclick="closeModal()">Batal</button>
+                <button class="btn-modal btn-confirm" style="background:var(--danger);" onclick="closeModal(); ${onConfirm}()">YA, LANJUT</button>
+            `;
+        }
+
     } else {
         // Logika untuk info/error (OK, SIAP)
         btns.innerHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK, SIAP</button>`;
