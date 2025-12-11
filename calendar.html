@@ -3,186 +3,161 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kalender Pembayaran - MAKA</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<title>Antrian FC Public</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <link rel="manifest" href="/makarental/manifest.json"> 
     
 <style>
-/* GLOBAL THEME */
+/* ================= GLOBAL PREMIUM THEME ================= */
 :root { 
-    --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
-    --danger:#ef4444; --success:#10b981; --warning:#fbbf24; --disabled:#cbd5e1;
-    --radius-lg:24px;
+    --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; 
+    --danger:#ef4444; --success:#10b981; --gold:#fbbf24; 
+    --glass-bg:rgba(255,255,255,0.9); 
+    --glass-border:rgba(255,255,255,0.7); 
+    --glass-shadow:0 6px 20px rgba(0,0,0,0.08); 
+    --radius-lg: 20px;
 }
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { margin:0; padding:0; font-family:'Inter', sans-serif; background:var(--bg-base); color:var(--text); min-height:100vh; padding-bottom:100px;}
+.app-container { max-width:520px; margin:0 auto; padding:20px; }
+.header { text-align:center; margin-bottom:20px; }
+.section-title { font-size:1.4em; font-weight:800; margin-top:35px; margin-bottom:15px; border-bottom:3px solid var(--accent); display:inline-block; padding-bottom:5px; }
 
-body { 
-    margin:0; font-family:'Inter', sans-serif; 
-    background:var(--bg-base); color:var(--text); 
-    min-height:100vh; position:relative; padding-bottom:100px;
+/* Slot Charger (Premium Model) */
+.slot-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(130px, 1fr)); gap:15px; }
+.slot-item {
+    background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
+    box-shadow: var(--glass-shadow); padding:15px; text-align:center; transition:0.3s;
+    display:flex; flex-direction:column; align-items:center; position:relative;
 }
+.slot-item.occupied { background:#e0f7f7; border-color:var(--accent); }
+.slot-item.charging { background:#d4edda; border-color:var(--success); animation: chargePulse 2s infinite alternate; }
+.slot-item.my-slot { border:3px solid var(--gold); } /* User sendiri */
 
-/* BACKGROUND */
-body::before {
-    content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: url('1763947427555.jpg') center/cover no-repeat; 
-    opacity: 0.15; z-index: -1; pointer-events: none;
+@keyframes chargePulse { from { box-shadow: 0 0 0 rgba(16,185,129,0.3); } to { box-shadow: 0 0 15px rgba(16,185,129,0.6); } }
+
+.slot-label { font-size:1.5em; font-weight:900; margin-bottom:5px; color:var(--accent); }
+.slot-status { font-size:0.8em; font-weight:600; color:#64748b; min-height:1.2em; }
+.slot-plat { font-size:1em; font-weight:800; color:var(--text); margin-top:5px; }
+.slot-timestamp { font-size:0.7em; color:#94a3b8; margin-top:3px; }
+
+/* Antrian */
+.queue-list { display:flex; flex-direction:column; gap:12px; }
+.queue-item {
+    display:flex; align-items:center;
+    background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px;
+    box-shadow: var(--glass-shadow); padding:15px; transition:0.3s;
 }
+.queue-item.my-queue { border:3px solid var(--gold); }
 
-.app-container { max-width:520px; margin:0 auto; padding:20px 20px 100px; }
+.queue-number { font-size:1.8em; font-weight:900; color:var(--danger); width:50px; text-align:center; flex-shrink:0; }
+.queue-details { flex-grow:1; margin-left:15px; }
+.queue-plat { font-size:1.1em; font-weight:800; margin:0; }
+.queue-name { font-size:0.8em; color:#64748b; }
 
-/* HEADER & NAVIGASI BULAN */
-.header { 
-    display: flex; justify-content: space-between; align-items: center; 
-    margin-bottom: 20px; background: white; padding: 10px 20px; 
-    border-radius: 99px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+/* Tombol */
+.btn-primary { background:var(--accent); color:white; padding:12px 20px; border:none; border-radius:12px; font-weight:700; font-size:1em; cursor:pointer; transition:0.2s; box-shadow:0 4px 15px rgba(14,165,166,0.3); }
+.btn-primary:active { transform:scale(0.98); }
+.btn-danger { background:var(--danger); box-shadow:0 4px 15px rgba(239,68,68,0.3); }
+
+/* Alarm Screen */
+#alarmScreen { position:fixed; inset:0; background:rgba(239,68,68,0.95); z-index:1000; display:none; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; }
+#alarmScreen h1 { font-size:3em; margin:0; animation: bounce 1s infinite alternate; }
+@keyframes bounce { from { transform:scale(1); } to { transform:scale(1.1); } }
+#alarmScreen p { font-size:1.5em; font-weight:700; }
+
+/* Modal Custom (for Admin/etc) */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); display: none; justify-content: center; align-items: center; z-index: 1001; transition: opacity 0.3s; opacity: 0;
 }
-.month-title { font-family: 'Syne'; font-size: 1.1em; font-weight: 800; text-transform: uppercase; }
-.btn-nav { 
-    background: #f1f5f9; border: none; width: 36px; height: 36px; 
-    border-radius: 50%; font-weight: bold; cursor: pointer; color: var(--text);
-}
+.modal-overlay.show { display: flex; opacity: 1; }
+.modal-box { background: white; padding: 25px; border-radius: 20px; max-width: 90%; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.modal-title { font-size: 1.2em; font-weight: 800; margin: 10px 0 5px; }
+.modal-desc { color: #64748b; margin-bottom: 20px; }
+.btn-modal { padding: 10px 15px; border: none; border-radius: 10px; font-weight: 700; cursor: pointer; margin: 5px; }
+.btn-confirm { background: var(--accent); color: white; }
 
-/* KALENDER GRID */
-.calendar-grid { 
-    display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; 
-    margin-bottom: 25px; 
-}
-.day-name { 
-    text-align: center; font-size: 0.75em; font-weight: 800; 
-    color: var(--muted); margin-bottom: 10px; text-transform: uppercase;
-}
-.date-cell {
-    aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    border-radius: 14px; font-weight: 700; font-size: 0.9em;
-    background: rgba(255,255,255,0.6); position: relative;
-    transition: 0.2s; border: 1px solid transparent;
-}
-
-/* STATUS WARNA */
-.date-cell.lunas { background: #dcfce7; color: var(--success); border-color: var(--success); }
-.date-cell.tunggak { 
-    background: #fee2e2; color: var(--danger); border-color: var(--danger); 
-    box-shadow: 0 4px 10px rgba(239,68,68,0.2); cursor: pointer; animation: pulseRed 2s infinite;
-}
-.date-cell.disabled { background: #e2e8f0; color: #94a3b8; opacity: 0.5; pointer-events: none; }
-.date-cell.future { background: rgba(255,255,255,0.4); color: #94a3b8; pointer-events: none; }
-/* TANGGAL 31 (LIBUR) */
-.date-cell.libur-ok { background: #f3f4f6; color: #94a3b8; border: 1px dashed #cbd5e1; cursor: default; }
-
-@keyframes pulseRed { 0%{border-color:var(--danger);} 50%{border-color:transparent;} 100%{border-color:var(--danger);} }
-
-.date-cell.dp { border-bottom: 3px solid #fbbf24; } 
-.small-lbl { font-size: 0.5em; text-transform: uppercase; margin-top: -2px; font-weight: 800; }
-
-/* HERO CARD */
-.hero-card {
-    background: linear-gradient(135deg, #ef4444, #b91c1c);
-    color: white; padding: 24px; border-radius: 24px;
-    box-shadow: 0 15px 40px rgba(239, 68, 68, 0.3);
-    position: relative; overflow: hidden; text-align: center;
-    transition: 0.3s;
-}
-.hero-card.aman {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    box-shadow: 0 15px 40px rgba(14, 165, 166, 0.3);
-}
-
-.hero-label { font-size: 0.8em; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.9; margin-bottom: 5px; }
-.hero-amount { font-family: 'Inter'; font-size: 2.8em; font-weight: 900; margin: 0; line-height: 1; letter-spacing: -1px; }
-.hero-desc { font-size: 0.9em; margin-top: 10px; font-weight: 600; opacity: 0.9; }
-
-/* FOOTER NAV */
-footer.bottom-nav {
-    position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-    width: auto; min-width: 260px; 
-    background: rgba(255, 255, 255, 0.95); 
-    backdrop-filter: blur(20px);
-    border-radius: 50px; padding: 10px 30px; 
-    display: flex; justify-content: space-between; align-items: center; gap: 40px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5); z-index: 999;
-}
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #94a3b8; font-size: 9px; font-weight: 700; transition: 0.2s; }
-.nav-item span { font-size: 22px; margin-bottom: 2px; }
-.nav-item.active { color: var(--accent); }
-
-/* MODAL KUSTOM (Tambahan) */
-.modal-overlay-kustom { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:9999; display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s; }
-.modal-overlay-kustom.show { display:flex; opacity:1; }
-.modal-box-kustom { background:white; width:85%; max-width:320px; padding:25px; border-radius:24px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s; }
-.modal-overlay-kustom.show .modal-box-kustom { transform:scale(1); }
-.modal-icon-kustom { font-size:40px; margin-bottom:15px; display:block; }
-.btn-modal-kustom { width:100%; padding:12px; margin-top:10px; border-radius:12px; border:none; font-weight:bold; cursor:pointer; }
-.modal-title-kustom { font-family:'Inter'; font-size:1.3em; font-weight:800; margin:0 0 10px; color:var(--text); }
-.modal-desc-kustom { font-size:0.9em; color:#64748b; line-height:1.5; margin-bottom:20px; }
+/* Admin Controls */
+.admin-controls { margin-top: 15px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.admin-controls button { padding: 8px 12px; font-size: 0.75em; border-radius: 8px; font-weight: 700; }
+.btn-admin-small { background: #fee2e2; color: var(--danger); border: none; }
+.btn-admin-action { background: #dbeafe; color: #2563eb; border: none; }
+.btn-admin-move { background: var(--gold); color: white; border: none; }
 </style>
 </head>
 <body>
 
 <div class="app-container">
     <div class="header">
-        <button class="btn-nav" onclick="changeMonth(-1)">‹</button>
-        <div id="monthDisplay" class="month-title">...</div>
-        <button class="btn-nav" onclick="changeMonth(1)">›</button>
+        <h1 style="font-size:1.8em; margin:0; font-weight:900;">⚡ Antrian Charging FC</h1>
+        <p style="color:#64748b; margin:5px 0 0;">MAKA Rental - Full Service Charging</p>
     </div>
 
-    <div class="calendar-grid" id="calendarGrid"></div>
-
-    <div id="heroCard" class="hero-card">
-        <div class="hero-label">TOTAL TUNGGAKAN (GLOBAL)</div>
-        <div id="totalDebt" class="hero-amount">Rp 0</div>
-        <div id="debtDesc" class="hero-desc">Data sedang dimuat...</div>
+    <div id="adminLoginSection" style="margin-bottom:20px; border-top:1px dashed #ddd; padding-top:20px; text-align:center;">
+        <h3 id="adminStatus" style="font-size:1em; margin:0 0 10px; font-weight:700; color:#ef4444;">Bukan Admin</h3>
+        <input type="password" id="adminPass" placeholder="Admin Passcode" style="padding:10px; border:1px solid #ddd; border-radius:8px; width:200px; margin-right:10px;">
+        <button id="btnLoginAdmin" onclick="adminLogin()" class="btn-primary" style="padding:10px 15px; font-size:0.9em;">Login Admin</button>
+        <div id="adminControlsGlobal" class="admin-controls" style="display:none; border-top:1px solid #ccc; padding-top:10px;">
+            <button onclick="confirmResetQueue()" class="btn-admin-small">RESET SEMUA ANTRIAN</button>
+        </div>
     </div>
     
-    <div style="text-align:center;margin-top:20px;font-size:0.7em;color:#64748b;">
-        🔴 Belum (Klik Bayar) &nbsp; 🟢 Lunas &nbsp; ⚪ Libur (Tgl 31)
+    <h2 class="section-title">Slot Charging Aktif</h2>
+    <div id="slotsContainer" class="slot-grid">
+        <div class="slot-item">Loading...</div>
+    </div>
+
+    <h2 class="section-title">Daftar Antrian</h2>
+    <div id="queueContainer" class="queue-list">
+        <div style="text-align:center; color:#64748b; padding:20px;">Antrian kosong.</div>
+    </div>
+
+    <div id="joinQueueSection" style="text-align:center; margin-top:30px; display:none;">
+        <button onclick="joinQueue()" class="btn-primary" style="width:100%;">GABUNG ANTRIAN SEKARANG</button>
+    </div>
+    
+    <div id="leaveQueueSection" style="text-align:center; margin-top:30px; display:none;">
+        <button onclick="confirmLeave()" class="btn-primary btn-danger" style="width:100%;">KELUAR DARI ANTRIAN/SLOT</button>
+    </div>
+</div>
+
+<div id="alarmScreen">
+    <h1>🔔</h1>
+    <p id="alarmText">Slot Anda telah selesai charging!</p>
+    <button onclick="stopAlarmAndClear()" class="btn-modal" style="background:white; color:var(--danger); margin-top:30px;">MATIKAN ALARM</button>
+</div>
+
+<div id="customModal" class="modal-overlay">
+    <div class="modal-box">
+        <span id="mIcon" class="modal-icon" style="font-size:2em;">ⓘ</span>
+        <h3 id="mTitle" class="modal-title">Judul</h3>
+        <p id="mDesc" class="modal-desc">Deskripsi</p>
+        <div id="mBtns">
+            <button class="btn-modal btn-confirm" onclick="closeModal()">OK</button>
+        </div>
     </div>
 </div>
 
 <footer class="bottom-nav">
-    <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
-    <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
-    <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
-</footer>
+  </footer>
 
-<div id="customModalConfirm" class="modal-overlay-kustom">
-    <div class="modal-box-kustom">
-        <h3 id="mTitle">Bayar?</h3>
-        <p id="mDesc" style="color:#666;font-size:0.9em;margin:10px 0;">Konfirmasi</p>
-        <div id="mBtns"></div>
-    </div>
-</div>
-
-<div id="customModalInfo" class="modal-overlay-kustom">
-    <div class="modal-box-kustom">
-        <span id="mIconInfo" class="modal-icon-kustom">🔔</span>
-        <h3 id="mTitleInfo" class="modal-title-kustom">Info</h3>
-        <p id="mDescInfo" class="modal-desc-kustom">Pesan...</p>
-        <button class="btn-modal-kustom" onclick="closeModalInfo()">OK</button>
-    </div>
-</div>
+<audio id="alarmAudio" loop src="1709477026725.mp3" preload="auto"></audio>
+<audio id="keepAliveAudio" loop src="1709483325170.mp3" preload="auto"></audio>
 
 <script>
-// PWA ANTI LOADING
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'))}
+// --- FUNGSI UTILITY COOKIE (untuk Admin Login) ---
+// Note: Tetap pakai localStorage untuk currentUser agar tidak merusak sesi global saat ini.
+// Tapi untuk admin status, kita pakai localStorage sementara.
+function getLocal(key) { return localStorage.getItem(key); }
+function setLocal(key, value) { localStorage.setItem(key, value); }
+function removeLocal(key) { localStorage.removeItem(key); }
 
-// --- FUNGSI MODAL KUSTOM BARU ---
-function showModalInfo(title, msg, icon="🔔") {
-    document.getElementById('mTitleInfo').innerText = title;
-    document.getElementById('mDescInfo').innerText = msg;
-    document.getElementById('mIconInfo').innerText = icon;
-    document.getElementById('customModalInfo').classList.add('show');
-}
-function closeModalInfo() {
-    document.getElementById('customModalInfo').classList.remove('show');
-}
-// --- END MODAL KUSTOM ---
-
-// --- CONFIG FIREBASE ---
+// --- FIREBASE CONFIG ---
 const firebaseConfig = {
+  // PASTE FIREBASE CONFIG ANDA DI SINI
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
   projectId: "rtomaka-e67b5",
@@ -193,205 +168,451 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-let currentUser = JSON.parse(localStorage.getItem('maka_user'));
-let plusData = JSON.parse(localStorage.getItem('maka_plus_data')) || { active: false };
-let currentYear = new Date().getFullYear();
-let currentMonth = new Date().getMonth();
-let paidDates = []; 
+const SLOTS_COUNT = 6; // Jumlah slot yang Anda miliki
+const slotsRef = db.collection('slots');
+const queueRef = db.collection('queue');
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Pengecekan Login
-    if(!currentUser) { window.location.href='index.html'; return; }
-    loadPayments();
-});
+let currentUser = JSON.parse(getLocal('maka_user'));
+let myActiveSlotIndex = -1;
+let myActiveQueueId = null;
+let isAdmin = false; // Status Admin
 
-function updateHeroCard(amount, count, error=false) {
-    const card = document.getElementById('heroCard');
-    const txtAmount = document.getElementById('totalDebt');
-    const txtDesc = document.getElementById('debtDesc');
+// Audio Controls (Poin 1: Volume Maksimal)
+const alarmAudio = document.getElementById('alarmAudio');
+const keepAliveAudio = document.getElementById('keepAliveAudio');
+alarmAudio.volume = 1.0; // Atur ke volume maksimal
+keepAliveAudio.volume = 0.01; // Tetap kecil untuk menjaga PWA tetap aktif (Keep Alive)
 
-    if (error) {
-        card.className = "hero-card"; // Merah Default
-        txtAmount.innerText = "⚠️ ERROR";
-        txtDesc.innerText = "Gagal memuat data. Cek koneksi internet Anda.";
-        return;
-    }
+// =======================================================
+// === FUNGSI UTAMA USER (SLOT & QUEUE) ===
+// =======================================================
 
-    if (amount > 0) {
-        card.className = "hero-card"; // Merah Default
-        txtAmount.innerText = "Rp " + amount.toLocaleString('id-ID');
-        txtDesc.innerText = `Anda menunggak ${count} hari. Klik kalender untuk bayar.`;
-    } else {
-        card.className = "hero-card aman"; // Biru
-        txtAmount.innerText = "Rp 0";
-        txtDesc.innerText = "Tidak ada tunggakan. Akun Aman! 👍";
-    }
-}
+function renderSlots(slotsData, queueData) {
+    const container = document.getElementById('slotsContainer');
+    container.innerHTML = '';
+    myActiveSlotIndex = -1; // Reset slot index aktif
 
-function loadPayments() {
-    // Tambahkan Error Handler pada onSnapshot
-    db.collection('daily_payments')
-      .where('plat', '==', currentUser.plat)
-      .onSnapshot(snap => {
-          paidDates = [];
-          snap.forEach(doc => { paidDates.push(doc.data().date); });
-          calculateTotalDebt();
-          renderCalendar();
-      }, error => {
-          console.error("Firestore Error:", error);
-          updateHeroCard(0, 0, true); // Tampilkan error di Hero Card
-          renderCalendar();
-      });
-}
+    for (let i = 0; i < SLOTS_COUNT; i++) {
+        const slot = slotsData.find(s => s.index === i) || { index: i, plat: null, charging: false, timestamp: null };
+        const isOccupied = slot.plat !== null;
+        const isCharging = slot.charging;
+        const isMySlot = isOccupied && slot.plat === currentUser.plat;
 
-// 2. HITUNG HARGA DINAMIS (LOGIKA BARU)
-function getDailyPrice(dateObj) {
-    // A. Cek Tanggal 31 -> LIBUR (Rp 0)
-    if (dateObj.getDate() === 31) return 0;
-
-    // B. Cek Masa Kontrak (Maka+ hanya berlaku 1 tahun pertama)
-    const joinDate = new Date(currentUser.joinedAt);
-    const diffTime = Math.abs(dateObj - joinDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-
-    let price = 70000; // Harga Dasar
-    
-    // Jika ikut MAKA+ dan masih dibawah 365 hari (1 Tahun)
-    if (plusData.active && diffDays <= 365) {
-        price += 10000; // Tambah 10rb
-    }
-    
-    return price;
-}
-
-function calculateTotalDebt() {
-    const joinDate = new Date(currentUser.joinedAt);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    
-    let totalHutang = 0;
-    let daysLate = 0;
-    let checkDate = new Date(joinDate);
-    checkDate.setHours(0,0,0,0);
-    
-    while (checkDate <= today) {
-        const dateStr = checkDate.toISOString().split('T')[0];
-        const price = getDailyPrice(checkDate); // Pakai fungsi harga dinamis
-
-        // Hanya hitung hutang jika harga > 0 (bukan tgl 31) dan belum dibayar
-        if (price > 0 && !paidDates.includes(dateStr)) {
-            totalHutang += price;
-            daysLate++;
-        }
-        checkDate.setDate(checkDate.getDate() + 1);
-    }
-
-    updateHeroCard(totalHutang, daysLate);
-}
-
-
-// 3. RENDER KALENDER (Tetap sama)
-function renderCalendar() {
-    const grid = document.getElementById('calendarGrid');
-    grid.innerHTML = '<div class="day-name">M</div><div class="day-name">S</div><div class="day-name">S</div><div class="day-name">R</div><div class="day-name">K</div><div class="day-name">J</div><div class="day-name">S</div>';
-    
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-    const joinDate = new Date(currentUser.joinedAt);
-    joinDate.setHours(0,0,0,0);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-
-    document.getElementById('monthDisplay').innerText = new Date(currentYear, currentMonth).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }).toUpperCase();
-
-    for(let i=0; i<firstDay; i++) grid.innerHTML += `<div class="date-cell empty"></div>`;
-
-    for(let d=1; d<=daysInMonth; d++) {
-        let m = (currentMonth+1).toString().padStart(2,'0');
-        let da = d.toString().padStart(2,'0');
-        let dateKey = `${currentYear}-${m}-${da}`;
-        let currentDate = new Date(dateKey);
-        currentDate.setHours(0,0,0,0);
-        
-        let cls = ""; let lbl = ""; let click = "";
-        
-        // Cek Harga hari ini
-        let price = getDailyPrice(currentDate);
-
-        if (d === 31) {
-            // TGL 31 SELALU LIBUR (Tidak bisa diklik, warna abu)
-            cls = "libur-ok"; 
-            lbl = `<div class="small-lbl">LIBUR</div>`;
-        } 
-        else if (currentDate < joinDate) {
-            cls = "disabled";
-        } 
-        else if (currentDate > today) {
-            cls = "future";
-        } 
-        else {
-            // Masa Aktif
-            if (paidDates.includes(dateKey)) {
-                cls = "lunas"; 
+        if (isMySlot) {
+            myActiveSlotIndex = i; // Update status slot aktif user
+            if (!isCharging) {
+                // Jika sudah di slot tapi tidak charging, tampilkan alarm
+                // Ini logika finish charging
+                startAlarm(`Slot ${i + 1} Selesai Charge!`);
             } else {
-                cls = "tunggak"; // Merah
-                click = `onclick="paySelf('${dateKey}', ${price})"`; // Kirim harga dinamis ke fungsi bayar
+                // Di slot dan sedang charging, matikan alarm
+                stopAlarmIfRunning();
             }
         }
 
-        // DP Marker (Bulan depannya join)
-        let joinMonthIdx = joinDate.getFullYear()*12 + joinDate.getMonth();
-        let currMonthIdx = currentYear*12 + currentMonth;
-        if (currMonthIdx > joinMonthIdx && (d===14 || d===28)) { 
-            cls += " dp"; 
-            if(!lbl) lbl=`<div class="small-lbl">DP</div>`; 
+        let slotClass = '';
+        let statusText = 'KOSONG';
+        if (isOccupied) {
+            slotClass = 'occupied';
+            statusText = isCharging ? 'CHARGING AKTIF' : 'SELESAI/STANDBY';
         }
-        
-        if (dateKey === today.toISOString().split('T')[0]) cls += " today";
 
-        grid.innerHTML += `<div class="date-cell ${cls}" ${click}>${d} ${lbl}</div>`;
+        const timeString = slot.timestamp ? new Date(slot.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '';
+
+        // Tampilan Admin Controls
+        let adminControlsHTML = '';
+        if (isAdmin) {
+            const btnDelete = `<button class="btn-admin-small" onclick="confirmDelete('slot', ${i})">HAPUS</button>`;
+            const btnStartStop = isCharging
+                ? `<button class="btn-admin-small" onclick="adminStopCharging(${i})">STOP CHARGE</button>`
+                : `<button class="btn-admin-action" onclick="adminStartCharging(${i})">MULAI CHARGE</button>`;
+            
+            const btnEmpty = isOccupied ? `<button class="btn-admin-small" onclick="emptySlot(${i})">KOSONGKAN</button>` : '';
+
+            adminControlsHTML = `
+                <div class="admin-controls">
+                    ${isOccupied ? btnStartStop + btnEmpty : ''}
+                </div>
+            `;
+        }
+
+        container.innerHTML += `
+            <div id="slot-${i}" class="slot-item ${slotClass} ${isCharging ? 'charging' : ''} ${isMySlot ? 'my-slot' : ''}">
+                <div class="slot-label">Slot ${i + 1}</div>
+                <div class="slot-status" style="color:${isCharging ? var('--success') : '#64748b'}">${statusText}</div>
+                <div class="slot-plat">${slot.plat || '-'}</div>
+                <div class="slot-timestamp">${isOccupied ? slot.name : ''} ${timeString}</div>
+                ${adminControlsHTML}
+            </div>
+        `;
+    }
+    updateActionButtons(queueData.length);
+}
+
+function renderQueue(queueData) {
+    const container = document.getElementById('queueContainer');
+    container.innerHTML = '';
+    myActiveQueueId = null; // Reset ID antrian aktif
+
+    if (queueData.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:#64748b; padding:20px; background:var(--glass-bg); border-radius:var(--radius-lg);">Antrian kosong. Mari bergabung!</div>`;
+    } else {
+        queueData.forEach((item, index) => {
+            const isMyQueue = item.plat === currentUser.plat;
+            if (isMyQueue) { myActiveQueueId = item.id; }
+            
+            // Tampilan Admin Controls
+            let adminControlsHTML = '';
+            if (isAdmin) {
+                const moveButtons = Array.from({ length: SLOTS_COUNT }, (_, i) => 
+                    `<button class="btn-admin-move" onclick="confirmMoveToSlot('${item.id}', ${i})">Pindah ke Slot ${i + 1}</button>`
+                ).join('');
+                
+                adminControlsHTML = `
+                    <div class="admin-controls">
+                        ${moveButtons}
+                        <button class="btn-admin-small" onclick="confirmDelete('queue', '${item.id}')">HAPUS ANTRIAN</button>
+                    </div>
+                `;
+            }
+
+            container.innerHTML += `
+                <div class="queue-item ${isMyQueue ? 'my-queue' : ''}">
+                    <div class="queue-number">${index + 1}</div>
+                    <div class="queue-details">
+                        <p class="queue-plat">${item.plat}</p>
+                        <p class="queue-name">${item.name}</p>
+                    </div>
+                    ${adminControlsHTML}
+                </div>
+            `;
+        });
+    }
+    updateActionButtons(queueData.length);
+}
+
+function updateActionButtons(queueLength) {
+    const inSlotOrQueue = myActiveSlotIndex !== -1 || myActiveQueueId !== null;
+    document.getElementById('joinQueueSection').style.display = inSlotOrQueue ? 'none' : 'block';
+    document.getElementById('leaveQueueSection').style.display = inSlotOrQueue ? 'block' : 'none';
+    
+    // Auto-alert jika antrian penuh dan bukan user admin
+    if (queueLength >= SLOTS_COUNT * 2 && myActiveSlotIndex === -1 && myActiveQueueId === null && !isAdmin) {
+        showModal("⚠️ Antrian Penuh", "Antrian dan slot sedang penuh. Coba lagi nanti.", "warning");
     }
 }
 
-// 4. KLIK BAYAR (SELF SERVICE DGN HARGA DINAMIS)
-function paySelf(dateStr, price) {
-    const d = new Date(dateStr);
-    const dateFmt = d.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
-    
-    document.getElementById('customModalConfirm').classList.add('show');
-    document.getElementById('mTitle').innerText = "Bayar Tanggal Ini?";
-    document.getElementById('mDesc').innerHTML = `Tgl: <b>${dateFmt}</b><br>Nominal: <b>Rp ${price.toLocaleString('id-ID')}</b>`;
-    document.getElementById('mBtns').innerHTML = `
-        <button class="btn-modal-kustom" onclick="document.getElementById('customModalConfirm').classList.remove('show')" style="background:#eee;color:#555">Batal</button>
-        <button class="btn-modal-kustom" style="background:#10b981;color:white" onclick="processPayment('${dateStr}', ${price})">Ya, Sudah Bayar</button>
-    `;
-}
+// =======================================================
+// === USER ACTIONS ===
+// =======================================================
 
-function processPayment(dateStr, amount) {
-    document.getElementById('customModalConfirm').classList.remove('show');
-    const docId = currentUser.plat + "_" + dateStr;
-    db.collection('daily_payments').doc(docId).set({
-        plat: currentUser.plat,
-        nama: currentUser.nama,
-        date: dateStr,
-        amount: amount,
-        paidAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-        // PERBAIKAN: Ganti alert() dengan showModalInfo()
-        showModalInfo("Lunas!", "Pembayaran Berhasil Dicatat.", "✅");
-    }).catch(error => {
-        console.error("Payment Error:", error);
-        // PERBAIKAN: Ganti alert() dengan showModalInfo()
-        showModalInfo("Gagal", "Gagal memproses pembayaran. Cek koneksi Anda.", "❌");
+function joinQueue() {
+    // 1. Cek apakah ada slot kosong
+    slotsRef.get().then(snap => {
+        const slotsData = snap.docs.map(doc => doc.data());
+        const occupiedCount = slotsData.filter(s => s.plat !== null).length;
+        
+        if (occupiedCount < SLOTS_COUNT) {
+            // Ada slot kosong, pindah ke slot
+            const firstEmptyIndex = Array.from({ length: SLOTS_COUNT }, (_, i) => i).find(i => !slotsData.find(s => s.index === i));
+            
+            showModal("Slot Tersedia", `Slot ${firstEmptyIndex + 1} tersedia. Anda akan masuk ke Slot ${firstEmptyIndex + 1}.`, "confirm", () => {
+                moveToSlot(firstEmptyIndex, 'user_join');
+            });
+            return;
+        }
+
+        // 2. Jika slot penuh, gabung antrian
+        queueRef.get().then(qSnap => {
+            const queueLength = qSnap.size;
+            if (queueLength >= SLOTS_COUNT * 2) {
+                showModal("Antrian Penuh", "Antrian sudah terlalu panjang. Coba lagi nanti.", "error");
+                return;
+            }
+            
+            const newQueueItem = {
+                plat: currentUser.plat,
+                name: currentUser.nama,
+                timestamp: Date.now(),
+                order: queueLength + 1
+            };
+
+            queueRef.add(newQueueItem).then(docRef => {
+                showModal("Antrian Berhasil", `Anda berada di antrian ke ${queueLength + 1}. Mohon tunggu notifikasi slot tersedia.`, "success");
+            }).catch(e => showModal("Error", "Gagal bergabung antrian: " + e.message, "error"));
+        });
     });
 }
 
-function changeMonth(n) {
-    currentMonth += n;
-    if(currentMonth > 11) { currentMonth=0; currentYear++; }
-    else if(currentMonth < 0) { currentMonth=11; currentYear--; }
-    renderCalendar();
+function confirmLeave() {
+    showModal("Konfirmasi", "Anda yakin ingin keluar dari Slot/Antrian?", "confirm", leaveQueue);
 }
+
+function leaveQueue() {
+    if (myActiveSlotIndex !== -1) {
+        // Keluar dari Slot
+        emptySlot(myActiveSlotIndex, true);
+    } else if (myActiveQueueId !== null) {
+        // Keluar dari Antrian
+        queueRef.doc(myActiveQueueId).delete().then(() => {
+            myActiveQueueId = null;
+            showModal("Keluar Sukses", "Berhasil keluar dari antrian.", "success");
+        }).catch(e => showModal("Error", "Gagal keluar antrian: " + e.message, "error"));
+    }
+}
+
+// Function to put motorcycle into a slot (Used by User and Admin)
+function moveToSlot(slotIndex, source = 'admin') {
+    const newSlotData = {
+        index: slotIndex,
+        plat: currentUser.plat,
+        name: currentUser.nama,
+        charging: source === 'user_join' ? true : false, // User yang join slot langsung charging
+        timestamp: Date.now()
+    };
+
+    slotsRef.doc('slot_' + slotIndex).set(newSlotData).then(() => {
+        // Jika asalnya dari queue, hapus dari queue
+        if (myActiveQueueId !== null) {
+             queueRef.doc(myActiveQueueId).delete().then(() => { myActiveQueueId = null; });
+        }
+        showModal("Masuk Slot Sukses", `Motor Anda masuk Slot ${slotIndex + 1}. Charging: ${newSlotData.charging ? 'Aktif' : 'Standby'}.`, "success");
+    }).catch(e => showModal("Error", "Gagal masuk slot: " + e.message, "error"));
+}
+
+// Function to empty a slot (Used by User and Admin)
+function emptySlot(slotIndex, isUserLeaving = false) {
+    const emptyData = {
+        index: slotIndex,
+        plat: null,
+        name: null,
+        charging: false,
+        timestamp: null
+    };
+
+    slotsRef.doc('slot_' + slotIndex).set(emptyData).then(() => {
+        if (isUserLeaving) {
+            myActiveSlotIndex = -1;
+            stopAlarmIfRunning();
+        }
+        
+        // Cek antrian, jika ada, pindahkan antrian pertama ke slot kosong ini.
+        queueRef.orderBy('timestamp').limit(1).get().then(snap => {
+            if (!snap.empty) {
+                const nextInQueue = snap.docs[0];
+                const data = nextInQueue.data();
+                
+                // NOTIFIKASI OTOMATIS KE USER ANTRIAN BERIKUTNYA
+                // Di sini Anda perlu sistem notifikasi yang kompleks (FCM)
+                // Untuk sementara, kita hanya jalankan fungsi move otomatis
+                
+                // Pindah ke slot baru
+                slotsRef.doc('slot_' + slotIndex).set({
+                    index: slotIndex,
+                    plat: data.plat,
+                    name: data.name,
+                    charging: false,
+                    timestamp: Date.now()
+                }).then(() => {
+                    nextInQueue.ref.delete(); // Hapus dari antrian
+                    if (isUserLeaving) {
+                         showModal("Slot Kosong", `Slot ${slotIndex + 1} dikosongkan. Antrian berikutnya masuk slot.`, "success");
+                    }
+                });
+            } else if (isUserLeaving) {
+                showModal("Slot Kosong", `Slot ${slot + 1} dikosongkan. Antrian kosong.`, "success");
+            }
+        });
+    }).catch(e => showModal("Error", "Gagal mengosongkan slot: " + e.message, "error"));
+}
+
+// =======================================================
+// === ADMIN ACTIONS (POIN 4) ===
+// =======================================================
+
+function adminLogin() {
+    const pass = document.getElementById('adminPass').value;
+    const adminCode = "MAKAADMIN123"; // GANTI DENGAN KODE RAHASIA ANDA
+
+    if (pass === adminCode) {
+        isAdmin = true;
+        setLocal('maka_is_admin', 'true');
+        document.getElementById('adminStatus').innerText = "✅ Admin Aktif";
+        document.getElementById('adminStatus').style.color = var('--success');
+        document.getElementById('adminLoginSection').style.display = 'none';
+        document.getElementById('adminControlsGlobal').style.display = 'flex';
+        renderListeners(); // Render ulang untuk menampilkan tombol admin
+    } else {
+        showModal("Gagal Login", "Passcode Admin salah.", "error");
+    }
+}
+
+// Global Reset
+function confirmResetQueue() {
+    showModal("⚠️ Reset Antrian", "Yakin ingin MENGHAPUS SEMUA motor di DAFTAR ANTRIAN? Slot Charging TIDAK akan di-reset.", "confirm", resetQueue);
+}
+function resetQueue() {
+    queueRef.get().then(snap => {
+        const batch = db.batch();
+        snap.docs.forEach(doc => batch.delete(doc.ref));
+        return batch.commit();
+    }).then(() => {
+        showModal("Reset Sukses", "Semua antrian telah dihapus.", "success");
+    }).catch(e => showModal("Error", "Gagal reset antrian: " + e.message, "error"));
+}
+
+// Slot Controls
+function adminStartCharging(slotIndex) {
+    slotsRef.doc('slot_' + slotIndex).update({ charging: true }).then(() => {
+        showModal("Sukses", `Slot ${slotIndex + 1} mulai charging.`, "success");
+    }).catch(e => showModal("Error", "Gagal mulai charging: " + e.message, "error"));
+}
+
+function adminStopCharging(slotIndex) {
+    slotsRef.doc('slot_' + slotIndex).update({ charging: false }).then(() => {
+        showModal("Sukses", `Slot ${slotIndex + 1} berhenti charging (Standby).`, "success");
+    }).catch(e => showModal("Error", "Gagal stop charging: " + e.message, "error"));
+}
+
+// Queue Controls - Delete
+function confirmDelete(type, id) {
+    showModal("⚠️ Hapus Motor", `Yakin ingin menghapus motor ini dari ${type === 'slot' ? 'Slot ' + (id + 1) : 'Antrian'}?`, "confirm", () => {
+        if (type === 'slot') { emptySlot(id); } // Gunakan emptySlot untuk Slot
+        else if (type === 'queue') { queueRef.doc(id).delete().then(() => showModal("Sukses", "Antrian dihapus.", "success")); }
+    });
+}
+
+// Queue Controls - Move
+function confirmMoveToSlot(queueId, slotIndex) {
+    showModal("Konfirmasi Pindah", `Pindahkan motor antrian ke Slot ${slotIndex + 1}?`, "confirm", () => {
+        queueRef.doc(queueId).get().then(doc => {
+            const data = doc.data();
+            const newSlotData = {
+                index: slotIndex,
+                plat: data.plat,
+                name: data.name,
+                charging: true,
+                timestamp: Date.now()
+            };
+            
+            // 1. Tulis ke Slot
+            slotsRef.doc('slot_' + slotIndex).set(newSlotData).then(() => {
+                // 2. Hapus dari Antrian
+                doc.ref.delete().then(() => {
+                    showModal("Pindah Sukses", `Motor ${data.plat} dipindah ke Slot ${slotIndex + 1} dan mulai charging.`, "success");
+                });
+            });
+        }).catch(e => showModal("Error", "Gagal memindahkan: " + e.message, "error"));
+    });
+}
+
+// =======================================================
+// === ALARM & MODAL ===
+// =======================================================
+
+function startAlarm(text) {
+    if (alarmAudio.paused) {
+        keepAliveAudio.pause(); // Matikan keep alive
+        alarmAudio.play(); 
+        document.getElementById('alarmText').innerText = text;
+        document.getElementById('alarmScreen').style.display='flex';
+        if(navigator.vibrate) navigator.vibrate([1000,500,1000]);
+        // Tampilkan notifikasi (standar browser)
+        if(Notification.permission==="granted") new Notification("SELESAI!", {body:text, tag:"alarm", icon:"/makarental/icon-512.png"});
+    }
+}
+
+function stopAlarmIfRunning() {
+    if (!alarmAudio.paused) {
+        stopAlarmAndClear();
+    }
+}
+
+// STOP ALARM & AUTO-CLEAR SLOT
+function stopAlarmAndClear() {
+    alarmAudio.pause(); 
+    alarmAudio.currentTime=0;
+    document.getElementById('alarmScreen').style.display='none';
+    keepAliveAudio.play(); // Balik ke mode standby
+    
+    // Auto kosongkan slot milik user
+    if (myActiveSlotIndex !== -1) {
+        emptySlot(myActiveSlotIndex, true); // True untuk isUserLeaving=true
+        myActiveSlotIndex = -1;
+    }
+}
+
+// HELPER MODAL
+function showModal(title, desc, type="info", onConfirm) {
+    document.getElementById('mTitle').innerText = title;
+    document.getElementById('mDesc').innerHTML = desc;
+    
+    let icon = "ⓘ";
+    let btnHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK</button>`;
+
+    if (type === "confirm") {
+        icon = "❓";
+        btnHTML = `
+            <button class="btn-modal" onclick="closeModal()" style="background:#eee;color:#555">Batal</button>
+            <button class="btn-modal btn-confirm" style="background:var(--danger);color:white" onclick="closeModal(); ${onConfirm.name}()">${onConfirm.name.includes('Delete') || onConfirm.name.includes('Reset') ? 'YA, HAPUS' : 'YA, LANJUT'}</button>
+        `;
+    } else if (type === "success") {
+        icon = "✅";
+    } else if (type === "error") {
+        icon = "❌";
+    } else if (type === "warning") {
+        icon = "⚠️";
+    }
+
+    document.getElementById('mIcon').innerText = icon;
+    document.getElementById('mBtns').innerHTML = btnHTML;
+    document.getElementById('customModal').classList.add('show');
+}
+function closeModal() { document.getElementById('customModal').classList.remove('show'); }
+
+// =======================================================
+// === FIREBASE LISTENERS & INIT ===
+// =======================================================
+
+function renderListeners() {
+    // 1. Cek Admin Status
+    isAdmin = getLocal('maka_is_admin') === 'true';
+    if(isAdmin) {
+        document.getElementById('adminStatus').innerText = "✅ Admin Aktif";
+        document.getElementById('adminStatus').style.color = var('--success');
+        document.getElementById('adminLoginSection').style.display = 'none';
+        document.getElementById('adminControlsGlobal').style.display = 'flex';
+    }
+
+    // 2. Load Slot & Queue Data (Listener Real-time)
+    slotsRef.onSnapshot(slotsSnap => {
+        const slotsData = slotsSnap.docs.map(doc => doc.data());
+        
+        queueRef.orderBy('timestamp').onSnapshot(queueSnap => {
+            const queueData = queueSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            renderSlots(slotsData, queueData);
+            renderQueue(queueData);
+            
+            // Cek apakah antrian pertama bisa masuk slot kosong
+            // Ini untuk Admin/Sistem Otomatis (di luar lingkup user)
+        });
+    }, error => console.error("Error fetching slots:", error));
+    
+    // 3. Keep Alive Audio
+    keepAliveAudio.play().catch(e => console.log('Keep Alive Blocked:', e));
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    if(!currentUser) { window.location.href='index.html'; return; }
+    
+    // Minta izin Notifikasi (agar bisa tampil di PWA)
+    if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+        Notification.requestPermission();
+    }
+    
+    renderListeners();
+});
 </script>
 </body>
 </html>
