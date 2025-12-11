@@ -203,7 +203,7 @@ let currentMonth = new Date().getMonth();
 let paidDates = []; 
 let isInitialized = false;
 
-// FIX: Initialize App Function
+// FIX: Initialization function untuk mengatasi White Screen saat kembali
 function initializeApp() {
     if (!isInitialized) {
         try {
@@ -328,7 +328,6 @@ function renderCalendar() {
 
     for(let i=0; i<firstDay; i++) grid.innerHTML += `<div class="date-cell empty"></div>`;
     
-    // Gunakan Document Fragment untuk performa
     const fragment = document.createDocumentFragment();
 
     for(let d=1; d<=daysInMonth; d++) {
