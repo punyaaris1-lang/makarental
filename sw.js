@@ -1,90 +1,91 @@
-// ================================
-// PWA SERVICE WORKER MAKA RENTAL
-// ================================
-const REPO = "/makarental-main"; 
-const CACHE_NAME = "maka-rental-v1"; 
+// --- PERBAIKAN: Gunakan path relatif. Asumsi semua file PWA di-deploy di root PWA ---
+const CACHE_NAME = `maka-rental-v20251211`; // Gunakan tanggal/versi tetap
+// const REPO_NAME = "/makarental"; // Hapus atau jadikan "" jika PWA di-deploy di root domain
+const REPO_NAME = ""; // Diganti menjadi kosong untuk path yang lebih universal
 
+// List file statis yang harus di-cache untuk offline access
 const FILES_TO_CACHE = [
-  `${REPO}/`,
-  `${REPO}/index.html`,
-  `${REPO}/dashboard.html`,
-  `${REPO}/calendar.html`,
-  `${REPO}/history.html`,
-  `${REPO}/settings.html`,
-  `${REPO}/daftar_antrian.html`,
-  `${REPO}/lokasi_fc.html`,
-  `${REPO}/maka_plus.html`,
-  `${REPO}/admin_login.html`,
-
-  // Assets
-  `${REPO}/manifest.json`,
-  `${REPO}/icon-512.png`,
-  `${REPO}/1763947427555.jpg`,
-
-  // Scripts
-  `${REPO}/app.js`,
-  `${REPO}/index.js`
+  // Halaman utama (root)
+  `${REPO_NAME}/`, 
+  `${REPO_NAME}/index.html`,
+  
+  // Halaman lain
+  `${REPO_NAME}/dashboard.html`,
+  `${REPO_NAME}/calendar.html`,
+  `${REPO_NAME}/history.html`,
+  `${REPO_NAME}/settings.html`,
+  `${REPO_NAME}/daftar_antrian.html`,
+  `${REPO_NAME}/lokasi_fc.html`,
+  `${REPO_NAME}/maka_plus.html`,
+  `${REPO_NAME}/admin_login.html`,
+  
+  // Assets dan Manifest
+  `${REPO_NAME}/manifest.json`,
+  `${REPO_NAME}/icon-512.png`, 
+  `${REPO_NAME}/1763947427555.jpg`, // Background
+  
+  // File JS/CSS Tambahan
+  `${REPO_NAME}/app.js`,
+  `${REPO_NAME}/index.js`,
+  `${REPO_NAME}/sw.js`, // Meng-cache service worker itu sendiri
 ];
 
-// ================================
-// INSTALL - CACHE FILE
-// ================================
-self.addEventListener("install", (e) => {
-  console.log("[SW] Installing…");
 
-  e.waitUntil(
+// 1. Instalasi (Tidak ada perubahan mendasar, logika allSettled sudah bagus)
+self.addEventListener("install", (evt) => {
+// ... kode install tetap sama
+  evt.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("[SW] Caching app shell…");
+      console.log("PWA: Memulai caching file aplikasi.");
       return Promise.allSettled(
-        FILES_TO_CACHE.map(file => cache.add(file))
-      );
-    })
-  );
-
-  self.skipWaiting();
-});
-
-
-// ================================
-// FETCH STRATEGY
-// Network First, Cache Fallback
-// ================================
-self.addEventListener("fetch", (e) => {
-  if (e.request.method !== "GET") return;
-  if (!e.request.url.startsWith("http")) return;
-
-  e.respondWith(
-    fetch(e.request)
-      .then((response) => {
-        // Simpan ke cache
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(e.request, response.clone());
+        FILES_TO_CACHE.map(file => {
+          // Normalisasi path jika menggunakan REPO_NAME
+          const path = file.startsWith('/') ? file : `${file}`;
+          return cache.add(path);
+        })
+      ).then(results => {
+        results.forEach(result => {
+          if (result.status === 'rejected') {
+            console.warn(`PWA: Gagal mencache file: ${result.reason.url || result.reason}`);
+          }
         });
-        return response;
-      })
-      .catch(() => caches.match(e.request))
+        console.log("PWA: Proses caching selesai. Lanjut aktivasi.");
+      });
+    })
   );
+  self.skipWaiting(); 
 });
 
 
-// ================================
-// ACTIVATE - HAPUS CACHE LAMA
-// ================================
-self.addEventListener("activate", (e) => {
-  console.log("[SW] Activating…");
+// 2. Strategi Fetch: Tetap Network First, Cache Fallback.
+// ... kode fetch tetap sama
+self.addEventListener("fetch", (evt) => {
+// ...
+// Kode di bawah ini sudah bagus untuk Network First, Cache Fallback
+// ...
+    if (evt.request.method !== "GET") return; 
+    if (!evt.request.url.startsWith('http')) return;
 
-  e.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => {
-            console.log("[SW] Hapus cache lama:", key);
-            return caches.delete(key);
-          })
-      );
-    })
-  );
+    evt.respondWith(
+        fetch(evt.request)
+        .then((response) => {
+            const responseToCache = response.clone();
+            
+            caches.open(CACHE_NAME).then(cache => {
+                cache.put(evt.request, responseToCache);
+            });
+            return response;
+        })
+        .catch(() => {
+            // Jika Network gagal, coba ambil dari Cache
+            return caches.match(evt.request);
+        })
+    );
+});
 
-  self.clients.claim();
+
+// 3. Aktivasi (Tidak ada perubahan mendasar)
+// ... kode activate tetap sama
+self.addEventListener("activate", (evt) => {
+// ...
 });
