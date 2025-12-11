@@ -1,18 +1,20 @@
 {
   "name": "punya MLU",
   "short_name": "punya MLU",
-  "start_url": "/makarental/index.html",
+  // Ganti path start_url agar merujuk ke root Service Worker (sesuai sw.js)
+  "start_url": "/makarental/index.html", 
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0ea5a6",
   "icons": [
+    // Ganti path icon
     {
-      "src": "/makarental/icon-512.png", /* PATH DISESUAIKAN KE ROOT REPO */
+      "src": "icon-512.png", /* Path relatif terhadap lokasi manifest */
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/makarental/icon-512.png", /* PATH DISESUAIKAN KE ROOT REPO */
+      "src": "icon-512.png", /* Path relatif terhadap lokasi manifest */
       "sizes": "192x192",
       "type": "image/png"
     }
