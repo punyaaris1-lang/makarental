@@ -1,98 +1,90 @@
-// Menggunakan timestamp untuk versi cache yang unik dan selalu baru
-const CACHE_NAME = `maka-rental-${Date.now()}`; 
-const REPO_NAME = "/makarental"; // Pastikan nama repositori Anda benar!
+// ================================
+// PWA SERVICE WORKER MAKA RENTAL
+// ================================
+const REPO = "/makarental-main"; 
+const CACHE_NAME = "maka-rental-v1"; 
 
-// List file statis yang harus di-cache untuk offline access
 const FILES_TO_CACHE = [
-  `${REPO_NAME}/`,
-  `${REPO_NAME}/index.html`,
-  `${REPO_NAME}/dashboard.html`,
-  `${REPO_NAME}/calendar.html`,
-  `${REPO_NAME}/history.html`,
-  `${REPO_NAME}/settings.html`,
-  `${REPO_NAME}/daftar_antrian.html`,
-  `${REPO_NAME}/lokasi_fc.html`,
-  `${REPO_NAME}/maka_plus.html`,
-  `${REPO_NAME}/admin_login.html`,
-  
-  // Assets dan Manifest
-  `${REPO_NAME}/manifest.json`,
-  `${REPO_NAME}/icon-512.png`, // Asumsi ikon di root repo
-  `${REPO_NAME}/1763947427555.jpg`, // Background
-  
-  // File JS/CSS Tambahan (Contoh dari folder Anda)
-  `${REPO_NAME}/app.js`,
-  `${REPO_NAME}/index.js`,
+  `${REPO}/`,
+  `${REPO}/index.html`,
+  `${REPO}/dashboard.html`,
+  `${REPO}/calendar.html`,
+  `${REPO}/history.html`,
+  `${REPO}/settings.html`,
+  `${REPO}/daftar_antrian.html`,
+  `${REPO}/lokasi_fc.html`,
+  `${REPO}/maka_plus.html`,
+  `${REPO}/admin_login.html`,
+
+  // Assets
+  `${REPO}/manifest.json`,
+  `${REPO}/icon-512.png`,
+  `${REPO}/1763947427555.jpg`,
+
+  // Scripts
+  `${REPO}/app.js`,
+  `${REPO}/index.js`
 ];
 
+// ================================
+// INSTALL - CACHE FILE
+// ================================
+self.addEventListener("install", (e) => {
+  console.log("[SW] Installing…");
 
-// 1. Instalasi: Menggunakan Promise.allSettled untuk mencegah instalasi total gagal
-self.addEventListener("install", (evt) => {
-  evt.waitUntil(
+  e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("PWA: Memulai caching file aplikasi.");
-      
-      // Menggunakan allSettled: 1 file gagal, file lain tetap masuk
+      console.log("[SW] Caching app shell…");
       return Promise.allSettled(
         FILES_TO_CACHE.map(file => cache.add(file))
-      ).then(results => {
-        results.forEach(result => {
-          if (result.status === 'rejected') {
-            console.warn(`PWA: Gagal mencache file: ${result.reason.url}`);
-          }
-        });
-        console.log("PWA: Proses caching selesai. Lanjut aktivasi.");
-      });
-    })
-  );
-  self.skipWaiting(); 
-});
-
-
-// 2. Strategi Fetch: Network First, Cache Fallback (Solusi ANTI OFFLINE PALSU)
-self.addEventListener("fetch", (evt) => {
-    // Abaikan permintaan yang tidak menggunakan GET (seperti POST ke API)
-    if (evt.request.method !== "GET") return; 
-    
-    // ABAIKAN jika request bukan HTTP/HTTPS (Misalnya Chrome extension)
-    if (!evt.request.url.startsWith('http')) return;
-
-    evt.respondWith(
-        // 1. Coba ambil dari Network (Internet) DULU
-        fetch(evt.request)
-        .then((response) => {
-            // Jika network berhasil, kembalikan response.
-            // Kita kloning response agar bisa disimpan ke cache tanpa merusak yang asli.
-            const responseToCache = response.clone();
-            
-            // Simpan response yang sukses ke cache untuk update versi
-            caches.open(CACHE_NAME).then(cache => {
-                cache.put(evt.request, responseToCache);
-            });
-            return response;
-        })
-        .catch(() => {
-            // 2. Jika Network gagal (offline), coba ambil dari Cache
-            return caches.match(evt.request);
-        })
-    );
-});
-
-
-// 3. Aktivasi: Menghapus cache lama (Script sudah benar)
-self.addEventListener("activate", (evt) => {
-  evt.waitUntil(
-    caches.keys().then((keyList) => {
-      return Promise.all(
-        keyList.map((key) => {
-          // Hanya hapus cache yang bukan versi terbaru
-          if (key !== CACHE_NAME) {
-            console.log('PWA: Menghapus cache lama:', key);
-            return caches.delete(key);
-          }
-        })
       );
     })
   );
+
+  self.skipWaiting();
+});
+
+
+// ================================
+// FETCH STRATEGY
+// Network First, Cache Fallback
+// ================================
+self.addEventListener("fetch", (e) => {
+  if (e.request.method !== "GET") return;
+  if (!e.request.url.startsWith("http")) return;
+
+  e.respondWith(
+    fetch(e.request)
+      .then((response) => {
+        // Simpan ke cache
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(e.request, response.clone());
+        });
+        return response;
+      })
+      .catch(() => caches.match(e.request))
+  );
+});
+
+
+// ================================
+// ACTIVATE - HAPUS CACHE LAMA
+// ================================
+self.addEventListener("activate", (e) => {
+  console.log("[SW] Activating…");
+
+  e.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => {
+            console.log("[SW] Hapus cache lama:", key);
+            return caches.delete(key);
+          })
+      );
+    })
+  );
+
   self.clients.claim();
 });
