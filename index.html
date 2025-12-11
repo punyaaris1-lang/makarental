@@ -8,9 +8,8 @@
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<link rel="manifest" href="/makarental/manifest.json">
-
+<link rel="manifest" href="/makarental/manifest.json"> 
+    
 <style>
 /* GLOBAL THEME */
 :root { 
@@ -42,9 +41,9 @@ body::before {
 .app-container { 
     width:100%; max-width:460px; margin: 0 auto;
     padding:24px; 
-    padding-top: 0; /* Biar nempel ke atas */
-    padding-bottom: 300px; /* AGGRESSIVE PADDING agar pasti bisa di-scroll */
-    min-height: 100vh; /* Agar tinggi minimalnya 100% */
+    padding-top: 0; 
+    padding-bottom: 300px; 
+    min-height: 100vh; 
 }
 
 /* CARD LOGIN */
@@ -55,20 +54,22 @@ body::before {
     box-shadow:var(--glass-shadow); border:1px solid var(--glass-border); 
 }
 
-/* JUDUL BARU (FONT KECIL & SATU BARIS) */
+/* JUDUL BARU (FONT KECIL & BERSIH) */
 .brand-title { 
-    font-family:'Syne', sans-serif; 
-    font-size:1.6em; /* Dikecilkan */
-    font-weight:800; 
+    font-family:'Inter', sans-serif; /* Mengubah font ke Inter/standar */
+    font-size:1.4em; /* Dikecilkan */
+    font-weight:900; /* Ditebalkan */
     text-align:center; margin:0 0 4px; color: var(--text);
-    letter-spacing: -1px;
+    letter-spacing: 0.5px;
     white-space: nowrap; 
 }
 .brand-subtitle { 
-    color:#64748b; font-size:0.85em; 
+    color:#64748b; 
+    font-size:0.8em; /* Dikecilkan */
     text-align:center; 
     margin-bottom:20px; 
     font-weight: 500; 
+    opacity: 0.8;
 }
 
 /* TABS */
@@ -176,8 +177,7 @@ input:focus { border-color: var(--accent); background: white; }
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      // PATH SW.JS TETAP MENGGUNAKAN RELATIF KARENA REGISTRASI SELALU DARI ROOT
-      navigator.serviceWorker.register('./sw.js') 
+      navigator.serviceWorker.register('./sw.js')
         .then(reg => console.log('PWA Ready', reg))
         .catch(err => console.log('PWA Error', err));
     });
@@ -194,8 +194,27 @@ const firebaseConfig = {
   messagingSenderId: "472036722228",
   appId: "1:472036722228:web:11d520f9204db317d02c61"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+
+let db;
+let isInitialized = false;
+
+// FIX: Initialization function untuk mengatasi White Screen saat kembali
+function initializeApp() {
+    if (!isInitialized) {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            isInitialized = true;
+        } catch (e) {
+            if (e.code !== 'app/duplicate-app') {
+                console.error("Firebase init error:", e);
+                return;
+            }
+        }
+    }
+}
+document.addEventListener("DOMContentLoaded", initializeApp);
+
 
 // --- MODAL LOGIC ---
 function showModal(title, msg, type="info") {
@@ -217,6 +236,8 @@ function switchTab(mode) {
 }
 
 function handleRegister() {
+  if (!db) return showModal("Error", "Koneksi database belum siap.", "error");
+
   const nama = document.getElementById('r-nama').value.trim();
   const hp = document.getElementById('r-hp').value.trim();
   const plat = document.getElementById('r-plat').value.trim().toUpperCase();
@@ -238,7 +259,7 @@ function handleRegister() {
     } else {
       const userData = {
         nama: nama, hp: hp, plat: plat, tglAmbil: tgl, dp: dp,
-        joinedAt: new Date(tgl).toISOString(), // Menggunakan tanggal ambil motor sebagai joinedAt
+        joinedAt: new Date(tgl).toISOString(), 
         isBanned: false,
         makaPlus: { active:false, activatedAt:null }
       };
@@ -250,21 +271,16 @@ function handleRegister() {
       });
     }
   }).catch((error) => {
+    // FIX: Pesan Gagal koneksi/daftar
     console.error("Error:", error);
-    // PERBAIKAN ERROR HANDLING KONEKSI
-    if (error.code && error.code.includes('unavailable')) {
-        showModal("Gagal Koneksi", "Gagal menghubungi server Firebase. Periksa koneksi internet Anda.", "error");
-    } else if (error.code && error.code.includes('not-found')) {
-        showModal("Database Error", "Database belum dibuat. Admin: Harap buat database Firestore di Console Firebase.", "error");
-    } else {
-        showModal("Gagal", "Terjadi kesalahan. Cek internet Anda.", "error");
-    }
-    // END PERBAIKAN
+    showModal("Gagal", "Terjadi kesalahan saat koneksi database. Cek Rules Firebase Anda.", "error");
     btn.disabled = false; btn.innerText = "DAFTAR SEKARANG";
   });
 }
 
 function handleLogin() {
+  if (!db) return showModal("Error", "Koneksi database belum siap.", "error");
+
   const plat = document.getElementById('l-plat').value.trim().toUpperCase();
   const btn = document.getElementById('btnLogin');
   
@@ -287,16 +303,9 @@ function handleLogin() {
       btn.disabled = false; btn.innerText = "MASUK APLIKASI";
     }
   }).catch((error) => {
+    // FIX: Pesan Gagal koneksi/login
     console.error("Error:", error);
-    // PERBAIKAN ERROR HANDLING KONEKSI
-    if (error.code && error.code.includes('unavailable')) {
-        showModal("Gagal Koneksi", "Gagal menghubungi server Firebase. Periksa koneksi internet Anda.", "error");
-    } else if (error.code && error.code.includes('not-found')) {
-        showModal("Database Error", "Database belum dibuat di Firebase Console.", "error");
-    } else {
-        showModal("Gagal", "Terjadi kesalahan. Cek internet Anda.", "error");
-    }
-    // END PERBAIKAN
+    showModal("Gagal", "Terjadi kesalahan saat koneksi database. Cek Rules Firebase Anda.", "error");
     btn.disabled = false; btn.innerText = "MASUK APLIKASI";
   });
 }
