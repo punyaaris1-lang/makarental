@@ -235,7 +235,7 @@ const db = firebase.firestore();
 const SLOTS_COUNT = 3; 
 const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
 const MAX_DIST = 0.2; // 200 meter dalam KM
-const ADMIN_PASSCODE = 'MAKAADMIN123'; // Admin PIN
+const ADMIN_PASSCODE = '1131'; // Admin PIN
 let isAdmin = false;
 let userLat=null;
 let userLng=null;
@@ -313,9 +313,6 @@ function initFirebase() {
     
     if(currentUser && currentUser.plat) {
         document.getElementById('uPlat').value = currentUser.plat;
-    }
-    if(!currentUser || !currentUser.plat) { 
-        // Lanjutkan tanpa redirect
     }
     
     if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ userLat=p.coords.latitude; userLng=p.coords.longitude; }, e=>{}, {enableHighAccuracy:true});
@@ -398,6 +395,7 @@ function renderSlots(slots, myPlat) {
         
         // User controls (di bawah timer/status)
         if (isMySlot && isOccupied) {
+            // PERBAIKAN: Gunakan fungsi bind untuk meneruskan argumen ke confirmEmptySlot
             controls = `<button class="ctrl-btn btn-red" onclick="confirmEmptySlot(${i}, true)">⏹️ SAYA SUDAH CABUT</button>`;
         }
         
@@ -409,6 +407,7 @@ function renderSlots(slots, myPlat) {
                     ? `<button class="adm-mini btn-red" onclick="adminStopCharging(${i})">STOP</button>`
                     : `<button class="adm-mini btn-green" onclick="adminStartCharging(${i})">START</button>`;
             }
+            // PERBAIKAN: Gunakan fungsi bind untuk meneruskan argumen ke confirmEmptySlot
             controls += `
                 <div class="slot-admin-controls">
                     ${isOccupied ? btnAdmin : ''}
@@ -533,7 +532,8 @@ document.getElementById('btnDaftar').onclick = () => {
     }).then(() => {
         localStorage.setItem('myPlat', p);
         localStorage.setItem('monitoring_active', 'true');
-        keepAliveAudio.play().catch(e=>console.log("Audio blocked", e));
+        // PERBAIKAN: Panggil fungsi unblock audio di sini
+        unblockAudio();
         btn.innerText = "MONITORING AKTIF";
         showModal("Berhasil Masuk", "<b>Monitoring Aktif!</b><br>Audio 'Hujan Pelan' diputar agar browser tidak tidur.", '✅');
         
@@ -541,9 +541,24 @@ document.getElementById('btnDaftar').onclick = () => {
         let errorMsg = typeof e === 'string' ? e : "Gagal Pendaftaran. Cek koneksi Anda.";
         if(e.code && e.code.includes('unavailable')) errorMsg = "Koneksi ke server Firebase gagal. Periksa internet Anda.";
         showModal("Gagal", errorMsg, '❌'); 
-        btn.disabled=false; document.getElementById('btnDaftar').innerText="DAFTAR & AKTIFKAN MONITORING"; // PERBAIKAN: Reset tombol
+        btn.disabled=false; document.getElementById('btnDaftar').innerText="DAFTAR & AKTIFKAN MONITORING"; 
     });
 };
+
+
+// --- AUDIO PERBAIKAN ---
+let audioUnblocked = false;
+function unblockAudio() {
+    if (!audioUnblocked) {
+        keepAliveAudio.play().catch(e => console.log("Keep Alive Blocked:", e));
+        audioUnblocked = true;
+    }
+}
+
+// Tambahkan listener untuk membuka blokir audio saat ada interaksi pertama
+document.addEventListener('click', unblockAudio, { once: true });
+document.addEventListener('touchstart', unblockAudio, { once: true });
+// --- END AUDIO PERBAIKAN ---
 
 
 // --- ADMIN/USER COMMON ACTIONS ---
@@ -572,17 +587,19 @@ function emptySlot(i, isUserLeaving) {
             localStorage.removeItem('monitoring_active');
             keepAliveAudio.pause();
         }
-        document.getElementById('btnDaftar').disabled=false; // PERBAIKAN: Reset tombol daftar
+        document.getElementById('btnDaftar').disabled=false; // Reset tombol daftar
         document.getElementById('btnDaftar').innerText="DAFTAR & AKTIFKAN MONITORING";
     }).catch(e => showModal("Error", "Gagal mengosongkan slot: " + e.message, '❌'));
 }
 
 function confirmEmptySlot(i, isUserLeaving) {
      if (isUserLeaving) {
-        // PERBAIKAN: Gunakan showModal untuk konfirmasi
-        showModal("Konfirmasi", "Yakin ingin mencabut motor dan mengosongkan Slot?", "confirm", emptySlot.bind(null, i, true));
+        // PERBAIKAN: Panggil fungsi showModal dengan nama fungsi callback yang disiapkan
+        showModal("Konfirmasi", "Yakin ingin mencabut motor dan mengosongkan Slot?", "confirm", 'processConfirmEmptySlot');
+        window.processConfirmEmptySlot = function() { emptySlot(i, true); };
      } else {
-        showModal("Konfirmasi Admin", "Yakin ingin mengosongkan Slot ini secara paksa?", "confirm", emptySlot.bind(null, i, false));
+        showModal("Konfirmasi Admin", "Yakin ingin mengosongkan Slot ini secara paksa?", "confirm", 'processConfirmEmptySlotAdmin');
+        window.processConfirmEmptySlotAdmin = function() { emptySlot(i, false); };
      }
 }
 
@@ -612,7 +629,7 @@ function loginAdmin() {
     }
 }
 function confirmResetAll() {
-    showModal("⚠️ RESET TOTAL", "Anda yakin ingin MENGHAPUS SEMUA DATA SLOT DAN ANTRIAN? Tindakan ini tidak bisa dibatalkan.", "confirm", resetAllData);
+    showModal("⚠️ RESET TOTAL", "Anda yakin ingin MENGHAPUS SEMUA DATA SLOT DAN ANTRIAN? Tindakan ini tidak bisa dibatalkan.", "confirm", 'resetAllData');
 }
 
 function resetAllData() {
@@ -656,7 +673,8 @@ function adminMoveToSlot(queueId, slotIndex) {
 }
 
 function confirmDeleteQueue(queueId) {
-    showModal("Konfirmasi Hapus", "Yakin ingin menghapus antrian ini?", "confirm", () => {
+    showModal("Konfirmasi Hapus", "Yakin ingin menghapus antrian ini?", "confirm", 'processDeleteQueue');
+    window.processDeleteQueue = function() {
         db.runTransaction(async t => {
             const d = (await t.get(refAntrian)).data() || {};
             let q = d.waitingQueue || [];
@@ -664,7 +682,7 @@ function confirmDeleteQueue(queueId) {
             t.set(refAntrian, d, {merge:true});
         }).then(() => showModal("Sukses", "Antrian dihapus.", '✅'))
         .catch(e => showModal("Error", "Gagal hapus antrian: " + e.message, '❌'));
-    });
+    };
 }
 
 // --- ALARM & MODAL ---
@@ -700,30 +718,12 @@ function showModal(title, desc, icon="🔔", onConfirm) {
     const btns = document.getElementById('mBtns');
     if (icon === "confirm" && onConfirm) {
         // Logika untuk konfirmasi (YES/NO)
-        // PERBAIKAN: Bind fungsi callback ke tombol 'YA, LANJUT'
+        const funcName = onConfirm; // Ini adalah string nama fungsi callback
+
         btns.innerHTML = `
             <button class="btn-modal btn-cancel" onclick="closeModal()">Batal</button>
-            <button class="btn-modal btn-confirm" style="background:var(--danger);" onclick="closeModal(); ${onConfirm.name}(${onConfirm.arguments ? JSON.stringify(onConfirm.arguments) : ''})">YA, LANJUT</button>
+            <button class="btn-modal btn-confirm" style="background:var(--danger);" onclick="closeModal(); ${funcName}()">YA, LANJUT</button>
         `;
-        // Catatan: Karena fungsi callback tidak menggunakan argument di HTML, saya akan menggunakan .name saja.
-        // Fungsi seperti confirmEmptySlot(i, isUserLeaving) harus dipanggil secara manual jika perlu argumen.
-        // Namun, kita akan pertahankan cara lama (onConfirm.name) untuk saat ini, karena callback diatur langsung di dalam fungsi admin.
-        
-        // Cek apakah onConfirm adalah fungsi:
-        if (typeof onConfirm === 'function') {
-            const funcName = onConfirm.name;
-            btns.innerHTML = `
-                <button class="btn-modal btn-cancel" onclick="closeModal()">Batal</button>
-                <button class="btn-modal btn-confirm" style="background:var(--danger);" onclick="closeModal(); ${funcName}()">YA, LANJUT</button>
-            `;
-        } else {
-             // Jika menggunakan fungsi bind (seperti di confirmEmptySlot)
-             btns.innerHTML = `
-                <button class="btn-modal btn-cancel" onclick="closeModal()">Batal</button>
-                <button class="btn-modal btn-confirm" style="background:var(--danger);" onclick="closeModal(); ${onConfirm}()">YA, LANJUT</button>
-            `;
-        }
-
     } else {
         // Logika untuk info/error (OK, SIAP)
         btns.innerHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK, SIAP</button>`;
