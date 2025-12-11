@@ -53,7 +53,7 @@ body::before {
 }
 .day-name { 
     text-align: center; font-size: 0.75em; font-weight: 800; 
-    color: var(--muted); margin-bottom: 10px; text-transform: uppercase;
+    color: #64748b; margin-bottom: 10px; text-transform: uppercase;
 }
 .date-cell {
     aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -194,20 +194,42 @@ const firebaseConfig = {
   messagingSenderId: "472036722228",
   appId: "1:472036722228:web:11d520f9204db317d02c61"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 
+let db;
 let currentUser = JSON.parse(localStorage.getItem('maka_user'));
 let plusData = JSON.parse(localStorage.getItem('maka_plus_data')) || { active: false };
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth();
 let paidDates = []; 
+let isInitialized = false;
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Pengecekan Login
+// FIX: Initialize App Function
+function initializeApp() {
+    if (!isInitialized) {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            isInitialized = true;
+        } catch (e) {
+            if (e.code !== 'app/duplicate-app') {
+                console.error("Firebase init error:", e);
+                return;
+            }
+        }
+    }
+
     if(!currentUser) { window.location.href='index.html'; return; }
     loadPayments();
+}
+
+document.addEventListener("DOMContentLoaded", initializeApp);
+// FIX: Listener untuk mengatasi White Screen/State Loss
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        initializeApp(); 
+    }
 });
+
 
 function updateHeroCard(amount, count, error=false) {
     const card = document.getElementById('heroCard');
@@ -215,25 +237,25 @@ function updateHeroCard(amount, count, error=false) {
     const txtDesc = document.getElementById('debtDesc');
 
     if (error) {
-        card.className = "hero-card"; // Merah Default
+        card.className = "hero-card"; 
         txtAmount.innerText = "⚠️ ERROR";
         txtDesc.innerText = "Gagal memuat data. Cek koneksi internet Anda.";
         return;
     }
 
     if (amount > 0) {
-        card.className = "hero-card"; // Merah Default
+        card.className = "hero-card"; 
         txtAmount.innerText = "Rp " + amount.toLocaleString('id-ID');
         txtDesc.innerText = `Anda menunggak ${count} hari. Klik kalender untuk bayar.`;
     } else {
-        card.className = "hero-card aman"; // Biru
+        card.className = "hero-card aman"; 
         txtAmount.innerText = "Rp 0";
         txtDesc.innerText = "Tidak ada tunggakan. Akun Aman! 👍";
     }
 }
 
 function loadPayments() {
-    // Tambahkan Error Handler pada onSnapshot
+    if (!db) return; // Pastikan db sudah terinisialisasi
     db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
       .onSnapshot(snap => {
@@ -243,26 +265,23 @@ function loadPayments() {
           renderCalendar();
       }, error => {
           console.error("Firestore Error:", error);
-          updateHeroCard(0, 0, true); // Tampilkan error di Hero Card
+          updateHeroCard(0, 0, true); 
           renderCalendar();
       });
 }
 
-// 2. HITUNG HARGA DINAMIS (LOGIKA BARU)
+// 2. HITUNG HARGA DINAMIS
 function getDailyPrice(dateObj) {
-    // A. Cek Tanggal 31 -> LIBUR (Rp 0)
     if (dateObj.getDate() === 31) return 0;
 
-    // B. Cek Masa Kontrak (Maka+ hanya berlaku 1 tahun pertama)
     const joinDate = new Date(currentUser.joinedAt);
     const diffTime = Math.abs(dateObj - joinDate);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
-    let price = 70000; // Harga Dasar
+    let price = 70000; 
     
-    // Jika ikut MAKA+ dan masih dibawah 365 hari (1 Tahun)
     if (plusData.active && diffDays <= 365) {
-        price += 10000; // Tambah 10rb
+        price += 10000; 
     }
     
     return price;
@@ -280,9 +299,8 @@ function calculateTotalDebt() {
     
     while (checkDate <= today) {
         const dateStr = checkDate.toISOString().split('T')[0];
-        const price = getDailyPrice(checkDate); // Pakai fungsi harga dinamis
+        const price = getDailyPrice(checkDate); 
 
-        // Hanya hitung hutang jika harga > 0 (bukan tgl 31) dan belum dibayar
         if (price > 0 && !paidDates.includes(dateStr)) {
             totalHutang += price;
             daysLate++;
@@ -294,7 +312,7 @@ function calculateTotalDebt() {
 }
 
 
-// 3. RENDER KALENDER (Memastikan klik berfungsi)
+// 3. RENDER KALENDER (FIX KLIK DENGAN ADD EVENT LISTENER)
 function renderCalendar() {
     const grid = document.getElementById('calendarGrid');
     grid.innerHTML = '<div class="day-name">M</div><div class="day-name">S</div><div class="day-name">S</div><div class="day-name">R</div><div class="day-name">K</div><div class="day-name">J</div><div class="day-name">S</div>';
@@ -310,6 +328,7 @@ function renderCalendar() {
 
     for(let i=0; i<firstDay; i++) grid.innerHTML += `<div class="date-cell empty"></div>`;
     
+    // Gunakan Document Fragment untuk performa
     const fragment = document.createDocumentFragment();
 
     for(let d=1; d<=daysInMonth; d++) {
@@ -322,15 +341,12 @@ function renderCalendar() {
         let cls = ""; let lbl = ""; 
         let isClickable = false;
         
-        // Cek Harga hari ini
         let price = getDailyPrice(currentDate);
         
         const cell = document.createElement('div');
-        cell.className = 'date-cell';
         cell.innerText = d;
 
         if (d === 31) {
-            // TGL 31 SELALU LIBUR
             cls = "libur-ok"; 
             lbl = `<div class="small-lbl">LIBUR</div>`;
         } 
@@ -345,12 +361,12 @@ function renderCalendar() {
             if (paidDates.includes(dateKey)) {
                 cls = "lunas"; 
             } else {
-                cls = "tunggak clickable-tunggak"; // Merah + Class kursor
+                cls = "tunggak clickable-tunggak"; 
                 isClickable = true; // Tandai agar bisa dipasang event listener
             }
         }
 
-        // DP Marker (Bulan depannya join)
+        // DP Marker 
         let joinMonthIdx = joinDate.getFullYear()*12 + joinDate.getMonth();
         let currMonthIdx = currentYear*12 + currentMonth;
         if (currMonthIdx > joinMonthIdx && (d===14 || d===28)) { 
@@ -360,7 +376,7 @@ function renderCalendar() {
         
         if (dateKey === today.toISOString().split('T')[0]) cls += " today";
 
-        cell.className += ` ${cls}`;
+        cell.className = `date-cell ${cls}`;
         if(lbl) cell.innerHTML += lbl; 
         
         // Memasang Event Listener setelah elemen dibuat (FIX KLIK)
@@ -375,7 +391,7 @@ function renderCalendar() {
     grid.appendChild(fragment);
 }
 
-// 4. KLIK BAYAR (SELF SERVICE DGN HARGA DINAMIS)
+// 4. KLIK BAYAR
 function paySelf(dateStr, price) {
     const d = new Date(dateStr);
     const dateFmt = d.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
@@ -390,6 +406,7 @@ function paySelf(dateStr, price) {
 }
 
 function processPayment(dateStr, amount) {
+    if (!db) return;
     document.getElementById('customModalConfirm').classList.remove('show');
     const docId = currentUser.plat + "_" + dateStr;
     db.collection('daily_payments').doc(docId).set({
