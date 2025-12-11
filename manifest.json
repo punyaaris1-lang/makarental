@@ -1,20 +1,21 @@
 {
   "name": "punya MLU",
   "short_name": "punya MLU",
-  // Ganti path start_url agar merujuk ke root Service Worker (sesuai sw.js)
+  // Start URL: Pertahankan prefix '/makarental/' jika di-host di sub-folder
   "start_url": "/makarental/index.html", 
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0ea5a6",
   "icons": [
-    // Ganti path icon
     {
-      "src": "icon-512.png", /* Path relatif terhadap lokasi manifest */
+      // PERBAIKAN: Gunakan path RELATIF untuk ikon (tanpa '/makarental/')
+      "src": "icon-512.png", 
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png", /* Path relatif terhadap lokasi manifest */
+      // PERBAIKAN: Gunakan path RELATIF untuk ikon (tanpa '/makarental/')
+      "src": "icon-512.png", 
       "sizes": "192x192",
       "type": "image/png"
     }
