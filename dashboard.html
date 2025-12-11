@@ -38,7 +38,7 @@ body::before { content:""; position:fixed; inset:0; background:url('176394742755
 
 /* MENU GRID */
 .section-title { font-family: 'Inter'; font-size: 1.2em; font-weight: 900; margin: 30px 0 15px; color: var(--text); }
-/* Diubah ke grid 4x2 agar menu info dan tips masuk */
+/* FIX: Diubah ke grid 4x2 agar 9 menu masuk */
 .icon-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
 .glass-card { background:rgba(255,255,255,0.7); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.5); box-shadow:0 4px 20px rgba(0,0,0,0.05); border-radius:20px; text-decoration:none; color:var(--text); padding:18px 5px; text-align:center; display:flex; flex-direction:column; align-items:center; transition:0.2s; }
 .glass-card:active { transform:scale(0.95); }
@@ -112,6 +112,8 @@ footer.bottom-nav {
             <a href="info_mlu.html" class="glass-card"><span>💡</span><p>MLU Info</p></a>
             <a href="tips_maka.html" class="glass-card"><span>📝</span><p>Tips MAKA</p></a>
             <a href="maka_plus.html" class="glass-card"><span>✨</span><p>MAKA+</p></a>
+            <div class="glass-card" style="visibility:hidden; height:0; padding:0;"></div>
+            
             <button onclick="triggerSOS()" class="glass-card" style="background:#fee2e2; border-color:#fca5a5;"><span>🚨</span><p style="color:red">SOS</p></button>
         </div>
     </div>
@@ -137,22 +139,36 @@ const firebaseConfig = {
   messagingSenderId: "472036722228",
   appId: "1:472036722228:web:11d520f9204db317d02c61"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 
-// Variabel didefinisikan di sini
+let db;
 let currentUser = JSON.parse(localStorage.getItem('maka_user'));
 let plusData = JSON.parse(localStorage.getItem('maka_plus_data')) || { active: false };
+let isInitialized = false;
 
-// --- MAIN LOGIC ---
-document.addEventListener("DOMContentLoaded", function() {
-    // PERBAIKAN 1: Cek Sesi di Awal
+// --- INITIALIZATION FUNCTION (FIX WHITE SCREEN) ---
+function initializeApp() {
+    // 1. Inisialisasi Firebase hanya jika belum pernah
+    if (!isInitialized) {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            isInitialized = true;
+        } catch (e) {
+            if (e.code !== 'app/duplicate-app') {
+                console.error("Firebase init error:", e);
+                return;
+            }
+        }
+    }
+    
+    // 2. Cek Sesi
+    currentUser = JSON.parse(localStorage.getItem('maka_user'));
     if(!currentUser || !currentUser.plat) { 
         window.location.href='index.html'; 
         return; 
     }
     
-    // 1. Render Info Awal
+    // 3. Render Info Awal
     document.getElementById('user-name-display').innerText = currentUser.nama || 'Pengguna';
     document.getElementById('user-plate-display').innerText = currentUser.plat || 'N/A';
     if(currentUser.photoUrl) {
@@ -160,9 +176,20 @@ document.addEventListener("DOMContentLoaded", function() {
         av.innerText = ""; av.style.backgroundImage = `url('${currentUser.photoUrl}')`;
     }
 
-    // 2. Load Payments & Update Hero
+    // 4. Load Payments & Update Hero
     loadPaymentsAndDebt();
+}
+
+document.addEventListener("DOMContentLoaded", initializeApp);
+
+// FIX: Tambahkan listener untuk ketika PWA kembali dari background
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        // Panggil ulang initializeApp untuk refresh data
+        initializeApp(); 
+    }
 });
+
 
 // --- LOGIKA HARGA DINAMIS (DIULANG DARI CALENDAR.HTML) ---
 function getDailyPrice(dateObj) {
@@ -211,6 +238,7 @@ function calculateTotalDebt(paidDates) {
 }
 
 function loadPaymentsAndDebt() {
+    if (!db) return; // Pastikan db sudah terinisialisasi
     db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
       .onSnapshot(snap => {
