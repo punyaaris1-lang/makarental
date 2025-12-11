@@ -117,8 +117,17 @@ footer.bottom-nav { position:fixed; bottom:25px; left:50%; transform:translateX(
 
 /* MODAL */
 .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:none; align-items:center; justify-content:center; }
+.modal-overlay.show { display: flex; }
 .modal-box { background:white; width:80%; max-width:300px; padding:25px; border-radius:24px; text-align:center; }
 .btn-modal { width:100%; padding:12px; margin-top:10px; border-radius:10px; border:none; font-weight:bold; cursor:pointer; }
+
+/* LIST ANTRIAN */
+.q-item { display:flex; justify-content:space-between; align-items:center; background:white; padding:15px; border-radius:12px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,0.05); }
+.q-plat { font-weight:800; font-size:1em; }
+.q-bat { font-size:0.75em; color:#64748b; }
+.ctrl-btn { padding: 8px 12px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 0.8em; transition: 0.1s; }
+.btn-red { background: #fecaca; color: #b91c1c; }
+.btn-green { background: #dcfce7; color: #166534; }
 </style>
 </head>
 <body>
@@ -158,12 +167,7 @@ footer.bottom-nav { position:fixed; bottom:25px; left:50%; transform:translateX(
 
     <div class="section-head">STATUS CHARGING</div>
     <div class="slot-grid" id="slots">
-        <div class="slot-card"><div class="slot-status">Loading...</div></div>
-        <div class="slot-card"><div class="slot-status">Loading...</div></div>
-        <div class="slot-card"><div class="slot-status">Loading...</div></div>
-    </div>
-
-    <div class="flash-hero" style="display:none">...</div>
+        </div>
 
     <div class="section-head">LIST ANTRIAN</div>
     <div class="queue-list" id="qListContainer">
@@ -172,9 +176,6 @@ footer.bottom-nav { position:fixed; bottom:25px; left:50%; transform:translateX(
 
     <div class="admin-trigger">
         <button onclick="showAdminPanel()" class="btn-admin-login">🔒 Admin / Operator Login</button>
-    </div>
-    <div id="adminResetArea" style="display:none; text-align:center; margin-top:20px;">
-        <button onclick="resetAll()" style="background:#fee2e2; color:red; border:1px solid red; padding:10px; border-radius:10px; font-weight:bold; font-size:0.8em;">⚠️ RESET SEMUA DATA</button>
     </div>
 </div>
 
@@ -228,31 +229,52 @@ const firebaseConfig = {
   messagingSenderId: "472036722228",
   appId: "1:472036722228:web:11d520f9204db317d02c61"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 
 // --- VARIABLES ---
 const SLOT_NAMES = ["SLOT 1", "SLOT 2", "SLOT 3"];
+let db;
 let isAdmin = false;
-let userLat=null;
 let triggered = new Set();
 let myActiveSlotIndex = -1;
 let chargingSlotsData = []; 
 let maxTargetBattery = 100; // Default
+let isInitialized = false;
 
 const keepAliveAudio = document.getElementById('keepAliveAudio');
 keepAliveAudio.volume = 0.05; 
 const alarmAudio = document.getElementById('alarmAudio');
 alarmAudio.volume = 1.0; // Volume Alarm MAX
 
-window.addEventListener('load', () => {
-    initFirebase();
-    if("Notification" in window) Notification.requestPermission();
-    if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ userLat=p.coords.latitude; }, e=>{}, {enableHighAccuracy:true});
+// FIX: Initialize App Function
+function initializeApp() {
+    if (!isInitialized) {
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.firestore();
+            isInitialized = true;
+            initFirebase(); // Panggil initFirebase setelah inisialisasi
+        } catch (e) {
+            if (e.code !== 'app/duplicate-app') {
+                console.error("Firebase init error:", e);
+                return;
+            }
+        }
+    }
+
     const u = JSON.parse(localStorage.getItem('maka_user'));
     if(u && u.plat) document.getElementById('uPlat').value = u.plat;
     checkFormInputs();
+}
+
+window.addEventListener('load', initializeApp);
+
+// FIX: Listener untuk mengatasi White Screen/State Loss
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        initializeApp(); 
+    }
 });
+
 
 function checkFormInputs() {
     const p = document.getElementById('uPlat').value.toUpperCase().trim();
@@ -260,11 +282,19 @@ function checkFormInputs() {
     const b = document.getElementById('uBat').value;
     const btn = document.getElementById('btnDaftar');
     
-    // Tombol aktif jika semua field terisi
-    if(p && w && b) {
+    if(p && w && b && p.length > 3 && w.length > 5 && b >= 1 && b <= 100) {
         btn.disabled = false;
     } else {
         btn.disabled = true;
+    }
+    // Update button text status
+    if (localStorage.getItem('myPlat') === p) {
+        btn.innerText = "MONITORING AKTIF";
+        document.getElementById('monitorStatus').style.display='block';
+        btn.disabled = true;
+    } else {
+         btn.innerText = "DAFTAR & AKTIFKAN MONITORING";
+         document.getElementById('monitorStatus').style.display='none';
     }
 }
 document.getElementById('uPlat').addEventListener('input', checkFormInputs);
@@ -275,9 +305,8 @@ document.getElementById('uBat').addEventListener('input', checkFormInputs);
 // --- TIMER TICKER ---
 setInterval(() => {
     chargingSlotsData.forEach((slot, i) => {
-        if (slot && slot.startTime) {
+        if (slot && slot.startTime && document.getElementById(`timer-${i}`)) {
             const start = new Date(slot.startTime).getTime();
-            // Durasi dihitung dalam menit, dikonversi ke milidetik
             const end = start + (slot.duration * 60000); 
             const diff = end - Date.now();
             
@@ -285,7 +314,7 @@ setInterval(() => {
             const myPlat = localStorage.getItem('myPlat') || "";
 
             if (diff <= 0) {
-                if(timerEl) timerEl.innerText = "SELESAI!";
+                timerEl.innerText = "SELESAI!";
                 if (!triggered.has(slot.name) && myPlat === slot.name) {
                     triggered.add(slot.name);
                     myActiveSlotIndex = i; 
@@ -296,9 +325,8 @@ setInterval(() => {
                 const m = Math.floor((diff % 3600000) / 60000);
                 const s = Math.floor((diff % 60000) / 1000);
                 
-                // Format HH:MM:SS atau MM:SS jika jam 0
                 const displayTime = h > 0 ? `${h}j ${m}m ${s}s` : `${m}m ${s}s`;
-                if(timerEl) timerEl.innerText = displayTime;
+                timerEl.innerText = displayTime;
             }
         }
     });
@@ -308,35 +336,30 @@ setInterval(() => {
 function calculateDuration(startBattery, currentQueueLength) {
     let target = 100;
     
-    // Logic Target Baterai berdasarkan kepadatan antrian
     if (currentQueueLength >= 3 && currentQueueLength <= 5) target = 95;
     else if (currentQueueLength >= 6 && currentQueueLength <= 10) target = 90;
     else if (currentQueueLength > 10) target = 85;
 
-    maxTargetBattery = target; // Update variabel global
+    maxTargetBattery = target; 
 
     let percentNeeded = target - startBattery;
     if(percentNeeded < 0) percentNeeded = 0;
     
-    // Base formula: 1% = 1 menit (60 menit per jam)
     let duration = percentNeeded * 1; 
 
-    // Modifikasi durasi berdasarkan Target yang ketat
     if (target < 100) {
-        // Jika target ketat (95/90/85), durasi dimodifikasi (misal 1% = 0.85 menit)
         duration = percentNeeded * 0.85; 
     } else if (percentNeeded > 50) {
-        // Jika butuh banyak cas, berikan sedikit buffer (misal 1% = 1.1 menit)
         duration = percentNeeded * 1.1; 
     }
     
-    // Durasi minimal 5 menit
     return Math.max(5, Math.ceil(duration)); 
 }
 
 
 // --- FIREBASE LOGIC ---
 function initFirebase() {
+    if (!db) return;
     const ref = db.collection("antrian").doc("utama");
     ref.onSnapshot(snap => {
         document.getElementById('connStatus').innerText = "LIVE ●";
@@ -355,43 +378,34 @@ function initFirebase() {
 
             const isRun = !!x.startTime;
             let css = isRun ? "st-charging" : "st-waiting";
-            let h = x.startBattery;
-            let targetLabel = "";
+            
+            // FIX: Menggunakan Start Battery untuk visual jika belum mulai
+            let batPercent = x.startBattery || 0; 
+            if (isRun) batPercent = 100; // Jika sedang running, baterai penuh secara visual
+
+            let targetLabel = (x.target && x.target < 100) ? `<span class="slot-target">Batas: ${x.target}%</span>` : "";
             let controls = "";
             let timerHtml = "";
 
             if(isRun) {
-                h = 100;
                 timerHtml = `<span id="timer-${i}" class="slot-timer">Menghitung...</span>`;
+                controls = `<button onclick="emptySlot(${i})" class="ctrl-btn btn-red">⏹️ SELESAI / CABUT</button>`;
             } else {
                 timerHtml = `<span class="slot-status ${css}">MENUNGGU</span>`;
+                controls = `<button onclick="startCharge(${i})" class="ctrl-btn btn-green">▶️ MULAI CAS</button>`;
             }
             
-            if(x.target && x.target < 100) targetLabel = `<span class="slot-target">Batas: ${x.target}%</span>`;
-
             const isMySlot = (x.name === myPlat); 
-            if (isMySlot) {
-                if(isRun) {
-                    controls = `<button class="ctrl-btn btn-red" onclick="emptySlot(${i})">⏹️ SELESAI / CABUT</button>`;
-                } else {
-                    controls = `<button class="ctrl-btn btn-green" onclick="startCharge(${i})">▶️ MULAI CAS</button>`;
-                }
-            } else if (isAdmin) {
-                 if(isRun) {
-                    controls = `<button class="ctrl-btn btn-red" onclick="emptySlot(${i})">⏹️ SELESAI / CABUT</button>`;
-                } else {
-                    controls = `<button class="ctrl-btn btn-green" onclick="startCharge(${i})">▶️ MULAI CAS</button>`;
-                }
-            }
+            let controlsDisplay = (isMySlot || isAdmin) ? controls : "";
 
 
             return `
             <div class="slot-card ${isRun?'active':''}">
                 <div class="slot-label">${SLOT_NAMES[i]}</div>
-                <div class="bat-body"><div class="bat-head"></div><div class="bat-liquid" style="height:${h}%"></div></div>
+                <div class="bat-body"><div class="bat-head"></div><div class="bat-liquid" style="height:${batPercent}%"></div></div>
                 <div class="slot-user">${x.name} <br> ${targetLabel}</div>
                 ${timerHtml}
-                ${controls}
+                ${controlsDisplay}
             </div>`;
         }).join('');
 
@@ -402,7 +416,6 @@ function initFirebase() {
         } else {
             qc.innerHTML = q.map((x,i) => {
                 let adminActs = "";
-                // Tombol Admin untuk Antrian
                 if(isAdmin) {
                     adminActs = `
                         <div class="q-actions" style="display:flex; gap:5px;">
@@ -423,30 +436,33 @@ function initFirebase() {
         const b = parseInt(document.getElementById('uBat').value);
         const btn = document.getElementById('btnDaftar');
 
-        if(!p || !w || isNaN(b)) return showModal("Error", 'Lengkapi semua data!', "❌");
+        if(!p || !w || isNaN(b) || b < 1 || b > 100) return showModal("Error", 'Lengkapi data dengan benar!', "❌");
         
-        // Memastikan audio diputar (PWA Monitor)
         keepAliveAudio.play().catch(e=>console.log("Audio blocked", e));
 
         btn.disabled=true; btn.innerText="MEMPROSES...";
 
         db.runTransaction(async t => {
             const ref = db.collection("antrian").doc("utama");
-            const d = (await t.get(ref)).data() || {};
+            const doc = await t.get(ref);
+            const d = doc.data() || {};
+
             let s = d.chargingSlots || [null,null,null];
             let q = d.waitingQueue || [];
+            
             if(s.some(x=>x?.name===p) || q.some(x=>x?.name===p)) throw "Sudah terdaftar.";
             
             let currentQueueLength = s.filter(x=>x).length + q.length;
             let duration = calculateDuration(b, currentQueueLength);
-            let target = maxTargetBattery; // Ambil target yang dihitung di calculateDuration
+            let target = maxTargetBattery; 
 
             let empty = s.findIndex(x => !x);
             
-            const userData = { name:p, phone:w, startBattery:b, target:target, startTime:null, duration:duration };
+            const userData = { name:p, phone:w, startBattery:b, target:target, duration:duration, joinedAt: firebase.firestore.FieldValue.serverTimestamp() };
 
             if(empty !== -1) {
                 // Masuk langsung ke slot (status menunggu)
+                userData.startTime = null;
                 s[empty] = userData;
             } else {
                 // Masuk ke antrian
@@ -455,13 +471,12 @@ function initFirebase() {
             t.set(ref, {chargingSlots:s, waitingQueue:q}, {merge:true});
         }).then(() => {
             localStorage.setItem('myPlat', p);
-            btn.innerText = "MONITORING AKTIF";
-            document.getElementById('monitorStatus').style.display='block';
+            checkFormInputs(); // Update UI
             showModal("Berhasil Masuk", "<b>Monitoring Aktif!</b><br>Anda berada di antrian. Audio diputar.", "✅");
         }).catch(e => {
             showModal("Gagal", (typeof e === 'string' ? e : "Gagal terhubung ke database.")); 
-            btn.disabled=false; btn.innerText="DAFTAR & AKTIFKAN MONITORING";
-            checkFormInputs();
+            btn.disabled=false; 
+            checkFormInputs(); // Update UI
         });
     };
 }
@@ -470,16 +485,16 @@ function initFirebase() {
 // --- ADMIN PANEL FUNCTIONS ---
 function showAdminPanel() {
     const pin = prompt("Masukkan PIN Admin:");
-    if (pin === '1131') { // PIN ADMIN
+    if (pin === '1131') { 
         isAdmin = true;
-        document.getElementById('adminPanel').style.display = 'flex';
+        document.getElementById('adminPanel').classList.add('show');
         showModal("Mode Operator", "Anda masuk sebagai Admin.");
     } else {
         showModal("Akses Ditolak", "PIN Salah.", "❌");
     }
 }
 function hideAdminPanel() {
-    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('adminPanel').classList.remove('show');
 }
 
 function kosongkanSlot() {
@@ -488,34 +503,65 @@ function kosongkanSlot() {
     updateDB(d => { d.chargingSlots[i] = null; return d; });
     hideAdminPanel();
 }
-
 function naikkanAntrian() {
     db.runTransaction(async t => {
         const ref = db.collection("antrian").doc("utama");
-        const d = (await t.get(ref)).data();
-        let s = d.chargingSlots;
-        let q = d.waitingQueue;
+        const doc = await t.get(ref);
+        const d = doc.data();
+        let s = d.chargingSlots || [null, null, null];
+        let q = d.waitingQueue || [];
         
-        if (q.length === 0) throw "Antrian kosong. Tidak ada yang bisa dinaikkan.";
+        if (q.length === 0) throw "Antrian kosong.";
 
         let emptyIdx = s.findIndex(x => !x);
-        if(emptyIdx === -1) throw "Semua slot terisi. Tidak bisa menaikkan antrian.";
+        if(emptyIdx === -1) throw "Semua slot terisi.";
 
-        // Ambil antrian pertama
         let user = q.shift(); 
         
-        // Hitung ulang durasi dan target (walau tidak perlu di antrian, dipertahankan konsistensi)
+        // Re-calculate duration and target for current queue density
         let currentQueueLength = s.filter(x=>x).length + q.length;
         user.duration = calculateDuration(user.startBattery, currentQueueLength);
         user.target = maxTargetBattery;
-        user.startTime = null; // Masuk sebagai Menunggu
+        user.startTime = null; 
 
-        s[emptyIdx] = user; // Pindahkan ke slot kosong
+        s[emptyIdx] = user; 
         
         t.update(ref, {chargingSlots: s, waitingQueue: q});
         return user.name;
     }).then((name) => {
         showModal("Antrian Naik", `${name} dipindahkan ke slot.`, "✅");
+    }).catch(e => showModal("Gagal", (typeof e === 'string' ? e : "Gagal transaksi Firestore.")));
+    hideAdminPanel();
+}
+function deleteQueue(i) {
+    if(!confirm(`Hapus antrian #${i+1}?`)) return;
+    updateDB(d => { d.waitingQueue.splice(i, 1); return d; });
+}
+function moveQueueToSlot(qIndex) {
+    db.runTransaction(async t => {
+        const ref = db.collection("antrian").doc("utama");
+        const doc = await t.get(ref);
+        const d = doc.data();
+        let s = d.chargingSlots || [null, null, null];
+        let q = d.waitingQueue || [];
+        
+        let emptyIdx = s.findIndex(x => !x);
+        if(emptyIdx === -1) throw "Semua slot terisi.";
+
+        let user = q[qIndex]; 
+        q.splice(qIndex, 1);
+        
+        let currentQueueLength = s.filter(x=>x).length + q.length;
+        user.duration = calculateDuration(user.startBattery, currentQueueLength);
+        user.target = maxTargetBattery;
+        user.startTime = null;
+
+        s[emptyIdx] = user; 
+        
+        t.update(ref, {chargingSlots: s, waitingQueue: q});
+        return user.name;
+    }).then((name) => {
+        showModal("Pindah Slot", `${name} dipindahkan ke slot.`, "✅");
     }).catch(e => showModal("Gagal", (typeof e === 'string' ? e : "Gagal transaksi Firestore.")));
 }
 
@@ -527,21 +573,17 @@ function blokirUser() {
     db.collection('users').doc(plat).update({
         isBanned: true
     }).then(() => {
-        // Kosongkan antrian/slot user yang diblokir
-        db.collection("antrian").doc("utama").update({
-            chargingSlots: firebase.firestore.FieldValue.arrayRemove({ name: plat }),
-            waitingQueue: firebase.firestore.FieldValue.arrayRemove({ name: plat }),
-        }).catch(e => console.log("User tidak ada di antrian, lanjut blokir."));
+        // Hapus dari antrian juga
+        updateDB(d => {
+            d.chargingSlots = (d.chargingSlots || [null,null,null]).map(x => x?.name === plat ? null : x);
+            d.waitingQueue = (d.waitingQueue || []).filter(x => x.name !== plat);
+            return d;
+        });
         showModal("Blokir Berhasil", `${plat} berhasil diblokir.`, "✅");
     }).catch(e => {
-        showModal("Gagal Blokir", "Plat tidak ditemukan di database Users.", "❌");
+        showModal("Gagal Blokir", "Plat tidak ditemukan.", "❌");
     });
     hideAdminPanel();
-}
-
-function kosongkanSlotAdmin(i) {
-    if(!confirm("Selesai & Kosongkan Slot?")) return; 
-    updateDB(d => { d.chargingSlots[i] = null; return d; });
 }
 
 function resetDatabase() {
@@ -558,12 +600,12 @@ function resetDatabase() {
 function emptySlot(i) {
     if(!confirm("Selesai & Cabut?")) return; 
     updateDB(d => { d.chargingSlots[i] = null; return d; });
-    localStorage.removeItem('myPlat'); // Hapus session user
+    localStorage.removeItem('myPlat'); 
     keepAliveAudio.pause();
+    checkFormInputs();
 }
 function startCharge(i) { 
     updateDB(d => { 
-        // Waktu mulai cas di slot sekarang
         d.chargingSlots[i].startTime = new Date().toISOString(); 
         return d; 
     });
@@ -572,7 +614,7 @@ function updateDB(callback) {
     const ref = db.collection("antrian").doc("utama");
     db.runTransaction(async t => {
         const doc = await t.get(ref);
-        const newData = callback(doc.data());
+        const newData = callback(doc.data() || {});
         t.update(ref, newData);
     }).catch(e => showModal("Error", e));
 }
@@ -581,19 +623,18 @@ function updateDB(callback) {
 function triggerFullAlert() {
     keepAliveAudio.pause(); 
     alarmAudio.play().catch(e => console.log("Alarm blocked"));
-    document.getElementById('alarmScreen').style.display='flex';
+    document.getElementById('alarmScreen').classList.add('show');
     if(navigator.vibrate) navigator.vibrate([1000,500,1000]);
     if(Notification.permission==="granted") new Notification("SELESAI!", {body:"Motor Penuh!", tag:"alarm"});
 }
 function stopAlarmAndClear() {
     alarmAudio.pause(); alarmAudio.currentTime=0;
-    document.getElementById('alarmScreen').style.display='none';
+    document.getElementById('alarmScreen').classList.remove('show');
     
     if (myActiveSlotIndex !== -1) { 
         emptySlot(myActiveSlotIndex); 
         myActiveSlotIndex = -1; 
     } else {
-        // Jika user cabut manual, tapi timer sudah expired, kita hentikan audio saja.
         keepAliveAudio.pause();
     }
 }
@@ -602,7 +643,7 @@ function stopAlarmAndClear() {
 function showModal(title, desc, icon="🔔") {
     document.getElementById('mTitle').innerText = title;
     document.getElementById('mDesc').innerHTML = desc;
-    document.getElementById('mBtns').innerHTML = `<button class="btn-modal" onclick="closeModal()">OK</button>`;
+    document.getElementById('mBtns').innerHTML = `<button class="btn-modal" style="background:var(--accent); color:white;" onclick="closeModal()">OK</button>`;
     document.getElementById('customModal').classList.add('show');
 }
 function closeModal() { document.getElementById('customModal').classList.remove('show'); }
