@@ -251,11 +251,15 @@ function handleRegister() {
     }
   }).catch((error) => {
     console.error("Error:", error);
-    if(error.code === 'not-found' || error.message.includes('not exist')) {
-        showModal("Database Belum Siap", "Admin: Harap buat database Firestore di Console Firebase.", "error");
+    // PERBAIKAN ERROR HANDLING KONEKSI
+    if (error.code && error.code.includes('unavailable')) {
+        showModal("Gagal Koneksi", "Gagal menghubungi server Firebase. Periksa koneksi internet Anda.", "error");
+    } else if (error.code && error.code.includes('not-found')) {
+        showModal("Database Error", "Database belum dibuat. Admin: Harap buat database Firestore di Console Firebase.", "error");
     } else {
-        showModal("Gagal", "Periksa koneksi internet Anda.", "error");
+        showModal("Gagal", "Terjadi kesalahan. Cek internet Anda.", "error");
     }
+    // END PERBAIKAN
     btn.disabled = false; btn.innerText = "DAFTAR SEKARANG";
   });
 }
@@ -283,11 +287,16 @@ function handleLogin() {
       btn.disabled = false; btn.innerText = "MASUK APLIKASI";
     }
   }).catch((error) => {
-    if(error.code === 'not-found' || error.message.includes('not exist')) {
+    console.error("Error:", error);
+    // PERBAIKAN ERROR HANDLING KONEKSI
+    if (error.code && error.code.includes('unavailable')) {
+        showModal("Gagal Koneksi", "Gagal menghubungi server Firebase. Periksa koneksi internet Anda.", "error");
+    } else if (error.code && error.code.includes('not-found')) {
         showModal("Database Error", "Database belum dibuat di Firebase Console.", "error");
     } else {
-        showModal("Koneksi Gagal", "Cek internet Anda.", "error");
+        showModal("Gagal", "Terjadi kesalahan. Cek internet Anda.", "error");
     }
+    // END PERBAIKAN
     btn.disabled = false; btn.innerText = "MASUK APLIKASI";
   });
 }
