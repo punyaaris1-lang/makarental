@@ -180,6 +180,10 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
         <div style="text-align:center;padding:20px;color:#999;font-size:0.8em;">Belum ada antrian.</div>
     </div>
     
+    <div id="leaveQueueSection" style="text-align:center; margin-top:30px; display:none;">
+        <button onclick="confirmEmptySlot(myActiveSlotIndex, true)" class="btn-submit btn-red" style="width:100%;">KELUAR DARI ANTRIAN/SLOT</button>
+    </div>
+
     <div class="admin-trigger">
         <button onclick="openAdmin()" class="btn-admin-login">🔒 Admin / Operator Login</button>
     </div>
@@ -231,6 +235,7 @@ const db = firebase.firestore();
 const SLOTS_COUNT = 3; 
 const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
 const MAX_DIST = 0.2; // 200 meter dalam KM
+const ADMIN_PASSCODE = 'MAKAADMIN123'; // Admin PIN
 let isAdmin = false;
 let userLat=null;
 let userLng=null;
@@ -258,7 +263,6 @@ setInterval(() => {
     chargingSlotsData.forEach((slot, i) => {
         if (slot && slot.startTime) {
             const start = new Date(slot.startTime).getTime();
-            // Durasi 1 jam default (60 menit)
             const durationMs = 60 * 60 * 1000; 
             const end = start + durationMs; 
             const diff = end - Date.now();
@@ -285,9 +289,12 @@ setInterval(() => {
 // --- FIREBASE LISTENER & RENDER ---
 function initFirebase() {
     const currentUser = JSON.parse(localStorage.getItem('maka_user'));
+    
+    if(currentUser && currentUser.plat) {
+        document.getElementById('uPlat').value = currentUser.plat;
+    }
     if(!currentUser || !currentUser.plat) { 
-        window.location.href='index.html'; 
-        return; 
+        // Lanjutkan tanpa redirect, tapi daftar harus diisi
     }
     
     if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ userLat=p.coords.latitude; userLng=p.coords.longitude; }, e=>{}, {enableHighAccuracy:true});
@@ -305,14 +312,12 @@ function initFirebase() {
         document.getElementById('connStatus').classList.remove('error');
 
         const d = snap.data() || {};
-        // Inisialisasi slot kosong jika data belum ada
         const s = d.chargingSlots && Array.isArray(d.chargingSlots) ? d.chargingSlots : Array(SLOTS_COUNT).fill(null);
         const q = d.waitingQueue || [];
         const myPlat = localStorage.getItem('myPlat') || (currentUser ? currentUser.plat : '');
         
         chargingSlotsData = s; 
         
-        // Update user status
         myActiveSlotIndex = s.findIndex(slot => slot && slot.plat === myPlat);
         myActiveQueueId = q.find(item => item.plat === myPlat) ? q.find(item => item.plat === myPlat).id : null;
 
@@ -473,7 +478,7 @@ document.getElementById('btnDaftar').onclick = () => {
         }
         const distance = getDist(userLat, userLng, STATION_LOC.lat, STATION_LOC.lng);
         if (distance > MAX_DIST) {
-            return showModal('Cukkkk jgn curang', `lu masih ${distance.toFixed(2)} KM dari FC Kelapa gading. Kalo masih jauh jgn daftar dulu cukkk. Batas max cuma ${MAX_DIST} KM.`, '❌');
+            return showModal('Di Luar Jangkauan', `Anda ${distance.toFixed(2)} KM dari FC. Batas max adalah ${MAX_DIST} KM.`, '❌');
         }
     }
 
@@ -488,7 +493,7 @@ document.getElementById('btnDaftar').onclick = () => {
         
         // 2. Tentukan slot atau antrian
         let empty = s.findIndex(x => !x);
-        const userData = { plat:p, name:currentUser.nama, phone:w, startBattery:b, target:100, startTime:null, duration:0 };
+        const userData = { plat:p, name:currentUser ? currentUser.nama : 'Guest', phone:w, startBattery:b, target:100, startTime:null, duration:0 };
 
         if(empty !== -1) {
             // Masuk Slot (Auto-fill)
@@ -526,7 +531,6 @@ function emptySlot(i, isUserLeaving) {
         // Cek antrian, jika ada, pindahkan yang pertama
         if (q.length > 0) {
             const nextUser = q.shift(); // Ambil dari depan & hapus
-            // Pastikan data yang dimasukkan ke slot memiliki ID yang konsisten
             s[i] = { ...nextUser, startTime: new Date().toISOString() }; 
         }
         
@@ -555,7 +559,6 @@ function updateAdminUI() {
     }
 }
 function openAdmin() { 
-    // Ganti button login dengan form jika belum login
     if (isAdmin) {
         document.getElementById('adminModal').classList.remove('show');
         return;
@@ -563,7 +566,8 @@ function openAdmin() {
     document.getElementById('adminModal').classList.add('show'); 
 }
 function loginAdmin() {
-    if(document.getElementById('adminPin').value === 'MAKAADMIN123') { 
+    // PERBAIKAN: Menggunakan ADMIN_PASSCODE
+    if(document.getElementById('adminPin').value === ADMIN_PASSCODE) { 
         localStorage.setItem('maka_is_admin', 'true');
         isAdmin = true;
         document.getElementById('adminModal').classList.remove('show');
@@ -605,7 +609,6 @@ function adminMoveToSlot(queueId, slotIndex) {
 
         const userToMove = q.splice(queueIndex, 1)[0];
         
-        // Slot sekarang diisi dengan user antrian, dan langsung START charging
         s[slotIndex] = { ...userToMove, startTime: new Date().toISOString() };
 
         t.set(refAntrian, {chargingSlots: s, waitingQueue: q}, {merge:true});
