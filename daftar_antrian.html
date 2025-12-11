@@ -185,7 +185,7 @@ footer.bottom-nav { position:fixed; bottom:25px; left:50%; transform:translateX(
     <a href="daftar_antrian.html" class="nav-item active"><span>🎫</span>Antrian</a>
 </footer>
 
-<div id="adminPanel">
+<div id="adminPanel" class="modal-overlay">
     <div class="admin-card">
         <div class="admin-header">ADMIN ACCESS</div>
         <select id="slotSelector" class="btn-select-slot">
@@ -237,13 +237,13 @@ let isAdmin = false;
 let triggered = new Set();
 let myActiveSlotIndex = -1;
 let chargingSlotsData = []; 
-let maxTargetBattery = 100; // Default
+let maxTargetBattery = 100; 
 let isInitialized = false;
 
 const keepAliveAudio = document.getElementById('keepAliveAudio');
 keepAliveAudio.volume = 0.05; 
 const alarmAudio = document.getElementById('alarmAudio');
-alarmAudio.volume = 1.0; // Volume Alarm MAX
+alarmAudio.volume = 1.0; 
 
 // FIX: Initialize App Function
 function initializeApp() {
@@ -252,7 +252,7 @@ function initializeApp() {
             firebase.initializeApp(firebaseConfig);
             db = firebase.firestore();
             isInitialized = true;
-            initFirebase(); // Panggil initFirebase setelah inisialisasi
+            initFirebase(); 
         } catch (e) {
             if (e.code !== 'app/duplicate-app') {
                 console.error("Firebase init error:", e);
@@ -282,12 +282,14 @@ function checkFormInputs() {
     const b = document.getElementById('uBat').value;
     const btn = document.getElementById('btnDaftar');
     
+    // Validasi dasar
     if(p && w && b && p.length > 3 && w.length > 5 && b >= 1 && b <= 100) {
         btn.disabled = false;
     } else {
         btn.disabled = true;
     }
-    // Update button text status
+    
+    // Status Monitoring
     if (localStorage.getItem('myPlat') === p) {
         btn.innerText = "MONITORING AKTIF";
         document.getElementById('monitorStatus').style.display='block';
@@ -372,16 +374,15 @@ function initFirebase() {
         
         chargingSlotsData = s; 
 
-        // RENDER SLOTS
+        // RENDER SLOTS (FIX: Baterai Visual)
         document.getElementById('slots').innerHTML = s.map((x,i) => {
             if(!x) return `<div class="slot-card"><div class="slot-label">${SLOT_NAMES[i]}</div><div class="bat-body"><div class="bat-head"></div><div class="bat-liquid" style="height:0%"></div></div><div class="slot-user">-</div><div class="slot-status st-ready">KOSONG</div></div>`;
 
             const isRun = !!x.startTime;
             let css = isRun ? "st-charging" : "st-waiting";
             
-            // FIX: Menggunakan Start Battery untuk visual jika belum mulai
             let batPercent = x.startBattery || 0; 
-            if (isRun) batPercent = 100; // Jika sedang running, baterai penuh secara visual
+            if (isRun) batPercent = 100; 
 
             let targetLabel = (x.target && x.target < 100) ? `<span class="slot-target">Batas: ${x.target}%</span>` : "";
             let controls = "";
@@ -409,7 +410,7 @@ function initFirebase() {
             </div>`;
         }).join('');
 
-        // RENDER QUEUE
+        // RENDER QUEUE (FIX: Tombol Admin di Antrian)
         const qc = document.getElementById('qListContainer');
         if(q.length===0) {
             qc.innerHTML = '<div style="text-align:center;color:#999;font-size:0.8em;padding:20px;">Antrian Kosong</div>';
@@ -429,7 +430,7 @@ function initFirebase() {
         }
     });
 
-    // DAFTAR
+    // DAFTAR (FIX: Tombol Daftar Error)
     document.getElementById('btnDaftar').onclick = () => {
         const p = document.getElementById('uPlat').value.toUpperCase().trim();
         const w = document.getElementById('uWa').value;
@@ -461,22 +462,20 @@ function initFirebase() {
             const userData = { name:p, phone:w, startBattery:b, target:target, duration:duration, joinedAt: firebase.firestore.FieldValue.serverTimestamp() };
 
             if(empty !== -1) {
-                // Masuk langsung ke slot (status menunggu)
                 userData.startTime = null;
                 s[empty] = userData;
             } else {
-                // Masuk ke antrian
                 q.push(userData);
             }
             t.set(ref, {chargingSlots:s, waitingQueue:q}, {merge:true});
         }).then(() => {
             localStorage.setItem('myPlat', p);
-            checkFormInputs(); // Update UI
+            checkFormInputs(); 
             showModal("Berhasil Masuk", "<b>Monitoring Aktif!</b><br>Anda berada di antrian. Audio diputar.", "✅");
         }).catch(e => {
-            showModal("Gagal", (typeof e === 'string' ? e : "Gagal terhubung ke database.")); 
+            showModal("Gagal", (typeof e === 'string' ? e : "Gagal terhubung ke database. Cek Rules Firestore.")); 
             btn.disabled=false; 
-            checkFormInputs(); // Update UI
+            checkFormInputs(); 
         });
     };
 }
@@ -503,6 +502,7 @@ function kosongkanSlot() {
     updateDB(d => { d.chargingSlots[i] = null; return d; });
     hideAdminPanel();
 }
+
 function naikkanAntrian() {
     db.runTransaction(async t => {
         const ref = db.collection("antrian").doc("utama");
@@ -518,7 +518,6 @@ function naikkanAntrian() {
 
         let user = q.shift(); 
         
-        // Re-calculate duration and target for current queue density
         let currentQueueLength = s.filter(x=>x).length + q.length;
         user.duration = calculateDuration(user.startBattery, currentQueueLength);
         user.target = maxTargetBattery;
@@ -533,36 +532,10 @@ function naikkanAntrian() {
     }).catch(e => showModal("Gagal", (typeof e === 'string' ? e : "Gagal transaksi Firestore.")));
     hideAdminPanel();
 }
+
 function deleteQueue(i) {
     if(!confirm(`Hapus antrian #${i+1}?`)) return;
     updateDB(d => { d.waitingQueue.splice(i, 1); return d; });
-}
-function moveQueueToSlot(qIndex) {
-    db.runTransaction(async t => {
-        const ref = db.collection("antrian").doc("utama");
-        const doc = await t.get(ref);
-        const d = doc.data();
-        let s = d.chargingSlots || [null, null, null];
-        let q = d.waitingQueue || [];
-        
-        let emptyIdx = s.findIndex(x => !x);
-        if(emptyIdx === -1) throw "Semua slot terisi.";
-
-        let user = q[qIndex]; 
-        q.splice(qIndex, 1);
-        
-        let currentQueueLength = s.filter(x=>x).length + q.length;
-        user.duration = calculateDuration(user.startBattery, currentQueueLength);
-        user.target = maxTargetBattery;
-        user.startTime = null;
-
-        s[emptyIdx] = user; 
-        
-        t.update(ref, {chargingSlots: s, waitingQueue: q});
-        return user.name;
-    }).then((name) => {
-        showModal("Pindah Slot", `${name} dipindahkan ke slot.`, "✅");
-    }).catch(e => showModal("Gagal", (typeof e === 'string' ? e : "Gagal transaksi Firestore.")));
 }
 
 function blokirUser() {
@@ -573,7 +546,6 @@ function blokirUser() {
     db.collection('users').doc(plat).update({
         isBanned: true
     }).then(() => {
-        // Hapus dari antrian juga
         updateDB(d => {
             d.chargingSlots = (d.chargingSlots || [null,null,null]).map(x => x?.name === plat ? null : x);
             d.waitingQueue = (d.waitingQueue || []).filter(x => x.name !== plat);
