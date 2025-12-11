@@ -258,12 +258,34 @@ function getDist(lat1, lon1, lat2, lon2) {
     return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
 }
 
+// --- LOGIKA PERHITUNGAN BATERAI ASLI ---
+function calculateDuration(startBattery, targetBattery, queueLength) {
+    let percentNeeded = targetBattery - startBattery;
+    if (percentNeeded < 0) percentNeeded = 0;
+
+    // Durasi dasar (contoh: 1% butuh 1 menit = 60 menit / jam)
+    let durationMinutes = percentNeeded * 1; 
+
+    // Adjust berdasarkan jumlah user/antrian (Max Cas Logic)
+    let multiplier = 1.0; 
+    if (queueLength >= 3 && queueLength <= 5) multiplier = 0.95; // Sedikit cepat
+    else if (queueLength >= 6 && queueLength <= 10) multiplier = 0.90;
+    else if (queueLength > 10) multiplier = 0.85;
+
+    // Sesuaikan durasi berdasarkan sisa baterai (Logika Asli)
+    if (percentNeeded > 50) multiplier *= 0.85; // Lebih cepat di awal
+    else if (percentNeeded < 20) multiplier *= 1.5; // Lebih lambat di akhir
+
+    return durationMinutes * multiplier;
+}
+
 // --- TIMER TICKER ---
 setInterval(() => {
     chargingSlotsData.forEach((slot, i) => {
         if (slot && slot.startTime) {
             const start = new Date(slot.startTime).getTime();
-            const durationMs = 60 * 60 * 1000; 
+            // Durasi didapat dari data slot
+            const durationMs = slot.duration * 60 * 1000; 
             const end = start + durationMs; 
             const diff = end - Date.now();
             
@@ -294,7 +316,7 @@ function initFirebase() {
         document.getElementById('uPlat').value = currentUser.plat;
     }
     if(!currentUser || !currentUser.plat) { 
-        // Lanjutkan tanpa redirect, tapi daftar harus diisi
+        // Lanjutkan tanpa redirect
     }
     
     if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ userLat=p.coords.latitude; userLng=p.coords.longitude; }, e=>{}, {enableHighAccuracy:true});
@@ -495,9 +517,15 @@ document.getElementById('btnDaftar').onclick = () => {
         let empty = s.findIndex(x => !x);
         const userData = { plat:p, name:currentUser ? currentUser.nama : 'Guest', phone:w, startBattery:b, target:100, startTime:null, duration:0 };
 
+        // Hitung durasi charging
+        const queueLength = q.length;
+        const targetBattery = 100; // Asumsi target selalu 100
+        const duration = calculateDuration(b, targetBattery, queueLength);
+
+
         if(empty !== -1) {
             // Masuk Slot (Auto-fill)
-            s[empty] = { ...userData, startTime: new Date().toISOString() };
+            s[empty] = { ...userData, duration: duration, startTime: new Date().toISOString() };
         } else {
             // Masuk Antrian
             q.push({ id: db.collection('queue').doc().id, ...userData });
@@ -514,7 +542,7 @@ document.getElementById('btnDaftar').onclick = () => {
         let errorMsg = typeof e === 'string' ? e : "Gagal Pendaftaran. Cek koneksi Anda.";
         if(e.code && e.code.includes('unavailable')) errorMsg = "Koneksi ke server Firebase gagal. Periksa internet Anda.";
         showModal("Gagal", errorMsg, '❌'); 
-        btn.disabled=false; btn.innerText="DAFTAR & AKTIFKAN MONITORING";
+        btn.disabled=false; document.getElementById('btnDaftar').innerText="DAFTAR & AKTIFKAN MONITORING"; // PERBAIKAN: Reset tombol
     });
 };
 
@@ -531,7 +559,11 @@ function emptySlot(i, isUserLeaving) {
         // Cek antrian, jika ada, pindahkan yang pertama
         if (q.length > 0) {
             const nextUser = q.shift(); // Ambil dari depan & hapus
-            s[i] = { ...nextUser, startTime: new Date().toISOString() }; 
+            
+            // Hitung durasi charging untuk user baru
+            const duration = calculateDuration(nextUser.startBattery, nextUser.target, q.length);
+
+            s[i] = { ...nextUser, duration: duration, startTime: new Date().toISOString() }; 
         }
         
         t.set(refAntrian, {chargingSlots: s, waitingQueue: q}, {merge:true});
@@ -541,6 +573,8 @@ function emptySlot(i, isUserLeaving) {
             localStorage.removeItem('monitoring_active');
             keepAliveAudio.pause();
         }
+        document.getElementById('btnDaftar').disabled=false; // PERBAIKAN: Reset tombol daftar
+        document.getElementById('btnDaftar').innerText="DAFTAR & AKTIFKAN MONITORING";
     }).catch(e => showModal("Error", "Gagal mengosongkan slot: " + e.message, '❌'));
 }
 
@@ -609,7 +643,11 @@ function adminMoveToSlot(queueId, slotIndex) {
 
         const userToMove = q.splice(queueIndex, 1)[0];
         
-        s[slotIndex] = { ...userToMove, startTime: new Date().toISOString() };
+        // Hitung durasi charging untuk user baru
+        const duration = calculateDuration(userToMove.startBattery, userToMove.target, q.length);
+
+        // Slot sekarang diisi dengan user antrian, dan langsung START charging
+        s[slotIndex] = { ...userToMove, duration: duration, startTime: new Date().toISOString() };
 
         t.set(refAntrian, {chargingSlots: s, waitingQueue: q}, {merge:true});
     }).then(() => {
