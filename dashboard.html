@@ -38,8 +38,8 @@ body::before { content:""; position:fixed; inset:0; background:url('176394742755
 
 /* MENU GRID */
 .section-title { font-family: 'Inter'; font-size: 1.2em; font-weight: 900; margin: 30px 0 15px; color: var(--text); }
-/* FIX: Diubah ke grid 4x2 agar 9 menu masuk */
-.icon-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+/* FIX: Diubah ke grid 3x3 agar total 9 ikon */
+.icon-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
 .glass-card { background:rgba(255,255,255,0.7); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.5); box-shadow:0 4px 20px rgba(0,0,0,0.05); border-radius:20px; text-decoration:none; color:var(--text); padding:18px 5px; text-align:center; display:flex; flex-direction:column; align-items:center; transition:0.2s; }
 .glass-card:active { transform:scale(0.95); }
 .glass-card span { font-size:26px; margin-bottom:8px; }
@@ -102,19 +102,20 @@ footer.bottom-nav {
             </div>
         </div>
 
-        <h2 class="section-title">✨ Menu Utama</h2>
+        <h2 class="section-title">✨MLU | Mau Apa Lu </h2>
         <div class="icon-grid">
             <a href="calendar.html" class="glass-card"><span>📆</span><p>Bayar</p></a>
             <a href="history.html" class="glass-card"><span>🧾</span><p>Riwayat</p></a>
             <a href="part_tracker.html" class="glass-card"><span>🎁</span><p>Gratisan</p></a>
-            <a href="settings.html" class="glass-card"><span>🔧</span><p>Setting</p></a>
             
+            <a href="settings.html" class="glass-card"><span>🔧</span><p>Setting</p></a>
             <a href="info_mlu.html" class="glass-card"><span>💡</span><p>MLU Info</p></a>
             <a href="tips_maka.html" class="glass-card"><span>📝</span><p>Tips MAKA</p></a>
-            <a href="maka_plus.html" class="glass-card"><span>✨</span><p>MAKA+</p></a>
-            <div class="glass-card" style="visibility:hidden; height:0; padding:0;"></div>
             
-            <button onclick="triggerSOS()" class="glass-card" style="background:#fee2e2; border-color:#fca5a5;"><span>🚨</span><p style="color:red">SOS</p></button>
+            <a href="maka_plus.html" class="glass-card"><span>✨</span><p>MAKA+</p></a>
+            <button onclick="triggerWaSOS()" class="glass-card" style="background:#fecaca; border-color:#fca5a5;"><span>💬</span><p style="color:red">MAKA SOS</p></button>
+            <button onclick="triggerSOS()" class="glass-card" style="background:#fee2e2; border-color:#fca5a5;"><span>🚨</span><p style="color:red">Antrian SOS</p></button>
+
         </div>
     </div>
 </div>
@@ -185,7 +186,6 @@ document.addEventListener("DOMContentLoaded", initializeApp);
 // FIX: Tambahkan listener untuk ketika PWA kembali dari background
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
-        // Panggil ulang initializeApp untuk refresh data
         initializeApp(); 
     }
 });
@@ -238,7 +238,7 @@ function calculateTotalDebt(paidDates) {
 }
 
 function loadPaymentsAndDebt() {
-    if (!db) return; // Pastikan db sudah terinisialisasi
+    if (!db) return; 
     db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
       .onSnapshot(snap => {
@@ -284,8 +284,18 @@ function loadPaymentsAndDebt() {
 }
 
 function triggerSOS() {
-    // Membuka daftar antrian dengan mode SOS
+    // Membuka daftar antrian dengan mode SOS (untuk antrian)
     window.location.href = 'daftar_antrian.html?mode=SOS'; 
+}
+
+function triggerWaSOS() {
+    const csNumber = '6281234567890'; // GANTI DENGAN NOMOR WA CS YANG SEBENARNYA
+    const userPlat = currentUser ? currentUser.plat : 'TIDAK DIKETAHUI';
+    const userName = currentUser ? currentUser.nama : 'Pengguna';
+    const message = `Halo CS MAKA. Saya ${userName} (${userPlat}). Saya butuh bantuan/laporan darurat terkait motor saya.`;
+    
+    // Buka WhatsApp
+    window.open(`https://wa.me/${csNumber}?text=${encodeURIComponent(message)}`, '_blank');
 }
 </script>
 </body>
