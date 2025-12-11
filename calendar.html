@@ -155,6 +155,7 @@ footer.bottom-nav {
 // PWA ANTI LOADING
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'))}
 
+// --- CONFIG FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -173,17 +174,46 @@ let currentMonth = new Date().getMonth();
 let paidDates = []; 
 
 document.addEventListener("DOMContentLoaded", () => {
+    // PERBAIKAN 1: Pengecekan Login
     if(!currentUser) { window.location.href='index.html'; return; }
     loadPayments();
 });
 
+function updateHeroCard(amount, count, error=false) {
+    const card = document.getElementById('heroCard');
+    const txtAmount = document.getElementById('totalDebt');
+    const txtDesc = document.getElementById('debtDesc');
+
+    if (error) {
+        card.className = "hero-card"; // Merah Default
+        txtAmount.innerText = "⚠️ ERROR";
+        txtDesc.innerText = "Gagal memuat data. Cek koneksi internet Anda.";
+        return;
+    }
+
+    if (amount > 0) {
+        card.className = "hero-card"; // Merah Default
+        txtAmount.innerText = "Rp " + amount.toLocaleString('id-ID');
+        txtDesc.innerText = `Anda menunggak ${count} hari. Klik kalender untuk bayar.`;
+    } else {
+        card.className = "hero-card aman"; // Biru
+        txtAmount.innerText = "Rp 0";
+        txtDesc.innerText = "Tidak ada tunggakan. Akun Aman! 👍";
+    }
+}
+
 function loadPayments() {
+    // PERBAIKAN 2: Tambahkan Error Handler pada onSnapshot
     db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
       .onSnapshot(snap => {
           paidDates = [];
           snap.forEach(doc => { paidDates.push(doc.data().date); });
           calculateTotalDebt();
+          renderCalendar();
+      }, error => {
+          console.error("Firestore Error:", error);
+          updateHeroCard(0, 0, true); // Tampilkan error di Hero Card
           renderCalendar();
       });
 }
@@ -233,23 +263,8 @@ function calculateTotalDebt() {
     updateHeroCard(totalHutang, daysLate);
 }
 
-function updateHeroCard(amount, count) {
-    const card = document.getElementById('heroCard');
-    const txtAmount = document.getElementById('totalDebt');
-    const txtDesc = document.getElementById('debtDesc');
 
-    if (amount > 0) {
-        card.className = "hero-card"; // Merah
-        txtAmount.innerText = "Rp " + amount.toLocaleString('id-ID');
-        txtDesc.innerText = `Anda menunggak ${count} hari. Klik kalender untuk bayar.`;
-    } else {
-        card.className = "hero-card aman"; // Biru
-        txtAmount.innerText = "Rp 0";
-        txtDesc.innerText = "Tidak ada tunggakan. Akun Aman! 👍";
-    }
-}
-
-// 3. RENDER KALENDER
+// 3. RENDER KALENDER (Tetap sama)
 function renderCalendar() {
     const grid = document.getElementById('calendarGrid');
     grid.innerHTML = '<div class="day-name">M</div><div class="day-name">S</div><div class="day-name">S</div><div class="day-name">R</div><div class="day-name">K</div><div class="day-name">J</div><div class="day-name">S</div>';
@@ -337,6 +352,10 @@ function processPayment(dateStr, amount) {
     }).then(() => {
         document.getElementById('customModal').style.display = 'none';
         alert("Lunas! ✅");
+    }).catch(error => {
+        console.error("Payment Error:", error);
+        alert("Gagal memproses pembayaran. Cek koneksi Anda.");
+        document.getElementById('customModal').style.display = 'none';
     });
 }
 
