@@ -58,38 +58,59 @@ footer.bottom-nav {
 .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #94a3b8; font-size: 9px; font-weight: 700; }
 .nav-item span { font-size: 22px; margin-bottom: 2px; }
 .nav-item.active { color: var(--accent); }
+
+/* BARU: Styling untuk mengatasi White Screen/Loading */
+#loading-overlay {
+    position: fixed; inset: 0; background: var(--bg-base); 
+    display: flex; align-items: center; justify-content: center; 
+    flex-direction: column;
+    z-index: 100; font-size: 2.5em; color: var(--accent);
+}
+.hidden-content { display: none !important; }
+
 </style>
 </head>
 <body>
 
+<div id="loading-overlay">
+    <div style="text-align:center;">
+        <span style="display:block; animation: pulse 1s infinite;">⚡</span>
+        <p style="font-size:0.5em; color:#64748b; font-weight:700;">Memuat Data...</p>
+    </div>
+</div>
+<style>
+@keyframes pulse { 0% {opacity:1} 50% {opacity:0.4} 100% {opacity:1} }
+</style>
 <div class="app-container">
-    <div class="header">
-        <div class="profile-pic" id="user-avatar">U</div>
-        <div>
-            <h1 id="user-name-display" style="margin:0;font-size:1.2em;font-weight:800;">Halo...</h1>
-            <p id="user-plate-display" style="margin:2px 0 0;font-size:0.85em;color:#64748b;font-weight:600;">Loading...</p>
+    <div id="main-content" class="hidden-content">
+        <div class="header">
+            <div class="profile-pic" id="user-avatar">U</div>
+            <div>
+                <h1 id="user-name-display" style="margin:0;font-size:1.2em;font-weight:800;">Halo...</h1>
+                <p id="user-plate-display" style="margin:2px 0 0;font-size:0.85em;color:#64748b;font-weight:600;">Loading...</p>
+            </div>
         </div>
-    </div>
 
-    <div id="heroCard" class="hero-card">
-        <div class="hero-label" id="bill-date">STATUS TUNGGAKAN</div>
-        <div id="hero-amount" class="hero-amount">Rp 0</div>
-        <div id="hero-desc" class="hero-desc">...</div>
-        
-        <div class="progress-container">
-            <div class="progress-info"><span>PROGRESS KEPEMILIKAN</span><span id="rto-days">Hari 0 / 1009</span></div>
-            <div class="progress-track"><div id="rto-bar" class="progress-fill"></div></div>
+        <div id="heroCard" class="hero-card">
+            <div class="hero-label" id="bill-date">STATUS TUNGGAKAN</div>
+            <div id="hero-amount" class="hero-amount">Rp 0</div>
+            <div id="hero-desc" class="hero-desc">...</div>
+            
+            <div class="progress-container">
+                <div class="progress-info"><span>PROGRESS KEPEMILIKAN</span><span id="rto-days">Hari 0 / 1009</span></div>
+                <div class="progress-track"><div id="rto-bar" class="progress-fill"></div></div>
+            </div>
         </div>
-    </div>
 
-    <h2 class="section-title">✨ Menu Utama</h2>
-    <div class="icon-grid">
-        <a href="calendar.html" class="glass-card"><span>📅</span><p>Bayar</p></a>
-        <a href="history.html" class="glass-card"><span>🗒️</span><p>Riwayat</p></a>
-        <a href="part_tracker.html" class="glass-card"><span>🎁</span><p>Gratisan</p></a>
-        <a href="settings.html" class="glass-card"><span>⚙️</span><p>Setting</p></a>
-        <a href="maka_plus.html" class="glass-card"><span>⭐</span><p>MAKA+</p></a>
-        <a href="daftar_antrian.html" class="glass-card" style="background:#fee2e2; border-color:#fca5a5;"><span>🚨</span><p style="color:red">SOS</p></a>
+        <h2 class="section-title">✨ Menu Utama</h2>
+        <div class="icon-grid">
+            <a href="calendar.html" class="glass-card"><span>📅</span><p>Bayar</p></a>
+            <a href="history.html" class="glass-card"><span>🗒️</span><p>Riwayat</p></a>
+            <a href="part_tracker.html" class="glass-card"><span>🎁</span><p>Gratisan</p></a>
+            <a href="settings.html" class="glass-card"><span>⚙️</span><p>Setting</p></a>
+            <a href="maka_plus.html" class="glass-card"><span>⭐</span><p>MAKA+</p></a>
+            <a href="daftar_antrian.html" class="glass-card" style="background:#fee2e2; border-color:#fca5a5;"><span>🚨</span><p style="color:red">SOS</p></a>
+        </div>
     </div>
 </div>
 
@@ -123,7 +144,7 @@ let plusData = JSON.parse(localStorage.getItem('maka_plus_data')) || { active: f
 document.addEventListener("DOMContentLoaded", function() {
     if(!currentUser) { window.location.href='index.html'; return; }
     
-    // 1. Render Info
+    // 1. Render Info Awal
     document.getElementById('user-name-display').innerText = currentUser.nama;
     document.getElementById('user-plate-display').innerText = currentUser.plat;
     if(currentUser.photoUrl) {
@@ -184,7 +205,7 @@ function calculateTotalDebt(paidDates) {
 function loadPaymentsAndDebt() {
     db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
-      .onSnapshot(snap => { // Callback sukses
+      .onSnapshot(snap => {
           let paidDates = [];
           snap.forEach(doc => { paidDates.push(doc.data().date); });
           
@@ -207,22 +228,22 @@ function loadPaymentsAndDebt() {
           // Update Progress RTO
           document.getElementById('rto-days').innerText = `Hari ${debt.currentDay} / 1009`;
           document.getElementById('rto-bar').style.width = (debt.currentDay / 1009) * 100 + "%";
-          
-      }, error => { // Callback error (PENANGANAN KONEKSI)
-          console.error("Firestore Snapshot Error:", error);
-          
-          if (error.code === 'unavailable') {
-              // Menampilkan pesan error di card utama
-              const card = document.getElementById('heroCard');
-              const amountEl = document.getElementById('hero-amount');
-              const descEl = document.getElementById('hero-desc');
-              
-              card.className = "hero-card warning"; // Menggunakan warning (merah)
-              amountEl.innerText = "⚠️ KONEKSI GAGAL";
-              descEl.innerText = "Gagal menghubungi server. Periksa koneksi internet Anda atau coba lagi nanti.";
-          } else {
-              console.error("Error lain saat memuat data:", error);
-          }
+
+          // BARU: Sembunyikan loading, tampilkan konten utama
+          document.getElementById('loading-overlay').style.display = 'none';
+          document.getElementById('main-content').classList.remove('hidden-content');
+
+      }, error => {
+          // Error Handler Firestore
+          console.error("Firestore Error:", error);
+          const card = document.getElementById('heroCard');
+          document.getElementById('hero-amount').innerText = "⚠️ ERROR";
+          document.getElementById('hero-desc').innerText = "Gagal memuat data. Periksa koneksi internet Anda.";
+          card.className = "hero-card warning";
+
+          // BARU: Sembunyikan loading, tampilkan konten utama dengan pesan error
+          document.getElementById('loading-overlay').style.display = 'none';
+          document.getElementById('main-content').classList.remove('hidden-content');
       });
 }
 
