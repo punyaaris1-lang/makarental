@@ -122,19 +122,21 @@ const db = firebase.firestore();
 let currentUser = JSON.parse(localStorage.getItem('maka_user'));
 
 document.addEventListener('DOMContentLoaded', () => {
+    // PERBAIKAN 1: Pengecekan Login
     if(!currentUser) { window.location.href='index.html'; return; }
     document.getElementById('platDisplay').innerText = currentUser.plat;
     loadPaymentHistory();
 });
 
 function loadPaymentHistory() {
+    const container = document.getElementById('historyList');
+    
     // Tarik data dari collection 'daily_payments'
     db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
       .orderBy('paidAt', 'desc') // Urutkan dari yang terbaru dibayar
       .limit(30)
       .onSnapshot(snap => {
-          const container = document.getElementById('historyList');
           let html = '';
           
           if (snap.empty) {
@@ -175,18 +177,16 @@ function loadPaymentHistory() {
           });
 
           container.innerHTML = html;
+      }, error => {
+          // PERBAIKAN 2: Error Handler Koneksi
+          console.error("Firestore Error:", error);
+          container.innerHTML = `
+              <div style="text-align:center; padding:50px; color:var(--danger); border:1px solid #fee2e2; border-radius:18px;">
+                  ⚠️ Gagal memuat riwayat. Periksa koneksi internet Anda.
+              </div>`;
       });
 }
 </script>
-    <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('PWA Registered'))
-        .catch(err => console.log('PWA Error', err));
-    });
-  }
-            </script>
     
 </body>
 </html>
