@@ -210,24 +210,23 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const currentUser = JSON.parse(localStorage.getItem('maka_user'));
+let currentUser = JSON.parse(localStorage.getItem('maka_user'));
 
 document.addEventListener('DOMContentLoaded', () => {
-    if(currentUser) {
-        document.getElementById('uName').innerText = currentUser.nama;
-        document.getElementById('uPlat').innerText = currentUser.plat;
-        document.getElementById('dWa').innerText = currentUser.hp || "-";
-        
-        // Format Tanggal
-        if(currentUser.joinedAt) {
-            const d = new Date(currentUser.joinedAt);
-            document.getElementById('dJoin').innerText = d.toLocaleDateString('id-ID');
-        }
-        
-        loadCurrentPhoto();
-    } else {
-        window.location.href='index.html';
+    // PERBAIKAN 1: Pengecekan Login
+    if(!currentUser) { window.location.href='index.html'; return; }
+    
+    document.getElementById('uName').innerText = currentUser.nama;
+    document.getElementById('uPlat').innerText = currentUser.plat;
+    document.getElementById('dWa').innerText = currentUser.hp || "-";
+    
+    // Format Tanggal
+    if(currentUser.joinedAt) {
+        const d = new Date(currentUser.joinedAt);
+        document.getElementById('dJoin').innerText = d.toLocaleDateString('id-ID');
     }
+    
+    loadCurrentPhoto();
 });
 
 function loadCurrentPhoto() {
@@ -242,6 +241,11 @@ function loadCurrentPhoto() {
         } else {
             document.getElementById('txtAvatar').innerText = currentUser.nama.charAt(0).toUpperCase();
         }
+    }).catch(error => {
+        // PERBAIKAN 2: Error Handler saat memuat data profil
+        console.error("Load Photo Error:", error);
+        showModal("Gagal Muat Data", "Gagal memuat detail profil. Cek koneksi Anda.", "❌");
+        document.getElementById('txtAvatar').innerText = currentUser.nama.charAt(0).toUpperCase();
     });
 }
 
@@ -279,7 +283,10 @@ function uploadPhoto() {
                 loadCurrentPhoto();
             })
             .catch(err => {
-                showModal("Gagal", "Error: " + err.message, "❌");
+                // PERBAIKAN 3: Error Handler saat mengupload/menyimpan ke Firebase
+                let errorMsg = "Gagal menyimpan foto. Cek koneksi Anda.";
+                if(err.code && err.code.includes('unavailable')) errorMsg = "Koneksi ke Firebase gagal. Coba lagi.";
+                showModal("Gagal", errorMsg, "❌");
             });
         }
     }
@@ -299,19 +306,19 @@ function handleLogout() {
     document.getElementById('mIcon').innerText = "🚪";
     
     // Ganti tombol jadi 2 (Batal / Ya)
-    const btns = modal.querySelector('.modal-box');
-    const oldBtn = btns.querySelector('.btn-modal');
-    if(oldBtn) oldBtn.remove();
+    const box = modal.querySelector('.modal-box');
     
-    // Cek jika tombol sudah ada (biar ga double)
-    if(!document.getElementById('btnYes')) {
-        btns.innerHTML += `
-            <div style="display:flex; gap:10px; margin-top:20px;">
-                <button onclick="closeModal()" style="flex:1; padding:12px; border:none; background:#f1f5f9; color:#64748b; border-radius:12px; font-weight:bold;">Batal</button>
-                <button id="btnYes" onclick="processLogout()" style="flex:1; padding:12px; border:none; background:var(--danger); color:white; border-radius:12px; font-weight:bold;">Ya, Keluar</button>
-            </div>
-        `;
-    }
+    // Hapus tombol lama jika ada dan pastikan hanya ada satu set tombol baru
+    box.innerHTML = `
+        <span id="mIcon" class="modal-icon">🚪</span>
+        <h3 id="mTitle" class="modal-title">Keluar Akun?</h3>
+        <p id="mDesc" class="modal-desc">Anda harus login ulang nanti.</p>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button onclick="closeModal()" style="flex:1; padding:12px; border:none; background:#f1f5f9; color:#64748b; border-radius:12px; font-weight:bold;">Batal</button>
+            <button id="btnYes" onclick="processLogout()" style="flex:1; padding:12px; border:none; background:var(--danger); color:white; border-radius:12px; font-weight:bold;">Ya, Keluar</button>
+        </div>
+    `;
+
     modal.classList.add('show');
 }
 
@@ -333,15 +340,6 @@ function showModal(title, msg, icon="🔔") {
 }
 function closeModal() { document.getElementById('customModal').classList.remove('show'); }
 </script>
-    <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('PWA Registered'))
-        .catch(err => console.log('PWA Error', err));
-    });
-  }
-    </script>
     
 </body>
 </html>
