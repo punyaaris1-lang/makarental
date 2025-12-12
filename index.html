@@ -1,188 +1,156 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Login RTO MAKA</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<link rel="manifest" href="/makarental/manifest.json"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RTO MAKA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <link rel="manifest" href="/makarental/manifest.json">
+    <link rel="stylesheet" href="login.css">
     
-<style>
-/* GLOBAL THEME */
-:root { 
-    --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
-    --glass-bg:rgba(255,255,255,0.75); --glass-border:rgba(255,255,255,0.5); 
-    --glass-shadow:0 8px 32px 0 rgba(31, 38, 135, 0.15); --backdrop-blur:blur(12px);
-    --radius-lg:24px; --radius-md:16px; 
-}
-* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    <style>
+        /* CSS from login.css should be linked here */
+        /* Ensure .btn-submit, .form-input, .app-container styles are loaded */
+        
+        /* Tambahkan CSS untuk select box */
+        .select-box {
+            width: 100%; padding: 14px; border: 1px solid #cbd5e1; 
+            border-radius: 12px; margin-bottom: 12px; font-family: 'Inter'; 
+            font-size: 1em; background: #f8fafc; outline: none; color: #0f1724;
+            appearance: none; /* Hapus panah default di beberapa browser */
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 15px;
+        }
+        .select-box:focus { border-color: #0ea5a6; background: white; }
 
-body { 
-    margin:0; padding:0; font-family:'Inter', sans-serif; 
-    background-color: var(--bg-base); color:var(--text); 
-    min-height:100vh; 
-    position: relative; 
-    overflow-x: hidden; 
-    padding-top: 50px; 
-    padding-bottom: 50px;
-}
+        /* Style tambahan untuk form-container */
+        .form-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            max-width: 380px;
+            width: 90%;
+            text-align: center;
+        }
 
-/* BACKGROUND IMAGE */
-body::before {
-    content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: url('1763947427555.jpg') center/cover no-repeat; 
-    opacity: 0.15; z-index: -1; pointer-events: none;
-}
+        .toggle-btn-group {
+            display: flex;
+            margin-bottom: 25px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 5px;
+        }
+        .toggle-btn {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            background: transparent;
+            font-weight: 700;
+            border-radius: 8px;
+            color: #64748b;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .toggle-btn.active {
+            background: white;
+            color: #0ea5a6;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
-/* PERBAIKAN: Menambah padding bawah LEBIH AGRESIV & mengatur tinggi */
-.app-container { 
-    width:100%; max-width:460px; margin: 0 auto;
-    padding:24px; 
-    padding-top: 0; 
-    padding-bottom: 300px; 
-    min-height: 100vh; 
-}
+        .btn-submit { 
+            background: #0ea5a6; 
+            color: white; 
+            border: none; 
+            padding: 18px; 
+            border-radius: 16px; 
+            font-weight: 900; 
+            font-size: 1.1em; 
+            cursor: pointer; 
+            width: 100%;
+        }
 
-/* CARD LOGIN */
-.auth-card { 
-    background:var(--glass-bg); backdrop-filter:var(--backdrop-blur); 
-    -webkit-backdrop-filter:var(--backdrop-blur);
-    border-radius:var(--radius-lg); padding:32px 24px; 
-    box-shadow:var(--glass-shadow); border:1px solid var(--glass-border); 
-}
+        .btn-submit:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
 
-/* JUDUL BARU (FONT KECIL & BERSIH) */
-.brand-title { 
-    font-family:'Inter', sans-serif; 
-    font-size:1.4em; 
-    font-weight:900; 
-    text-align:center; margin:0 0 4px; color: var(--text);
-    letter-spacing: 0.5px;
-    white-space: nowrap; 
-}
-.brand-subtitle { 
-    color:#64748b; 
-    font-size:0.8em; 
-    text-align:center; 
-    margin-bottom:20px; 
-    font-weight: 500; 
-    opacity: 0.8;
-}
+        .app-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f4f8; /* background utama */
+            background-image: url('1763947427555.jpg'); /* background image */
+            background-size: cover;
+            background-position: center;
+        }
 
-/* TABS */
-.tabs { display:flex; background:rgba(255,255,255,0.5); padding:5px; border-radius:16px; margin-bottom:20px; }
-.tab-btn { 
-    flex:1; padding:10px; 
-    border:none; background:transparent; 
-    color:#64748b; font-weight:700; border-radius:12px; cursor:pointer; 
-    font-family: 'Inter'; transition: 0.3s;
-}
-.tab-btn.active { background:white; color:var(--accent); box-shadow:0 4px 10px rgba(0,0,0,0.05); }
-
-/* FORM KOMPAK */
-.form-view { display:none; animation: fadeIn 0.4s ease; } 
-.form-view.active { display:block; }
-@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-
-.form-group { margin-bottom:12px; }
-label { display:block; font-size:0.75em; font-weight:800; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing: 0.5px; }
-input, select { 
-    width:100%; padding:12px; 
-    border-radius:var(--radius-md); 
-    border:1px solid #cbd5e1; background:rgba(255,255,255,0.8); 
-    outline:none; font-size: 1em; font-family: 'Inter'; transition: 0.2s;
-}
-input:focus { border-color: var(--accent); background: white; }
-
-/* BUTTON */
-.btn-primary { 
-    width:100%; margin-top:10px; 
-    padding:16px; 
-    border:none; 
-    border-radius:var(--radius-md); 
-    background:linear-gradient(90deg, var(--accent), var(--accent-2)); 
-    color:white; font-weight:800; font-size: 1em; cursor:pointer; 
-    box-shadow: 0 10px 25px rgba(14, 165, 166, 0.3); transition: 0.2s;
-    font-family: 'Syne'; letter-spacing: 0.5px;
-}
-.btn-primary:active { transform: scale(0.98); }
-.btn-primary:disabled { background:#cbd5e1; box-shadow: none; cursor:not-allowed; }
-
-/* CUSTOM MODAL POP-UP */
-.modal-overlay {
-    position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);
-    z-index:9999; display:none; align-items:center; justify-content:center;
-    opacity:0; transition:opacity 0.3s;
-}
-.modal-overlay.show { display:flex; opacity:1; }
-.modal-box {
-    background:white; width:85%; max-width:320px; padding:30px; border-radius:28px;
-    text-align:center; box-shadow:0 25px 60px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.modal-overlay.show .modal-box { transform:scale(1); }
-.modal-icon { font-size:40px; margin-bottom:15px; display:block; }
-.modal-title { font-family:'Syne'; font-size:1.4em; font-weight:800; margin:0 0 10px; color:var(--text); }
-.modal-desc { font-size:0.95em; color:#64748b; line-height:1.5; margin-bottom:25px; }
-.btn-modal { 
-    width: 100%; padding:14px; border-radius:14px; border:none; 
-    background:var(--text); color:white; font-weight:800; cursor:pointer; 
-}
-</style>
+        .logo {
+            font-family: 'Syne', sans-serif;
+            font-size: 2.2em;
+            font-weight: 900;
+            color: #0f1724;
+            margin-bottom: 5px;
+            letter-spacing: -1px;
+        }
+        .tagline {
+            color: #64748b;
+            font-size: 0.85em;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+    </style>
 </head>
 <body>
 
 <div class="app-container">
-  <div class="auth-card">
-    <div class="brand-title">RTO MAKA</div>
-    <div class="brand-subtitle">Connect With MLU System</div>
+    <div class="form-container">
+        <div class="logo">RTO MAKA</div>
+        <div class="tagline">Connect With MLU System</div>
+        
+        <div class="toggle-btn-group">
+            <button class="toggle-btn active" id="btnMasuk" onclick="toggleForm('masuk')">MASUK</button>
+            <button class="toggle-btn" id="btnDaftarBaru" onclick="toggleForm('daftar')">DAFTAR BARU</button>
+        </div>
 
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('login')">MASUK</button>
-      <button class="tab-btn" onclick="switchTab('register')">DAFTAR BARU</button>
-    </div>
+        <div id="formMasuk">
+            <input type="text" id="platMasuk" class="form-input" placeholder="PLAT NOMOR KENDARAAN" style="text-transform:uppercase;">
+            <button id="btnMasukApp" class="btn-submit" onclick="loginUser()" disabled>MASUK APLIKASI</button>
+        </div>
 
-    <div id="view-login" class="form-view active">
-      <div class="form-group">
-        <label>Plat Nomor Kendaraan</label>
-        <input id="l-plat" type="text" placeholder="Contoh: B 1234 XYZ" style="text-transform:uppercase;">
-      </div>
-      <button id="btnLogin" class="btn-primary" onclick="handleLogin()">MASUK APLIKASI</button>
-    </div>
-
-    <div id="view-register" class="form-view">
-      <div class="form-group"><label>Nama Lengkap</label><input id="r-nama" placeholder="Sesuai KTP"></div>
-      <div class="form-group"><label>Nomor HP (WA)</label><input id="r-hp" type="tel" placeholder="08xxxxxxxxxx"></div>
-      <div class="form-group"><label>Plat Nomor</label><input id="r-plat" placeholder="B 1234 XYZ" style="text-transform:uppercase;"></div>
-      <div class="form-group"><label>Tanggal Ambil Motor</label><input id="r-tgl" type="date"></div>
-      <div class="form-group"><label>Opsi DP</label>
-        <select id="r-dp"><option value="355">DP 355.000 (Cicil)</option><option value="755">DP 755.000 (Langsung)</option></select>
-      </div>
-      <button id="btnReg" class="btn-primary" onclick="handleRegister()">DAFTAR SEKARANG</button>
-    </div>
-  </div>
-</div>
-
-<div id="customModal" class="modal-overlay">
-    <div class="modal-box">
-        <span id="mIcon" class="modal-icon">🔔</span>
-        <h3 id="mTitle" class="modal-title">Info</h3>
-        <p id="mDesc" class="modal-desc">Pesan...</p>
-        <button class="btn-modal" onclick="closeModal()">OK, SIAP</button>
+        <div id="formDaftar" style="display:none;">
+            <input type="text" id="namaDaftar" class="form-input" placeholder="NAMA LENGKAP (Sesuai KTP)">
+            <input type="number" id="hpDaftar" class="form-input" placeholder="NOMOR HP (WA)">
+            <input type="text" id="platDaftar" class="form-input" placeholder="PLAT NOMOR KENDARAAN" style="text-transform:uppercase;">
+            <input type="date" id="ambilDaftar" class="form-input">
+            
+            <select id="dpDaftar" class="select-box">
+                <option value="" disabled selected>OPSI DP</option>
+                <option value="355000">DP 355.000 (Cicil)</option>
+                <option value="500000">DP 500.000 (Non-Cicil)</option>
+            </select>
+            
+            <button id="btnDaftarSekarang" class="btn-submit" onclick="registerUser()" disabled>DAFTAR SEKARANG</button>
+        </div>
     </div>
 </div>
 
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('PWA Ready', reg))
-        .catch(err => console.log('PWA Error', err));
-    });
-  }
-</script>
+<div id="customModal" class="modal-overlay" style="position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:9999; display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s;">
+    <div class="modal-box" style="background:white; padding:25px; border-radius:24px; width:85%; max-width:320px; text-align:center; box-shadow:0 20px 60px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s;">
+        <span id="mIcon" class="modal-icon" style="font-size:40px; margin-bottom:15px; display:block;">🔔</span>
+        <h3 id="mTitle" class="modal-title" style="font-family:'Inter'; font-size:1.3em; font-weight:800; margin:0 0 10px; color:#0f1724;">Judul</h3>
+        <p id="mDesc" class="modal-desc" style="font-size:0.9em; color:#64748b; line-height:1.5; margin-bottom:20px;">Keterangan...</p>
+        <div id="mBtns" class="modal-btns">
+             <button class="btn-modal btn-confirm" style="flex:1; padding:12px; border-radius:12px; border:none; font-weight:700; cursor:pointer; font-size:0.9em; background:#0f1724; color:white;" onclick="closeModal()">OK, SIAP</button>
+        </div>
+    </div>
+</div>
 
 <script>
 // --- CONFIG FIREBASE ---
@@ -190,137 +158,172 @@ const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
   projectId: "rtomaka-e67b5",
-  storageBucket: "rtomaka-e67b5.firebasestorage.app",
+  storageBucket: "rtomaka-e67b5.appspot.com",
   messagingSenderId: "472036722228",
   appId: "1:472036722228:web:11d520f9204db317d02c61"
 };
 
 let db;
-let isInitialized = false;
-
-// FIX: Initialization function untuk mengatasi White Screen saat kembali
-function initializeApp() {
-    if (!isInitialized) {
-        try {
-            if (!firebase.apps.length) { 
-                firebase.initializeApp(firebaseConfig);
-            }
-            db = firebase.firestore();
-            isInitialized = true;
-        } catch (e) {
-            if (e.code !== 'app/duplicate-app') {
-                console.error("Firebase init error:", e);
-                return;
-            }
-        }
-    }
+try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+} catch (e) {
+    console.error("Firebase init failed:", e);
+    // Tampilkan error jika inisialisasi gagal
 }
-document.addEventListener("DOMContentLoaded", initializeApp);
 
 
-// --- MODAL LOGIC ---
-function showModal(title, msg, type="info") {
+// --- HELPER FUNCTIONS ---
+function showModal(title, desc, icon="🔔") {
+    const modal = document.getElementById('customModal');
     document.getElementById('mTitle').innerText = title;
-    document.getElementById('mDesc').innerText = msg;
-    document.getElementById('mIcon').innerText = type === "error" ? "⚠️" : (type === "success" ? "✅" : "🔔");
-    document.getElementById('customModal').classList.add('show');
+    document.getElementById('mDesc').innerHTML = desc;
+    document.getElementById('mIcon').innerText = icon;
+    modal.classList.add('show');
+    modal.style.display = 'flex';
+    setTimeout(() => modal.style.opacity = '1', 10);
 }
 function closeModal() {
-    document.getElementById('customModal').classList.remove('show');
+    const modal = document.getElementById('customModal');
+    modal.style.opacity = '0';
+    setTimeout(() => modal.style.display = 'none', 300);
 }
 
-// --- APP LOGIC ---
-function switchTab(mode) {
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  event.target.classList.add('active');
-  document.querySelectorAll('.form-view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-'+mode).classList.add('active');
+function checkLoginState() {
+    if (localStorage.getItem('maka_user')) {
+        window.location.href = 'dashboard.html';
+    }
+}
+document.addEventListener('DOMContentLoaded', checkLoginState);
+
+function toggleForm(mode) {
+    document.getElementById('formMasuk').style.display = mode === 'masuk' ? 'block' : 'none';
+    document.getElementById('formDaftar').style.display = mode === 'daftar' ? 'block' : 'none';
+    document.getElementById('btnMasuk').classList.toggle('active', mode === 'masuk');
+    document.getElementById('btnDaftarBaru').classList.toggle('active', mode === 'daftar');
 }
 
-function handleRegister() {
-  if (!db) return showModal("Error", "Koneksi database belum siap.", "error");
-
-  const nama = document.getElementById('r-nama').value.trim();
-  const hp = document.getElementById('r-hp').value.trim();
-  const plat = document.getElementById('r-plat').value.trim().toUpperCase();
-  const tgl = document.getElementById('r-tgl').value;
-  const dp = document.getElementById('r-dp').value;
-  const btn = document.getElementById('btnReg');
-
-  if(!nama || !hp || !plat || !tgl) return showModal("Data Kurang", "Mohon lengkapi semua formulir.", "error");
-
-  btn.disabled = true; btn.innerText = "MENDAFTAR...";
-
-  const docRef = db.collection('users').doc(plat);
-  docRef.get().then((doc) => {
-    if (doc.exists) {
-      showModal("Sudah Terdaftar", "Plat nomor ini sudah ada. Silakan Login.", "error");
-      switchTab('login');
-      document.getElementById('l-plat').value = plat;
-      btn.disabled = false; btn.innerText = "DAFTAR SEKARANG";
+// --- VALIDATION AND BUTTON STATE ---
+function checkInputs(type) {
+    if (type === 'masuk') {
+        const p = document.getElementById('platMasuk').value.toUpperCase().trim();
+        document.getElementById('btnMasukApp').disabled = p.length < 4;
     } else {
-      const userData = {
-        nama: nama, hp: hp, plat: plat, tglAmbil: tgl, dp: dp,
-        joinedAt: new Date(tgl).toISOString(), 
-        isBanned: false,
-        makaPlus: { active:false, activatedAt:null }
-      };
-      
-      docRef.set(userData).then(() => {
-        // PERBAIKAN KRITIS: Buat antrian dengan array KOSONG di chargingSlots
-        // Ini mencegah crash di Antrian karena array of 'null'
-        db.collection('antrian').doc('utama').set({
-            chargingSlots: [], 
-            waitingQueue: []
-        }, { merge: true }).then(() => {
-            localStorage.setItem('maka_user', JSON.stringify(userData));
-            showModal("Sukses", "Pendaftaran Berhasil! Selamat Datang.", "success");
-            setTimeout(() => window.location.href = 'dashboard.html', 1500);
-        }).catch((e) => {
-             showModal("Gagal", "Gagal inisialisasi antrian. Coba lagi.", "error");
+        const n = document.getElementById('namaDaftar').value.trim();
+        const h = document.getElementById('hpDaftar').value.trim();
+        const p = document.getElementById('platDaftar').value.toUpperCase().trim();
+        const a = document.getElementById('ambilDaftar').value;
+        const d = document.getElementById('dpDaftar').value;
+        
+        const isValid = n && h.length > 8 && p.length > 4 && a && d;
+        document.getElementById('btnDaftarSekarang').disabled = !isValid;
+    }
+}
+document.querySelectorAll('.form-input, .select-box').forEach(el => {
+    el.addEventListener('input', () => {
+        checkInputs(el.id.includes('Masuk') ? 'masuk' : 'daftar');
+    });
+});
+
+
+// --- CORE LOGIC ---
+
+// 1. LOGIN
+function loginUser() {
+    const plat = document.getElementById('platMasuk').value.toUpperCase().trim();
+    if (!plat) return;
+
+    db.collection('users').doc(plat).get()
+        .then(doc => {
+            if (doc.exists) {
+                const userData = doc.data();
+                localStorage.setItem('maka_user', JSON.stringify(userData));
+                window.location.href = 'dashboard.html';
+            } else {
+                showModal("Gagal Masuk", "Plat Nomor tidak terdaftar. Silakan Daftar Baru.", '❌');
+            }
+        })
+        .catch(error => {
+            console.error("Login Error:", error);
+            showModal("Gagal", "Terjadi kesalahan koneksi database. Periksa koneksi internet Anda.", '❌');
         });
-
-      });
-    }
-  }).catch((error) => {
-    // FIX: Pesan Error lebih jelas
-    console.error("Error:", error);
-    showModal("Gagal", "Gagal koneksi database. Cek Rules Firebase Anda. (Error detail: " + error.message + ")", "error");
-    btn.disabled = false; btn.innerText = "DAFTAR SEKARANG";
-  });
 }
 
-function handleLogin() {
-  if (!db) return showModal("Error", "Koneksi database belum siap.", "error");
+// 2. REGISTRATION (FIXED & HARDENED)
+function registerUser() {
+    const nama = document.getElementById('namaDaftar').value.trim();
+    const hp = document.getElementById('hpDaftar').value.trim();
+    const plat = document.getElementById('platDaftar').value.toUpperCase().trim();
+    const ambil = document.getElementById('ambilDaftar').value;
+    const dp = document.getElementById('dpDaftar').value;
+    
+    if (!nama || !hp || !plat || !ambil || !dp) return;
+    
+    const btn = document.getElementById('btnDaftarSekarang');
+    btn.disabled = true;
+    btn.innerText = "MEMPROSES...";
 
-  const plat = document.getElementById('l-plat').value.trim().toUpperCase();
-  const btn = document.getElementById('btnLogin');
-  
-  if(!plat) return showModal("Input Kosong", "Mohon isi Plat Nomor Anda.", "error");
-  
-  btn.disabled = true; btn.innerText = "MEMERIKSA...";
+    const newUserData = {
+        plat: plat,
+        name: nama,
+        phone: hp,
+        dpOption: dp,
+        ambilMotor: new Date(ambil + 'T00:00:00').toISOString(),
+        registeredAt: firebase.firestore.FieldValue.serverTimestamp(),
+        // Data Awal untuk Dashboard:
+        rentPrice: 70000, 
+        outstanding: 0,
+        daysOwned: 0,
+        totalDay: 1009
+    };
+    
+    // START TRANSACTION
+    db.runTransaction(async t => {
+        const userRef = db.collection('users').doc(plat);
+        const antrianRef = db.collection('antrian').doc('utama');
+        
+        const userDoc = await t.get(userRef);
+        if (userDoc.exists) {
+            throw new Error("Plat Nomor sudah terdaftar.");
+        }
 
-  db.collection('users').doc(plat).get().then((doc) => {
-    if (doc.exists) {
-      const data = doc.data();
-      if(data.isBanned) {
-        showModal("Akses Ditolak", "Akun Anda diblokir oleh Admin.", "error");
-        btn.disabled = false; btn.innerText = "MASUK APLIKASI";
-        return;
-      }
-      localStorage.setItem('maka_user', JSON.stringify(data));
-      window.location.href = 'dashboard.html';
-    } else {
-      showModal("Tidak Ditemukan", "Plat nomor belum terdaftar. Silakan Daftar Baru.", "error");
-      btn.disabled = false; btn.innerText = "MASUK APLIKASI";
-    }
-  }).catch((error) => {
-    // FIX: Pesan Error lebih jelas
-    console.error("Error:", error);
-    showModal("Gagal", "Gagal koneksi database. Cek Rules Firebase Anda. (Error detail: " + error.message + ")", "error");
-    btn.disabled = false; btn.innerText = "MASUK APLIKASI";
-  });
+        // 1. TULIS DATA USER BARU
+        t.set(userRef, newUserData);
+
+        // 2. TULIS/PERBAIKI DATA ANTRIAN (KRITIS!)
+        const antrianDoc = await t.get(antrianRef);
+        if (!antrianDoc.exists) {
+            // Jika dokumen antrian BELUM ADA, buat dengan array kosong (fix untuk crash 'target')
+            t.set(antrianRef, {
+                chargingSlots: [], 
+                waitingQueue: []
+            });
+        }
+        
+    }).then(() => {
+        // SUKSES
+        localStorage.setItem('maka_user', JSON.stringify(newUserData));
+        showModal("Pendaftaran Berhasil!", "Selamat datang! Anda akan dialihkan ke dashboard.", '✅');
+        setTimeout(() => {
+            window.location.href = 'dashboard.html';
+        }, 1500);
+    }).catch(e => {
+        // GAGAL
+        btn.disabled = false;
+        btn.innerText = "DAFTAR SEKARANG";
+        
+        let errorMsg = "Terjadi kesalahan saat koneksi database. Cek Rules Firebase Anda.";
+        if (e.message && e.message.includes("Plat Nomor sudah terdaftar")) {
+            errorMsg = "Plat Nomor ini sudah terdaftar. Silakan gunakan tombol MASUK.";
+        } else if (e.code && e.code === 'permission-denied') {
+             errorMsg = "Gagal penulisan. Cek Rules Firebase: `allow write: if true;`";
+        }
+        
+        showModal("Gagal", errorMsg, '❌');
+        console.error("Registration Error Detail:", e);
+    });
 }
 </script>
+
 </body>
 </html>
