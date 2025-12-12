@@ -56,16 +56,16 @@ body::before {
 
 /* JUDUL BARU (FONT KECIL & BERSIH) */
 .brand-title { 
-    font-family:'Inter', sans-serif; /* Mengubah font ke Inter/standar */
-    font-size:1.4em; /* Dikecilkan */
-    font-weight:900; /* Ditebalkan */
+    font-family:'Inter', sans-serif; 
+    font-size:1.4em; 
+    font-weight:900; 
     text-align:center; margin:0 0 4px; color: var(--text);
     letter-spacing: 0.5px;
     white-space: nowrap; 
 }
 .brand-subtitle { 
     color:#64748b; 
-    font-size:0.8em; /* Dikecilkan */
+    font-size:0.8em; 
     text-align:center; 
     margin-bottom:20px; 
     font-weight: 500; 
@@ -202,7 +202,9 @@ let isInitialized = false;
 function initializeApp() {
     if (!isInitialized) {
         try {
-            firebase.initializeApp(firebaseConfig);
+            if (!firebase.apps.length) { 
+                firebase.initializeApp(firebaseConfig);
+            }
             db = firebase.firestore();
             isInitialized = true;
         } catch (e) {
@@ -265,15 +267,23 @@ function handleRegister() {
       };
       
       docRef.set(userData).then(() => {
-        localStorage.setItem('maka_user', JSON.stringify(userData));
-        showModal("Sukses", "Pendaftaran Berhasil! Selamat Datang.", "success");
-        setTimeout(() => window.location.href = 'dashboard.html', 1500);
+        // FIX: Tambahkan inisialisasi antrian dasar agar Antrian tidak crash saat dibuka pertama kali
+        // Ini memastikan Collection 'antrian' dibuat dengan data yang diharapkan (null, null, null)
+        db.collection('antrian').doc('utama').set({
+            chargingSlots: [null, null, null],
+            waitingQueue: []
+        }, { merge: true }).then(() => {
+            localStorage.setItem('maka_user', JSON.stringify(userData));
+            showModal("Sukses", "Pendaftaran Berhasil! Selamat Datang.", "success");
+            setTimeout(() => window.location.href = 'dashboard.html', 1500);
+        });
+
       });
     }
   }).catch((error) => {
-    // FIX: Pesan Gagal koneksi/daftar
+    // FIX: Pesan Error lebih jelas
     console.error("Error:", error);
-    showModal("Gagal", "Terjadi kesalahan saat koneksi database. Cek Rules Firebase Anda.", "error");
+    showModal("Gagal", "Gagal koneksi database. Cek Rules Firebase Anda. (Error detail: " + error.message + ")", "error");
     btn.disabled = false; btn.innerText = "DAFTAR SEKARANG";
   });
 }
@@ -303,9 +313,9 @@ function handleLogin() {
       btn.disabled = false; btn.innerText = "MASUK APLIKASI";
     }
   }).catch((error) => {
-    // FIX: Pesan Gagal koneksi/login
+    // FIX: Pesan Error lebih jelas
     console.error("Error:", error);
-    showModal("Gagal", "Terjadi kesalahan saat koneksi database. Cek Rules Firebase Anda.", "error");
+    showModal("Gagal", "Gagal koneksi database. Cek Rules Firebase Anda. (Error detail: " + error.message + ")", "error");
     btn.disabled = false; btn.innerText = "MASUK APLIKASI";
   });
 }
