@@ -13,25 +13,13 @@
 <style>
 /* GLOBAL THEME */
 :root { 
-    --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
-    --danger:#ef4444; --success:#10b981; --warning:#fbbf24; --disabled:#cbd5e1;
-    --primary-pink: #ff1493;
-    --radius-lg:24px;
+    --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; 
+    --danger:#ef4444; --success:#10b981; --gold:#fbbf24; 
+    --glass-bg:rgba(255,255,255,0.9); 
 }
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-
-body { 
-    margin:0; padding:0; font-family:'Inter', sans-serif; 
-    background:var(--bg-base); color:var(--text); 
-    min-height:100vh; position:relative; overflow-x:hidden;
-}
-
-body::before {
-    content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: url('1763947427555.jpg') center/cover no-repeat; 
-    opacity: 0.15; z-index: -1; pointer-events: none;
-}
-
+body { margin:0; padding:0; font-family:'Inter', sans-serif; background:var(--bg-base); color:var(--text); min-height:100vh; position:relative; overflow-x:hidden; }
+body::before { content:""; position:fixed; top:0; left:0; right:0; bottom:0; background:url('1763947427555.jpg') center/cover no-repeat; opacity:0.15; z-index:-1; pointer-events:none; }
 .app-container { max-width:520px; margin:0 auto; padding:20px 20px 100px; }
 
 /* HEADER */
@@ -40,7 +28,7 @@ body::before {
 .header p { color:#64748b; font-size:0.75em; margin:4px 0 0; font-weight:600; }
 .live-badge { background:#64748b; color:white; font-weight:800; font-size:0.65em; padding:6px 12px; border-radius:20px; }
 .live-badge.online { background:var(--success); box-shadow:0 0 10px var(--success); }
-.live-badge.error { background:var(--danger); box-shadow:0 0 10px var(--danger); } 
+.live-badge.error { background:var(--danger); box-shadow:0 0 10px var(--danger); } /* Tambah class error */
 
 /* FORMULIR */
 .reg-card { background:white; border-radius:20px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.05); margin-bottom: 25px; border:1px solid #e2e8f0; }
@@ -121,42 +109,6 @@ body::before {
 .admin-trigger { text-align:center; margin-top:50px; padding: 20px; border-top: 1px dashed #ccc; }
 .btn-admin-login { background: transparent; border: 2px solid #cbd5e1; color: #94a3b8; padding: 8px 20px; border-radius: 99px; font-size: 0.8em; font-weight: 700; cursor: pointer; }
 
-/* ADMIN PANEL OVERLAY */
-#adminPanel {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000;
-    display: none; align-items: center; justify-content: center;
-    backdrop-filter: blur(10px);
-}
-#adminPanel.show { display: flex; }
-.admin-card {
-    width: 90%; max-width: 400px; padding: 25px; border-radius: 20px;
-    background: #111; color: white; box-shadow: 0 0 30px rgba(255,20,147,0.5);
-}
-.admin-header {
-    font-family: 'Syne'; font-size: 1.5em; font-weight: 900; margin-bottom: 20px;
-    text-align: center; color: var(--primary-pink);
-}
-.admin-action-btn {
-    width: 100%; padding: 16px; margin-bottom: 15px; border: none; border-radius: 12px;
-    font-weight: 800; font-size: 1em; cursor: pointer; text-transform: uppercase;
-    transition: 0.2s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-}
-.btn-select {
-    background: #333; color: white; padding: 16px; border: 2px solid #555;
-}
-.btn-select-slot {
-    width: 100%; height: 50px; background: #333; color: white; border: 2px solid #555;
-    border-radius: 12px; margin-bottom: 15px; font-size: 1em;
-}
-
-.btn-teal { background: var(--accent); color: white; border-bottom: 4px solid #00898a; }
-.btn-pink { background: var(--primary-pink); color: white; border-bottom: 4px solid #cc0077; }
-.btn-danger-admin { background: var(--danger); color: white; border-bottom: 4px solid #cc3333; }
-.btn-light { background: #555; color: white; }
-.admin-action-btn:active { transform: translateY(2px); box-shadow: none; }
-
-
 /* NAV */
 footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:auto; min-width:280px; background:rgba(255,255,255,0.9); backdrop-filter:blur(20px); border-radius:999px; padding:12px 30px; display:flex; justify-content:space-between; align-items:center; gap:30px; box-shadow:0 10px 40px rgba(0,0,0,0.1); border:1px solid rgba(255,255,255,0.5); z-index:999; }
 .nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#94a3b8; font-size:10px; font-weight:700; transition:0.2s; }
@@ -193,7 +145,7 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
         <input id="uWa" type="number" class="form-input" placeholder="WhatsApp">
         <input id="uBat" type="number" class="form-input" placeholder="Sisa Baterai (%)">
         
-        <button id="btnDaftar" class="btn-submit" disabled>DAFTAR & AKTIFKAN MONITORING</button>
+        <button id="btnDaftar" class="btn-submit">DAFTAR & AKTIFKAN MONITORING</button>
         
         <p id="monitorStatus" style="text-align:center; font-size:0.75em; color:var(--success); font-weight:700; margin-top:15px; display:none; background:#ecfdf5; padding:10px; border-radius:10px; border:1px solid #10b981;">
             🔊 <b>MONITORING AKTIF</b><br>Audio "Hujan Pelan" diputar agar browser tidak tidur.
@@ -202,7 +154,10 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
 
     <div class="section-head">STATUS CHARGING</div>
     <div class="slot-grid" id="slots">
-        </div>
+        <div class="slot-card"><div class="slot-status">Loading...</div></div>
+        <div class="slot-card"><div class="slot-status">Loading...</div></div>
+        <div class="slot-card"><div class="slot-status">Loading...</div></div>
+    </div>
 
     <div class="flash-hero">
         <div class="fh-item">
@@ -223,6 +178,9 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
 
     <div class="admin-trigger">
         <button onclick="openAdmin()" class="btn-admin-login">🔒 Admin / Operator Login</button>
+    </div>
+    <div id="adminResetArea" style="display:none; text-align:center; margin-top:20px;">
+        <button onclick="resetAll()" style="background:#fee2e2; color:red; border:1px solid red; padding:10px; border-radius:10px; font-weight:bold; font-size:0.8em;">⚠️ RESET SEMUA DATA</button>
     </div>
 </div>
 
@@ -252,28 +210,6 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
     </div>
 </div>
 
-<div id="adminPanel" class="modal-overlay">
-    <div class="admin-card">
-        <div class="admin-header">ADMIN ACCESS</div>
-        <select id="slotSelector" class="btn-select-slot">
-            <option value="0">Slot 1</option>
-            <option value="1">Slot 2</option>
-            <option value="2">Slot 3</option>
-        </select>
-
-        <button onclick="kosongkanSlot()" class="admin-action-btn btn-danger-admin">KOSONGKAN SLOT</button>
-        <button onclick="naikkanAntrian()" class="admin-action-btn btn-teal">NAIKKAN ANTRIAN (AUTO)</button>
-        
-        <div style="height: 10px;"></div>
-        
-        <input type="text" id="platBlokir" class="form-input btn-select" placeholder="Plat Nomor untuk Blokir">
-        <button onclick="blokirUser()" class="admin-action-btn btn-pink">BLOKIR USER</button>
-        
-        <button onclick="resetAll()" class="admin-action-btn btn-danger-admin">⚠️ RESET DATABASE</button>
-        <button onclick="hideAdminPanel()" class="admin-action-btn btn-light">TUTUP PANEL</button>
-    </div>
-</div>
-
 <script>
 // --- CONFIG FIREBASE ---
 const firebaseConfig = {
@@ -290,10 +226,10 @@ const db = firebase.firestore();
 // --- VARIABLES ---
 const SLOT_NAMES = ["SLOT 1", "SLOT 2", "SLOT 3"];
 const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
-const MAX_DIST = 0.2; // 200 meter
+const MAX_DIST = 0.2; // PERBAIKAN: Ubah MAX_DIST dari meter (200) ke KM (0.2)
 let isAdmin = false;
 let userLat=null;
-let userLng=null;
+let userLng=null; // Tambahkan userLng
 let triggered = new Set();
 let myActiveSlotIndex = -1; 
 let chargingSlotsData = []; 
@@ -301,60 +237,26 @@ let chargingSlotsData = [];
 const keepAliveAudio = document.getElementById('keepAliveAudio');
 keepAliveAudio.volume = 0.05; 
 const alarmAudio = document.getElementById('alarmAudio');
-alarmAudio.volume = 1.0; 
 
-// PERBAIKAN: Fungsi hitung jarak
+// PERBAIKAN: Fungsi hitung jarak (disalin dari lokasi_fc.html)
 function getDist(lat1, lon1, lat2, lon2) {
     const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
     const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-    return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+    return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))); // Hasil dalam KM
 }
 
 window.addEventListener('load', () => {
-    // PWA Init
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log('PWA Error', err));
-    }
     initFirebase();
     if("Notification" in window) Notification.requestPermission();
+    // PERBAIKAN: Tangkap userLng
     if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ userLat=p.coords.latitude; userLng=p.coords.longitude; }, e=>{}, {enableHighAccuracy:true});
     const u = JSON.parse(localStorage.getItem('maka_user'));
     if(u && u.plat) document.getElementById('uPlat').value = u.plat; 
-    checkFormInputs();
-});
-
-// FIX: Panggil initFirebase dari dalam load/visibilitychange untuk stabilitas
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-        initFirebase();
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('PWA Error', err));
     }
 });
-
-
-function checkFormInputs() {
-    const p = document.getElementById('uPlat').value.toUpperCase().trim();
-    const w = document.getElementById('uWa').value;
-    const b = document.getElementById('uBat').value;
-    const btn = document.getElementById('btnDaftar');
-    
-    // FIX: Validasi diperketat
-    const isValid = p && w && b && p.length > 3 && w.length > 5 && b >= 1 && b <= 100;
-    btn.disabled = !isValid;
-    
-    // Status Monitoring
-    if (localStorage.getItem('myPlat') === p) {
-        btn.innerText = "MONITORING AKTIF";
-        document.getElementById('monitorStatus').style.display='block';
-        btn.disabled = true; // FIX: Pastikan tombol tidak bisa diklik jika monitoring sudah aktif
-    } else {
-         btn.innerText = "DAFTAR & AKTIFKAN MONITORING";
-         document.getElementById('monitorStatus').style.display='none';
-    }
-}
-document.getElementById('uPlat').addEventListener('input', checkFormInputs);
-document.getElementById('uWa').addEventListener('input', checkFormInputs);
-document.getElementById('uBat').addEventListener('input', checkFormInputs);
-
 
 // --- TIMER TICKER ---
 setInterval(() => {
@@ -406,7 +308,7 @@ function initFirebase() {
         else if(q.length > 10) limit = 85;
         document.getElementById('maxCasDisplay').innerText = limit + "%";
 
-        // RENDER SLOTS (FIX: Baterai Visual dan Admin Controls)
+        // RENDER SLOTS (Logika Rendering Tetap Sama)
         document.getElementById('slots').innerHTML = s.map((x,i) => {
             if(!x) return `
             <div class="slot-card">
@@ -417,15 +319,22 @@ function initFirebase() {
             </div>`;
 
             const isRun = !!x.startTime;
-            let h = x.startBattery || 0; // FIX: Pastikan h tidak null saat rendering
-            if(isRun) h = 100;
-
-            let targetLabel = (x.target && x.target < 100) ? `<span class="slot-target">Batas: ${x.target}%</span>` : "";
+            let css = isRun ? "st-charging" : "st-waiting";
+            let h = x.startBattery;
+            let targetLabel = "";
             let controls = "";
-            let timerHtml = isRun ? `<span id="timer-${i}" class="slot-timer">Menghitung...</span>` : `<span class="slot-status st-waiting">MENUNGGU</span>`;
+            let timerHtml = "";
+
+            if(isRun) {
+                h = 100;
+                timerHtml = `<span id="timer-${i}" class="slot-timer">Menghitung...</span>`;
+            } else {
+                timerHtml = `<span class="slot-status ${css}">MENUNGGU</span>`;
+            }
             
+            if(x.target && x.target < 100) targetLabel = `<span class="slot-target">Batas: ${x.target}%</span>`;
+
             const isMySlot = (x.name === myPlat); 
-            
             if (isAdmin || isMySlot) {
                 if(isRun) {
                     controls = `<button class="ctrl-btn btn-red" onclick="emptySlot(${i})">⏹️ SELESAI / CABUT</button>`;
@@ -445,7 +354,7 @@ function initFirebase() {
             </div>`;
         }).join('');
 
-        // RENDER QUEUE 
+        // RENDER QUEUE (Logika Rendering Tetap Sama)
         const qc = document.getElementById('qListContainer');
         if(q.length===0) {
             qc.innerHTML = '<div style="text-align:center;color:#999;font-size:0.8em;padding:20px;">Antrian Kosong</div>';
@@ -467,7 +376,7 @@ function initFirebase() {
             }).join('');
         }
     }, error => {
-        // FIX: Tambahkan error handling jika koneksi ke Firestore gagal
+        // Error Handler Koneksi
         console.error("Firestore Listener Error:", error);
         document.getElementById('connStatus').innerText = "ERROR ⚠️";
         document.getElementById('connStatus').classList.remove('online');
@@ -475,218 +384,177 @@ function initFirebase() {
         document.getElementById('slots').innerHTML = '<div class="slot-card" style="grid-column: span 3; padding: 30px; color: var(--danger);">Gagal terhubung ke server. Cek koneksi Anda.</div>';
     });
 
-    // DAFTAR (FIX: Error handling dan GPS check)
+    // DAFTAR (Logika submit button)
     document.getElementById('btnDaftar').onclick = () => {
         const p = document.getElementById('uPlat').value.toUpperCase().trim();
         const w = document.getElementById('uWa').value;
         const b = parseInt(document.getElementById('uBat').value);
         const btn = document.getElementById('btnDaftar');
 
-        if(btn.disabled) return; 
-        
+        if(!p || !w || isNaN(b)) return showModal('Error', 'Lengkapi data!');
+        if(b < 0 || b > 100) return showModal('Error', 'Sisa Baterai tidak valid!');
+
+        // PERBAIKAN 2: GPS LOCK LOGIC
         if (!isAdmin) {
             if (!userLat || !userLng) {
+                btn.disabled=false; btn.innerText="DAFTAR & AKTIFKAN MONITORING";
                 return showModal('GPS Diperlukan', 'Mohon tunggu lokasi terdeteksi dan pastikan izin GPS aktif.', '⚠️'); 
             }
             
             const distance = getDist(userLat, userLng, STATION_LOC.lat, STATION_LOC.lng);
             
             if (distance > MAX_DIST) {
+                btn.disabled=false; btn.innerText="DAFTAR & AKTIFKAN MONITORING";
                 return showModal('Di Luar Jangkauan', `Anda ${distance.toFixed(2)} KM dari FC. Batas max adalah ${MAX_DIST} KM.`, '❌');
             }
         }
-        
-        btn.disabled=true; btn.innerText="MEMPROSES...";
-        
-        // Start monitoring audio
+        // END GPS LOCK
+
+        // PLAY WHITE NOISE
         keepAliveAudio.play().then(()=>{
+            document.getElementById('monitorStatus').style.display='block';
             if('wakeLock' in navigator) navigator.wakeLock.request('screen');
         }).catch(e=>console.log("Audio blocked", e));
 
+        btn.disabled=true; btn.innerText="MEMPROSES...";
 
         db.runTransaction(async t => {
             const ref = db.collection("antrian").doc("utama");
             const d = (await t.get(ref)).data() || {};
             let s = d.chargingSlots || [null,null,null];
             let q = d.waitingQueue || [];
-            
             if(s.some(x=>x?.name===p) || q.some(x=>x?.name===p)) throw "Sudah terdaftar.";
             
             let empty = s.findIndex(x => !x);
             let targetBat = 100;
             
-            // Hitung target cas berdasarkan kepadatan saat ini
-            let totalUser = s.filter(x=>x).length + q.length;
-            if (totalUser >= 3 && totalUser <= 5) targetBat = 95;
-            else if (totalUser >= 6 && totalUser <= 10) targetBat = 90;
-            else if (totalUser > 10) targetBat = 85;
-
-            // RUMUS TIMER DINAMIS
-            let percentNeeded = targetBat - b;
-            if(percentNeeded < 0) percentNeeded = 0;
-            
-            let multiplier = 1.0; 
-            if(percentNeeded > 50) multiplier = 0.85; 
-            else if(percentNeeded < 20) multiplier = 1.5;
-
-            let duration = percentNeeded * multiplier;
-            duration = Math.max(5, Math.ceil(duration)); // Durasi minimal 5 menit
-
-            const userData = { name:p, phone:w, startBattery:b, target:targetBat, duration:duration, joinedAt: firebase.firestore.FieldValue.serverTimestamp() };
-
-
             if(empty !== -1) {
-                userData.startTime = null;
-                s[empty] = userData;
+                // AUTO RULE LANGSUNG
+                let totalUser = s.filter(x=>x).length + q.length;
+                if (totalUser >= 3 && totalUser <= 5) targetBat = 95;
+                else if (totalUser >= 6 && totalUser <= 10) targetBat = 90;
+                else if (totalUser > 10) targetBat = 85;
+
+                // RUMUS TIMER DINAMIS
+                let percentNeeded = targetBat - b;
+                if(percentNeeded < 0) percentNeeded = 0;
+                
+                let multiplier = 1.0; 
+                if(percentNeeded > 50) multiplier = 0.85; 
+                else if(percentNeeded < 20) multiplier = 1.5;
+
+                let duration = percentNeeded * multiplier;
+
+                s[empty] = { name:p, phone:w, startBattery:b, target:targetBat, startTime:null, duration:duration };
             } else {
-                q.push(userData);
+                q.push({ name:p, phone:w, startBattery:b, target:100, duration:0 });
             }
             t.set(ref, {chargingSlots:s, waitingQueue:q}, {merge:true});
         }).then(() => {
             localStorage.setItem('myPlat', p);
-            checkFormInputs(); 
-            showModal("Berhasil Masuk", "<b>Monitoring Aktif!</b><br>Sistem akan berdesis pelan agar browser tidak tidur.", '✅');
+            btn.innerText = "MONITORING AKTIF";
+            showModal("Berhasil Masuk", "<b>Monitoring Aktif!</b><br>Sistem akan berdesis pelan agar browser tidak tidur.");
         }).catch(e => {
             let errorMsg = typeof e === 'string' ? e : "Gagal Pendaftaran. Cek koneksi Anda.";
             if(e.code && e.code.includes('unavailable')) errorMsg = "Koneksi ke server Firebase gagal. Periksa internet Anda.";
             showModal("Gagal", errorMsg, '❌'); 
-            checkFormInputs(); 
+            btn.disabled=false; btn.innerText="DAFTAR & AKTIFKAN MONITORING";
         });
     };
 }
 
-// --- ADMIN LOGIC ---
+// --- ADMIN LOGIC (TETAP SAMA) ---
 function openAdmin() { document.getElementById('adminModal').classList.add('show'); }
 function loginAdmin() {
     if(document.getElementById('adminPin').value === '1131') {
         isAdmin = true;
         document.getElementById('adminModal').classList.remove('show');
-        showAdminPanel(); // Langsung tampilkan panel admin
+        document.getElementById('adminResetArea').style.display='block';
         showModal("Mode Operator", "Anda masuk sebagai Admin.");
+        db.collection("antrian").doc("utama").get().catch(e => console.error("Admin check failed:", e));
     } else {
         showModal("Error", "PIN Salah", '❌');
     }
 }
 
-function showAdminPanel() {
-    document.getElementById('adminPanel').classList.add('show');
-}
-function hideAdminPanel() {
-    document.getElementById('adminPanel').classList.remove('show');
-}
-
-function kosongkanSlot() {
-    const i = parseInt(document.getElementById('slotSelector').value);
-    if(!confirm(`Kosongkan Slot ${i+1}?`)) return; 
+function emptySlot(i) {
+    if(!confirm("Selesai & Kosongkan Slot?")) return;
     updateDB(d => { d.chargingSlots[i] = null; return d; });
-    hideAdminPanel();
 }
-
-function naikkanAntrian() {
+function startCharge(i) {
+    updateDB(d => { d.chargingSlots[i].startTime = new Date().toISOString(); return d; });
+}
+function moveQueueToSlot(qIdx) {
     db.runTransaction(async t => {
         const ref = db.collection("antrian").doc("utama");
-        const doc = await t.get(ref);
-        const d = doc.data();
-        let s = d.chargingSlots || [null, null, null];
-        let q = d.waitingQueue || [];
-        
-        if (q.length === 0) throw "Antrian kosong.";
-
+        const d = (await t.get(ref)).data();
+        let s = d.chargingSlots;
+        let q = d.waitingQueue;
         let emptyIdx = s.findIndex(x => !x);
-        if(emptyIdx === -1) throw "Semua slot terisi.";
-
-        let user = q.shift(); 
+        if(emptyIdx === -1) throw "Slot Penuh!";
         
-        let totalQueue = s.filter(x=>x).length + q.length;
+        let totalQueue = q.length;
         let targetBat = 100;
         if (totalQueue >= 3 && totalQueue <= 5) targetBat = 95;
         else if (totalQueue >= 6 && totalQueue <= 10) targetBat = 90;
         else if (totalQueue > 10) targetBat = 85;
 
-        // RUMUS TIMER DINAMIS
+        let user = q[qIdx];
+        q.splice(qIdx, 1);
         let percentNeeded = targetBat - user.startBattery;
         if(percentNeeded < 0) percentNeeded = 0;
-        
+
         let multiplier = 1.0; 
         if(percentNeeded > 50) multiplier = 0.85; 
         else if(percentNeeded < 20) multiplier = 1.5;
         user.duration = percentNeeded * multiplier;
-        user.duration = Math.max(5, Math.ceil(user.duration)); // Min 5 menit
 
         user.target = targetBat; 
         user.startTime = null; 
-        s[emptyIdx] = user; 
-        
+        s[emptyIdx] = user;
         t.update(ref, {chargingSlots: s, waitingQueue: q});
-        return user.name;
-    }).then((name) => {
-        showModal("Antrian Naik", `${name} dipindahkan ke slot.`, '✅');
-    }).catch(e => showModal("Gagal", (typeof e === 'string' ? e : "Gagal transaksi Firestore."), '❌'));
-    hideAdminPanel();
+        return targetBat;
+    }).then((t) => {
+        let msg = "✅ User dipindahkan.<br>";
+        if(t < 100) msg += `⚠️ Batas Cas: <b style="color:red">${t}%</b>`;
+        showModal("Info", msg);
+    }).catch(e => {
+        let errorMsg = typeof e === 'string' ? e : "Gagal memproses. Cek koneksi Anda.";
+        if(e.code && e.code.includes('unavailable')) errorMsg = "Koneksi ke server Firebase gagal.";
+        showModal("Gagal", errorMsg, '❌');
+    });
 }
 
 function deleteQueue(i) {
-    if(!confirm(`Hapus antrian #${i+1}?`)) return;
+    if(!confirm("Hapus?")) return;
     updateDB(d => { d.waitingQueue.splice(i, 1); return d; });
 }
-
-function blokirUser() {
-    const plat = document.getElementById('platBlokir').value.toUpperCase().trim();
-    if (!plat) return showModal("Error", "Masukkan Plat Nomor.", '❌');
-    if (!confirm(`Yakin BLOKIR ${plat}? User akan keluar dari aplikasi.`)) return;
-
-    db.collection('users').doc(plat).update({
-        isBanned: true
-    }).then(() => {
-        updateDB(d => {
-            d.chargingSlots = (d.chargingSlots || [null,null,null]).map(x => x?.name === plat ? null : x);
-            d.waitingQueue = (d.waitingQueue || []).filter(x => x.name !== plat);
-            return d;
-        });
-        showModal("Blokir Berhasil", `${plat} berhasil diblokir.`, '✅');
-    }).catch(e => {
-        showModal("Gagal Blokir", "Plat tidak ditemukan.", '❌');
-    });
-    hideAdminPanel();
-}
-
 function resetAll() {
-    if(confirm("RESET TOTAL? Ini akan menghapus SEMUA antrian dan slot.")) {
+    if(confirm("RESET TOTAL? Semua data antrian akan hilang!")) {
         db.collection("antrian").doc("utama").set({chargingSlots:[null,null,null], waitingQueue:[]})
-            .then(() => showModal("Sukses", "Data antrian telah direset.", '✅'))
+            .then(() => showModal("Sukses", "Data antrian telah direset."))
             .catch(e => {
-                showModal("Error", "Gagal reset. Cek koneksi Anda.", '❌');
+                let errorMsg = "Gagal reset. Cek koneksi Anda.";
+                if(e.code && e.code.includes('unavailable')) errorMsg = "Koneksi ke server Firebase gagal.";
+                showModal("Error", errorMsg, '❌');
             });
     }
-    hideAdminPanel();
 }
 
-// HELPER FUNCTIONS
-function emptySlot(i) {
-    if(!confirm("Selesai & Cabut?")) return; 
-    updateDB(d => { d.chargingSlots[i] = null; return d; });
-    localStorage.removeItem('myPlat'); 
-    keepAliveAudio.pause();
-    checkFormInputs();
-}
-function startCharge(i) { 
-    updateDB(d => { 
-        d.chargingSlots[i].startTime = new Date().toISOString(); 
-        return d; 
-    });
-}
 function updateDB(callback) {
     const ref = db.collection("antrian").doc("utama");
     db.runTransaction(async t => {
         const doc = await t.get(ref);
-        const newData = callback(doc.data() || {});
+        const newData = callback(doc.data());
         t.update(ref, newData);
     }).catch(e => {
-        showModal("Error", "Gagal update database. Cek koneksi Anda.", '❌');
+        let errorMsg = "Gagal update. Cek koneksi Anda.";
+        if(e.code && e.code.includes('unavailable')) errorMsg = "Koneksi ke server Firebase gagal.";
+        showModal("Error", errorMsg, '❌');
     });
 }
 
-// ALERT SYSTEM
+// --- ALERT SYSTEM & HELPER ---
 function triggerFullAlert() {
     keepAliveAudio.pause(); 
     alarmAudio.volume=1.0; 
@@ -710,17 +578,18 @@ function stopAlarmAndClear() {
     }
 }
 
-// HELPER MODAL
 function showModal(title, desc, icon="🔔") {
     document.getElementById('mTitle').innerText = title;
     document.getElementById('mDesc').innerHTML = desc;
+    // Tentukan ikon berdasarkan judul
     document.getElementById('mIcon').innerText = title.includes('Gagal') || title.includes('Error') || icon === '❌' || icon === '⚠️' ? '⚠️' : icon;
     const btns = document.getElementById('mBtns');
-    btns.innerHTML = `<button class="btn-modal btn-confirm" style="background:var(--accent); color:white;" onclick="closeModal()">OK, SIAP</button>`;
+    btns.innerHTML = `<button class="btn-modal btn-confirm" onclick="closeModal()">OK, SIAP</button>`;
     
     document.getElementById('customModal').classList.add('show');
 }
 function closeModal() { document.getElementById('customModal').classList.remove('show'); }
 </script>
+    
 </body>
 </html>
