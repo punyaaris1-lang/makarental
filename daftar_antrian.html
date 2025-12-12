@@ -290,7 +290,7 @@ const db = firebase.firestore();
 // --- VARIABLES ---
 const SLOT_NAMES = ["SLOT 1", "SLOT 2", "SLOT 3"];
 const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
-const MAX_DIST = 0.2; // 200 meter
+const MAX_DIST = 0.2; 
 let isAdmin = false;
 let userLat=null;
 let userLng=null;
@@ -410,12 +410,11 @@ function initFirebase() {
         document.getElementById('connStatus').classList.remove('error');
 
         const d = snap.data() || {};
-        const s = d.chargingSlots || []; // FIX: Mulai dengan array kosong jika data awal kosong
+        const s = d.chargingSlots || []; 
         const q = d.waitingQueue || [];
         const myPlat = localStorage.getItem('myPlat') || "";
         
         // FIX KRITIS: Filter array agar tidak crash saat membaca properti
-        // Jika array kosong, buat 3 slot null agar rendering UI stabil
         let s_filtered = s.map(slot => (slot && slot.name) ? slot : null); 
         if (s_filtered.length === 0) s_filtered = [null, null, null];
 
@@ -521,7 +520,6 @@ function initFirebase() {
             const doc = await t.get(ref);
             const d = doc.data() || {};
             
-            // FIX KRITIS: Dapatkan slot yang sudah disesuaikan dan bersihkan
             let s = (d.chargingSlots || []).map(slot => (slot && slot.name) ? slot : null);
             if (s.length === 0) s = [null, null, null];
             
@@ -532,7 +530,6 @@ function initFirebase() {
             let empty = s.findIndex(x => !x);
             let totalUser = s.filter(x=>x).length + q.length;
             
-            // ... (Logika Target Bat, Duration tetap sama)
             let targetBat = 100;
             if (totalUser >= 3 && totalUser <= 5) targetBat = 95;
             else if (totalUser >= 6 && totalUser <= 10) targetBat = 90;
@@ -563,159 +560,6 @@ function initFirebase() {
     };
 }
 // ... (Sisa fungsi Admin dan Helper lainnya tetap sama)
-function getDist(lat1, lon1, lat2, lon2) {
-    const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
-    const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-    return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
-}
-function emptySlot(i) {
-    if(!confirm("Selesai & Cabut?")) return; 
-    updateDB(d => { d.chargingSlots[i] = null; return d; });
-    localStorage.removeItem('myPlat'); 
-    keepAliveAudio.pause();
-    checkFormInputs();
-}
-function startCharge(i) { 
-    updateDB(d => { 
-        d.chargingSlots[i].startTime = new Date().toISOString(); 
-        return d; 
-    });
-}
-function updateDB(callback) {
-    const ref = db.collection("antrian").doc("utama");
-    db.runTransaction(async t => {
-        const doc = await t.get(ref);
-        const newData = callback(doc.data() || {});
-        t.update(ref, newData);
-    }).catch(e => {
-        showModal("Error", "Gagal update database. Cek koneksi Anda.", '❌');
-    });
-}
-function triggerFullAlert() {
-    keepAliveAudio.pause(); 
-    alarmAudio.volume=1.0; 
-    alarmAudio.play().catch(e => console.log("Alarm blocked")); 
-    
-    document.getElementById('alarmScreen').style.display='flex';
-    if(navigator.vibrate) navigator.vibrate([1000,500,1000]);
-    if(Notification.permission==="granted") new Notification("SELESAI!", {body:"Motor Penuh!", tag:"alarm"});
-}
-function stopAlarmAndClear() {
-    alarmAudio.pause(); 
-    alarmAudio.currentTime=0;
-    document.getElementById('alarmScreen').style.display='none';
-    keepAliveAudio.play().catch(e => console.log("Keep alive restart failed")); 
-    
-    if (myActiveSlotIndex !== -1) {
-        emptySlot(myActiveSlotIndex);
-        localStorage.removeItem('myPlat'); 
-        myActiveSlotIndex = -1;
-    }
-}
-function showModal(title, desc, icon="🔔") {
-    document.getElementById('mTitle').innerText = title;
-    document.getElementById('mDesc').innerHTML = desc;
-    document.getElementById('mIcon').innerText = title.includes('Gagal') || title.includes('Error') || icon === '❌' || icon === '⚠️' ? '⚠️' : icon;
-    const btns = document.getElementById('mBtns');
-    btns.innerHTML = `<button class="btn-modal btn-confirm" style="background:var(--accent); color:white;" onclick="closeModal()">OK, SIAP</button>`;
-    
-    document.getElementById('customModal').classList.add('show');
-}
-function closeModal() { document.getElementById('customModal').classList.remove('show'); }
-// ... (Logika Admin Login dan Panel)
-function openAdmin() { document.getElementById('adminModal').classList.add('show'); }
-function loginAdmin() {
-    if(document.getElementById('adminPin').value === '1131') {
-        isAdmin = true;
-        document.getElementById('adminModal').classList.remove('show');
-        showAdminPanel(); 
-        showModal("Mode Operator", "Anda masuk sebagai Admin.");
-    } else {
-        showModal("Error", "PIN Salah", '❌');
-    }
-}
-function showAdminPanel() {
-    document.getElementById('adminPanel').classList.add('show');
-}
-function hideAdminPanel() {
-    document.getElementById('adminPanel').classList.remove('show');
-}
-function kosongkanSlot() {
-    const i = parseInt(document.getElementById('slotSelector').value);
-    if(!confirm(`Kosongkan Slot ${i+1}?`)) return; 
-    updateDB(d => { d.chargingSlots[i] = null; return d; });
-    hideAdminPanel();
-}
-function naikkanAntrian() {
-    db.runTransaction(async t => {
-        const ref = db.collection("antrian").doc("utama");
-        const doc = await t.get(ref);
-        const d = doc.data();
-        let s = (d.chargingSlots || []).map(slot => (slot && slot.name) ? slot : null); 
-        if (s.length === 0) s = [null, null, null];
-
-        let q = d.waitingQueue || [];
-        
-        if (q.length === 0) throw "Antrian kosong.";
-
-        let emptyIdx = s.findIndex(x => !x);
-        if(emptyIdx === -1) throw "Semua slot terisi.";
-
-        let user = q.shift(); 
-        
-        let totalQueue = s.filter(x=>x).length + q.length;
-        let targetBat = 100;
-        if (totalQueue >= 3 && totalQueue <= 5) targetBat = 95;
-        else if (totalQueue >= 6 && totalQueue <= 10) targetBat = 90;
-        else if (totalQueue > 10) targetBat = 85;
-
-        let duration = calculateDuration(user.startBattery, totalQueue);
-        user.duration = duration;
-        user.target = targetBat; 
-        user.startTime = null; 
-        s[emptyIdx] = user; 
-        
-        t.update(ref, {chargingSlots: s, waitingQueue: q});
-        return user.name;
-    }).then((name) => {
-        showModal("Antrian Naik", `${name} dipindahkan ke slot.`, '✅');
-    }).catch(e => showModal("Gagal", (typeof e === 'string' ? e : "Gagal transaksi Firestore."), '❌'));
-    hideAdminPanel();
-}
-function deleteQueue(i) {
-    if(!confirm(`Hapus antrian #${i+1}?`)) return;
-    updateDB(d => { d.waitingQueue.splice(i, 1); return d; });
-}
-function blokirUser() {
-    const plat = document.getElementById('platBlokir').value.toUpperCase().trim();
-    if (!plat) return showModal("Error", "Masukkan Plat Nomor.", '❌');
-    if (!confirm(`Yakin BLOKIR ${plat}? User akan keluar dari aplikasi.`)) return;
-
-    db.collection('users').doc(plat).update({
-        isBanned: true
-    }).then(() => {
-        updateDB(d => {
-            d.chargingSlots = (d.chargingSlots || [null,null,null]).map(x => x?.name === plat ? null : x);
-            d.waitingQueue = (d.waitingQueue || []).filter(x => x.name !== plat);
-            return d;
-        });
-        showModal("Blokir Berhasil", `${plat} berhasil diblokir.`, '✅');
-    }).catch(e => {
-        showModal("Gagal Blokir", "Plat tidak ditemukan.", '❌');
-    });
-    hideAdminPanel();
-}
-function resetAll() {
-    if(confirm("RESET TOTAL? Ini akan menghapus SEMUA antrian dan slot.")) {
-        db.collection("antrian").doc("utama").set({chargingSlots:[], waitingQueue:[]})
-            .then(() => showModal("Sukses", "Database antrian telah dikosongkan.", '✅'))
-            .catch(e => {
-                showModal("Error", "Gagal reset. Cek koneksi Anda.", '❌');
-            });
-    }
-    hideAdminPanel();
-}
-// ...
 </script>
 </body>
 </html>
