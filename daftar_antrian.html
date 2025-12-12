@@ -202,10 +202,7 @@ footer.bottom-nav { position:fixed; bottom:20px; left:50%; transform:translateX(
 
     <div class="section-head">STATUS CHARGING</div>
     <div class="slot-grid" id="slots">
-        <div class="slot-card"><div class="slot-status">Loading...</div></div>
-        <div class="slot-card"><div class="slot-status">Loading...</div></div>
-        <div class="slot-card"><div class="slot-status">Loading...</div></div>
-    </div>
+        </div>
 
     <div class="flash-hero">
         <div class="fh-item">
@@ -413,13 +410,17 @@ function initFirebase() {
         document.getElementById('connStatus').classList.remove('error');
 
         const d = snap.data() || {};
-        const s = d.chargingSlots || [null,null,null];
+        const s = d.chargingSlots || []; // FIX: Mulai dengan array kosong jika data awal kosong
         const q = d.waitingQueue || [];
         const myPlat = localStorage.getItem('myPlat') || "";
         
-        // FIX KRITIS: FILTER UNTUK MENGATASI MAPS/OBJEK YANG RUSAK (DARI FIREBASE ANDA)
-        chargingSlotsData = s.map(slot => (slot && slot.name) ? slot : null); 
-        
+        // FIX KRITIS: Filter array agar tidak crash saat membaca properti
+        // Jika array kosong, buat 3 slot null agar rendering UI stabil
+        let s_filtered = s.map(slot => (slot && slot.name) ? slot : null); 
+        if (s_filtered.length === 0) s_filtered = [null, null, null];
+
+        chargingSlotsData = s_filtered; 
+
         // HERO COUNT & MAX CAS LOGIC
         document.getElementById('qCountDisplay').innerText = q.length;
         let limit = 100;
@@ -430,7 +431,6 @@ function initFirebase() {
 
         // RENDER SLOTS (FIX: Baterai Visual dan Admin Controls)
         document.getElementById('slots').innerHTML = chargingSlotsData.map((x,i) => {
-            // FIX: Cek apakah slot benar-benar kosong/null
             if(!x) return `
             <div class="slot-card">
                 <div class="slot-label">${SLOT_NAMES[i]}</div>
@@ -489,9 +489,8 @@ function initFirebase() {
                 </div>`;
             }).join('');
         }
-        checkFormInputs(); // FIX: Panggil checkFormInputs lagi setelah data slot dimuat
+        checkFormInputs(); 
     }, error => {
-        // FIX: Tambahkan error handling jika koneksi ke Firestore gagal
         console.error("Firestore Listener Error:", error);
         document.getElementById('connStatus').innerText = "ERROR ⚠️";
         document.getElementById('connStatus').classList.remove('online');
@@ -521,22 +520,26 @@ function initFirebase() {
             const ref = db.collection("antrian").doc("utama");
             const doc = await t.get(ref);
             const d = doc.data() || {};
-            // FIX KRITIS: Pastikan slot dibaca dengan aman
-            let s = (d.chargingSlots || [null,null,null]).map(slot => (slot && slot.name) ? slot : null); 
+            
+            // FIX KRITIS: Dapatkan slot yang sudah disesuaikan dan bersihkan
+            let s = (d.chargingSlots || []).map(slot => (slot && slot.name) ? slot : null);
+            if (s.length === 0) s = [null, null, null];
+            
             let q = d.waitingQueue || [];
             
             if(s.some(x=>x?.name===p) || q.some(x=>x?.name===p)) throw "Sudah terdaftar.";
             
             let empty = s.findIndex(x => !x);
-            let targetBat = 100;
-            
             let totalUser = s.filter(x=>x).length + q.length;
+            
+            // ... (Logika Target Bat, Duration tetap sama)
+            let targetBat = 100;
             if (totalUser >= 3 && totalUser <= 5) targetBat = 95;
             else if (totalUser >= 6 && totalUser <= 10) targetBat = 90;
             else if (totalUser > 10) targetBat = 85;
 
-            // RUMUS TIMER DINAMIS
             let duration = calculateDuration(b, totalUser);
+            duration = Math.max(5, Math.ceil(duration)); 
 
             const userData = { name:p, phone:w, startBattery:b, target:targetBat, duration:duration, joinedAt: firebase.firestore.FieldValue.serverTimestamp() };
 
@@ -546,7 +549,6 @@ function initFirebase() {
             } else {
                 q.push(userData);
             }
-            // FIX: HANYA UPDATE FIELD YANG PERLU
             t.set(ref, {chargingSlots:s, waitingQueue:q}, {merge:true});
         }).then(() => {
             localStorage.setItem('myPlat', p);
@@ -560,8 +562,67 @@ function initFirebase() {
         });
     };
 }
-
 // ... (Sisa fungsi Admin dan Helper lainnya tetap sama)
+function getDist(lat1, lon1, lat2, lon2) {
+    const R=6371; const dLat=(lat2-lat1)*Math.PI/180; const dLon=(lon2-lon1)*Math.PI/180;
+    const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
+}
+function emptySlot(i) {
+    if(!confirm("Selesai & Cabut?")) return; 
+    updateDB(d => { d.chargingSlots[i] = null; return d; });
+    localStorage.removeItem('myPlat'); 
+    keepAliveAudio.pause();
+    checkFormInputs();
+}
+function startCharge(i) { 
+    updateDB(d => { 
+        d.chargingSlots[i].startTime = new Date().toISOString(); 
+        return d; 
+    });
+}
+function updateDB(callback) {
+    const ref = db.collection("antrian").doc("utama");
+    db.runTransaction(async t => {
+        const doc = await t.get(ref);
+        const newData = callback(doc.data() || {});
+        t.update(ref, newData);
+    }).catch(e => {
+        showModal("Error", "Gagal update database. Cek koneksi Anda.", '❌');
+    });
+}
+function triggerFullAlert() {
+    keepAliveAudio.pause(); 
+    alarmAudio.volume=1.0; 
+    alarmAudio.play().catch(e => console.log("Alarm blocked")); 
+    
+    document.getElementById('alarmScreen').style.display='flex';
+    if(navigator.vibrate) navigator.vibrate([1000,500,1000]);
+    if(Notification.permission==="granted") new Notification("SELESAI!", {body:"Motor Penuh!", tag:"alarm"});
+}
+function stopAlarmAndClear() {
+    alarmAudio.pause(); 
+    alarmAudio.currentTime=0;
+    document.getElementById('alarmScreen').style.display='none';
+    keepAliveAudio.play().catch(e => console.log("Keep alive restart failed")); 
+    
+    if (myActiveSlotIndex !== -1) {
+        emptySlot(myActiveSlotIndex);
+        localStorage.removeItem('myPlat'); 
+        myActiveSlotIndex = -1;
+    }
+}
+function showModal(title, desc, icon="🔔") {
+    document.getElementById('mTitle').innerText = title;
+    document.getElementById('mDesc').innerHTML = desc;
+    document.getElementById('mIcon').innerText = title.includes('Gagal') || title.includes('Error') || icon === '❌' || icon === '⚠️' ? '⚠️' : icon;
+    const btns = document.getElementById('mBtns');
+    btns.innerHTML = `<button class="btn-modal btn-confirm" style="background:var(--accent); color:white;" onclick="closeModal()">OK, SIAP</button>`;
+    
+    document.getElementById('customModal').classList.add('show');
+}
+function closeModal() { document.getElementById('customModal').classList.remove('show'); }
+// ... (Logika Admin Login dan Panel)
 function openAdmin() { document.getElementById('adminModal').classList.add('show'); }
 function loginAdmin() {
     if(document.getElementById('adminPin').value === '1131') {
@@ -590,7 +651,9 @@ function naikkanAntrian() {
         const ref = db.collection("antrian").doc("utama");
         const doc = await t.get(ref);
         const d = doc.data();
-        let s = (d.chargingSlots || [null, null, null]).map(slot => (slot && slot.name) ? slot : null); 
+        let s = (d.chargingSlots || []).map(slot => (slot && slot.name) ? slot : null); 
+        if (s.length === 0) s = [null, null, null];
+
         let q = d.waitingQueue || [];
         
         if (q.length === 0) throw "Antrian kosong.";
@@ -644,115 +707,15 @@ function blokirUser() {
 }
 function resetAll() {
     if(confirm("RESET TOTAL? Ini akan menghapus SEMUA antrian dan slot.")) {
-        db.collection("antrian").doc("utama").set({chargingSlots:[null,null,null], waitingQueue:[]})
-            .then(() => showModal("Sukses", "Data antrian telah direset.", '✅'))
+        db.collection("antrian").doc("utama").set({chargingSlots:[], waitingQueue:[]})
+            .then(() => showModal("Sukses", "Database antrian telah dikosongkan.", '✅'))
             .catch(e => {
                 showModal("Error", "Gagal reset. Cek koneksi Anda.", '❌');
             });
     }
     hideAdminPanel();
 }
-function updateDB(callback) {
-    const ref = db.collection("antrian").doc("utama");
-    db.runTransaction(async t => {
-        const doc = await t.get(ref);
-        const newData = callback(doc.data() || {});
-        t.update(ref, newData);
-    }).catch(e => {
-        showModal("Error", "Gagal update database. Cek koneksi Anda.", '❌');
-    });
-}
-function triggerFullAlert() {
-    keepAliveAudio.pause(); 
-    alarmAudio.volume=1.0; 
-    alarmAudio.play().catch(e => console.log("Alarm blocked")); 
-    
-    document.getElementById('alarmScreen').style.display='flex';
-    if(navigator.vibrate) navigator.vibrate([1000,500,1000]);
-    if(Notification.permission==="granted") new Notification("SELESAI!", {body:"Motor Penuh!", tag:"alarm"});
-}
-function stopAlarmAndClear() {
-    alarmAudio.pause(); 
-    alarmAudio.currentTime=0;
-    document.getElementById('alarmScreen').style.display='none';
-    keepAliveAudio.play().catch(e => console.log("Keep alive restart failed")); 
-    
-    if (myActiveSlotIndex !== -1) {
-        emptySlot(myActiveSlotIndex);
-        localStorage.removeItem('myPlat'); 
-        myActiveSlotIndex = -1;
-    }
-}
-function showModal(title, desc, icon="🔔") {
-    document.getElementById('mTitle').innerText = title;
-    document.getElementById('mDesc').innerHTML = desc;
-    document.getElementById('mIcon').innerText = title.includes('Gagal') || title.includes('Error') || icon === '❌' || icon === '⚠️' ? '⚠️' : icon;
-    const btns = document.getElementById('mBtns');
-    btns.innerHTML = `<button class="btn-modal btn-confirm" style="background:var(--accent); color:white;" onclick="closeModal()">OK, SIAP</button>`;
-    
-    document.getElementById('customModal').classList.add('show');
-}
-function closeModal() { document.getElementById('customModal').classList.remove('show'); }
-    // INIT FIREBASE LISTENERS
-function initFirebase() {
-    // 🔄 Ambil data SLOT
-    db.collection("chargingSlots").onSnapshot(snap => {
-        chargingSlotsData = [];
-        const slotsContainer = document.getElementById("slots");
-        slotsContainer.innerHTML = "";
-
-        snap.forEach((doc, i) => {
-            const d = doc.data();
-            chargingSlotsData[i] = d;
-
-            let persen = d.level || 0;
-
-            slotsContainer.innerHTML += `
-                <div class="slot-card ${d.active ? 'active' : ''}">
-                    <div class="slot-label">${SLOT_NAMES[i]}</div>
-
-                    <div class="bat-body">
-                        <div class="bat-head"></div>
-                        <div class="bat-liquid" style="height:${persen}%"></div>
-                    </div>
-
-                    <div class="slot-user">${d.plat || '-'}</div>
-                    <span class="slot-timer" id="timer-${i}">${d.active ? '...' : '-'}</span>
-                    <span class="slot-target">${d.target ? d.target+'%' : ''}</span>
-
-                    <div class="slot-status ${d.active ? 'st-charging' : 'st-ready'}">
-                        ${d.active ? 'CHARGING' : 'READY'}
-                    </div>
-                </div>
-            `;
-        });
-    });
-
-    // 🔄 Ambil JUMLAH ANTRIAN
-    db.collection("queue").onSnapshot(q => {
-        const list = document.getElementById("qListContainer");
-        list.innerHTML = "";
-        
-        document.getElementById("qCountDisplay").innerText = q.size;
-
-        if(q.empty) {
-            list.innerHTML = `<div style="text-align:center;padding:20px;color:#999;font-size:0.8em;">Belum ada antrian.</div>`;
-            return;
-        }
-
-        q.forEach(doc => {
-            const d = doc.data();
-            list.innerHTML += `
-                <div class="q-item">
-                    <div class="q-plat">${d.plat}</div>
-                    <div class="q-bat">${d.bat}%</div>
-                </div>
-            `;
-        });
-    });
-}
-    
+// ...
 </script>
-
 </body>
 </html>
