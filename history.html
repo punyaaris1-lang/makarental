@@ -121,11 +121,9 @@ let db;
 let currentUser = JSON.parse(localStorage.getItem('maka_user'));
 let isInitialized = false;
 
-// FIX: Initialization function untuk mengatasi White Screen saat kembali
 function initializeApp() {
     if (!isInitialized) {
         try {
-            // FIX: Tambahkan pengecekan apakah aplikasi sudah diinisialisasi
             if (!firebase.apps.length) { 
                 firebase.initializeApp(firebaseConfig);
             }
@@ -133,13 +131,11 @@ function initializeApp() {
             isInitialized = true;
         } catch (e) {
             console.error("Firebase init error:", e);
-            // Jika Firebase gagal init, set error di UI
             document.getElementById('historyList').innerHTML = `<div style="text-align:center; padding:50px; color:var(--danger); border:1px solid #fee2e2; border-radius:18px;">⚠️ Gagal memuat data. Periksa koneksi internet Anda atau coba muat ulang.</div>`;
             return;
         }
     }
     
-    // Cek Login
     currentUser = JSON.parse(localStorage.getItem('maka_user'));
     if(!currentUser) { window.location.href='index.html'; return; }
     
@@ -149,7 +145,6 @@ function initializeApp() {
 
 document.addEventListener('DOMContentLoaded', initializeApp);
 
-// FIX: Listener untuk mengatasi White Screen/State Loss
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
         initializeApp(); 
@@ -160,10 +155,9 @@ document.addEventListener('visibilitychange', () => {
 function loadPaymentHistory() {
     const container = document.getElementById('historyList');
     
-    // Tarik data dari collection 'daily_payments'
     db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
-      .orderBy('paidAt', 'desc') // Urutkan dari yang terbaru dibayar
+      .orderBy('paidAt', 'desc') 
       .limit(30)
       .onSnapshot(snap => {
           let html = '';
@@ -177,16 +171,23 @@ function loadPaymentHistory() {
               const d = doc.data();
               
               // Tanggal Tagihan/Sewa
-              const dateSewa = new Date(d.date + 'T00:00:00'); // Convert date string to date object
+              const dateSewa = new Date(d.date + 'T00:00:00'); 
               const dateSewaFmt = dateSewa.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'long' });
 
-              // Tanggal Pembayaran (Paid At)
-              const paidAt = d.paidAt.toDate(); // Mengambil timestamp dari server
-              const paidAtFmt = paidAt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' ' + paidAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+              // PERBAIKAN KRITIS: Cek apakah paidAt adalah Timestamp sebelum menggunakannya
+              let paidAtFmt = 'N/A';
+              if (d.paidAt && typeof d.paidAt.toDate === 'function') {
+                  const paidAt = d.paidAt.toDate(); 
+                  paidAtFmt = paidAt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' ' + paidAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+              } else {
+                   // Gunakan tanggal sewa jika paidAt tidak valid (untuk data lama)
+                   paidAtFmt = 'Dicatat pada ' + dateSewa.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+              }
+
 
               const amountFmt = d.amount.toLocaleString('id-ID');
               
-              const isPaid = true; // Di sini, semua data dari daily_payments dianggap LUNAS
+              const isPaid = true; 
               const statusClass = isPaid ? '' : 'unpaid';
               const statusText = isPaid ? 'Lunas' : 'Tunggakan';
               const borderStyle = isPaid ? 'border-left: 5px solid var(--success);' : 'border-left: 5px solid var(--danger);';
@@ -207,7 +208,7 @@ function loadPaymentHistory() {
 
           container.innerHTML = html;
       }, error => {
-          // PERBAIKAN: Error Handler Koneksi yang Lebih Jelas
+          // Error Handler Koneksi yang Lebih Jelas
           console.error("Firestore Error:", error);
           container.innerHTML = `
               <div style="text-align:center; padding:50px; color:var(--danger); border:1px solid #fee2e2; border-radius:18px;">
