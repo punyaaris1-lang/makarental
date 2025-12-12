@@ -267,15 +267,17 @@ function handleRegister() {
       };
       
       docRef.set(userData).then(() => {
-        // FIX: Tambahkan inisialisasi antrian dasar agar Antrian tidak crash saat dibuka pertama kali
-        // Ini memastikan Collection 'antrian' dibuat dengan data yang diharapkan (null, null, null)
+        // PERBAIKAN KRITIS: Buat antrian dengan array KOSONG di chargingSlots
+        // Ini mencegah crash di Antrian karena array of 'null'
         db.collection('antrian').doc('utama').set({
-            chargingSlots: [null, null, null],
+            chargingSlots: [], 
             waitingQueue: []
         }, { merge: true }).then(() => {
             localStorage.setItem('maka_user', JSON.stringify(userData));
             showModal("Sukses", "Pendaftaran Berhasil! Selamat Datang.", "success");
             setTimeout(() => window.location.href = 'dashboard.html', 1500);
+        }).catch((e) => {
+             showModal("Gagal", "Gagal inisialisasi antrian. Coba lagi.", "error");
         });
 
       });
