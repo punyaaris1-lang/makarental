@@ -693,6 +693,66 @@ function showModal(title, desc, icon="🔔") {
     document.getElementById('customModal').classList.add('show');
 }
 function closeModal() { document.getElementById('customModal').classList.remove('show'); }
+    // INIT FIREBASE LISTENERS
+function initFirebase() {
+    // 🔄 Ambil data SLOT
+    db.collection("chargingSlots").onSnapshot(snap => {
+        chargingSlotsData = [];
+        const slotsContainer = document.getElementById("slots");
+        slotsContainer.innerHTML = "";
+
+        snap.forEach((doc, i) => {
+            const d = doc.data();
+            chargingSlotsData[i] = d;
+
+            let persen = d.level || 0;
+
+            slotsContainer.innerHTML += `
+                <div class="slot-card ${d.active ? 'active' : ''}">
+                    <div class="slot-label">${SLOT_NAMES[i]}</div>
+
+                    <div class="bat-body">
+                        <div class="bat-head"></div>
+                        <div class="bat-liquid" style="height:${persen}%"></div>
+                    </div>
+
+                    <div class="slot-user">${d.plat || '-'}</div>
+                    <span class="slot-timer" id="timer-${i}">${d.active ? '...' : '-'}</span>
+                    <span class="slot-target">${d.target ? d.target+'%' : ''}</span>
+
+                    <div class="slot-status ${d.active ? 'st-charging' : 'st-ready'}">
+                        ${d.active ? 'CHARGING' : 'READY'}
+                    </div>
+                </div>
+            `;
+        });
+    });
+
+    // 🔄 Ambil JUMLAH ANTRIAN
+    db.collection("queue").onSnapshot(q => {
+        const list = document.getElementById("qListContainer");
+        list.innerHTML = "";
+        
+        document.getElementById("qCountDisplay").innerText = q.size;
+
+        if(q.empty) {
+            list.innerHTML = `<div style="text-align:center;padding:20px;color:#999;font-size:0.8em;">Belum ada antrian.</div>`;
+            return;
+        }
+
+        q.forEach(doc => {
+            const d = doc.data();
+            list.innerHTML += `
+                <div class="q-item">
+                    <div class="q-plat">${d.plat}</div>
+                    <div class="q-bat">${d.bat}%</div>
+                </div>
+            `;
+        });
+    });
+}
+    
 </script>
+
 </body>
 </html>
