@@ -1,5 +1,5 @@
-const CACHE_NAME = 'maka-app-v3-force-update'; // Ganti nama cache agar browser reset
-const ASSETS = [
+const CACHE_NAME = 'maka-v4-force-reset'; // Ganti versi biar browser sadar ada baru
+const urlsToCache = [
   './',
   './index.html',
   './dashboard.html',
@@ -11,35 +11,38 @@ const ASSETS = [
   './tips_maka.html',
   './maka_plus.html',
   './lokasi_fc.html',
-  './daftar_antrian.html' // Pastikan file ini ada atau hapus baris ini
+  './daftar_antrian.html'
 ];
 
-// INSTALL: Cache file baru
-self.addEventListener('install', (e) => {
-  self.skipWaiting(); // Paksa update segera
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+// 1. Install & Paksa Browser Pakai File Baru
+self.addEventListener('install', event => {
+  self.skipWaiting(); // PENTING: Langsung aktifkan SW baru
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
 });
 
-// ACTIVATE: Hapus cache lama
-self.addEventListener('activate', (e) => {
-  e.waitUntil(
-    caches.keys().then((keys) => {
+// 2. Hapus Cache Lama (File Sampah)
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) return caches.delete(key);
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Menghapus cache lama:', cacheName);
+            return caches.delete(cacheName);
+          }
         })
       );
     })
   );
-  self.clients.claim(); // Ambil alih kontrol halaman segera
+  self.clients.claim(); // Ambil alih semua halaman segera
 });
 
-// FETCH: Network First (Utamakan internet, baru cache)
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    fetch(e.request)
-      .catch(() => caches.match(e.request))
+// 3. Strategi Network First (Cek Internet Dulu, Baru Cache)
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    fetch(event.request)
+      .catch(() => caches.match(event.request))
   );
 });
