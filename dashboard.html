@@ -3,393 +3,92 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MAKA Dashboard</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800;900&display=swap" rel="stylesheet">
-
+<title>Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<link rel="manifest" href="/makarental/manifest.json">
-
 <style>
-:root{
-  --black:#0b0f14;
-  --glass:rgba(255,255,255,.06);
-  --border:rgba(255,255,255,.14);
-  --yellow:#fbbf24;
-  --teal:#14b8a6;
-  --danger:#ef4444;
-  --text:#e5e7eb;
-  --muted:#9ca3af;
-}
+:root { --pri:#0f1724; --acc:#0ea5a6; --yel:#fbbf24; --bg:#f8fafc; }
+body { margin:0; font-family:'Inter'; background:var(--bg); color:var(--pri); padding-bottom:100px; }
+.con { max-width:480px; margin:0 auto; padding:20px; }
+.head { display:flex; justify-content:space-between; margin-bottom:20px; align-items:center; }
+h1 { font-family:'Syne'; margin:0; font-size:1.5em; }
+.sub { color:#64748b; font-size:0.9em; }
+.av { width:45px; height:45px; background:var(--pri); color:var(--yel); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne'; font-weight:800; background-size:cover; }
 
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:Inter,sans-serif;
-  background:
-    radial-gradient(900px 400px at top right,#1a1f2e,transparent),
-    radial-gradient(600px 300px at bottom left,#0f766e33,transparent),
-    var(--black);
-  color:var(--text);
-  min-height:100vh;
-  padding-bottom:140px;
-}
-
-.app-container{
-  max-width:480px;
-  margin:auto;
-  padding:24px 22px;
-}
-
-/* HEADER */
-.header-user{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:28px;
-}
-
-.user-greeting h1{
-  font-family:Syne;
-  font-weight:900;
-  font-size:1.6em;
-  margin:0;
-}
-
-.user-greeting p{
-  margin-top:4px;
-  font-size:.75em;
-  color:var(--muted);
-  letter-spacing:1px;
-  text-transform:uppercase;
-}
-
-.user-avatar{
-  width:50px;height:50px;
-  border-radius:50%;
-  background:linear-gradient(135deg,#111827,#020617);
-  border:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family:Syne;
-  font-weight:800;
-  color:var(--yellow);
-  background-size:cover;
-  background-position:center;
-}
-
-/* HERO */
-.hero-card{
-  position:relative;
-  background:linear-gradient(180deg,rgba(255,255,255,.06),transparent),#020617;
-  border:1px solid var(--border);
-  border-radius:24px;
-  padding:26px;
-  box-shadow:0 40px 80px rgba(0,0,0,.45);
-  margin-bottom:36px;
-  overflow:hidden;
-}
-
-.hero-card.warning{border-color:rgba(239,68,68,.6)}
-
-.hero-card::after{
-  content:"MAKA";
-  position:absolute;
-  right:-30px;
-  bottom:-50px;
-  font-family:Syne;
-  font-size:120px;
-  font-weight:900;
-  color:rgba(255,255,255,.03);
-}
-
-.hero-top{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:18px;
-}
-
-.hero-label{
-  font-size:.7em;
-  letter-spacing:2px;
-  color:var(--muted);
-}
-
-.status-pill{
-  padding:6px 14px;
-  border-radius:100px;
-  font-size:.65em;
-  font-weight:700;
-  background:rgba(255,255,255,.08);
-  color:var(--yellow);
-}
-
-.hero-amount{
-  font-family:Syne;
-  font-size:3em;
-  font-weight:900;
-  letter-spacing:-1px;
-}
-
-.hero-desc{
-  font-size:.85em;
-  color:var(--muted);
-  margin-top:6px;
-}
-
-.progress-section{
-  margin-top:26px;
-  padding-top:18px;
-  border-top:1px solid var(--border);
-}
-
-.prog-labels{
-  display:flex;
-  justify-content:space-between;
-  font-size:.65em;
-  color:var(--muted);
-  margin-bottom:10px;
-}
-
-.prog-track{
-  height:6px;
-  background:rgba(255,255,255,.08);
-  border-radius:20px;
-  overflow:hidden;
-}
-
-.prog-fill{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,var(--yellow),#fde68a);
-  box-shadow:0 0 20px rgba(251,191,36,.6);
-  transition:width 1s ease;
-}
+/* HERO CARD HITAM */
+.hero { background:var(--pri); color:#fff; padding:25px; border-radius:24px; position:relative; overflow:hidden; box-shadow:0 15px 40px rgba(15,23,36,0.2); margin-bottom:30px; }
+.hero::after { content:'MAKA'; position:absolute; bottom:-20px; right:-10px; font-family:'Syne'; font-size:4em; font-weight:900; color:rgba(255,255,255,0.05); }
+.lbl { font-size:0.7em; font-weight:700; opacity:0.7; letter-spacing:1px; }
+.val { font-family:'Syne'; font-size:2.5em; font-weight:800; margin:5px 0; line-height:1; }
+.pill { float:right; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:20px; font-size:0.7em; font-weight:800; }
+.pill.red { background:#ef4444; color:#fff; }
+.bar-bg { background:rgba(255,255,255,0.1); height:6px; border-radius:10px; margin-top:20px; overflow:hidden; }
+.bar-fill { background:var(--yel); height:100%; width:0%; transition:1s; }
 
 /* MENU */
-.section-title{
-  font-family:Syne;
-  font-weight:800;
-  margin-bottom:16px;
-}
-
-.menu-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-}
-
-.menu-card{
-  background:var(--glass);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:18px 8px;
-  text-align:center;
-  color:var(--text);
-  text-decoration:none;
-  backdrop-filter:blur(12px);
-}
-
-.menu-card:active{transform:scale(.95)}
-
-.menu-icon{font-size:26px;margin-bottom:8px}
-.menu-text{font-size:.7em;font-weight:700}
-
-.btn-sos{border-color:rgba(239,68,68,.5);color:#fecaca}
-.btn-plus{border-color:rgba(20,184,166,.6);color:#99f6e4}
+.grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.card { background:#fff; border:1px solid #e2e8f0; padding:15px; border-radius:16px; text-align:center; text-decoration:none; color:var(--pri); display:flex; flex-direction:column; align-items:center; transition:0.2s; }
+.card:active { transform:scale(0.95); background:#f1f5f9; }
+.ico { font-size:24px; margin-bottom:5px; filter:grayscale(100%); }
+.card:active .ico { filter:grayscale(0%); }
+.txt { font-size:0.75em; font-weight:700; }
 
 /* NAV */
-.bottom-nav{
-  position:fixed;
-  bottom:26px;
-  left:50%;
-  transform:translateX(-50%);
-  background:rgba(2,6,23,.9);
-  border:1px solid var(--border);
-  border-radius:100px;
-  padding:14px 34px;
-  display:flex;
-  gap:34px;
-  backdrop-filter:blur(16px);
-}
-
-.nav-item{
-  font-size:10px;
-  color:var(--muted);
-  text-decoration:none;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-.nav-item span{font-size:20px}
-.nav-item.active{color:var(--yellow)}
-
-/* LOADING */
-#loading-overlay{
-  position:fixed;
-  inset:0;
-  background:#020617;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-}
-
-.spinner{
-  width:52px;height:52px;
-  border:4px solid rgba(255,255,255,.1);
-  border-top:4px solid var(--yellow);
-  border-radius:50%;
-  animation:spin 1s linear infinite;
-}
-
-@keyframes spin{to{transform:rotate(360deg)}}
-
-.hidden{display:none}
+footer { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--pri); padding:12px 30px; border-radius:50px; display:flex; gap:30px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:99; }
+.nav-i { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#94a3b8; font-size:9px; font-weight:700; }
+.nav-i span { font-size:20px; margin-bottom:2px; }
+.nav-i.act { color:#fff; } .nav-i.act span { color:var(--yel); }
 </style>
 </head>
-
 <body>
-
-<div id="loading-overlay">
-  <div class="spinner"></div>
-  <div style="margin-top:12px;font-family:Syne;letter-spacing:3px">MAKA MOTOR</div>
+<div class="con">
+    <div class="head"><div><h1>Halo...</h1><p class="sub" id="pl">Loading...</p></div><div class="av" id="av">U</div></div>
+    <div class="hero">
+        <span class="pill" id="st">...</span><span class="lbl">TAGIHAN</span>
+        <div class="val" id="rp">Rp 0</div>
+        <p style="font-size:0.9em; opacity:0.8; margin:0 0 10px 0;" id="ds">...</p>
+        <div style="font-size:0.7em; display:flex; justify-content:space-between;"><span>PROGRESS</span><span id="dy">0/1009</span></div>
+        <div class="bar-bg"><div class="bar-fill" id="bf"></div></div>
+    </div>
+    <h3 style="font-family:'Syne'; border-left:4px solid var(--acc); padding-left:10px;">Menu Utama</h3>
+    <div class="grid">
+        <a href="calendar.html" class="card"><div class="ico">📅</div><span class="txt">Bayar</span></a>
+        <a href="history.html" class="card"><div class="ico">🧾</div><span class="txt">Riwayat</span></a>
+        <a href="part_tracker.html" class="card"><div class="ico">🎁</div><span class="txt">Gratisan</span></a>
+        <a href="settings.html" class="card"><div class="ico">⚙️</div><span class="txt">Setting</span></a>
+        <a href="info_mlu.html" class="card"><div class="ico">💡</div><span class="txt">Info MLU</span></a>
+        <a href="tips_maka.html" class="card"><div class="ico">📖</div><span class="txt">Panduan</span></a>
+        <a href="maka_plus.html" class="card"><div class="ico">✨</div><span class="txt">MAKA+</span></a>
+        <button onclick="window.open('https://wa.me/6281234567890','_blank')" class="card"><div class="ico">💬</div><span class="txt">CS WA</span></button>
+        <button onclick="location.href='daftar_antrian.html?mode=SOS'" class="card" style="background:#fee2e2; border-color:#fecaca"><div class="ico">🚨</div><span class="txt" style="color:#dc2626">Darurat</span></button>
+    </div>
 </div>
-
-<div class="app-container hidden" id="main-content">
-
-  <div class="header-user">
-    <div class="user-greeting">
-      <h1 id="user-name-display">Halo</h1>
-      <p>Unit <span id="user-plate-display">-</span></p>
-    </div>
-    <div id="user-avatar" class="user-avatar">U</div>
-  </div>
-
-  <div id="heroCard" class="hero-card">
-    <div class="hero-top">
-      <div class="hero-label">STATUS TAGIHAN</div>
-      <div id="status-pill" class="status-pill">CHECKING</div>
-    </div>
-
-    <div id="hero-amount" class="hero-amount">Rp 0</div>
-    <div id="hero-desc" class="hero-desc">Memuat data...</div>
-
-    <div class="progress-section">
-      <div class="prog-labels">
-        <span>KEPEMILIKAN</span>
-        <span id="rto-days">0 / 1009</span>
-      </div>
-      <div class="prog-track"><div id="rto-bar" class="prog-fill"></div></div>
-    </div>
-  </div>
-
-  <div class="section-title">Menu Utama</div>
-  <div class="menu-grid">
-    <a href="calendar.html" class="menu-card"><div class="menu-icon">📅</div><div class="menu-text">Bayar</div></a>
-    <a href="history.html" class="menu-card"><div class="menu-icon">🧾</div><div class="menu-text">Riwayat</div></a>
-    <a href="part_tracker.html" class="menu-card"><div class="menu-icon">🎁</div><div class="menu-text">Bonus</div></a>
-
-    <a href="settings.html" class="menu-card"><div class="menu-icon">⚙️</div><div class="menu-text">Setting</div></a>
-    <a href="info_mlu.html" class="menu-card"><div class="menu-icon">💡</div><div class="menu-text">Info</div></a>
-    <a href="tips_maka.html" class="menu-card"><div class="menu-icon">📖</div><div class="menu-text">Panduan</div></a>
-
-    <a href="maka_plus.html" class="menu-card btn-plus"><div class="menu-icon">✨</div><div class="menu-text">MAKA+</div></a>
-    <button onclick="triggerWaSOS()" class="menu-card btn-sos"><div class="menu-icon">💬</div><div class="menu-text">CS</div></button>
-    <button onclick="triggerSOS()" class="menu-card btn-sos"><div class="menu-icon">🚨</div><div class="menu-text">Darurat</div></button>
-  </div>
-</div>
-
-<footer class="bottom-nav">
-  <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
-  <a href="dashboard.html" class="nav-item active"><span>🏠</span>Home</a>
-  <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
+<footer>
+    <a href="lokasi_fc.html" class="nav-i"><span>⚡</span>Lokasi</a>
+    <a href="dashboard.html" class="nav-i act"><span>🏠</span>Home</a>
+    <a href="daftar_antrian.html" class="nav-i"><span>🎫</span>Antrian</a>
 </footer>
-
 <script>
-// SERVICE WORKER
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'))
-}
+const c={apiKey:"AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",authDomain:"rtomaka-e67b5.firebaseapp.com",projectId:"rtomaka-e67b5",storageBucket:"rtomaka-e67b5.firebasestorage.app",messagingSenderId:"472036722228",appId:"1:472036722228:web:11d520f9204db317d02c61"};
+try{if(!firebase.apps.length)firebase.initializeApp(c);var db=firebase.firestore();}catch(e){}
+let u=JSON.parse(localStorage.getItem('maka_user')), p=JSON.parse(localStorage.getItem('maka_plus_data'))||{active:false};
+if(!u)location.href='index.html';
+document.querySelector('h1').innerText=u.nama; document.getElementById('pl').innerText=u.plat;
+if(u.photoUrl)document.getElementById('av').style.backgroundImage=`url('${u.photoUrl}')`,document.getElementById('av').innerText='';
 
-// FIREBASE
-const firebaseConfig={
-  apiKey:"AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
-  authDomain:"rtomaka-e67b5.firebaseapp.com",
-  projectId:"rtomaka-e67b5"
-};
-
-firebase.initializeApp(firebaseConfig);
-const db=firebase.firestore();
-
-let currentUser=JSON.parse(localStorage.getItem('maka_user'));
-let plusData=JSON.parse(localStorage.getItem('maka_plus_data'))||{active:false};
-
-if(!currentUser||!currentUser.plat){
-  location.href='index.html';
-}
-
-document.getElementById('user-name-display').innerText=currentUser.nama||'Pengguna';
-document.getElementById('user-plate-display').innerText=currentUser.plat;
-
-if(currentUser.photoUrl){
-  const av=document.getElementById('user-avatar');
-  av.innerText='';
-  av.style.backgroundImage=`url('${currentUser.photoUrl}')`;
-}
-
-function loadPaymentsAndDebt(){
-  db.collection('daily_payments')
-    .where('plat','==',currentUser.plat)
-    .onSnapshot(snap=>{
-      let paid=[];
-      snap.forEach(d=>paid.push(d.data().date));
-
-      let total=0,days=0;
-      let join=new Date(currentUser.joinedAt);
-      let today=new Date(); today.setHours(0,0,0,0);
-
-      let cur=0;
-      while(join<=today && cur<1009){
-        const ds=join.toISOString().split('T')[0];
-        if(join.getDate()!==31 && !paid.includes(ds)){
-          total+=70000;days++;
-        }
-        cur++; join.setDate(join.getDate()+1);
-      }
-
-      const card=document.getElementById('heroCard');
-      if(total>0){
-        card.classList.add('warning');
-        heroAmount.innerText="Rp "+total.toLocaleString('id-ID');
-        heroDesc.innerText=`Menunggak ${days} hari`;
-        statusPill.innerText="TUNGGAKAN";
-      }else{
-        heroAmount.innerText="Rp 0";
-        heroDesc.innerText="Tidak ada tunggakan";
-        statusPill.innerText="AMAN";
-      }
-
-      rtoDays.innerText=`${cur} / 1009`;
-      rtoBar.style.width=(cur/1009*100)+"%";
-
-      loadingOverlay.style.display='none';
-      mainContent.classList.remove('hidden');
-    });
-}
-
-loadPaymentsAndDebt();
-
-function triggerSOS(){location.href='daftar_antrian.html?mode=SOS'}
-function triggerWaSOS(){
-  window.open(`https://wa.me/6281234567890?text=Halo CS MAKA, saya ${currentUser.nama} (${currentUser.plat})`,'_blank');
-}
+db.collection('daily_payments').where('plat','==',u.plat).onSnapshot(s=>{
+    let pd=[], tot=0, cur=new Date(u.joinedAt), now=new Date(), lt=0, dc=0; now.setHours(0,0,0,0); cur.setHours(0,0,0,0);
+    s.forEach(d=>pd.push(d.data().date));
+    while(cur<=now && dc<1009){
+        let d=cur.toISOString().split('T')[0], pr=(cur.getDate()===31)?0:(p.active&&Math.ceil(Math.abs(cur-new Date(u.joinedAt))/864e5)<=365)?80000:70000;
+        if(pr>0 && !pd.includes(d)){ tot+=pr; lt++; }
+        cur.setDate(cur.getDate()+1); dc++;
+    }
+    document.getElementById('rp').innerText="Rp "+tot.toLocaleString('id');
+    document.getElementById('dy').innerText=dc+"/1009"; document.getElementById('bf').style.width=(dc/1009)*100+"%";
+    if(tot>0){ document.getElementById('st').innerText="TUNGGAKAN"; document.getElementById('st').className="pill red"; document.getElementById('ds').innerText=lt+" Hari Belum Bayar"; }
+    else { document.getElementById('st').innerText="AMAN"; document.getElementById('st').className="pill"; document.getElementById('ds').innerText="Tidak ada tagihan."; }
+});
 </script>
-
-</body>
-</html>
+</body></html>

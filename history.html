@@ -3,87 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Riwayat - MAKA</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<title>Riwayat</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
-/* THEME */
-:root { --maka-black:#0f1724; --maka-teal:#0ea5a6; --bg-page:#f8fafc; --border:#e2e8f0; }
-body { margin:0; font-family:'Inter'; background:var(--bg-page); color:var(--maka-black); padding-bottom:120px; }
-.app-container { max-width:480px; margin:0 auto; padding:20px 24px; }
-
-.header-simple { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; padding-top:10px; }
-.page-title { font-family:'Syne'; font-weight:800; font-size:1.6em; margin:0; }
-.plat-badge { font-size:0.85em; font-weight:700; background:#fff; padding:8px 14px; border-radius:10px; border:1px solid var(--border); }
-
-/* LIST */
-.history-list { display:flex; flex-direction:column; gap:12px; }
-.history-card { 
-    background:#ffffff; border-radius:16px; padding:18px; border:1px solid var(--border);
-    display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 8px rgba(0,0,0,0.03);
-}
-.hc-left h4 { margin:0 0 5px; font-size:0.95em; font-weight:700; }
-.hc-left p { margin:0; font-size:0.75em; color:#64748b; font-weight:500; }
-.hc-right { text-align:right; }
-.hc-amount { font-family:'Syne'; font-size:1.1em; font-weight:800; display:block; margin-bottom:5px; }
-.status-pill { display:inline-block; font-size:0.65em; font-weight:800; padding:4px 10px; border-radius:6px; background:#dcfce7; color:#166534; }
-
-.empty-state { text-align:center; padding:50px 20px; color:#94a3b8; }
-
-/* NAV */
-footer.bottom-nav { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:var(--maka-black); border-radius:100px; padding:14px 35px; display:flex; gap:40px; box-shadow:0 20px 50px rgba(0,0,0,0.3); z-index:999; }
-.nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#64748b; font-size:10px; font-weight:700; }
-.nav-item span { font-size:22px; margin-bottom:3px; }
-.nav-item.active span { color:#fbbf24; }
+body { margin:0; font-family:'Inter'; background:#f8fafc; color:#0f1724; padding-bottom:100px; }
+.con { max-width:480px; margin:0 auto; padding:20px; }
+h1 { font-family:'Syne'; margin:0 0 20px 0; }
+.card { background:#fff; padding:15px; border-radius:16px; border:1px solid #e2e8f0; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.l h4 { margin:0; font-family:'Syne'; } .l p { margin:0; font-size:0.8em; color:#64748b; }
+.r { text-align:right; font-weight:800; font-family:'Syne'; }
+.ok { font-size:0.6em; background:#dcfce7; color:#166534; padding:3px 8px; border-radius:5px; }
+footer { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#0f1724; padding:12px 30px; border-radius:50px; display:flex; gap:30px; z-index:99; }
+.ni { text-decoration:none; color:#94a3b8; font-size:9px; font-weight:700; display:flex; flex-direction:column; align-items:center; }
+.ni span { font-size:20px; margin-bottom:2px; }
 </style>
 </head>
 <body>
-
-<div class="app-container">
-  <div class="header-simple"><h1 class="page-title">Riwayat</h1><div class="plat-badge" id="platDisplay">...</div></div>
-  <div class="history-list" id="historyList"><div class="empty-state">Memuat data...</div></div>
-</div>
-
-<footer class="bottom-nav">
-    <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
-    <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
-    <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
-</footer>
-
+<div class="con"><h1>Riwayat</h1><div id="lst">Memuat...</div></div>
+<footer><a href="lokasi_fc.html" class="ni"><span>⚡</span>Lokasi</a><a href="dashboard.html" class="ni"><span>🏠</span>Home</a><a href="daftar_antrian.html" class="ni"><span>🎫</span>Antrian</a></footer>
 <script>
-const firebaseConfig={apiKey:"AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",authDomain:"rtomaka-e67b5.firebaseapp.com",projectId:"rtomaka-e67b5",storageBucket:"rtomaka-e67b5.firebasestorage.app",messagingSenderId:"472036722228",appId:"1:472036722228:web:11d520f9204db317d02c61"};
-let db, currentUser=JSON.parse(localStorage.getItem('maka_user'));
-
-function init(){
-    try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);db=firebase.firestore();}catch(e){}
-    if(!currentUser){window.location.href='index.html';return;}
-    document.getElementById('platDisplay').innerText=currentUser.plat;
-    
-    // FIX ERROR: Hapus .orderBy() dari query agar tidak perlu index manual
-    db.collection('daily_payments').where('plat','==',currentUser.plat).limit(50).onSnapshot(snap=>{
-        if(snap.empty){ document.getElementById('historyList').innerHTML='<div class="empty-state">Belum ada riwayat.</div>'; return; }
-        
-        // SORTING CLIENT SIDE (Javascript)
-        let data=[]; snap.forEach(d=>data.push(d.data()));
-        data.sort((a,b)=> new Date(b.date) - new Date(a.date)); // Urutkan tanggal terbaru diatas
-
-        let html='';
-        data.forEach(d=>{
-            const dateSewa = new Date(d.date).toLocaleDateString('id-ID',{day:'numeric', month:'long', year:'numeric'});
-            let payTime = 'Manual';
-            if(d.paidAt && d.paidAt.toDate) {
-                const t = d.paidAt.toDate(); payTime = t.toLocaleDateString('id-ID',{day:'numeric',month:'short'}) + ', ' + t.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'});
-            }
-            html += `<div class="history-card">
-                <div class="hc-left"><h4>Sewa: ${dateSewa}</h4><p>Dibayar: ${payTime}</p></div>
-                <div class="hc-right"><span class="hc-amount">Rp ${parseInt(d.amount).toLocaleString('id')}</span><span class="status-pill">LUNAS</span></div>
-            </div>`;
-        });
-        document.getElementById('historyList').innerHTML=html;
-    });
-}
-document.addEventListener("DOMContentLoaded",init);
-</script>
-</body>
-</html>
+const c={apiKey:"AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",authDomain:"rtomaka-e67b5.firebaseapp.com",projectId:"rtomaka-e67b5",storageBucket:"rtomaka-e67b5.firebasestorage.app",messagingSenderId:"472036722228",appId:"1:472036722228:web:11d520f9204db317d02c61"};
+try{if(!firebase.apps.length)firebase.initializeApp(c);var db=firebase.firestore();}catch(e){}
+let u=JSON.parse(localStorage.getItem('maka_user'));
+if(u) db.collection('daily_payments').where('plat','==',u.plat).limit(30).onSnapshot(s=>{
+    let d=[]; s.forEach(x=>d.push(x.data())); d.sort((a,b)=>new Date(b.date)-new Date(a.date));
+    let h=''; d.forEach(i=>{ h+=`<div class="card"><div class="l"><h4>${i.date}</h4><p>Lunas</p></div><div class="r">Rp 70.000<br><span class="ok">SUKSES</span></div></div>`; });
+    document.getElementById('lst').innerHTML=h||'Kosong';
+});
+</script></body></html>
