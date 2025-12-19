@@ -3,123 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Gratisan Part</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<title>Gratisan Part - MAKA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="manifest" href="/makarental/manifest.json"> 
   
 <style>
-/* ================= GLOBAL PREMIUM THEME ================= */
+/* === MAKA MOTORS THEME === */
 :root {
-  --bg-base: #f0f4f8;
-  --accent: #0ea5a6;
-  --accent-2: #06b6d4;
-  --text: #0f1724;
-  --muted: #64748b;
+  --maka-black: #0f1724;
+  --maka-white: #ffffff;
+  --maka-yellow: #fbbf24;
+  --maka-teal: #0ea5a6;
+  --bg-page: #f8fafc;
+  --border-color: #e2e8f0;
+  --text-muted: #64748b;
   --danger: #ef4444;
-  --success: #10b981;
-  
-  --glass-bg: rgba(255, 255, 255, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  --backdrop-blur: blur(12px);
-  
-  --radius-lg: 24px;
-  --max-width: 520px;
 }
-
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
   margin: 0; padding: 0;
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg-base);
-  color: var(--text);
+  background-color: var(--bg-page);
+  color: var(--maka-black);
   min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
+  padding-bottom: 100px;
 }
 
-body::before {
-  content: "";
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: url('1763947427555.jpg') center/cover no-repeat; 
-  opacity: 0.15; z-index: -1; pointer-events: none;
-}
-
-.app-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 20px 20px 120px 20px;
-}
+.app-container { max-width: 480px; margin: 0 auto; padding: 20px 24px; }
 
 /* HEADER */
-.header { margin-bottom: 24px; }
-.header h1 {
-  font-family: 'Syne', sans-serif; font-size: 1.8em; font-weight: 800;
-  margin: 0; color: var(--text); letter-spacing: -0.5px;
+.header-simple { margin-bottom: 24px; padding-top: 10px; }
+.page-title {
+    font-family: 'Syne', sans-serif; font-size: 1.5em; font-weight: 800;
+    margin: 0; letter-spacing: -0.5px;
 }
-.header p { color: var(--muted); font-size: 0.9em; margin: 4px 0 0 0; }
+.page-subtitle { color: var(--text-muted); font-size: 0.9em; margin-top: 4px; }
 
-/* GRID CARD */
+/* CARD GRID */
 .part-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px;
 }
 
 .part-card {
-  background: var(--glass-bg);
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: var(--backdrop-blur);
-  -webkit-backdrop-filter: var(--backdrop-blur);
-  border-radius: 20px;
-  border: 1px solid var(--glass-border);
-  padding: 16px;
+  background: var(--maka-white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px; padding: 16px;
   display: flex; flex-direction: column; justify-content: space-between;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
 }
 
-.part-name { font-weight: 700; font-size: 0.9em; margin: 0 0 8px 0; color: var(--text); }
-.part-limit { font-size: 0.75em; color: var(--muted); margin-bottom: 8px; }
-.highlight-num { font-weight: 800; font-size: 1.2em; color: var(--accent); }
+.part-name { font-weight: 700; font-size: 0.85em; margin-bottom: 10px; color: var(--text-muted); text-transform: uppercase; }
+.part-info { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+.part-remain { font-family: 'Syne'; font-size: 2em; font-weight: 800; line-height: 1; }
+.part-total { font-size: 0.8em; color: var(--text-muted); margin-bottom: 3px; }
 
 /* PROGRESS BAR */
 .progress-track {
-  width: 100%; height: 6px; background: rgba(0,0,0,0.05);
-  border-radius: 99px; overflow: hidden; margin-bottom: 8px;
+  width: 100%; height: 6px; background: #f1f5f9;
+  border-radius: 10px; overflow: hidden;
 }
 .progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  border-radius: 99px; transition: width 0.5s ease;
+  height: 100%; background: var(--maka-yellow);
+  border-radius: 10px; transition: width 0.5s ease;
 }
-.progress-fill.empty { background: var(--danger); }
+.progress-fill.low { background: var(--danger); }
+.progress-fill.good { background: var(--maka-teal); }
 
 /* BUTTON ACTION */
 .btn-action {
-  width: 100%; padding: 16px; border-radius: 16px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: white; border: none; font-weight: 800; font-size: 1em; cursor: pointer;
-  box-shadow: 0 8px 20px rgba(14, 165, 166, 0.2);
+  width: 100%; padding: 16px; border-radius: 14px;
+  background: var(--maka-black); color: white; border: none; 
+  font-weight: 700; font-family: 'Syne'; font-size: 1em; cursor: pointer;
   display: flex; justify-content: center; align-items: center; gap: 8px;
-  text-decoration: none; margin-bottom: 30px;
+  margin-bottom: 30px; transition: 0.2s;
 }
 .btn-action:active { transform: scale(0.98); }
 
-/* LOG RIWAYAT SECTION */
-.log-section h3 { font-family: 'Syne'; font-size: 1.2em; margin-bottom: 12px; }
+/* LOG HISTORY */
+.log-section h3 { font-family: 'Syne'; font-size: 1.1em; margin-bottom: 15px; }
 .log-list {
-  background: var(--glass-bg);
-  backdrop-filter: var(--backdrop-blur);
-  border-radius: 20px;
-  border: 1px solid var(--glass-border);
-  padding: 10px;
+  background: var(--maka-white); border: 1px solid var(--border-color);
+  border-radius: 16px; overflow: hidden;
 }
 .log-item {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 12px; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 0.9em;
+  padding: 14px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.9em;
 }
 .log-item:last-child { border-bottom: none; }
-.log-date { font-size: 0.8em; color: var(--muted); display: block; }
-.log-part { font-weight: 700; color: var(--text); }
+.log-date { font-size: 0.8em; color: var(--text-muted); }
+.log-part { font-weight: 700; }
 
 /* MODAL */
 .modal-overlay {
@@ -127,70 +99,61 @@ body::before {
   display: none; align-items: center; justify-content: center; z-index: 2000;
 }
 .modal-content {
-  background: #fff; width: 85%; max-width: 320px; padding: 24px;
+  background: white; width: 85%; max-width: 320px; padding: 25px;
   border-radius: 24px; text-align: center;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
 }
-.modal-content h3 { font-family: 'Syne'; margin: 0 0 10px; font-size: 1.4em; }
+.modal-title { font-family: 'Syne'; font-size: 1.3em; margin: 0 0 10px; font-weight: 800; }
 select {
-  width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd;
-  background: #f8fafc; margin-bottom: 20px; font-size: 1em; outline: none;
+  width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);
+  background: #f8fafc; margin-bottom: 20px; font-size: 1em; outline: none; font-family: 'Inter';
 }
 .btn-row { display: flex; gap: 10px; }
-.btn-ok { flex: 1; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 700; }
-.btn-cancel { flex: 1; padding: 12px; background: #f1f5f9; color: var(--muted); border: none; border-radius: 12px; font-weight: 700; }
+.btn-ok { flex: 1; padding: 12px; background: var(--maka-black); color: white; border: none; border-radius: 12px; font-weight: 700; }
+.btn-cancel { flex: 1; padding: 12px; background: #f1f5f9; color: var(--text-muted); border: none; border-radius: 12px; font-weight: 700; }
 
-/* NAV STANDAR */
+/* NAV */
 footer.bottom-nav {
-  position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px;
-  width: calc(100% - 40px); max-width: 480px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  border-radius: 999px; padding: 12px 20px; display: flex; justify-content: space-around;
-  align-items: center; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-  border: 1px solid rgba(255,255,255,0.5); z-index: 999;
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: var(--maka-black); border-radius: 100px; padding: 12px 30px;
+    display: flex; gap: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 999;
 }
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; transition: 0.2s;
-}
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 600; }
 .nav-item span { font-size: 20px; margin-bottom: 2px; }
-.nav-item.active { color: var(--accent); font-weight: 700; }
-.nav-item.active span { transform: scale(1.1); filter: drop-shadow(0 2px 4px rgba(14,165,166,0.3)); }
+.nav-item.active span { color: var(--maka-yellow); }
 </style>
 </head>
 
 <body>
 <div class="app-container">
-    <header class="header">
-        <h1>Cek Gratisan</h1>
-        <p>Jatah part gratis 3 tahun</p>
-    </header>
+    <div class="header-simple">
+        <h1 class="page-title">Cek Gratisan</h1>
+        <div class="page-subtitle">Jatah part gratis (3 Tahun)</div>
+    </div>
 
     <div id="part-tracker" class="part-grid"></div>
 
     <button class="btn-action" onclick="openModal()">
-        <span>📝</span> CATAT PENGGUNAAN BARU
+        <span>🛠️</span> CATAT PENGGANTIAN
     </button>
     
     <div class="log-section">
-        <h3>Riwayat Penggantian</h3>
+        <h3>Riwayat Klaim</h3>
         <div id="log-list" class="log-list">
-            <div style="text-align:center; padding:15px; color:#999; font-size:0.8em;">Belum ada data.</div>
+            <div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9em;">Belum ada data.</div>
         </div>
     </div>
 </div>
 
 <div id="modal" class="modal-overlay">
     <div class="modal-content">
-        <h3>Catat Penggantian</h3>
-        <p style="color:#666; font-size:0.9em; margin-bottom:15px;">Pilih part yang diganti hari ini:</p>
+        <h3 class="modal-title">Ganti Apa Hari Ini?</h3>
+        <p style="color:#64748b; font-size:0.9em; margin-bottom:15px;">Pilih part yang baru saja diganti:</p>
         <select id="partSelect">
             <option value="">-- Pilih Part --</option>
         </select>
         <div class="btn-row">
             <button class="btn-cancel" onclick="closeModal()">Batal</button>
-            <button class="btn-ok" onclick="saveUsage()">Konfirmasi</button>
+            <button class="btn-ok" onclick="saveUsage()">Simpan</button>
         </div>
     </div>
 </div>
@@ -202,13 +165,13 @@ footer.bottom-nav {
 </footer>
 
 <script>
-// Data
+// Data Logic (Sama seperti sebelumnya, hanya styling yang berubah)
 let PART_LIMITS = JSON.parse(localStorage.getItem('maka_part_limits')) || {
     ban_depan: 3, ban_belakang: 3, kampas_depan: 3, kampas_belakang: 3
 };
 let partUsage = JSON.parse(localStorage.getItem('maka_part_usage')) || {
     ban_depan: 0, ban_belakang: 0, kampas_depan: 0, kampas_belakang: 0, 
-    history: [] // New: Array untuk menyimpan log riwayat
+    history: [] 
 };
 
 function getParts() {
@@ -221,7 +184,6 @@ function getParts() {
 }
 
 function render() {
-    // 1. Render Cards
     const container = document.getElementById('part-tracker');
     const select = document.getElementById('partSelect');
     container.innerHTML = '';
@@ -233,16 +195,20 @@ function render() {
         const remaining = limit - used;
         const percent = (used / limit) * 100;
         
-        const barClass = remaining <= 0 ? 'progress-fill empty' : 'progress-fill';
-        const color = remaining <= 0 ? 'var(--danger)' : 'var(--accent)';
+        let barClass = 'progress-fill good'; // Default Teal
+        let colorText = 'var(--maka-teal)';
+        
+        if (remaining <= 1) { barClass = 'progress-fill low'; colorText = 'var(--danger)'; } // Merah
+        else if (remaining === 2) { barClass = 'progress-fill'; colorText = 'var(--maka-yellow)'; } // Kuning
 
         container.innerHTML += `
             <div class="part-card">
-                <div>
-                    <div class="part-name">${p.name}</div>
-                    <div class="progress-track"><div class="${barClass}" style="width:${percent}%"></div></div>
+                <div class="part-name">${p.name}</div>
+                <div class="part-info">
+                    <span class="part-remain" style="color:${colorText}">${remaining}</span>
+                    <span class="part-total">dari ${limit}</span>
                 </div>
-                <div class="part-limit">Sisa: <span class="highlight-num" style="color:${color}">${remaining}</span> / ${limit}</div>
+                <div class="progress-track"><div class="${barClass}" style="width:${percent}%"></div></div>
             </div>`;
         
         if (remaining > 0) {
@@ -250,16 +216,14 @@ function render() {
         }
     });
 
-    // 2. Render History Log
+    // Render Log
     const logContainer = document.getElementById('log-list');
     const history = partUsage.history || [];
     
     if(history.length === 0) {
-        logContainer.innerHTML = '<div style="text-align:center; padding:15px; color:#999; font-size:0.8em;">Belum ada data.</div>';
+        logContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9em;">Belum ada data.</div>';
     } else {
-        // Urutkan dari yang terbaru (reverse)
         logContainer.innerHTML = history.slice().reverse().map(h => {
-            // Cari nama part cantik
             const pName = getParts().find(x => x.key === h.key)?.name || h.key;
             return `
             <div class="log-item">
@@ -275,14 +239,11 @@ function closeModal() { document.getElementById('modal').style.display = 'none';
 
 function saveUsage() {
     const key = document.getElementById('partSelect').value;
-    if (!key) return alert("Pilih part dulu!");
+    if (!key) return;
     
-    // Update Counter
     partUsage[key] = (partUsage[key] || 0) + 1;
-    
-    // Update History Log with Date
     const today = new Date().toLocaleDateString('id-ID', {
-        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'
+        day: 'numeric', month: 'short', year: 'numeric'
     });
     
     if(!partUsage.history) partUsage.history = [];
@@ -291,20 +252,9 @@ function saveUsage() {
     localStorage.setItem('maka_part_usage', JSON.stringify(partUsage));
     closeModal();
     render();
-    alert("Berhasil dicatat!");
 }
 
 document.addEventListener('DOMContentLoaded', render);
 </script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('PWA Registered'))
-        .catch(err => console.log('PWA Error', err));
-    });
-  }
-  </script>
-  
 </body>
 </html>

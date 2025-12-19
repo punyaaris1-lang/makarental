@@ -3,146 +3,152 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kalender Pembayaran - MAKA</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<title>Kalender Pembayaran</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<link rel="manifest" href="/makarental/manifest.json"> 
-    
+
 <style>
-/* GLOBAL THEME */
+/* === MAKA MOTORS THEME === */
 :root { 
-    --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
-    --danger:#ef4444; --success:#10b981; --warning:#fbbf24; --disabled:#cbd5e1;
-    --radius-lg:24px;
+    --maka-black: #0f1724; 
+    --maka-white: #ffffff;
+    --maka-yellow: #fbbf24;
+    --maka-teal: #0ea5a6;
+    --bg-page: #f8fafc;
+    --text-main: #0f1724;
+    --text-muted: #64748b;
+    --danger: #ef4444;
 }
-* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
 body { 
     margin:0; font-family:'Inter', sans-serif; 
-    background:var(--bg-base); color:var(--text); 
-    min-height:100vh; position:relative; padding-bottom:100px;
+    background: var(--bg-page); color:var(--text-main); 
+    min-height:100vh; padding-bottom:100px;
 }
 
-/* BACKGROUND */
-body::before {
-    content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: url('1763947427555.jpg') center/cover no-repeat; 
-    opacity: 0.15; z-index: -1; pointer-events: none;
+.app-container { max-width:480px; margin:0 auto; padding:20px 24px; }
+
+/* HEADER */
+.header-simple {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 24px; padding-top: 10px;
+}
+.page-title {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5em;
+    margin: 0; letter-spacing: -0.5px;
 }
 
-.app-container { max-width:520px; margin:0 auto; padding:20px 20px 100px; }
+/* CALENDAR NAV */
+.cal-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--maka-white); padding: 12px 20px;
+    border-radius: 100px; border: 1px solid #e2e8f0;
+    margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+.month-label { font-family: 'Syne'; font-weight: 800; text-transform: uppercase; font-size: 1.1em; }
+.btn-nav {
+    background: var(--maka-black); color: var(--maka-yellow);
+    border: none; width: 32px; height: 32px; border-radius: 50%;
+    font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
 
-/* HEADER & NAVIGASI BULAN */
-.header { 
-    display: flex; justify-content: space-between; align-items: center; 
-    margin-bottom: 20px; background: white; padding: 10px 20px; 
-    border-radius: 99px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
-.month-title { font-family: 'Syne'; font-size: 1.1em; font-weight: 800; text-transform: uppercase; }
-.btn-nav { 
-    background: #f1f5f9; border: none; width: 36px; height: 36px; 
-    border-radius: 50%; font-weight: bold; cursor: pointer; color: var(--text);
-}
+/* GRID */
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-bottom: 30px; }
+.day-name { text-align: center; font-size: 0.7em; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; }
 
-/* KALENDER GRID */
-.calendar-grid { 
-    display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; 
-    margin-bottom: 25px; 
-}
-.day-name { 
-    text-align: center; font-size: 0.75em; font-weight: 800; 
-    color: #64748b; margin-bottom: 10px; text-transform: uppercase;
-}
 .date-cell {
     aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    border-radius: 14px; font-weight: 700; font-size: 0.9em;
-    background: rgba(255,255,255,0.6); position: relative;
-    transition: 0.2s; border: 1px solid transparent;
+    border-radius: 12px; font-weight: 600; font-size: 0.9em;
+    background: var(--maka-white); border: 1px solid #e2e8f0;
+    position: relative; transition: 0.2s;
 }
 
-/* STATUS WARNA */
-.date-cell.lunas { background: #dcfce7; color: var(--success); border-color: var(--success); }
+/* STATUS COLORS */
+.date-cell.lunas { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
 .date-cell.tunggak { 
-    background: #fee2e2; color: var(--danger); border-color: var(--danger); 
-    box-shadow: 0 4px 10px rgba(239,68,68,0.2); animation: pulseRed 2s infinite;
+    background: #fee2e2; color: #991b1b; border-color: #fecaca; cursor: pointer;
+    box-shadow: 0 2px 5px rgba(239, 68, 68, 0.2);
 }
-.date-cell.clickable-tunggak {
-    cursor: pointer !important;
+.date-cell.disabled { background: #f1f5f9; color: #cbd5e1; pointer-events: none; }
+.date-cell.today { border: 2px solid var(--maka-black); }
+
+/* SUMMARY CARD */
+.summary-card {
+    background: var(--maka-black); color: var(--maka-white);
+    padding: 24px; border-radius: 20px; text-align: center;
+    box-shadow: 0 15px 30px rgba(15, 23, 36, 0.15);
 }
+.sum-label { font-size: 0.75em; opacity: 0.7; letter-spacing: 1px; font-weight: 700; }
+.sum-total { font-family: 'Syne'; font-size: 2.5em; font-weight: 800; margin: 5px 0; color: var(--maka-yellow); }
+.sum-desc { font-size: 0.9em; opacity: 0.8; }
 
-.date-cell.disabled { background: #e2e8f0; color: #94a3b8; opacity: 0.5; pointer-events: none; }
-.date-cell.future { background: rgba(255,255,255,0.4); color: #94a3b8; pointer-events: none; }
-/* TANGGAL 31 (LIBUR) */
-.date-cell.libur-ok { background: #f3f4f6; color: #94a3b8; border: 1px dashed #cbd5e1; cursor: default; }
-
-@keyframes pulseRed { 0%{border-color:var(--danger);} 50%{border-color:transparent;} 100%{border-color:var(--danger);} }
-
-.date-cell.dp { border-bottom: 3px solid #fbbf24; } 
-.small-lbl { font-size: 0.5em; text-transform: uppercase; margin-top: -2px; font-weight: 800; }
-
-/* HERO CARD */
-.hero-card {
-    background: linear-gradient(135deg, #ef4444, #b91c1c);
-    color: white; padding: 24px; border-radius: 24px;
-    box-shadow: 0 15px 40px rgba(239, 68, 68, 0.3);
-    position: relative; overflow: hidden; text-align: center;
-    transition: 0.3s;
+/* MODAL */
+.modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+    display: none; align-items: center; justify-content: center; z-index: 2000;
 }
-.hero-card.aman {
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    box-shadow: 0 15px 40px rgba(14, 165, 166, 0.3);
+.modal-content {
+    background: white; width: 85%; max-width: 340px; padding: 30px; border-radius: 24px;
+    text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
 }
+.modal-title { font-family: 'Syne'; font-size: 1.4em; font-weight: 800; margin: 0 0 10px; }
+.modal-btn-row { display: flex; gap: 10px; margin-top: 25px; }
+.btn-confirm { flex: 1; padding: 14px; background: var(--maka-black); color: var(--maka-yellow); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
+.btn-cancel { flex: 1; padding: 14px; background: #f1f5f9; color: var(--text-muted); border: none; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-.hero-label { font-size: 0.8em; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; opacity: 0.9; margin-bottom: 5px; }
-.hero-amount { font-family: 'Inter'; font-size: 2.8em; font-weight: 900; margin: 0; line-height: 1; letter-spacing: -1px; }
-.hero-desc { font-size: 0.9em; margin-top: 10px; font-weight: 600; opacity: 0.9; }
-
-/* FOOTER NAV */
+/* NAV */
 footer.bottom-nav {
-    position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-    width: auto; min-width: 260px; 
-    background: rgba(255, 255, 255, 0.95); 
-    backdrop-filter: blur(20px);
-    border-radius: 50px; padding: 10px 30px; 
-    display: flex; justify-content: space-between; align-items: center; gap: 40px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5); z-index: 999;
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: var(--maka-black); border-radius: 100px; padding: 12px 30px;
+    display: flex; gap: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 999;
 }
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #94a3b8; font-size: 9px; font-weight: 700; transition: 0.2s; }
-.nav-item span { font-size: 22px; margin-bottom: 2px; }
-.nav-item.active { color: var(--accent); }
-
-/* MODAL KUSTOM (Tambahan) */
-.modal-overlay-kustom { position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:9999; display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s; }
-.modal-overlay-kustom.show { display:flex; opacity:1; }
-.modal-box-kustom { background:white; width:85%; max-width:320px; padding:25px; border-radius:24px; text-align:center; box-shadow:0 20px 50px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s; }
-.modal-overlay-kustom.show .modal-box-kustom { transform:scale(1); }
-.modal-icon-kustom { font-size:40px; margin-bottom:15px; display:block; }
-.btn-modal-kustom { width:100%; padding:12px; margin-top:10px; border-radius:12px; border:none; font-weight:bold; cursor:pointer; }
-.modal-title-kustom { font-family:'Inter'; font-size:1.3em; font-weight:800; margin:0 0 10px; color:var(--text); }
-.modal-desc-kustom { font-size:0.9em; color:#64748b; line-height:1.5; margin-bottom:20px; }
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 600; }
+.nav-item span { font-size: 20px; margin-bottom: 2px; }
+.nav-item.active span { color: var(--maka-yellow); }
 </style>
 </head>
 <body>
 
 <div class="app-container">
-    <div class="header">
+    <div class="header-simple">
+        <h1 class="page-title">Kalender</h1>
+        <div style="font-size:0.8em; font-weight:700; background:#fff; padding:5px 10px; border-radius:10px; border:1px solid #e2e8f0;">
+            <span id="displayPlat">...</span>
+        </div>
+    </div>
+
+    <div class="cal-nav">
         <button class="btn-nav" onclick="changeMonth(-1)">‹</button>
-        <div id="monthDisplay" class="month-title">...</div>
+        <div id="monthDisplay" class="month-label">...</div>
         <button class="btn-nav" onclick="changeMonth(1)">›</button>
     </div>
 
-    <div class="calendar-grid" id="calendarGrid"></div>
+    <div class="cal-grid" id="calendarGrid"></div>
 
-    <div id="heroCard" class="hero-card">
-        <div class="hero-label">TOTAL TUNGGAKAN (GLOBAL)</div>
-        <div id="totalDebt" class="hero-amount">Rp 0</div>
-        <div id="debtDesc" class="hero-desc">Data sedang dimuat...</div>
+    <div class="summary-card">
+        <div class="sum-label">TOTAL TUNGGAKAN</div>
+        <div id="totalDebt" class="sum-total">Rp 0</div>
+        <div id="debtDesc" class="sum-desc">Memuat data...</div>
     </div>
-    
-    <div style="text-align:center;margin-top:20px;font-size:0.7em;color:#64748b;">
-        🔴 Belum (Klik Bayar) &nbsp; 🟢 Lunas &nbsp; ⚪ Libur (Tgl 31)
+</div>
+
+<div id="paymentModal" class="modal-overlay">
+    <div class="modal-content">
+        <div style="font-size:40px; margin-bottom:15px;">💰</div>
+        <h3 class="modal-title">Bayar Sewa?</h3>
+        <p style="color:#64748b; line-height:1.5;">
+            Konfirmasi pembayaran untuk tanggal:<br>
+            <b id="payDateDisplay" style="color:var(--text-main); font-size:1.1em;">-</b>
+        </p>
+        <div style="background:#f8fafc; padding:10px; border-radius:10px; margin:15px 0;">
+            Nominal: <b id="payAmountDisplay" style="color:var(--maka-teal);">Rp 0</b>
+        </div>
+        <div class="modal-btn-row">
+            <button class="btn-cancel" onclick="closePaymentModal()">Batal</button>
+            <button class="btn-confirm" onclick="executePayment()">Bayar Sekarang</button>
+        </div>
     </div>
 </div>
 
@@ -152,39 +158,7 @@ footer.bottom-nav {
     <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
 </footer>
 
-<div id="customModalConfirm" class="modal-overlay-kustom">
-    <div class="modal-box-kustom">
-        <h3 id="mTitle">Bayar?</h3>
-        <p id="mDesc" style="color:#666;font-size:0.9em;margin:10px 0;">Konfirmasi</p>
-        <div id="mBtns"></div>
-    </div>
-</div>
-
-<div id="customModalInfo" class="modal-overlay-kustom">
-    <div class="modal-box-kustom">
-        <span id="mIconInfo" class="modal-icon-kustom">🔔</span>
-        <h3 id="mTitleInfo" class="modal-title-kustom">Info</h3>
-        <p id="mDescInfo" class="modal-desc-kustom">Pesan...</p>
-        <button class="btn-modal-kustom" onclick="closeModalInfo()">OK, SIAP</button>
-    </div>
-</div>
-
 <script>
-// PWA ANTI LOADING
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js'))}
-
-// --- FUNGSI MODAL KUSTOM BARU ---
-function showModalInfo(title, msg, icon="🔔") {
-    document.getElementById('mTitleInfo').innerText = title;
-    document.getElementById('mDescInfo').innerText = msg;
-    document.getElementById('mIconInfo').innerText = icon === "✅" ? "✅" : (icon === "❌" ? "❌" : "🔔");
-    document.getElementById('customModalInfo').classList.add('show');
-}
-function closeModalInfo() {
-    document.getElementById('customModalInfo').classList.remove('show');
-}
-// --- END MODAL KUSTOM ---
-
 // --- CONFIG FIREBASE ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
@@ -200,225 +174,137 @@ let currentUser = JSON.parse(localStorage.getItem('maka_user'));
 let plusData = JSON.parse(localStorage.getItem('maka_plus_data')) || { active: false };
 let currentYear = new Date().getFullYear();
 let currentMonth = new Date().getMonth();
-let paidDates = []; 
-let isInitialized = false;
+let paidDates = [];
+let selectedDatePayload = null; // Menyimpan data sementara saat modal dibuka
 
-// FIX: Initialization function untuk mengatasi White Screen saat kembali
-function initializeApp() {
-    if (!isInitialized) {
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            isInitialized = true;
-        } catch (e) {
-            if (e.code !== 'app/duplicate-app') {
-                console.error("Firebase init error:", e);
-                return;
-            }
-        }
-    }
+function init() {
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+    } catch(e) { console.log(e); }
 
     if(!currentUser) { window.location.href='index.html'; return; }
-    loadPayments();
+    document.getElementById('displayPlat').innerText = currentUser.plat;
+    loadData();
 }
 
-document.addEventListener("DOMContentLoaded", initializeApp);
-// FIX: Listener untuk mengatasi White Screen/State Loss
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-        initializeApp(); 
-    }
-});
-
-
-function updateHeroCard(amount, count, error=false) {
-    const card = document.getElementById('heroCard');
-    const txtAmount = document.getElementById('totalDebt');
-    const txtDesc = document.getElementById('debtDesc');
-
-    if (error) {
-        card.className = "hero-card"; 
-        txtAmount.innerText = "⚠️ ERROR";
-        txtDesc.innerText = "Gagal memuat data. Cek koneksi internet Anda.";
-        return;
-    }
-
-    if (amount > 0) {
-        card.className = "hero-card"; 
-        txtAmount.innerText = "Rp " + amount.toLocaleString('id-ID');
-        txtDesc.innerText = `Anda menunggak ${count} hari. Klik kalender untuk bayar.`;
-    } else {
-        card.className = "hero-card aman"; 
-        txtAmount.innerText = "Rp 0";
-        txtDesc.innerText = "Tidak ada tunggakan. Akun Aman! 👍";
-    }
+function getDailyPrice(dateObj) {
+    if (dateObj.getDate() === 31) return 0;
+    const joinDate = new Date(currentUser.joinedAt);
+    const diffDays = Math.ceil(Math.abs(dateObj - joinDate) / (1000 * 60 * 60 * 24)); 
+    let price = 70000;
+    if (plusData.active && diffDays <= 365) price += 10000;
+    return price;
 }
 
-function loadPayments() {
-    if (!db) return; // Pastikan db sudah terinisialisasi
+function loadData() {
     db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
       .onSnapshot(snap => {
           paidDates = [];
-          snap.forEach(doc => { paidDates.push(doc.data().date); });
-          calculateTotalDebt();
+          snap.forEach(doc => paidDates.push(doc.data().date));
           renderCalendar();
-      }, error => {
-          console.error("Firestore Error:", error);
-          updateHeroCard(0, 0, true); 
-          renderCalendar();
+          calculateDebt();
       });
 }
 
-// 2. HITUNG HARGA DINAMIS
-function getDailyPrice(dateObj) {
-    if (dateObj.getDate() === 31) return 0;
-
-    const joinDate = new Date(currentUser.joinedAt);
-    const diffTime = Math.abs(dateObj - joinDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-
-    let price = 70000; 
-    
-    if (plusData.active && diffDays <= 365) {
-        price += 10000; 
-    }
-    
-    return price;
-}
-
-function calculateTotalDebt() {
-    const joinDate = new Date(currentUser.joinedAt);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    
-    let totalHutang = 0;
-    let daysLate = 0;
-    let checkDate = new Date(joinDate);
-    checkDate.setHours(0,0,0,0);
-    
-    while (checkDate <= today) {
-        const dateStr = checkDate.toISOString().split('T')[0];
-        const price = getDailyPrice(checkDate); 
-
-        if (price > 0 && !paidDates.includes(dateStr)) {
-            totalHutang += price;
-            daysLate++;
-        }
-        checkDate.setDate(checkDate.getDate() + 1);
-    }
-
-    updateHeroCard(totalHutang, daysLate);
-}
-
-
-// 3. RENDER KALENDER (FIX KLIK DENGAN ADD EVENT LISTENER)
 function renderCalendar() {
     const grid = document.getElementById('calendarGrid');
     grid.innerHTML = '<div class="day-name">M</div><div class="day-name">S</div><div class="day-name">S</div><div class="day-name">R</div><div class="day-name">K</div><div class="day-name">J</div><div class="day-name">S</div>';
     
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-    const joinDate = new Date(currentUser.joinedAt);
-    joinDate.setHours(0,0,0,0);
-    const today = new Date();
-    today.setHours(0,0,0,0);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const joinDate = new Date(currentUser.joinedAt); joinDate.setHours(0,0,0,0);
 
-    document.getElementById('monthDisplay').innerText = new Date(currentYear, currentMonth).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }).toUpperCase();
+    document.getElementById('monthDisplay').innerText = new Date(currentYear, currentMonth).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
 
-    for(let i=0; i<firstDay; i++) grid.innerHTML += `<div class="date-cell empty"></div>`;
-    
-    const fragment = document.createDocumentFragment();
+    for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
 
     for(let d=1; d<=daysInMonth; d++) {
         let m = (currentMonth+1).toString().padStart(2,'0');
         let da = d.toString().padStart(2,'0');
         let dateKey = `${currentYear}-${m}-${da}`;
-        let currentDate = new Date(dateKey);
-        currentDate.setHours(0,0,0,0);
+        let currDate = new Date(dateKey); currDate.setHours(0,0,0,0);
         
-        let cls = ""; let lbl = ""; 
-        let isClickable = false;
-        
-        let price = getDailyPrice(currentDate);
-        
-        const cell = document.createElement('div');
-        cell.innerText = d;
+        let cls = "date-cell";
+        let content = d;
+        let onClick = "";
 
-        if (d === 31) {
-            cls = "libur-ok"; 
-            lbl = `<div class="small-lbl">LIBUR</div>`;
-        } 
-        else if (currentDate < joinDate) {
-            cls = "disabled";
-        } 
-        else if (currentDate > today) {
-            cls = "future";
-        } 
-        else {
-            // Masa Aktif
-            if (paidDates.includes(dateKey)) {
-                cls = "lunas"; 
+        if(d===31) {
+            cls += " disabled"; content = "31";
+        } else if(currDate < joinDate || currDate > today) {
+            cls += " disabled";
+        } else {
+            // Logic Lunas/Tunggak
+            if(paidDates.includes(dateKey)) {
+                cls += " lunas";
             } else {
-                cls = "tunggak clickable-tunggak"; 
-                isClickable = true; // Tandai agar bisa dipasang event listener
+                cls += " tunggak";
+                // Add event listener logic via onclick attribute for simplicity here
+                onClick = `openPaymentModal('${dateKey}')`;
             }
         }
 
-        // DP Marker 
-        let joinMonthIdx = joinDate.getFullYear()*12 + joinDate.getMonth();
-        let currMonthIdx = currentYear*12 + currentMonth;
-        if (currMonthIdx > joinMonthIdx && (d===14 || d===28)) { 
-            cls += " dp"; 
-            if(!lbl) lbl=`<div class="small-lbl">DP</div>`; 
-        }
-        
-        if (dateKey === today.toISOString().split('T')[0]) cls += " today";
+        if(dateKey === today.toISOString().split('T')[0]) cls += " today";
 
-        cell.className = `date-cell ${cls}`;
-        if(lbl) cell.innerHTML += lbl; 
-        
-        // Memasang Event Listener setelah elemen dibuat (FIX KLIK)
-        if (isClickable) {
-            cell.style.cursor = 'pointer';
-            cell.addEventListener('click', () => paySelf(dateKey, price));
-        }
-
-        fragment.appendChild(cell);
+        grid.innerHTML += `<div class="${cls}" onclick="${onClick}">${content}</div>`;
     }
-    
-    grid.appendChild(fragment);
 }
 
-// 4. KLIK BAYAR
-function paySelf(dateStr, price) {
-    const d = new Date(dateStr);
-    const dateFmt = d.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+function calculateDebt() {
+    // (Logic hitung hutang sama seperti dashboard)
+    const joinDate = new Date(currentUser.joinedAt);
+    const today = new Date(); today.setHours(0,0,0,0);
+    let total = 0; let days = 0;
+    let check = new Date(joinDate); check.setHours(0,0,0,0);
     
-    document.getElementById('customModalConfirm').classList.add('show');
-    document.getElementById('mTitle').innerText = "Bayar Tanggal Ini?";
-    document.getElementById('mDesc').innerHTML = `Tgl: <b>${dateFmt}</b><br>Nominal: <b>Rp ${price.toLocaleString('id-ID')}</b>`;
-    document.getElementById('mBtns').innerHTML = `
-        <button class="btn-modal-kustom" onclick="document.getElementById('customModalConfirm').classList.remove('show')" style="background:#eee;color:#555">Batal</button>
-        <button class="btn-modal-kustom" style="background:#10b981;color:white" onclick="processPayment('${dateStr}', ${price})">Ya, Sudah Bayar</button>
-    `;
+    while(check <= today) {
+        const dStr = check.toISOString().split('T')[0];
+        const price = getDailyPrice(check);
+        if(price > 0 && !paidDates.includes(dStr)) {
+            total += price; days++;
+        }
+        check.setDate(check.getDate()+1);
+    }
+    document.getElementById('totalDebt').innerText = "Rp " + total.toLocaleString('id-ID');
+    document.getElementById('debtDesc').innerText = days > 0 ? `${days} Hari Belum Dibayar` : "Semua Lunas! 👍";
 }
 
-function processPayment(dateStr, amount) {
-    if (!db) return;
-    document.getElementById('customModalConfirm').classList.remove('show');
-    const docId = currentUser.plat + "_" + dateStr;
+function openPaymentModal(dateStr) {
+    const price = getDailyPrice(new Date(dateStr));
+    const fmtDate = new Date(dateStr).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'});
+    
+    selectedDatePayload = { date: dateStr, amount: price }; // Simpan data
+    
+    document.getElementById('payDateDisplay').innerText = fmtDate;
+    document.getElementById('payAmountDisplay').innerText = "Rp " + price.toLocaleString('id-ID');
+    document.getElementById('paymentModal').style.display = 'flex';
+}
+
+function closePaymentModal() {
+    document.getElementById('paymentModal').style.display = 'none';
+    selectedDatePayload = null;
+}
+
+function executePayment() {
+    if(!selectedDatePayload) return;
+    
+    // GENERATE ID UNIK: PLAT_TANGGAL
+    const docId = `${currentUser.plat}_${selectedDatePayload.date}`;
+    
     db.collection('daily_payments').doc(docId).set({
         plat: currentUser.plat,
         nama: currentUser.nama,
-        date: dateStr,
-        amount: amount,
-        paidAt: firebase.firestore.FieldValue.serverTimestamp()
+        date: selectedDatePayload.date,
+        amount: selectedDatePayload.amount,
+        paidAt: firebase.firestore.FieldValue.serverTimestamp() // PENTING UNTUK HISTORY
     }).then(() => {
-        showModalInfo("Lunas!", "Pembayaran Berhasil Dicatat.", "✅");
-    }).catch(error => {
-        console.error("Payment Error:", error);
-        showModalInfo("Gagal", "Gagal memproses pembayaran. Cek koneksi Anda.", "❌");
+        closePaymentModal();
+        alert("Pembayaran Berhasil Dicatat! ✅");
+        // Tidak perlu reload, snapshot akan otomatis update UI
+    }).catch(e => {
+        alert("Gagal mencatat: " + e.message);
     });
 }
 
@@ -428,6 +314,8 @@ function changeMonth(n) {
     else if(currentMonth < 0) { currentMonth=11; currentYear--; }
     renderCalendar();
 }
+
+document.addEventListener("DOMContentLoaded", init);
 </script>
 </body>
 </html>

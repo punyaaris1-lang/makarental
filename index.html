@@ -3,164 +3,146 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>RTO MAKA</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<title>Masuk - MAKA Motors</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <link rel="manifest" href="/makarental/manifest.json"> 
     
 <style>
-/* GLOBAL THEME */
+/* === MAKA MOTORS THEME === */
 :root { 
-    --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
-    --glass-bg:rgba(255,255,255,0.75); --glass-border:rgba(255,255,255,0.5); 
-    --glass-shadow:0 8px 32px 0 rgba(31, 38, 135, 0.15); --backdrop-blur:blur(12px);
-    --radius-lg:24px; --radius-md:16px; 
+    --maka-black: #0f1724; 
+    --maka-white: #ffffff;
+    --maka-yellow: #fbbf24;
+    --maka-teal: #0ea5a6;
+    --bg-page: #f8fafc;
+    --border-color: #e2e8f0;
+    --danger: #ef4444;
 }
+
 * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
 body { 
     margin:0; padding:0; font-family:'Inter', sans-serif; 
-    background-color: var(--bg-base); color:var(--text); 
-    min-height:100vh; 
-    position: relative; 
-    overflow-x: hidden; 
-    padding-top: 50px; 
-    padding-bottom: 50px;
+    background-color: var(--bg-page); color: var(--maka-black); 
+    min-height:100vh; display: flex; flex-direction: column; 
+    align-items: center; justify-content: center;
 }
 
-/* BACKGROUND IMAGE */
-body::before {
-    content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: url('1763947427555.jpg') center/cover no-repeat; 
-    opacity: 0.15; z-index: -1; pointer-events: none;
+.auth-container { 
+    width:100%; max-width:400px; padding:30px 24px; 
 }
 
-/* PERBAIKAN: Menambah padding bawah LEBIH AGRESIV & mengatur tinggi */
-.app-container { 
-    width:100%; max-width:460px; margin: 0 auto;
-    padding:24px; 
-    padding-top: 0; 
-    padding-bottom: 300px; 
-    min-height: 100vh; 
-}
-
-/* CARD LOGIN */
-.auth-card { 
-    background:var(--glass-bg); backdrop-filter:var(--backdrop-blur); 
-    -webkit-backdrop-filter:var(--backdrop-blur);
-    border-radius:var(--radius-lg); padding:32px 24px; 
-    box-shadow:var(--glass-shadow); border:1px solid var(--glass-border); 
-}
-
-/* JUDUL BARU (FONT KECIL & BERSIH) */
+/* BRANDING */
+.brand-area { text-align: center; margin-bottom: 40px; }
 .brand-title { 
-    font-family:'Inter', sans-serif; 
-    font-size:1.4em; 
-    font-weight:900; 
-    text-align:center; margin:0 0 4px; color: var(--text);
-    letter-spacing: 0.5px;
-    white-space: nowrap; 
+    font-family:'Syne', sans-serif; font-size: 2em; font-weight:800; 
+    color: var(--maka-black); letter-spacing: -1px; margin: 0;
 }
 .brand-subtitle { 
-    color:#64748b; 
-    font-size:0.8em; 
-    text-align:center; 
-    margin-bottom:20px; 
-    font-weight: 500; 
-    opacity: 0.8;
+    color: #64748b; font-size: 0.9em; margin-top: 5px; font-weight: 500;
 }
 
 /* TABS */
-.tabs { display:flex; background:rgba(255,255,255,0.5); padding:5px; border-radius:16px; margin-bottom:20px; }
+.tabs { 
+    display:flex; border-bottom: 2px solid var(--border-color); 
+    margin-bottom: 30px; 
+}
 .tab-btn { 
-    flex:1; padding:10px; 
-    border:none; background:transparent; 
-    color:#64748b; font-weight:700; border-radius:12px; cursor:pointer; 
-    font-family: 'Inter'; transition: 0.3s;
+    flex:1; padding:12px; border:none; background:transparent; 
+    color: #94a3b8; font-weight:700; cursor:pointer; 
+    font-family: 'Inter'; font-size: 0.9em; transition: 0.3s;
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
 }
-.tab-btn.active { background:white; color:var(--accent); box-shadow:0 4px 10px rgba(0,0,0,0.05); }
+.tab-btn.active { 
+    color: var(--maka-black); border-bottom-color: var(--maka-black); 
+}
 
-/* FORM KOMPAK */
-.form-view { display:none; animation: fadeIn 0.4s ease; } 
+/* FORM */
+.form-view { display:none; animation: fadeUp 0.4s ease; } 
 .form-view.active { display:block; }
-@keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+@keyframes fadeUp { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 
-.form-group { margin-bottom:12px; }
-label { display:block; font-size:0.75em; font-weight:800; color:#64748b; margin-bottom:6px; text-transform:uppercase; letter-spacing: 0.5px; }
+.form-group { margin-bottom:20px; }
+label { 
+    display:block; font-size:0.75em; font-weight:700; color: #64748b; 
+    margin-bottom:8px; text-transform:uppercase; letter-spacing: 0.5px; 
+}
 input, select { 
-    width:100%; padding:12px; 
-    border-radius:var(--radius-md); 
-    border:1px solid #cbd5e1; background:rgba(255,255,255,0.8); 
-    outline:none; font-size: 1em; font-family: 'Inter'; transition: 0.2s;
+    width:100%; padding:14px; border-radius: 12px; 
+    border:1px solid var(--border-color); background: var(--maka-white); 
+    outline:none; font-size: 1em; font-family: 'Inter'; font-weight: 600;
+    color: var(--maka-black); transition: 0.2s;
 }
-input:focus { border-color: var(--accent); background: white; }
+input:focus { border-color: var(--maka-black); }
 
-/* BUTTON */
+/* BUTTONS */
 .btn-primary { 
-    width:100%; margin-top:10px; 
-    padding:16px; 
-    border:none; 
-    border-radius:var(--radius-md); 
-    background:linear-gradient(90deg, var(--accent), var(--accent-2)); 
-    color:white; font-weight:800; font-size: 1em; cursor:pointer; 
-    box-shadow: 0 10px 25px rgba(14, 165, 166, 0.3); transition: 0.2s;
-    font-family: 'Syne'; letter-spacing: 0.5px;
+    width:100%; padding:16px; border:none; border-radius: 12px; 
+    background: var(--maka-black); color: var(--maka-white); 
+    font-weight:700; font-size: 1em; cursor:pointer; 
+    font-family: 'Syne'; transition: 0.2s; margin-top: 10px;
 }
-.btn-primary:active { transform: scale(0.98); }
-.btn-primary:disabled { background:#cbd5e1; box-shadow: none; cursor:not-allowed; }
+.btn-primary:active { transform: scale(0.98); opacity: 0.9; }
+.btn-primary:disabled { background: #cbd5e1; cursor: not-allowed; }
 
-/* CUSTOM MODAL POP-UP */
+/* MODAL POPUP (Updated Font) */
 .modal-overlay {
-    position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px);
+    position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(5px);
     z-index:9999; display:none; align-items:center; justify-content:center;
-    opacity:0; transition:opacity 0.3s;
 }
-.modal-overlay.show { display:flex; opacity:1; }
 .modal-box {
-    background:white; width:85%; max-width:320px; padding:30px; border-radius:28px;
-    text-align:center; box-shadow:0 25px 60px rgba(0,0,0,0.3); transform:scale(0.9); transition:0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    background:white; width:85%; max-width:320px; padding:30px; border-radius:24px;
+    text-align:center; box-shadow:0 25px 50px rgba(0,0,0,0.2);
 }
-.modal-overlay.show .modal-box { transform:scale(1); }
 .modal-icon { font-size:40px; margin-bottom:15px; display:block; }
-.modal-title { font-family:'Syne'; font-size:1.4em; font-weight:800; margin:0 0 10px; color:var(--text); }
-.modal-desc { font-size:0.95em; color:#64748b; line-height:1.5; margin-bottom:25px; }
+.modal-title { 
+    font-family:'Syne'; font-size:1.4em; font-weight:800; 
+    margin:0 0 10px; color:var(--maka-black); 
+}
+.modal-desc { 
+    font-size:0.95em; color:#64748b; line-height:1.5; margin-bottom:25px; 
+}
 .btn-modal { 
-    width: 100%; padding:14px; border-radius:14px; border:none; 
-    background:var(--text); color:white; font-weight:800; cursor:pointer; 
+    width: 100%; padding:14px; border-radius:12px; border:none; 
+    background: var(--maka-black); color:white; font-weight:700; cursor:pointer; 
 }
 </style>
 </head>
 <body>
 
-<div class="app-container">
-  <div class="auth-card">
-    <div class="brand-title">RTO MAKA</div>
-    <div class="brand-subtitle">Connect With MLU System</div>
+<div class="auth-container">
+  <div class="brand-area">
+    <h1 class="brand-title">MAKA MOTORS</h1>
+    <p class="brand-subtitle">RTO & Charging System</p>
+  </div>
 
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('login')">MASUK</button>
-      <button class="tab-btn" onclick="switchTab('register')">DAFTAR BARU</button>
-    </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('login')">MASUK</button>
+    <button class="tab-btn" onclick="switchTab('register')">DAFTAR BARU</button>
+  </div>
 
-    <div id="view-login" class="form-view active">
-      <div class="form-group">
-        <label>Plat Nomor Kendaraan</label>
-        <input id="l-plat" type="text" placeholder="Contoh: B 1234 XYZ" style="text-transform:uppercase;">
-      </div>
-      <button id="btnLogin" class="btn-primary" onclick="handleLogin()">MASUK APLIKASI</button>
+  <div id="view-login" class="form-view active">
+    <div class="form-group">
+      <label>Plat Nomor Kendaraan</label>
+      <input id="l-plat" type="text" placeholder="B xxxx XXX" style="text-transform:uppercase;">
     </div>
+    <button id="btnLogin" class="btn-primary" onclick="handleLogin()">MASUK APLIKASI</button>
+  </div>
 
-    <div id="view-register" class="form-view">
-      <div class="form-group"><label>Nama Lengkap</label><input id="r-nama" placeholder="Sesuai KTP"></div>
-      <div class="form-group"><label>Nomor HP (WA)</label><input id="r-hp" type="tel" placeholder="08xxxxxxxxxx"></div>
-      <div class="form-group"><label>Plat Nomor</label><input id="r-plat" placeholder="B 1234 XYZ" style="text-transform:uppercase;"></div>
-      <div class="form-group"><label>Tanggal Ambil Motor</label><input id="r-tgl" type="date"></div>
-      <div class="form-group"><label>Opsi DP</label>
-        <select id="r-dp"><option value="355">DP 355.000 (Cicil)</option><option value="755">DP 755.000 (Langsung)</option></select>
-      </div>
-      <button id="btnReg" class="btn-primary" onclick="handleRegister()">DAFTAR SEKARANG</button>
+  <div id="view-register" class="form-view">
+    <div class="form-group"><label>Nama Lengkap</label><input id="r-nama" placeholder="Sesuai KTP"></div>
+    <div class="form-group"><label>Nomor WhatsApp</label><input id="r-hp" type="tel" placeholder="08xxxxxxxxxx"></div>
+    <div class="form-group"><label>Plat Nomor</label><input id="r-plat" placeholder="B xxxx XXX" style="text-transform:uppercase;"></div>
+    <div class="form-group"><label>Tanggal Ambil Motor</label><input id="r-tgl" type="date"></div>
+    <div class="form-group"><label>Opsi DP</label>
+      <select id="r-dp">
+          <option value="355">DP 355.000 (Cicil)</option>
+          <option value="755">DP 755.000 (Langsung)</option>
+      </select>
     </div>
+    <button id="btnReg" class="btn-primary" onclick="handleRegister()">DAFTAR SEKARANG</button>
   </div>
 </div>
 
@@ -174,17 +156,7 @@ input:focus { border-color: var(--accent); background: white; }
 </div>
 
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('PWA Ready', reg))
-        .catch(err => console.log('PWA Error', err));
-    });
-  }
-</script>
-
-<script>
-// --- CONFIG FIREBASE ---
+// CONFIG FIREBASE (Sama seperti sebelumnya)
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -195,46 +167,18 @@ const firebaseConfig = {
 };
 
 let db;
-let isInitialized = false;
+try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); } catch(e){}
 
-function initializeApp() {
-    if (!isInitialized) {
-        try {
-            if (!firebase.apps.length) { 
-                firebase.initializeApp(firebaseConfig);
-            }
-            db = firebase.firestore();
-            isInitialized = true;
-        } catch (e) {
-            if (e.code !== 'app/duplicate-app') {
-                console.error("Firebase init error:", e);
-                return;
-            }
-        }
-    }
-}
-document.addEventListener("DOMContentLoaded", initializeApp);
-
-
-// --- MODAL LOGIC ---
+// UI FUNCTIONS
 function showModal(title, msg, type="info") {
     const modal = document.getElementById('customModal');
     document.getElementById('mTitle').innerText = title;
     document.getElementById('mDesc').innerText = msg;
     document.getElementById('mIcon').innerText = type === "error" ? "⚠️" : (type === "success" ? "✅" : "🔔");
-    
-    // Pastikan modal muncul
-    modal.classList.add('show');
     modal.style.display = 'flex';
-    setTimeout(() => modal.style.opacity = '1', 10);
 }
-function closeModal() {
-    const modal = document.getElementById('customModal');
-    modal.style.opacity = '0';
-    setTimeout(() => modal.style.display = 'none', 300);
-}
+function closeModal() { document.getElementById('customModal').style.display = 'none'; }
 
-// --- APP LOGIC ---
 function switchTab(mode) {
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   event.target.classList.add('active');
@@ -242,98 +186,65 @@ function switchTab(mode) {
   document.getElementById('view-'+mode).classList.add('active');
 }
 
-function handleRegister() {
-  if (!db) return showModal("Error", "Koneksi database belum siap.", "error");
-
-  const nama = document.getElementById('r-nama').value.trim();
-  const hp = document.getElementById('r-hp').value.trim();
-  const plat = document.getElementById('r-plat').value.trim().toUpperCase();
-  const tgl = document.getElementById('r-tgl').value;
-  const dp = document.getElementById('r-dp').value;
-  const btn = document.getElementById('btnReg');
-
-  if(!nama || !hp || !plat || !tgl) return showModal("Data Kurang", "Mohon lengkapi semua formulir.", "error");
-
-  btn.disabled = true; btn.innerText = "MENDAFTAR...";
-
-  const docRef = db.collection('users').doc(plat);
-  
-  // FIX KRITIS: Menggunakan Transaction untuk memastikan pembuatan data Antrian aman
-  db.runTransaction(async (t) => {
-    const userDoc = await t.get(docRef);
-    if (userDoc.exists) {
-        throw new Error("Plat Nomor sudah terdaftar.");
-    }
-    
-    const userData = {
-        nama: nama, hp: hp, plat: plat, tglAmbil: tgl, dp: dp,
-        joinedAt: new Date(tgl).toISOString(), 
-        isBanned: false,
-        makaPlus: { active:false, activatedAt:null }
-    };
-    
-    // Tulis data user
-    t.set(docRef, userData);
-
-    // Tulis data antrian dasar (Collection 'antrian', Document 'utama')
-    const antrianRef = db.collection('antrian').doc('utama');
-    const antrianData = {
-        chargingSlots: [], // ARRAY KOSONG ADALAH YANG PALING AMAN
-        waitingQueue: []
-    };
-    t.set(antrianRef, antrianData, { merge: true });
-
-    return userData;
-
-  }).then((userData) => {
-    // SUKSES
-    localStorage.setItem('maka_user', JSON.stringify(userData));
-    showModal("Sukses", "Pendaftaran Berhasil! Selamat Datang.", "success");
-    setTimeout(() => window.location.href = 'dashboard.html', 1500);
-  }).catch((error) => {
-    // GAGAL
-    btn.disabled = false; btn.innerText = "DAFTAR SEKARANG";
-    
-    let errorMsg = "Gagal koneksi database. Cek Rules Firebase Anda.";
-    if (error.message && error.message.includes("Plat Nomor sudah terdaftar")) {
-        errorMsg = "Plat Nomor ini sudah terdaftar. Silakan gunakan tombol MASUK.";
-    } else if (error.code && error.code === 'permission-denied') {
-        errorMsg = "Gagal penulisan. Cek Rules Firebase: `allow write: if true;`";
-    }
-    
-    showModal("Gagal", errorMsg, "error");
-    console.error("Registration Error Detail:", error);
-  });
-}
-
+// AUTH LOGIC
 function handleLogin() {
-  if (!db) return showModal("Error", "Koneksi database belum siap.", "error");
-
   const plat = document.getElementById('l-plat').value.trim().toUpperCase();
   const btn = document.getElementById('btnLogin');
   
   if(!plat) return showModal("Input Kosong", "Mohon isi Plat Nomor Anda.", "error");
   
-  btn.disabled = true; btn.innerText = "MEMERIKSA...";
+  btn.innerText = "MEMERIKSA..."; btn.disabled = true;
 
   db.collection('users').doc(plat).get().then((doc) => {
     if (doc.exists) {
-      const data = doc.data();
-      if(data.isBanned) {
-        showModal("Akses Ditolak", "Akun Anda diblokir oleh Admin.", "error");
+      if(doc.data().isBanned) {
+        showModal("Akses Ditolak", "Akun Anda diblokir.", "error");
         btn.disabled = false; btn.innerText = "MASUK APLIKASI";
         return;
       }
-      localStorage.setItem('maka_user', JSON.stringify(data));
+      localStorage.setItem('maka_user', JSON.stringify(doc.data()));
       window.location.href = 'dashboard.html';
     } else {
       showModal("Tidak Ditemukan", "Plat nomor belum terdaftar. Silakan Daftar Baru.", "error");
       btn.disabled = false; btn.innerText = "MASUK APLIKASI";
     }
-  }).catch((error) => {
-    console.error("Error:", error);
-    showModal("Gagal", "Gagal koneksi database. Cek Rules Firebase Anda. (Error detail: " + error.message + ")", "error");
-    btn.disabled = false; btn.innerText = "MASUK APLIKASI";
+  }).catch(err => {
+      console.error(err);
+      showModal("Gagal", "Periksa koneksi internet.", "error");
+      btn.disabled = false; btn.innerText = "MASUK APLIKASI";
+  });
+}
+
+function handleRegister() {
+  const nama = document.getElementById('r-nama').value.trim();
+  const hp = document.getElementById('r-hp').value.trim();
+  const plat = document.getElementById('r-plat').value.trim().toUpperCase();
+  const tgl = document.getElementById('r-tgl').value;
+  const dp = document.getElementById('r-dp').value;
+  
+  if(!nama || !hp || !plat || !tgl) return showModal("Data Kurang", "Lengkapi semua formulir.", "error");
+
+  const btn = document.getElementById('btnReg');
+  btn.innerText = "MENDAFTAR..."; btn.disabled = true;
+
+  db.runTransaction(async (t) => {
+    const docRef = db.collection('users').doc(plat);
+    const doc = await t.get(docRef);
+    if(doc.exists) throw "Plat nomor sudah terdaftar!";
+    
+    const userData = {
+        nama, hp, plat, tglAmbil: tgl, dp,
+        joinedAt: new Date(tgl).toISOString(), isBanned: false
+    };
+    t.set(docRef, userData);
+    return userData;
+  }).then((ud) => {
+      localStorage.setItem('maka_user', JSON.stringify(ud));
+      showModal("Sukses", "Pendaftaran Berhasil!", "success");
+      setTimeout(()=> window.location.href='dashboard.html', 1500);
+  }).catch(err => {
+      showModal("Gagal", err.toString().replace("Error: ", ""), "error");
+      btn.disabled = false; btn.innerText = "DAFTAR SEKARANG";
   });
 }
 </script>

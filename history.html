@@ -4,91 +4,100 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Riwayat Pembayaran</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<link rel="manifest" href="/makarental/manifest.json"> 
-    
+
 <style>
-/* GLOBAL THEME */
+/* === MAKA MOTORS THEME === */
 :root { 
-    --bg-base:#f0f4f8; --accent:#0ea5a6; --accent-2:#06b6d4; --text:#0f1724; 
-    --danger:#ef4444; --success:#10b981; --muted:#64748b;
+    --maka-black: #0f1724; 
+    --maka-white: #ffffff;
+    --maka-teal: #0ea5a6;
+    --bg-page: #f8fafc;
+    --border-color: #e2e8f0;
 }
-* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
 body { 
     margin:0; font-family:'Inter', sans-serif; 
-    background:var(--bg-base); color:var(--text); 
-    min-height:100vh; position:relative; padding-bottom:100px;
+    background: var(--bg-page); color:#0f1724; 
+    min-height:100vh; padding-bottom:100px;
 }
 
-/* BACKGROUND */
-body::before {
-    content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: url('1763947427555.jpg') center/cover no-repeat; 
-    opacity: 0.15; z-index: -1; pointer-events: none;
-}
-
-.app-container { max-width:520px; margin:0 auto; padding:20px 20px 100px; }
+.app-container { max-width:480px; margin:0 auto; padding:20px 24px; }
 
 /* HEADER */
-.header { margin-bottom:25px; text-align: center; }
-.header h1 { font-family:'Syne'; font-size:1.8em; font-weight:800; margin:0; color:var(--text); letter-spacing:-0.5px; }
-.header p { color:var(--muted); margin-top:5px; font-weight: 600; }
-
-/* RIWAYAT LIST */
-.history-list { display: flex; flex-direction: column; gap: 15px; }
-.history-item { 
-    background: white; border-radius: 18px; padding: 15px; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+.header-simple {
     display: flex; justify-content: space-between; align-items: center;
-    border-left: 5px solid var(--success);
+    margin-bottom: 24px; padding-top: 10px;
 }
-.hi-info h4 { 
-    margin: 0; font-size: 1em; font-weight: 800; color: var(--text);
-    display: flex; align-items: center; gap: 8px;
+.page-title {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5em;
+    margin: 0; letter-spacing: -0.5px;
 }
-.hi-info p { margin: 2px 0 0; font-size: 0.75em; color: var(--muted); font-weight: 600; }
-.hi-amount { 
-    font-size: 1.2em; font-weight: 900; color: var(--success);
-    text-align: right;
+.plat-badge {
+    font-size: 0.8em; font-weight: 700; background: #fff; padding: 6px 12px; 
+    border-radius: 8px; border: 1px solid var(--border-color); color: var(--maka-black);
 }
-.hi-amount.unpaid { color: var(--danger); }
 
-/* STATUS BADGE */
-.status-badge { 
-    font-size: 0.7em; font-weight: 800; padding: 4px 8px; border-radius: 8px;
-    background: #d1fae5; color: var(--success);
-}
-.status-badge.unpaid { background: #fee2e2; color: var(--danger); }
+/* HISTORY LIST */
+.history-list { display: flex; flex-direction: column; gap: 12px; }
 
-/* FOOTER NAV */
+.history-card { 
+    background: var(--maka-white); border-radius: 16px; padding: 16px; 
+    border: 1px solid var(--border-color);
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    transition: transform 0.2s;
+}
+.history-card:active { transform: scale(0.98); }
+
+.hc-left h4 { 
+    margin: 0; font-size: 0.95em; font-weight: 700; color: var(--maka-black);
+    font-family: 'Syne'; margin-bottom: 4px;
+}
+.hc-left p { margin: 0; font-size: 0.75em; color: #64748b; font-weight: 500; }
+
+.hc-right { text-align: right; }
+.hc-amount { 
+    font-size: 1em; font-weight: 800; color: var(--maka-black); 
+    display: block; margin-bottom: 4px;
+}
+.status-pill { 
+    display: inline-block; font-size: 0.65em; font-weight: 700; 
+    padding: 3px 8px; border-radius: 6px;
+    background: #dcfce7; color: #166534; /* Green Success */
+}
+
+/* EMPTY STATE */
+.empty-state { text-align: center; padding: 40px 20px; color: #94a3b8; }
+.empty-icon { font-size: 40px; margin-bottom: 10px; opacity: 0.5; }
+
+/* NAV */
 footer.bottom-nav {
-    position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-    width: auto; min-width: 260px; 
-    background: rgba(255, 255, 255, 0.95); 
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-radius: 50px; padding: 10px 30px; 
-    display: flex; justify-content: space-between; align-items: center; gap: 40px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.5); z-index: 999;
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: var(--maka-black); border-radius: 100px; padding: 12px 30px;
+    display: flex; gap: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 999;
 }
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #94a3b8; font-size: 9px; font-weight: 700; transition: 0.2s; }
-.nav-item span { font-size: 22px; margin-bottom: 2px; }
-.nav-item.active { color: var(--accent); }
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 600; }
+.nav-item span { font-size: 20px; margin-bottom: 2px; }
+.nav-item.active span { color: #fbbf24; }
 </style>
 </head>
 <body>
 
 <div class="app-container">
-  <header class="header">
-    <h1>Riwayat</h1>
-    <p>Log pembayaran unit <span id="platDisplay">...</span></p>
-  </header>
+  <div class="header-simple">
+    <h1 class="page-title">Riwayat</h1>
+    <div class="plat-badge" id="platDisplay">...</div>
+  </div>
 
   <div class="history-list" id="historyList">
-    <div style="text-align:center; padding:50px; color:#94a3b8;">Memuat riwayat pembayaran...</div>
+    <div class="empty-state">
+        <div class="spinner"></div>
+        <p>Memuat data...</p>
+    </div>
   </div>
 </div>
 
@@ -99,15 +108,7 @@ footer.bottom-nav {
 </footer>
 
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(err => console.log('PWA Error', err));
-    });
-  }
-</script>
-
-<script>
-// --- CONFIG FIREBASE ---
+// CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -119,109 +120,82 @@ const firebaseConfig = {
 
 let db;
 let currentUser = JSON.parse(localStorage.getItem('maka_user'));
-let isInitialized = false;
 
-function initializeApp() {
-    if (!isInitialized) {
-        try {
-            if (!firebase.apps.length) { 
-                firebase.initializeApp(firebaseConfig);
-            }
-            db = firebase.firestore();
-            isInitialized = true;
-        } catch (e) {
-            console.error("Firebase init error:", e);
-            document.getElementById('historyList').innerHTML = `<div style="text-align:center; padding:50px; color:var(--danger); border:1px solid #fee2e2; border-radius:18px;">⚠️ Gagal memuat data. Periksa koneksi internet Anda atau coba muat ulang.</div>`;
-            return;
-        }
-    }
-    
-    currentUser = JSON.parse(localStorage.getItem('maka_user'));
+function init() {
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+    } catch(e) { console.log(e); }
+
     if(!currentUser) { window.location.href='index.html'; return; }
-    
     document.getElementById('platDisplay').innerText = currentUser.plat;
-    loadPaymentHistory();
+    loadHistory();
 }
 
-document.addEventListener('DOMContentLoaded', initializeApp);
-
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-        initializeApp(); 
-    }
-});
-
-
-function loadPaymentHistory() {
+function loadHistory() {
     const container = document.getElementById('historyList');
     
-    if (!db) {
-        container.innerHTML = `<div style="text-align:center; padding:50px; color:var(--danger); border:1px solid #fee2e2; border-radius:18px;">⚠️ Database belum terhubung. Coba muat ulang.</div>`;
-        return;
-    }
-    
+    // FIX PENTING: Mengubah orderBy dari 'paidAt' ke 'date' 
+    // agar tidak perlu composite index yang rumit di Firestore.
     db.collection('daily_payments')
       .where('plat', '==', currentUser.plat)
-      .orderBy('paidAt', 'desc') 
-      .limit(30)
+      .orderBy('date', 'desc') // Mengurutkan berdasarkan Tanggal Sewa (YYYY-MM-DD)
+      .limit(50)
       .onSnapshot(snap => {
-          let html = '';
-          
           if (snap.empty) {
-              container.innerHTML = '<div style="text-align:center; padding:50px; color:#94a3b8;">Belum ada riwayat pembayaran yang tercatat.</div>';
+              container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🧾</div>
+                    <p>Belum ada riwayat pembayaran.</p>
+                </div>`;
               return;
           }
 
+          let html = '';
           snap.forEach(doc => {
               const d = doc.data();
               
-              // Tanggal Tagihan/Sewa
-              const dateSewa = new Date(d.date + 'T00:00:00'); 
+              // Format Tanggal Sewa (YYYY-MM-DD) -> Readable
+              const dateSewa = new Date(d.date); 
               const dateSewaFmt = dateSewa.toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'long' });
 
-              // FIX KRITIS: Cek apakah paidAt adalah Timestamp sebelum menggunakannya
-              let paidAtFmt = 'N/A';
-              if (d.paidAt && typeof d.paidAt.toDate === 'function') {
-                  const paidAt = d.paidAt.toDate(); 
-                  paidAtFmt = paidAt.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' ' + paidAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+              // Format Waktu Bayar (paidAt)
+              let paidTime = '-';
+              if (d.paidAt && d.paidAt.toDate) {
+                  const pt = d.paidAt.toDate();
+                  paidTime = pt.toLocaleDateString('id-ID', {day:'numeric', month:'short'}) + ' • ' + pt.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
               } else {
-                   // Gunakan tanggal sewa jika paidAt tidak valid (untuk data lama)
-                   paidAtFmt = 'Dicatat pada ' + dateSewa.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+                  paidTime = "Data Lama";
               }
 
-
-              const amountFmt = d.amount.toLocaleString('id-ID');
-              
-              const isPaid = true; 
-              const statusClass = isPaid ? '' : 'unpaid';
-              const statusText = isPaid ? 'Lunas' : 'Tunggakan';
-              const borderStyle = isPaid ? 'border-left: 5px solid var(--success);' : 'border-left: 5px solid var(--danger);';
+              const amount = parseInt(d.amount).toLocaleString('id-ID');
 
               html += `
-              <div class="history-item" style="${borderStyle}">
-                  <div class="hi-info">
-                      <h4>Sewa Harian <span class="status-badge ${statusClass}">${statusText}</span></h4>
-                      <p>Untuk Tgl Sewa: ${dateSewaFmt}</p>
-                      <p>Dibayar: ${paidAtFmt}</p>
+              <div class="history-card">
+                  <div class="hc-left">
+                      <h4>Sewa: ${dateSewaFmt}</h4>
+                      <p>Dibayar: ${paidTime}</p>
                   </div>
-                  <div class="hi-amount ${statusClass}">
-                      Rp ${amountFmt}
+                  <div class="hc-right">
+                      <span class="hc-amount">Rp ${amount}</span>
+                      <span class="status-pill">LUNAS ✅</span>
                   </div>
               </div>
               `;
           });
-
           container.innerHTML = html;
       }, error => {
-          // Error Handler Koneksi yang Lebih Jelas
           console.error("Firestore Error:", error);
           container.innerHTML = `
-              <div style="text-align:center; padding:50px; color:var(--danger); border:1px solid #fee2e2; border-radius:18px;">
-                  ⚠️ Gagal memuat riwayat. Periksa koneksi internet atau Firewall Firestore.
+              <div class="empty-state" style="color:#ef4444;">
+                  <div class="empty-icon">⚠️</div>
+                  <p><b>Gagal memuat data.</b><br>
+                  <small>${error.message}</small></p>
               </div>`;
       });
 }
+
+document.addEventListener("DOMContentLoaded", init);
 </script>
-    
 </body>
 </html>

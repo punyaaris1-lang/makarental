@@ -4,212 +4,174 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MAKA+ Charger</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="manifest" href="/makarental/manifest.json"> 
   
 <style>
-/* ================= GLOBAL PREMIUM THEME ================= */
+/* === MAKA MOTORS THEME === */
 :root {
-  --bg-base: #f0f4f8;
-  --accent: #0ea5a6;
-  --accent-2: #06b6d4;
-  --text: #0f1724;
-  --muted: #64748b;
-  --gold: #fbbf24;
-  
-  --glass-bg: rgba(255, 255, 255, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  --backdrop-blur: blur(12px);
-  
-  --radius-lg: 24px;
-  --max-width: 520px;
+  --maka-black: #0f1724;
+  --maka-white: #ffffff;
+  --maka-yellow: #fbbf24;
+  --maka-teal: #0ea5a6;
+  --bg-page: #f8fafc;
+  --border-color: #e2e8f0;
+  --text-muted: #64748b;
 }
-
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
   margin: 0; padding: 0;
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg-base);
-  color: var(--text);
+  background-color: var(--bg-page);
+  color: var(--maka-black);
   min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
+  padding-bottom: 100px;
 }
 
-body::before {
-  content: "";
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: url('1763947427555.jpg') center/cover no-repeat; 
-  opacity: 0.15; z-index: -1; pointer-events: none;
-}
-
-.app-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 20px 20px 120px 20px;
-}
+.app-container { max-width: 480px; margin: 0 auto; padding: 20px 24px; }
 
 /* HEADER */
-.header { margin-bottom: 24px; text-align: center; }
-.header h1 {
-  font-family: 'Syne', sans-serif; font-size: 1.8em; font-weight: 800;
-  margin: 0; color: var(--text);
+.header-simple { text-align: center; margin-bottom: 30px; margin-top: 10px; }
+.page-title {
+    font-family: 'Syne', sans-serif; font-size: 1.8em; font-weight: 800;
+    margin: 0;
 }
-.header p { color: var(--muted); margin: 6px 0 0 0; font-size: 0.9em; }
+.page-subtitle { color: var(--text-muted); margin-top: 5px; font-size: 0.9em; }
 
-/* PRODUCT HERO (GLASS) */
+/* PRODUCT CARD */
 .product-card {
-  background: var(--glass-bg);
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: var(--backdrop-blur);
-  -webkit-backdrop-filter: var(--backdrop-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
-  padding: 30px 20px;
+  background: var(--maka-white);
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 30px 24px;
   text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
   margin-bottom: 24px;
 }
 
-.prod-circle {
-  width: 100px; height: 100px; border-radius: 50%;
-  background: linear-gradient(135deg, #e0f2fe, #fff);
+.prod-icon {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: #f1f5f9; color: var(--maka-black);
   display: flex; align-items: center; justify-content: center;
-  font-size: 50px; margin: 0 auto 20px;
-  border: 1px dashed var(--accent);
-  box-shadow: 0 10px 30px rgba(14, 165, 166, 0.2);
+  font-size: 40px; margin: 0 auto 20px;
+  border: 2px solid var(--maka-black);
 }
 
 .prod-title { font-family: 'Syne'; font-size: 1.4em; font-weight: 800; margin-bottom: 10px; }
-.prod-desc { font-size: 0.9em; color: var(--muted); line-height: 1.5; margin-bottom: 25px; }
+.prod-desc { font-size: 0.9em; color: var(--text-muted); line-height: 1.6; margin-bottom: 30px; }
 
 /* STEPS FLOW */
 .steps-container {
-  text-align: left; background: rgba(255,255,255,0.4); 
-  padding: 20px; border-radius: 16px; margin-bottom: 25px;
+  text-align: left; 
+  padding: 20px; border-radius: 16px; margin-bottom: 30px;
+  border: 1px dashed var(--border-color); background: #f8fafc;
 }
-.step-item { display: flex; gap: 12px; margin-bottom: 15px; }
+.step-item { display: flex; gap: 15px; margin-bottom: 20px; }
 .step-item:last-child { margin-bottom: 0; }
 .step-num { 
-  background: var(--text); color: white; width: 24px; height: 24px; 
-  border-radius: 50%; text-align: center; line-height: 24px; font-size: 12px; font-weight: bold; flex-shrink: 0;
+  background: var(--maka-black); color: var(--maka-yellow); 
+  width: 24px; height: 24px; border-radius: 50%; 
+  text-align: center; line-height: 24px; font-size: 12px; font-weight: bold; flex-shrink: 0;
 }
-.step-text { font-size: 0.9em; line-height: 1.4; color: #334155; }
-.step-text a { color: var(--accent); font-weight: 700; text-decoration: none; }
+.step-text { font-size: 0.9em; line-height: 1.5; color: #334155; }
+.step-text a { color: var(--maka-teal); font-weight: 700; text-decoration: none; }
 
-/* PRICE BOX */
+/* PRICE BOX (DARK THEME) */
 .price-box {
-  background: linear-gradient(135deg, var(--text), #1a2333);
-  color: white; padding: 20px; border-radius: 20px;
+  background: var(--maka-black);
+  color: white; padding: 20px; border-radius: 16px;
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 25px;
 }
-.price-val { font-family: 'Syne'; font-size: 1.5em; font-weight: 800; color: var(--gold); }
+.price-lbl { font-size: 0.7em; opacity: 0.7; letter-spacing: 1px; font-weight: 700; }
+.price-val { font-family: 'Syne'; font-size: 1.6em; font-weight: 800; color: var(--maka-yellow); }
 
-/* STATUS BADGE (HIDDEN DEFAULT) */
+/* STATUS BADGE */
 .status-badge {
-  background: #f0fdf4; border: 1px solid #22c55e; color: #15803d;
+  background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534;
   padding: 15px; border-radius: 16px; font-size: 0.9em; line-height: 1.5;
-  margin-bottom: 20px; display: none;
+  margin-bottom: 20px; display: none; text-align: left;
 }
 .status-badge.active { display: block; }
 
-/* BUTTONS */
+/* BUTTON */
 .btn-main {
-  width: 100%; padding: 18px; border: none; border-radius: 18px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: white; font-family: 'Syne'; font-size: 1em; font-weight: 800;
-  cursor: pointer; box-shadow: 0 10px 25px rgba(14, 165, 166, 0.3);
-  transition: 0.2s;
+  width: 100%; padding: 16px; border: none; border-radius: 14px;
+  background: var(--maka-black); color: white;
+  font-family: 'Syne'; font-size: 1em; font-weight: 800;
+  cursor: pointer; transition: 0.2s;
 }
-.btn-main:active { transform: scale(0.98); }
-.btn-main:disabled { background: #cbd5e1; color: #94a3b8; box-shadow: none; cursor: default; }
+.btn-main:active { transform: scale(0.98); opacity: 0.9; }
+.btn-main:disabled { background: #cbd5e1; color: #94a3b8; cursor: default; }
 
-/* MODAL CONFIRM (PREMIUM) */
+/* MODAL CONFIRM */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
   display: none; align-items: center; justify-content: center; z-index: 2000;
-  opacity: 0; transition: opacity 0.3s;
 }
-.modal-overlay.active { display: flex; opacity: 1; }
-
 .modal-content {
-  background: #fff; width: 85%; max-width: 340px; padding: 30px; border-radius: 28px;
-  text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.3); transform: scale(0.9); transition: transform 0.3s;
+  background: #fff; width: 85%; max-width: 340px; padding: 30px; border-radius: 24px;
+  text-align: center;
 }
-.modal-overlay.active .modal-content { transform: scale(1); }
-
-.modal-content h3 { font-family: 'Syne'; font-size: 1.4em; margin: 0 0 10px; }
-.modal-content p { color: var(--muted); margin: 0 0 25px; line-height: 1.5; }
-
-.modal-actions { display: flex; gap: 12px; }
+.modal-title { font-family: 'Syne'; font-size: 1.4em; font-weight: 800; margin: 0 0 10px; }
+.modal-actions { display: flex; gap: 12px; margin-top: 25px; }
 .btn-cancel {
-  flex: 1; padding: 14px; background: #f1f5f9; color: var(--muted);
-  border: none; border-radius: 14px; font-weight: 800; cursor: pointer;
+  flex: 1; padding: 14px; background: #f1f5f9; color: var(--text-muted);
+  border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
 }
 .btn-confirm {
-  flex: 1; padding: 14px; background: var(--text); color: var(--gold);
-  border: none; border-radius: 14px; font-weight: 800; cursor: pointer;
+  flex: 1; padding: 14px; background: var(--maka-black); color: var(--maka-yellow);
+  border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
 }
 
-/* NAV STANDAR */
+/* NAV */
 footer.bottom-nav {
-  position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px;
-  width: calc(100% - 40px); max-width: 480px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  border-radius: 999px; padding: 12px 20px; display: flex; justify-content: space-around;
-  align-items: center; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-  border: 1px solid rgba(255,255,255,0.5); z-index: 999;
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: var(--maka-black); border-radius: 100px; padding: 12px 30px;
+    display: flex; gap: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 999;
 }
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; transition: 0.2s;
-}
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 600; }
 .nav-item span { font-size: 20px; margin-bottom: 2px; }
-.nav-item.active { color: var(--accent); font-weight: 700; }
-.nav-item.active span { transform: scale(1.1); filter: drop-shadow(0 2px 4px rgba(14,165,166,0.3)); }
+.nav-item.active span { color: var(--maka-yellow); }
 </style>
 </head>
 <body>
 
 <div class="app-container">
-    <header class="header">
-        <h1>MAKA+</h1>
-        <p>Program Kepemilikan Charger</p>
-    </header>
+    <div class="header-simple">
+        <h1 class="page-title">MAKA+</h1>
+        <p class="page-subtitle">Program Kepemilikan Charger</p>
+    </div>
 
     <div class="product-card">
-        <div class="prod-circle">🔌</div>
-        <div class="prod-title">Portable Fast Charger</div>
+        <div class="prod-icon">🔌</div>
+        <div class="prod-title">Fast Charger</div>
         
         <div class="steps-container">
             <div class="step-item">
                 <div class="step-num">1</div>
                 <div class="step-text">
-                    Isi formulir pendaftaran di sini:<br>
+                    Isi formulir pendaftaran di:<br>
                     <a href="https://bit.ly/semilchargerplus" target="_blank">🔗 bit.ly/semilchargerplus</a>
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-num">2</div>
                 <div class="step-text">
-                    Tunggu persetujuan Admin. Anda akan dihubungi untuk pengambilan unit charger.
+                    Tunggu persetujuan Admin & pengambilan unit.
                 </div>
             </div>
             <div class="step-item">
                 <div class="step-num">3</div>
                 <div class="step-text">
-                    Setelah unit diterima, klik tombol <b>"Aktifkan Cicilan"</b> di bawah ini untuk memulai billing.
+                    Setelah unit diterima, klik <b>"Aktifkan Cicilan"</b> di bawah.
                 </div>
             </div>
         </div>
 
         <div class="price-box">
             <div style="text-align:left;">
-                <span style="font-size:0.8em; opacity:0.7;">BIAYA CICILAN</span><br>
+                <span class="price-lbl">TAMBAHAN BIAYA</span><br>
                 <span style="font-size:0.7em;">(Selama 365 Hari)</span>
             </div>
             <div class="price-val">+10rb<span style="font-size:0.5em;">/hari</span></div>
@@ -217,8 +179,8 @@ footer.bottom-nav {
 
         <div id="statusArea" class="status-badge">
             ✅ <b>CICILAN SEDANG BERJALAN</b><br>
-            Aktif Sejak: <span id="lblDate">-</span><br>
-            Selesai: <span id="lblEnd">-</span>
+            <small>Aktif Sejak: <span id="lblDate">-</span></small><br>
+            <small>Selesai: <span id="lblEnd">-</span></small>
         </div>
 
         <button id="btnAction" class="btn-main" onclick="openModal()">
@@ -229,10 +191,11 @@ footer.bottom-nav {
 
 <div id="modalConfirm" class="modal-overlay">
     <div class="modal-content">
-        <h3>Konfirmasi Aktivasi</h3>
-        <p>Apakah Anda sudah menerima unit Charger?<br><br>
-        Tagihan harian Anda akan otomatis bertambah <b>Rp 10.000</b> selama <b>1 TAHUN</b> (365 Hari).</p>
-        
+        <h3 class="modal-title">Konfirmasi</h3>
+        <p style="color:#64748b; font-size:0.95em;">
+            Apakah unit Charger sudah diterima?<br><br>
+            Tagihan harian akan bertambah <b>Rp 10.000</b> selama <b>1 TAHUN</b>.
+        </p>
         <div class="modal-actions">
             <button class="btn-cancel" onclick="closeModal()">Batal</button>
             <button class="btn-confirm" onclick="confirmActivation()">Ya, Aktifkan</button>
@@ -265,52 +228,28 @@ footer.bottom-nav {
             badge.classList.add('active');
             btn.disabled = true;
             btn.textContent = "CICILAN AKTIF";
-            btn.style.background = "#cbd5e1";
-            btn.style.color = "#64748b";
-            btn.style.boxShadow = "none";
+            btn.style.background = "#e2e8f0"; // Disabled gray
+            btn.style.color = "#94a3b8";
         }
     }
 
     function openModal() {
-        // Cek dulu kalau sudah aktif ga perlu buka modal (double check)
-        const btn = document.getElementById('btnAction');
-        if(!btn.disabled) {
-            document.getElementById('modalConfirm').classList.add('active');
+        if(!document.getElementById('btnAction').disabled) {
+            document.getElementById('modalConfirm').style.display = 'flex';
         }
     }
-
-    function closeModal() {
-        document.getElementById('modalConfirm').classList.remove('active');
-    }
+    function closeModal() { document.getElementById('modalConfirm').style.display = 'none'; }
 
     function confirmActivation() {
         const today = new Date();
-        today.setHours(0,0,0,0); // Reset jam agar kalkulasi hari akurat
-
-        const data = {
-            active: true,
-            activatedAt: today.toISOString()
-        };
-
-        localStorage.setItem(MAKA_PLUS_KEY, JSON.stringify(data));
+        today.setHours(0,0,0,0);
+        localStorage.setItem(MAKA_PLUS_KEY, JSON.stringify({ active: true, activatedAt: today.toISOString() }));
         closeModal();
         loadState();
-        
-        // Alert sukses kecil
-        setTimeout(() => alert("✅ Cicilan Berhasil Diaktifkan!"), 300);
+        alert("Aktivasi Berhasil! Tagihan Anda telah diperbarui.");
     }
 
     document.addEventListener('DOMContentLoaded', loadState);
 </script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('PWA Registered'))
-        .catch(err => console.log('PWA Error', err));
-    });
-  }
-  </script>
-  
 </body>
 </html>
