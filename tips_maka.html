@@ -3,135 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tips MAKA</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0a0f18">
+<title>Tips MAKA Luxury</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="manifest" href="/makarental/manifest.json"> 
   
 <style>
-/* ================= GLOBAL PREMIUM THEME ================= */
+/* === MAKA LUXURY THEME === */
 :root {
-  --bg-base: #f0f4f8;
-  --accent: #0ea5a6;
-  --accent-2: #06b6d4;
-  --text: #0f1724;
-  --muted: #64748b;
-  
-  /* Glassmorphism Variables */
-  --glass-bg: rgba(255, 255, 255, 0.65);
-  --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  --backdrop-blur: blur(12px);
-  
-  --radius-lg: 24px;
-  --max-width: 520px;
+  --bg:#0a0f18; --gold:#D4AF37; --glass:rgba(255, 255, 255, 0.03); --border:rgba(255, 255, 255, 0.08);
+  --text-dim:#94a3b8;
 }
-
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-body {
-  margin: 0; padding: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-base);
-  color: var(--text);
-  min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
-}
-
-body::before {
-  content: "";
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background: url('1763947427555.jpg') center/cover no-repeat; 
-  opacity: 0.15; z-index: -1; pointer-events: none;
-}
-
-.app-container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 20px 20px 120px 20px;
-}
+body { margin:0; font-family:'Inter', sans-serif; background:var(--bg); color:#fff; min-height:100vh; padding-bottom:120px; }
+.app-container { max-width:480px; margin:0 auto; padding:20px; }
 
 /* HEADER */
-.header { margin-bottom: 24px; }
-.header h1 {
-  font-family: 'Syne', sans-serif; font-size: 1.8em; font-weight: 800;
-  margin: 0; color: var(--text); letter-spacing: -0.5px;
-}
-.header p { color: var(--muted); font-size: 0.9em; margin: 4px 0 0 0; }
+.header { margin-bottom: 24px; margin-top: 10px; text-align: center; }
+.title { font-family: 'Syne'; font-size: 1.8em; font-weight: 800; margin: 0; color: var(--gold); }
+.subtitle { color: var(--text-dim); font-size: 0.9em; margin-top: 5px; }
 
 /* ARTICLE LIST */
-.article-container { display: flex; flex-direction: column; gap: 20px; }
+.list { display: flex; flex-direction: column; gap: 20px; }
+.card {
+  background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 20px;
+  backdrop-filter: blur(10px); transition: transform 0.2s;
+}
+.card:active { transform: scale(0.98); background: rgba(255,255,255,0.05); }
 
-.article-card {
-  background: var(--glass-bg);
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: var(--backdrop-blur);
-  -webkit-backdrop-filter: var(--backdrop-blur);
-  border-radius: 20px;
-  border: 1px solid var(--glass-border);
-  padding: 20px;
-  transition: transform 0.2s;
+.c-title { font-family: 'Syne'; font-size: 1.25em; color: #fff; margin: 0 0 10px 0; line-height: 1.3; }
+.c-meta { 
+  display: inline-block; font-size: 0.7em; color: var(--gold); 
+  border: 1px solid var(--gold); padding: 4px 10px; border-radius: 8px; margin-bottom: 15px; 
+  text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
 }
-.article-card:active { transform: scale(0.99); }
+.c-img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 15px; background: #1e293b; }
+.c-text { font-size: 0.95em; line-height: 1.6; color: #cbd5e1; white-space: pre-line; margin: 0; }
 
-.article-card h3 {
-  font-family: 'Syne', sans-serif; font-size: 1.25em; color: var(--accent);
-  margin: 0 0 8px 0; line-height: 1.3;
-}
+/* EMPTY */
+.empty { text-align: center; padding: 40px; color: var(--text-dim); background: var(--glass); border-radius: 20px; border: 1px dashed var(--border); }
 
-.article-meta {
-  display: inline-block; font-size: 0.75em; color: var(--muted);
-  background: rgba(255,255,255,0.5); padding: 4px 8px; border-radius: 6px;
-  margin-bottom: 15px; border: 1px solid rgba(0,0,0,0.05);
-}
-
-.article-photo {
-  width: 100%; height: 200px; object-fit: cover;
-  border-radius: 12px; margin-bottom: 15px;
-  background: #cbd5e1;
-}
-
-.article-content {
-  font-size: 0.95em; line-height: 1.6; color: #334155; margin: 0;
-  white-space: pre-line;
-}
-
-/* EMPTY STATE */
-.empty-state {
-  text-align: center; padding: 40px; color: var(--muted);
-  background: rgba(255,255,255,0.4); border-radius: 20px;
-}
-
-/* NAV STANDAR */
-footer.bottom-nav {
-  position: fixed; left: 50%; transform: translateX(-50%); bottom: 20px;
-  width: calc(100% - 40px); max-width: 480px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-  border-radius: 999px; padding: 12px 20px; display: flex; justify-content: space-around;
-  align-items: center; box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-  border: 1px solid rgba(255,255,255,0.5); z-index: 999;
-}
-.nav-item {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-decoration: none; color: var(--muted); font-size: 11px; gap: 4px; transition: 0.2s;
-}
-.nav-item span { font-size: 20px; margin-bottom: 2px; }
-.nav-item.active { color: var(--accent); font-weight: 700; }
-.nav-item.active span { transform: scale(1.1); filter: drop-shadow(0 2px 4px rgba(14,165,166,0.3)); }
+/* NAV */
+footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(20,27,45,0.8); backdrop-filter: blur(20px); padding: 12px 30px; border-radius: 100px; display: flex; gap: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 999; }
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 9px; font-weight: 700; }
+.nav-item span { font-size: 20px; margin-bottom: 3px; filter: grayscale(100%); }
+.nav-item.active span { filter: grayscale(0%); transform: translateY(-2px); }
 </style>
 </head>
 <body>
     <div class="app-container">
-        <header class="header">
-            <h1>Tips & Trik</h1>
-            <p>Panduan perawatan motor MAKA.</p>
-        </header>
-
-        <section class="article-container" id="article-list">
-            <div class="empty-state">Memuat tips...</div>
-        </section>
+        <div class="header">
+            <h1 class="title">Tips & Trik</h1>
+            <p class="subtitle">Panduan Perawatan MAKA</p>
+        </div>
+        <div class="list" id="list"><div class="empty">Memuat tips...</div></div>
     </div>
 
     <footer class="bottom-nav">
@@ -141,46 +65,30 @@ footer.bottom-nav {
     </footer>
 
     <script>
-        function renderArticles() {
-            const articles = JSON.parse(localStorage.getItem('maka_tips_articles')) || [];
-            const container = document.getElementById('article-list');
-            container.innerHTML = '';
+        const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
+        try{firebase.initializeApp(firebaseConfig); var db=firebase.firestore();}catch(e){}
 
-            if (articles.length === 0) {
-                container.innerHTML = `<div class="empty-state">Belum ada tips yang diposting Admin.</div>`;
-                return;
-            }
-
-            // Urutkan terbaru diatas
-            articles.slice().reverse().forEach(article => {
-                let photosHTML = '';
-                if(article.photos && article.photos.length > 0) {
-                     photosHTML = article.photos.map(url => 
-                        `<img src="${url}" alt="Foto" class="article-photo" onerror="this.style.display='none'">`
-                    ).join('');
-                }
-
-                container.innerHTML += `
-                    <div class="article-card">
-                        <h3>${article.title}</h3>
-                        <span class="article-meta">📅 ${article.date}</span>
-                        ${photosHTML}
-                        <p class="article-content">${article.content}</p>
-                    </div>
-                `;
+        function load() {
+            db.collection('tips_maka').orderBy('timestamp', 'desc').limit(20).get().then(snap => {
+                const c = document.getElementById('list'); c.innerHTML = '';
+                if (snap.empty) { c.innerHTML = '<div class="empty">Belum ada tips.</div>'; return; }
+                
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    let img = '';
+                    if(d.photos && d.photos.length > 0) img = `<img src="${d.photos[0]}" class="c-img" onerror="this.style.display='none'">`;
+                    
+                    c.innerHTML += `
+                    <div class="card">
+                        <h3 class="c-title">${d.title}</h3>
+                        <span class="c-meta">${d.date}</span>
+                        ${img}
+                        <p class="c-text">${d.content}</p>
+                    </div>`;
+                });
             });
         }
-        document.addEventListener('DOMContentLoaded', renderArticles);
+        document.addEventListener('DOMContentLoaded', load);
     </script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(reg => console.log('PWA Registered'))
-        .catch(err => console.log('PWA Error', err));
-    });
-  }
-  </script>
-  
 </body>
 </html>
