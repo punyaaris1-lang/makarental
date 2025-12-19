@@ -3,122 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0a0f18">
-<title>Gratisan Luxury</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<title>Gratisan - MAKA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="manifest" href="/makarental/manifest.json"> 
   
 <style>
-/* === MAKA LUXURY THEME === */
+/* === MAKA CLEAN THEME === */
 :root {
-  --bg:#0a0f18; 
-  --gold:#D4AF37; 
-  --glass:rgba(255, 255, 255, 0.03);
-  --border:rgba(255, 255, 255, 0.08);
-  --teal:#0ea5a6; --danger:#ef4444;
+  --maka-black: #0f1724; --maka-white: #ffffff; --maka-teal: #0ea5a6; --maka-yellow: #fbbf24;
+  --bg-page: #f8fafc; --border: #e2e8f0; --text-muted: #64748b; --danger: #ef4444;
 }
-
-body {
-  margin: 0; font-family: 'Inter', sans-serif;
-  background: var(--bg); color: #fff;
-  min-height: 100vh; padding-bottom: 120px;
-}
-
-.app-container { max-width: 480px; margin: 0 auto; padding: 20px; }
+body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg-page); color: var(--maka-black); padding-bottom: 120px; }
+.app-container { max-width: 480px; margin: 0 auto; padding: 20px 24px; }
 
 /* HEADER */
-.header-simple { margin-bottom: 24px; padding-top: 10px; }
-.page-title { font-family: 'Syne'; font-size: 1.8em; font-weight: 800; margin: 0; color: var(--gold); }
-.page-subtitle { color: #94a3b8; font-size: 0.9em; margin-top: 4px; }
+.header-simple { margin-bottom: 25px; padding-top: 10px; }
+.page-title { font-family: 'Syne'; font-size: 1.6em; font-weight: 800; margin: 0; }
+.page-subtitle { color: var(--text-muted); font-size: 0.9em; margin-top: 4px; }
 
-/* CARD GRID (GLASS STYLE) */
+/* GRID */
 .part-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
-
 .part-card {
-  background: var(--glass); border: 1px solid var(--border);
-  border-radius: 18px; padding: 16px;
-  display: flex; flex-direction: column; justify-content: space-between;
-  backdrop-filter: blur(10px);
+  background: var(--maka-white); border: 1px solid var(--border);
+  border-radius: 16px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
 }
-
-.part-name { font-weight: 700; font-size: 0.75em; margin-bottom: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+.part-name { font-weight: 700; font-size: 0.75em; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
 .part-info { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
-.part-remain { font-family: 'Syne'; font-size: 2em; font-weight: 800; line-height: 1; text-shadow: 0 0 10px rgba(255,255,255,0.1); }
-.part-total { font-size: 0.8em; color: #64748b; margin-bottom: 3px; }
+.part-remain { font-family: 'Syne'; font-size: 2em; font-weight: 800; line-height: 1; }
+.part-total { font-size: 0.8em; color: var(--text-muted); margin-bottom: 3px; }
 
-/* PROGRESS BAR GLOW */
-.progress-track { width: 100%; height: 6px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; }
-.progress-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; box-shadow: 0 0 10px currentColor; }
-.progress-fill.good { background: var(--teal); color: var(--teal); }
-.progress-fill.med { background: var(--gold); color: var(--gold); }
-.progress-fill.low { background: var(--danger); color: var(--danger); }
+/* PROGRESS */
+.progress-track { width: 100%; height: 6px; background: #f1f5f9; border-radius: 10px; overflow: hidden; }
+.progress-fill { height: 100%; transition: width 0.5s ease; border-radius: 10px; }
+.progress-fill.good { background: var(--maka-teal); }
+.progress-fill.med { background: var(--maka-yellow); }
+.progress-fill.low { background: var(--danger); }
 
-/* BUTTON ACTION */
+/* BUTTON */
 .btn-action {
-  width: 100%; padding: 16px; border-radius: 14px;
-  background: linear-gradient(135deg, var(--gold), #b8860b);
-  color: #000; border: none; font-weight: 800; font-family: 'Syne'; 
-  font-size: 1em; cursor: pointer; display: flex; justify-content: center; gap: 8px;
-  margin-bottom: 30px; box-shadow: 0 5px 20px rgba(212, 175, 55, 0.2);
+  width: 100%; padding: 16px; border-radius: 14px; border: none;
+  background: var(--maka-black); color: white; font-weight: 700; font-family: 'Syne'; 
+  font-size: 1em; cursor: pointer; display: flex; justify-content: center; gap: 10px;
+  margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* LOG HISTORY */
-.log-section h3 { font-family: 'Syne'; font-size: 1.1em; margin-bottom: 15px; color: #fff; }
-.log-list { background: var(--glass); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+/* LOG */
+.log-section h3 { font-family: 'Syne'; font-size: 1.1em; margin-bottom: 15px; }
+.log-list { background: var(--maka-white); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
 .log-item { display: flex; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: 0.9em; }
 .log-item:last-child { border:none; }
-.log-date { font-size: 0.8em; color: #64748b; }
-.log-part { font-weight: 700; color: #fff; }
+.log-date { font-size: 0.8em; color: var(--text-muted); }
+.log-part { font-weight: 700; }
 
-/* MODAL DARK */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 2000; }
-.modal-content { background: #141b2d; width: 85%; max-width: 320px; padding: 25px; border-radius: 24px; text-align: center; border: 1px solid var(--border); }
-.modal-title { font-family: 'Syne'; font-size: 1.3em; margin: 0 0 10px; font-weight: 800; color: var(--gold); }
-select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; margin-bottom: 20px; outline: none; }
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
+.modal-content { background: white; width: 85%; max-width: 320px; padding: 25px; border-radius: 24px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+.modal-title { font-family: 'Syne'; font-size: 1.3em; margin: 0 0 15px; font-weight: 800; }
+select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: #f8fafc; margin-bottom: 20px; outline: none; }
 .btn-row { display: flex; gap: 10px; }
-.btn-ok { flex: 1; padding: 12px; background: var(--gold); color: #000; border: none; border-radius: 12px; font-weight: 700; }
-.btn-cancel { flex: 1; padding: 12px; background: rgba(255,255,255,0.1); color: #fff; border: none; border-radius: 12px; font-weight: 700; }
+.btn-ok { flex: 1; padding: 12px; background: var(--maka-black); color: white; border: none; border-radius: 12px; font-weight: 700; }
+.btn-cancel { flex: 1; padding: 12px; background: #f1f5f9; color: var(--text-muted); border: none; border-radius: 12px; font-weight: 700; }
 
-/* NAV FOOTER GLASS */
-footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(20,27,45,0.8); backdrop-filter: blur(20px); padding: 12px 30px; border-radius: 100px; display: flex; gap: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 999; }
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 9px; font-weight: 700; }
-.nav-item span { font-size: 20px; margin-bottom: 3px; filter: grayscale(100%); }
-.nav-item.active span { filter: grayscale(0%); transform: translateY(-2px); }
+/* NAV */
+footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--maka-black); border-radius: 100px; padding: 14px 35px; display: flex; gap: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); z-index: 999; }
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 700; }
+.nav-item span { font-size: 22px; margin-bottom: 3px; }
+.nav-item.active span { color: var(--maka-yellow); }
 </style>
 </head>
-
 <body>
 <div class="app-container">
-    <div class="header-simple">
-        <h1 class="page-title">Gratisan</h1>
-        <div class="page-subtitle">Jatah Part (3 Tahun)</div>
-    </div>
-
+    <div class="header-simple"><h1 class="page-title">Gratisan</h1><div class="page-subtitle">Jatah Part (3 Tahun)</div></div>
     <div id="part-tracker" class="part-grid"></div>
-
-    <button class="btn-action" onclick="openModal()"><span>🛠️</span> KLAIM PART</button>
-    
-    <div class="log-section">
-        <h3>Riwayat Klaim</h3>
-        <div id="log-list" class="log-list">
-            <div style="text-align:center; padding:20px; color:#64748b;">Belum ada data.</div>
-        </div>
-    </div>
+    <button class="btn-action" onclick="openModal()"><span>🛠️</span> KLAIM PENGGANTIAN</button>
+    <div class="log-section"><h3>Riwayat Klaim</h3><div id="log-list" class="log-list"><div style="text-align:center; padding:20px; color:#94a3b8;">Belum ada data.</div></div></div>
 </div>
 
 <div id="modal" class="modal-overlay">
     <div class="modal-content">
         <h3 class="modal-title">Pilih Part</h3>
-        <p style="color:#94a3b8; font-size:0.9em; margin-bottom:15px;">Apa yang diganti hari ini?</p>
         <select id="partSelect"><option value="">-- Pilih Part --</option></select>
         <div class="btn-row"><button class="btn-cancel" onclick="closeModal()">Batal</button><button class="btn-ok" onclick="saveUsage()">Simpan</button></div>
     </div>
 </div>
 
 <footer class="bottom-nav">
-  <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
-  <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
-  <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
+    <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
+    <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
+    <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
 </footer>
 
 <script>
@@ -129,25 +102,21 @@ const PARTS = [{k:'ban_depan',n:'Ban Depan'},{k:'ban_belakang',n:'Ban Belakang'}
 function render() {
     const c = document.getElementById('part-tracker'), s = document.getElementById('partSelect');
     c.innerHTML = ''; s.innerHTML = '<option value="">-- Pilih Part --</option>';
-
     PARTS.forEach(p => {
         const lim = LIMITS[p.k] || 3, used = usage[p.k] || 0, rem = lim - used, pct = (used/lim)*100;
-        let cls = 'good', clr = 'var(--teal)';
-        if(rem<=1){cls='low';clr='var(--danger)'} else if(rem===2){cls='med';clr='var(--gold)'}
-
+        let cls = 'good', clr = 'var(--maka-teal)';
+        if(rem<=1){cls='low';clr='var(--danger)'} else if(rem===2){cls='med';clr='var(--maka-yellow)'}
         c.innerHTML += `<div class="part-card"><div class="part-name">${p.n}</div><div class="part-info"><span class="part-remain" style="color:${clr}">${rem}</span><span class="part-total">/ ${lim}</span></div><div class="progress-track"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div></div>`;
         if(rem>0) s.innerHTML += `<option value="${p.k}">${p.n}</option>`;
     });
-
     const l = document.getElementById('log-list'), h = usage.history || [];
-    l.innerHTML = h.length===0 ? '<div style="text-align:center; padding:20px; color:#64748b;">Belum ada data.</div>' : h.slice().reverse().map(x => `<div class="log-item"><div class="log-part">${PARTS.find(i=>i.k===x.key)?.n||x.key}</div><small class="log-date">${x.date}</small></div>`).join('');
+    l.innerHTML = h.length===0 ? '<div style="text-align:center; padding:20px; color:#94a3b8;">Belum ada data.</div>' : h.slice().reverse().map(x => `<div class="log-item"><div class="log-part">${PARTS.find(i=>i.k===x.key)?.n||x.key}</div><small class="log-date">${x.date}</small></div>`).join('');
 }
 function openModal(){document.getElementById('modal').style.display='flex'}
 function closeModal(){document.getElementById('modal').style.display='none'}
 function saveUsage(){
     const k=document.getElementById('partSelect').value; if(!k)return;
-    usage[k]=(usage[k]||0)+1; 
-    if(!usage.history) usage.history=[];
+    usage[k]=(usage[k]||0)+1; if(!usage.history) usage.history=[];
     usage.history.push({key:k, date:new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})});
     localStorage.setItem('maka_part_usage',JSON.stringify(usage)); closeModal(); render();
 }

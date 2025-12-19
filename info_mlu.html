@@ -3,88 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0a0f18">
-<title>Info MLU Luxury</title>
+<title>Info MLU - MAKA</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="manifest" href="/makarental/manifest.json"> 
-  
 <style>
-/* === MAKA LUXURY THEME === */
-:root {
-  --bg:#0a0f18; --gold:#D4AF37; --glass:rgba(255, 255, 255, 0.03); --border:rgba(255, 255, 255, 0.08);
-  --text-dim:#94a3b8; --teal:#0ea5a6;
-}
-body { margin:0; font-family:'Inter', sans-serif; background:var(--bg); color:#fff; min-height:100vh; padding-bottom:120px; }
-.app-container { max-width:480px; margin:0 auto; padding:20px; }
+/* === MAKA CLEAN THEME === */
+:root { --maka-black: #0f1724; --maka-white: #ffffff; --maka-teal: #0ea5a6; --bg-page: #f8fafc; --border: #e2e8f0; --text-muted: #64748b; }
+body { margin:0; font-family:'Inter', sans-serif; background:var(--bg-page); color:var(--maka-black); padding-bottom:120px; }
+.app-container { max-width:480px; margin:0 auto; padding:20px 24px; }
 
-/* HEADER */
-.header { margin-bottom: 24px; margin-top: 10px; text-align: center; }
-.title { font-family: 'Syne'; font-size: 1.8em; font-weight: 800; margin: 0; color: var(--gold); }
-.subtitle { color: var(--text-dim); font-size: 0.9em; margin-top: 5px; }
+.header-simple { margin-bottom: 25px; padding-top: 10px; text-align: center; }
+.page-title { font-family: 'Syne'; font-size: 1.6em; font-weight: 800; margin: 0; }
+.page-subtitle { color: var(--text-muted); font-size: 0.9em; margin-top: 4px; }
 
-/* LIST */
 .list { display: flex; flex-direction: column; gap: 20px; }
-.card {
-  background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 20px;
-  backdrop-filter: blur(10px); animation: fade 0.5s ease;
-}
-@keyframes fade { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-
-.c-title { font-family: 'Syne'; font-size: 1.25em; color: #fff; margin: 0 0 10px 0; }
-.c-meta { 
-  display: inline-block; font-size: 0.7em; color: var(--teal); 
-  border: 1px solid rgba(14, 165, 166, 0.3); padding: 4px 10px; border-radius: 8px; margin-bottom: 15px; 
-  text-transform: uppercase; letter-spacing: 1px; font-weight: 700; background: rgba(14, 165, 166, 0.1);
-}
-.c-img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 15px; background: #1e293b; }
-.c-text { font-size: 0.95em; line-height: 1.6; color: #cbd5e1; white-space: pre-line; margin: 0; }
-
-.empty { text-align: center; padding: 40px; color: var(--text-dim); background: var(--glass); border-radius: 20px; border: 1px dashed var(--border); }
+.card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+.c-title { font-family: 'Syne'; font-size: 1.2em; font-weight: 700; margin: 0 0 10px 0; }
+.c-meta { display: inline-block; font-size: 0.7em; color: var(--maka-teal); background: #f0fdfa; padding: 4px 10px; border-radius: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid rgba(14,165,166,0.2); }
+.c-img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 15px; background: #e2e8f0; }
+.c-text { font-size: 0.95em; line-height: 1.6; color: #475569; white-space: pre-line; margin: 0; }
+.empty { text-align: center; padding: 40px; color: var(--text-muted); }
 
 /* NAV */
-footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(20,27,45,0.8); backdrop-filter: blur(20px); padding: 12px 30px; border-radius: 100px; display: flex; gap: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 999; }
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 9px; font-weight: 700; }
-.nav-item span { font-size: 20px; margin-bottom: 3px; filter: grayscale(100%); }
-.nav-item.active span { filter: grayscale(0%); transform: translateY(-2px); }
+footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--maka-black); border-radius: 100px; padding: 14px 35px; display: flex; gap: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); z-index: 999; }
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 700; }
+.nav-item span { font-size: 22px; margin-bottom: 3px; }
+.nav-item.active span { color: var(--maka-yellow); }
 </style>
 </head>
 <body>
     <div class="app-container">
-        <div class="header">
-            <h1 class="title">Info MLU</h1>
-            <p class="subtitle">Berita Komunitas</p>
-        </div>
+        <div class="header-simple"><h1 class="page-title">Info MLU</h1><p class="page-subtitle">Berita Komunitas</p></div>
         <div class="list" id="list"><div class="empty">Memuat info...</div></div>
     </div>
-
     <footer class="bottom-nav">
         <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
         <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
         <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
     </footer>
-
     <script>
         const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
         try{firebase.initializeApp(firebaseConfig); var db=firebase.firestore();}catch(e){}
-
         function load() {
             db.collection('info_mlu').orderBy('timestamp', 'desc').limit(20).get().then(snap => {
                 const c = document.getElementById('list'); c.innerHTML = '';
                 if (snap.empty) { c.innerHTML = '<div class="empty">Belum ada info.</div>'; return; }
-                
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    let img = '';
-                    if(d.photos && d.photos.length > 0) img = `<img src="${d.photos[0]}" class="c-img" onerror="this.style.display='none'">`;
-                    
-                    c.innerHTML += `
-                    <div class="card">
-                        <h3 class="c-title">${d.title}</h3>
-                        <span class="c-meta">${d.date}</span>
-                        ${img}
-                        <p class="c-text">${d.content}</p>
-                    </div>`;
-                });
+                snap.forEach(doc => { const d = doc.data(); let img = d.photos && d.photos.length > 0 ? `<img src="${d.photos[0]}" class="c-img" onerror="this.style.display='none'">` : ''; c.innerHTML += `<div class="card"><h3 class="c-title">${d.title}</h3><span class="c-meta">${d.date}</span>${img}<p class="c-text">${d.content}</p></div>`; });
             });
         }
         document.addEventListener('DOMContentLoaded', load);

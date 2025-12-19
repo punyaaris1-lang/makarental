@@ -3,154 +3,94 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<meta name="theme-color" content="#0a0f18">
-<title>Lokasi FC Luxury</title>
+<title>Lokasi FC Clean</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="manifest" href="/makarental/manifest.json"> 
-  
 <style>
-/* === MAKA LUXURY THEME === */
-:root {
-  --bg:#0a0f18; --gold:#D4AF37; --glass:rgba(255, 255, 255, 0.03); --border:rgba(255, 255, 255, 0.08);
-  --text-dim:#94a3b8; --teal:#0ea5a6; --cyan:#06b6d4;
-}
-body { margin:0; padding:0; font-family:'Inter', sans-serif; background:var(--bg); color:#fff; min-height:100vh; overflow-x:hidden; }
-
-/* BACKGROUND POLOS GELAP (Tanpa Gambar Lama) */
-.app-container { max-width:520px; margin:0 auto; padding:20px; padding-bottom:120px; display:flex; flex-direction:column; min-height:100vh; }
+/* === MAKA CLEAN THEME === */
+:root { --maka-black: #0f1724; --maka-white: #ffffff; --maka-yellow: #fbbf24; --maka-teal: #0ea5a6; --bg-page: #f8fafc; --border: #e2e8f0; --text-muted: #64748b; }
+body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg-page); color: var(--maka-black); min-height: 100vh; overflow-x: hidden; }
+.app-container { max-width: 520px; margin: 0 auto; padding: 20px; padding-bottom: 120px; display: flex; flex-direction: column; min-height: 100vh; }
 
 /* HEADER */
 .header { margin-bottom: 25px; margin-top: 10px; }
-.h-title { font-family: 'Syne'; font-size: 1.8em; font-weight: 800; margin: 0; line-height: 1; color: var(--gold); }
-.h-sub { font-size: 0.75em; color: var(--teal); font-weight: 700; letter-spacing: 2px; margin-top: 5px; }
+.h-title { font-family: 'Syne'; font-size: 1.8em; font-weight: 800; margin: 0; line-height: 1; color: var(--maka-black); }
+.h-sub { font-size: 0.75em; color: var(--text-muted); font-weight: 700; letter-spacing: 2px; margin-top: 5px; }
 
-/* HERO CARD (NEAREST) */
+/* HERO CARD (BLACK LIKE DASHBOARD) */
 .hero-card {
-  background: linear-gradient(135deg, rgba(20, 27, 45, 0.9), rgba(10, 15, 24, 0.95));
-  border-radius: 24px; padding: 24px; color: white;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5); margin-bottom: 30px;
-  position: relative; overflow: hidden; border: 1px solid var(--border);
+  background: var(--maka-black); border-radius: 24px; padding: 24px; color: white;
+  box-shadow: 0 10px 30px rgba(15, 23, 36, 0.15); margin-bottom: 30px;
+  position: relative; overflow: hidden;
 }
-/* Efek Kilau Emas */
-.hero-card::after {
-  content: ''; position: absolute; top: -50%; right: -50%; width: 200px; height: 200px;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
-  border-radius: 50%; pointer-events: none;
-}
+.hero-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
 
-.radar-status {
-  display: flex; align-items: center; gap: 8px; font-size: 0.7em; font-weight: 800;
-  background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 99px;
-  width: fit-content; margin-bottom: 15px; color: var(--gold); border: 1px solid rgba(212, 175, 55, 0.3);
-}
-.gps-dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0% {opacity:1; box-shadow:0 0 0 0 rgba(212,175,55,0.4)} 70% {opacity:1; box-shadow:0 0 0 10px rgba(212,175,55,0)} 100% {opacity:1} }
+.radar-status { display: flex; align-items: center; gap: 8px; font-size: 0.7em; font-weight: 800; background: rgba(255,255,255,0.15); padding: 5px 12px; border-radius: 99px; width: fit-content; margin-bottom: 15px; color: var(--maka-yellow); }
+.gps-dot { width: 8px; height: 8px; background: var(--maka-yellow); border-radius: 50%; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% {opacity:1} 50% {opacity:0.4} 100% {opacity:1} }
 
-.hero-dist { position: absolute; top: 24px; right: 24px; font-family: 'Syne'; font-weight: 800; font-size: 1.4em; color: var(--teal); }
+.hero-dist { position: absolute; top: 24px; right: 24px; font-family: 'Syne'; font-weight: 800; font-size: 1.4em; color: var(--maka-teal); }
 .hero-name { font-family: 'Syne'; font-size: 1.6em; font-weight: 800; margin: 0 0 10px 0; }
-.hero-info { font-size: 0.9em; color: var(--text-dim); margin-bottom: 20px; line-height: 1.5; }
+.hero-info { font-size: 0.9em; opacity: 0.8; margin-bottom: 20px; line-height: 1.5; }
+.btn-nav-hero { background: white; color: var(--maka-black); border: none; padding: 14px 20px; border-radius: 14px; font-weight: 800; cursor: pointer; width: 100%; font-family: 'Syne'; transition: 0.2s; }
 
-.btn-nav-hero {
-  background: var(--gold); color: #000; border: none; padding: 14px 20px;
-  border-radius: 14px; font-weight: 800; cursor: pointer; width: 100%;
-  font-family: 'Syne'; transition: 0.2s;
-}
-.btn-nav-hero:active { transform: scale(0.98); opacity: 0.9; }
-
-/* LIST GROUPS */
+/* LIST */
 .city-group { margin-bottom: 30px; }
 .city-header { display: flex; align-items: center; margin-bottom: 15px; gap: 12px; }
-.city-title { font-family: 'Syne'; font-weight: 800; font-size: 1em; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+.city-title { font-family: 'Syne'; font-weight: 800; font-size: 1em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 .city-line { flex: 1; height: 1px; background: var(--border); }
 
 /* HORIZONTAL SCROLL (FIXED) */
-.h-scroll {
-  display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px;
-  /* Dihapus snap mandatory agar scroll smooth & tidak mental */
-  /* scroll-snap-type: x proximity; */ 
-}
+.h-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; /* snap removed for smoothness */ }
 .h-scroll::-webkit-scrollbar { display: none; }
 
-/* MINI CARDS (GLASS) */
+/* MINI CARDS (WHITE CLEAN) */
 .mini-card {
-  min-width: 170px; width: 170px; height: 210px;
-  background: var(--glass); border: 1px solid var(--border);
-  border-radius: 20px; padding: 18px;
-  display: flex; flex-direction: column; justify-content: space-between;
-  cursor: pointer; position: relative; overflow: hidden; backdrop-filter: blur(10px);
-  /* scroll-snap-align: start; */ /* Dihapus agar smooth */
+  min-width: 170px; width: 170px; height: 210px; background: #fff; border: 1px solid var(--border);
+  border-radius: 20px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between;
+  cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
   transition: transform 0.2s;
 }
-.mini-card:active { transform: scale(0.96); background: rgba(255,255,255,0.05); }
-
-.bg-bolt {
-  position: absolute; right: -10px; bottom: -10px; font-size: 5rem;
-  opacity: 0.03; color: #fff; transform: rotate(-15deg); pointer-events: none;
-}
-
-.mini-top h3 {
-  margin: 0; font-size: 1em; font-weight: 800; line-height: 1.3;
-  color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-}
-.mini-info { font-size: 0.8em; color: var(--text-dim); margin-top: 8px; line-height: 1.4; }
-
-.mini-dist {
-  text-align: right; font-weight: 800; color: var(--teal); font-size: 0.9em;
-  background: rgba(14, 165, 166, 0.1); padding: 5px 10px; border-radius: 8px;
-  align-self: flex-end; border: 1px solid rgba(14, 165, 166, 0.2);
-}
+.mini-card:active { transform: scale(0.96); background: #f1f5f9; }
+.mini-top h3 { margin: 0; font-size: 1em; font-weight: 800; line-height: 1.3; color: var(--maka-black); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.mini-info { font-size: 0.8em; color: var(--text-muted); margin-top: 8px; line-height: 1.4; }
+.mini-dist { text-align: right; font-weight: 800; color: var(--maka-teal); font-size: 0.9em; background: #f0fdfa; padding: 5px 10px; border-radius: 8px; align-self: flex-end; border: 1px solid rgba(14, 165, 166, 0.1); }
 
 /* NAV */
-footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(20,27,45,0.8); backdrop-filter: blur(20px); padding: 12px 30px; border-radius: 100px; display: flex; gap: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 999; }
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 9px; font-weight: 700; }
-.nav-item span { font-size: 20px; margin-bottom: 3px; filter: grayscale(100%); }
-.nav-item.active span { filter: grayscale(0%); transform: translateY(-2px); }
+footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--maka-black); border-radius: 100px; padding: 14px 35px; display: flex; gap: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); z-index: 999; }
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 700; }
+.nav-item span { font-size: 22px; margin-bottom: 3px; }
+.nav-item.active span { color: var(--maka-yellow); }
 </style>
 </head>
-
 <body>
   <div class="app-container">
-    <div class="header">
-      <h1 class="h-title">FAST CHARGING</h1>
-      <div class="h-sub">MAKA LINTAS UTARA</div>
-    </div>
-
+    <div class="header"><h1 class="h-title">FAST CHARGING</h1><div class="h-sub">MAKA LINTAS UTARA</div></div>
     <main id="view-list">
-      <div id="scanState" class="hero-card" style="text-align:center; border:1px dashed var(--border); background:transparent; box-shadow:none;">
-        <div style="margin-bottom:15px; font-size:2.5em;">📡</div>
-        <h2 style="font-size:1.1em; font-family:'Syne'; margin:0;">Mencari Sinyal GPS...</h2>
-        <p style="font-size:0.9em; color:var(--text-dim); margin:5px 0 0 0;">Pastikan Izin Lokasi Aktif</p>
+      <div id="scanState" class="hero-card" style="text-align:center; border:1px dashed #444; background:transparent; box-shadow:none; color:var(--text-muted);">
+        <div style="margin-bottom:15px; font-size:2.5em;">📡</div><h2 style="font-size:1.1em; font-family:'Syne'; margin:0;">Mencari Sinyal GPS...</h2>
       </div>
-
       <div id="foundState" class="hero-card" style="display:none;">
-        <div class="radar-status"><div class="gps-dot"></div> TERDEKAT</div>
-        <div class="hero-dist" id="heroDist">-- KM</div>
-        <h2 class="hero-name" id="heroName">Nama Lokasi</h2>
-        <div class="hero-info" id="heroInfo">Loading...</div>
+        <div class="radar-status"><div class="gps-dot"></div> TERDEKAT</div><div class="hero-dist" id="heroDist">-- KM</div>
+        <h2 class="hero-name" id="heroName">Nama Lokasi</h2><div class="hero-info" id="heroInfo">Loading...</div>
         <button id="btnHeroNav" class="btn-nav-hero">NAVIGASI SEKARANG ↗</button>
       </div>
-
       <div id="mainListContainer"></div>
     </main>
   </div>
-
   <footer class="bottom-nav">
     <a href="lokasi_fc.html" class="nav-item active"><span>⚡</span>Lokasi</a>
     <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
     <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
   </footer>
-
   <script>
-    /* LOGIC UTAMA (TIDAK DIUBAH, HANYA RENDER UI) */
     const URL_LOKASI = "https://docs.google.com/spreadsheets/d/1EJOTMMfGpBMFPqR0LzbMbh7tZUcTCZld4x387OO9aJM/export?format=csv";
     let chargers = [], userLat = null, userLng = null;
-
     async function loadData() {
       try {
         const txt = await fetch(URL_LOKASI).then(r=>r.text());
         chargers = txt.split('\n').slice(1).map((r,i) => {
-          const c = r.split(',');
-          let lat=parseFloat(c[4]?.replace(',','.')), lng=parseFloat(c[5]?.replace(',','.'));
+          const c = r.split(','); let lat=parseFloat(c[4]?.replace(',','.')), lng=parseFloat(c[5]?.replace(',','.'));
           if(c.length<5 || isNaN(lat) || isNaN(lng)) return null;
           return { id:i, name:c[0].replace(/"/g,''), city:c[1], type:c[2], status:c[3], lat:lat, lng:lng, link:c[6]||'', nozzle:c[7]||'-', cost:c[8]||'-' };
         }).filter(i=>i);
@@ -158,45 +98,30 @@ footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: transla
         if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ userLat=p.coords.latitude; userLng=p.coords.longitude; processData(); }, e=>{console.log("GPS Err")}, {enableHighAccuracy:true});
       } catch(e) { console.error(e); }
     }
-
     function getDist(lat1, lon1, lat2, lon2) {
       const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
       const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
       return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(1);
     }
-
     function processData() {
-      if(userLat) {
-        chargers.forEach(c => c.dist = parseFloat(getDist(userLat, userLng, c.lat, c.lng)));
-        chargers.sort((a,b) => a.dist - b.dist);
-      }
+      if(userLat) { chargers.forEach(c => c.dist = parseFloat(getDist(userLat, userLng, c.lat, c.lng))); chargers.sort((a,b) => a.dist - b.dist); }
       if(chargers.length>0) {
-        const n=chargers[0];
-        document.getElementById('scanState').style.display='none';
-        document.getElementById('foundState').style.display='block';
-        document.getElementById('heroName').innerText=n.name;
-        document.getElementById('heroDist').innerText=n.dist?n.dist+' KM':'';
+        const n=chargers[0]; document.getElementById('scanState').style.display='none'; document.getElementById('foundState').style.display='block';
+        document.getElementById('heroName').innerText=n.name; document.getElementById('heroDist').innerText=n.dist?n.dist+' KM':'';
         document.getElementById('heroInfo').innerText=`${n.city} • ${n.type}\n${n.nozzle} Nozzle • ${n.cost}`;
-        document.getElementById('btnHeroNav').onclick=()=>openGmaps(n);
+        document.getElementById('btnHeroNav').onclick=()=>window.open(n.link && n.link.length>5 ? n.link : `http://maps.google.com/?q=${n.lat},${n.lng}`, '_blank');
         renderList();
       }
     }
-
     function renderList() {
-      const c = document.getElementById('mainListContainer'); c.innerHTML='';
-      const grp = {};
+      const c = document.getElementById('mainListContainer'); c.innerHTML=''; const grp = {};
       chargers.forEach(i => { const k=i.city||'Lainnya'; if(!grp[k])grp[k]=[]; grp[k].push(i); });
-
       Object.keys(grp).forEach(k => {
         let h = `<div class="city-group"><div class="city-header"><div class="city-title">${k}</div><div class="city-line"></div></div><div class="h-scroll">`;
-        grp[k].forEach(i => {
-          h += `<div onclick='openGmaps(${JSON.stringify(i).replace(/'/g, "")})' class="mini-card"><div class="bg-bolt">⚡</div><div class="mini-top"><h3>${i.name}</h3><div class="mini-info">${i.type}<br>${i.cost}</div></div><div class="mini-dist">${i.dist?i.dist+' KM':''}</div></div>`;
-        });
+        grp[k].forEach(i => { h += `<div onclick='window.open("${i.link||"#"}", "_blank")' class="mini-card"><div style="font-size:2em;margin-bottom:10px;">⚡</div><div class="mini-top"><h3>${i.name}</h3><div class="mini-info">${i.type}<br>${i.cost}</div></div><div class="mini-dist">${i.dist?i.dist+' KM':''}</div></div>`; });
         h += `</div></div>`; c.innerHTML += h;
       });
     }
-
-    function openGmaps(i) { window.open(i.link && i.link.length>5 ? i.link : `http://maps.google.com/?q=${i.lat},${i.lng}`, '_blank'); }
     document.addEventListener('DOMContentLoaded', loadData);
   </script>
 </body>

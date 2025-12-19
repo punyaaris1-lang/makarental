@@ -3,72 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0a0f18">
-<title>Profil Luxury</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<title>Pengaturan - MAKA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
-:root { --bg:#0a0f18; --gold:#D4AF37; --glass:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.08); }
-body { margin:0; font-family:'Inter'; background:var(--bg); color:#fff; padding-bottom:120px; }
-.app-container { max-width:480px; margin:0 auto; padding:20px; }
+/* THEME */
+:root { --maka-black:#0f1724; --maka-white:#ffffff; --bg-page:#f8fafc; --border:#e2e8f0; }
+body { margin:0; font-family:'Inter'; background:var(--bg-page); color:var(--maka-black); padding-bottom:120px; }
+.app-container { max-width:480px; margin:0 auto; padding:20px 24px; }
 
-.profile-card { text-align:center; padding:30px; background:var(--glass); border-radius:24px; border:1px solid var(--border); margin-bottom:30px; }
-.avatar-ring { width:84px; height:84px; border-radius:50%; background:linear-gradient(45deg, var(--gold), #333); padding:2px; margin:0 auto 15px; }
-.avatar { width:100%; height:100%; background:#111; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne'; font-size:2em; font-weight:800; color:var(--gold); background-size:cover; }
-.name { font-family:'Syne'; font-size:1.4em; font-weight:800; margin:0; }
-.plat { color:var(--gold); font-size:0.9em; margin-top:5px; }
+.header-simple { text-align:center; margin-bottom:30px; padding-top:10px; }
+.page-title { font-family:'Syne'; font-weight:800; font-size:1.5em; margin:0; }
 
-.menu-group { background:var(--glass); border-radius:18px; border:1px solid var(--border); margin-bottom:20px; overflow:hidden; }
-.item { padding:18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; font-weight:600; cursor:pointer; }
-.item:last-child { border:none; }
-.val { color:#94a3b8; font-weight:400; }
+/* PROFILE CARD */
+.profile-card { background:#fff; border:1px solid var(--border); border-radius:24px; padding:30px; text-align:center; box-shadow:0 4px 15px rgba(0,0,0,0.02); margin-bottom:30px; }
+.avatar-box { width:90px; height:90px; margin:0 auto 15px; position:relative; }
+.avatar { width:100%; height:100%; border-radius:50%; background:var(--maka-black); color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Syne'; font-size:2em; font-weight:800; object-fit:cover; }
+.btn-edit { position:absolute; bottom:0; right:0; width:30px; height:30px; background:#fff; border:1px solid var(--border); border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; }
+.user-name { font-family:'Syne'; font-weight:800; font-size:1.3em; margin:0; }
+.user-plat { color:#64748b; margin-top:5px; font-weight:500; }
 
-.btn-logout { width:100%; padding:15px; background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid #ef4444; border-radius:12px; font-weight:bold; cursor:pointer; }
+/* MENU */
+.menu-label { font-size:0.75em; font-weight:700; color:#94a3b8; margin-bottom:10px; letter-spacing:1px; }
+.menu-group { background:#fff; border:1px solid var(--border); border-radius:16px; overflow:hidden; margin-bottom:25px; }
+.menu-item { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; font-weight:600; cursor:pointer; }
+.menu-item:last-child { border:none; }
+.menu-val { font-weight:400; color:#64748b; }
+
+.btn-logout { width:100%; padding:15px; background:#fee2e2; color:#ef4444; border:none; border-radius:14px; font-weight:700; font-family:'Syne'; cursor:pointer; }
 
 /* NAV */
-footer { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:rgba(20,27,45,0.8); backdrop-filter:blur(20px); padding:12px 30px; border-radius:100px; display:flex; gap:30px; border:1px solid var(--border); box-shadow:0 20px 40px rgba(0,0,0,0.5); }
-.nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#64748b; font-size:9px; font-weight:700; }
-.nav-item span { font-size:20px; margin-bottom:3px; filter:grayscale(100%); }
-.nav-item.active span { filter:grayscale(0%); transform:translateY(-2px); }
+footer.bottom-nav { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:var(--maka-black); border-radius:100px; padding:14px 35px; display:flex; gap:40px; box-shadow:0 20px 50px rgba(0,0,0,0.3); z-index:999; }
+.nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#64748b; font-size:10px; font-weight:700; }
+.nav-item span { font-size:22px; margin-bottom:3px; }
+.nav-item.active span { color:#fbbf24; }
 </style>
 </head>
 <body>
+
 <div class="app-container">
-    <div class="profile-card">
-        <div class="avatar-ring">
-            <input type="file" id="file" hidden onchange="up(this)">
-            <div class="avatar" id="av" onclick="document.getElementById('file').click()">U</div>
-        </div>
-        <h2 class="name" id="name">...</h2>
-        <p class="plat" id="plat">...</p>
+  <div class="header-simple"><h1 class="page-title">Pengaturan</h1></div>
+
+  <div class="profile-card">
+    <div class="avatar-box">
+        <input type="file" id="fileInp" hidden onchange="up(this)">
+        <div class="avatar" id="av">U</div>
+        <div class="btn-edit" onclick="document.getElementById('fileInp').click()">📷</div>
     </div>
-    <div class="menu-group">
-        <div class="item"><span>WhatsApp</span><span class="val" id="hp">-</span></div>
-        <div class="item"><span>Join Date</span><span class="val" id="join">-</span></div>
-    </div>
-    <button class="btn-logout" onclick="localStorage.removeItem('maka_user');window.location.href='index.html'">LOGOUT</button>
+    <h2 class="user-name" id="uName">...</h2>
+    <p class="user-plat" id="uPlat">...</p>
+  </div>
+
+  <div class="menu-label">AKUN SAYA</div>
+  <div class="menu-group">
+    <div class="menu-item"><span>WhatsApp</span><span class="menu-val" id="dWa">-</span></div>
+    <div class="menu-item"><span>Bergabung</span><span class="menu-val" id="dJoin">-</span></div>
+  </div>
+
+  <div class="menu-label">LAINNYA</div>
+  <div class="menu-group">
+    <div class="menu-item" onclick="window.open('https://wa.me/6281234567890','_blank')"><span>Bantuan Admin</span><span>›</span></div>
+    <div class="menu-item" onclick="window.location.href='tips_maka.html'"><span>Panduan Aplikasi</span><span>›</span></div>
+  </div>
+
+  <button class="btn-logout" onclick="logout()">KELUAR AKUN</button>
 </div>
+
 <footer class="bottom-nav">
     <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
     <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
     <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
 </footer>
+
 <script>
-const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
-try{firebase.initializeApp(firebaseConfig); var db=firebase.firestore();}catch(e){}
-let u=JSON.parse(localStorage.getItem('maka_user'));
-if(u){
-    document.getElementById('name').innerText=u.nama;
-    document.getElementById('plat').innerText=u.plat;
-    document.getElementById('hp').innerText=u.hp;
-    document.getElementById('join').innerText=u.joinedAt.split('T')[0];
-    db.collection('users').doc(u.plat).get().then(d=>{ if(d.data().photoUrl) { document.getElementById('av').innerText=''; document.getElementById('av').style.backgroundImage=`url('${d.data().photoUrl}')`; } });
+const firebaseConfig={apiKey:"AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",authDomain:"rtomaka-e67b5.firebaseapp.com",projectId:"rtomaka-e67b5",storageBucket:"rtomaka-e67b5.firebasestorage.app",messagingSenderId:"472036722228",appId:"1:472036722228:web:11d520f9204db317d02c61"};
+let db, u=JSON.parse(localStorage.getItem('maka_user'));
+
+function init(){
+    try{if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);db=firebase.firestore();}catch(e){}
+    if(!u){window.location.href='index.html';return;}
+    document.getElementById('uName').innerText=u.nama; document.getElementById('uPlat').innerText=u.plat; document.getElementById('dWa').innerText=u.hp;
+    document.getElementById('dJoin').innerText=new Date(u.joinedAt).toLocaleDateString('id-ID');
+    
+    // Load Photo
+    db.collection('users').doc(u.plat).get().then(d=>{
+        if(d.data().photoUrl){ document.getElementById('av').style.backgroundImage=`url('${d.data().photoUrl}')`; document.getElementById('av').innerText=''; }
+    });
 }
 function up(i){
     let r=new FileReader(); r.readAsDataURL(i.files[0]);
-    r.onload=function(e){ db.collection('users').doc(u.plat).update({photoUrl:e.target.result}); location.reload(); }
+    r.onload=function(e){ db.collection('users').doc(u.plat).update({photoUrl:e.target.result}).then(()=>location.reload()); }
 }
+function logout(){ if(confirm("Keluar akun?")){localStorage.removeItem('maka_user');window.location.href='index.html';} }
+document.addEventListener("DOMContentLoaded",init);
 </script>
 </body>
 </html>

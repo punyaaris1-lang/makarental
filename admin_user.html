@@ -3,68 +3,69 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Admin OPS - Luxury</title>
+<title>Admin Ops - MAKA</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-/* THEME */
-:root { --bg:#0a0f18; --gold:#D4AF37; --glass:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.1); --text:#fff; }
+/* === MAKA LUXURY THEME === */
+:root { --bg:#0a0f18; --teal:#0ea5a6; --glass:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.1); --text:#fff; }
 body { margin:0; padding:20px; font-family:'Inter'; background:var(--bg); color:var(--text); min-height:100vh; padding-bottom: 80px; }
 .container { max-width:800px; margin:0 auto; }
 
-/* HEADER & STATS */
-h2 { font-family:'Syne'; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:15px; color: var(--gold); }
-.logout { font-size:0.6em; color:#ef4444; text-decoration:none; border:1px solid #ef4444; padding:5px 10px; border-radius:8px; }
+/* HEADER */
+h2 { font-family:'Syne'; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:15px; color: var(--teal); margin-top: 0; }
+.logout { font-size:0.6em; color:#ef4444; text-decoration:none; border:1px solid #ef4444; padding:5px 12px; border-radius:10px; font-weight: 700; }
 
-.stats-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:25px; }
-.stat-card { background:var(--glass); border:1px solid var(--border); padding:15px; border-radius:16px; text-align:center; }
-.stat-val { font-family:'Syne'; font-size:1.8em; font-weight:800; color:var(--gold); display:block; }
-.stat-lbl { font-size:0.7em; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; }
+/* STATS DASHBOARD (NEW) */
+.stats-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:30px; }
+.stat-card { background:var(--glass); border:1px solid var(--border); padding:20px; border-radius:20px; text-align:center; }
+.stat-val { font-family:'Syne'; font-size:2em; font-weight:800; color:#fff; display:block; line-height: 1; margin-bottom: 5px;}
+.stat-lbl { font-size:0.7em; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; font-weight: 700; }
 
 /* TABS */
-.tabs { display:flex; gap:10px; margin-bottom:20px; }
-.tab-btn { flex:1; padding:12px; background:transparent; border:1px solid var(--border); color:#64748b; border-radius:12px; cursor:pointer; font-weight:700; transition:0.3s; }
-.tab-btn.active { background:var(--gold); color:#000; border-color:var(--gold); }
+.tabs { display:flex; gap:10px; margin-bottom:25px; }
+.tab-btn { flex:1; padding:14px; background:transparent; border:1px solid var(--border); color:#64748b; border-radius:14px; cursor:pointer; font-weight:700; transition:0.3s; font-family: 'Syne'; }
+.tab-btn.active { background:var(--teal); color:#fff; border-color:var(--teal); box-shadow: 0 0 20px rgba(14, 165, 166, 0.3); }
 
 /* CONTENT */
 .section { display:none; } .section.active { display:block; }
-.glass-card { background:var(--glass); border:1px solid var(--border); padding:20px; border-radius:20px; margin-bottom:20px; }
+.glass-card { background:var(--glass); border:1px solid var(--border); padding:25px; border-radius:24px; margin-bottom:20px; }
 
 input, select, textarea { 
     width:100%; padding:14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); 
     color:white; border-radius:12px; margin-bottom:15px; outline:none; font-family:'Inter';
 }
-label { display:block; font-size:0.75em; color:var(--gold); margin-bottom:5px; font-weight:700; }
+label { display:block; font-size:0.75em; color:var(--teal); margin-bottom:8px; font-weight:700; letter-spacing: 0.5px; }
 
 /* BUTTONS */
-button { width:100%; padding:14px; background:var(--glass); color:white; border:1px solid var(--border); border-radius:12px; font-weight:700; cursor:pointer; }
-.btn-gold { background:var(--gold); color:black; border:none; }
-.btn-action { width:auto; padding:6px 12px; font-size:0.75em; }
-.btn-wa { background:#25D366; color:white; border:none; margin-right:5px; }
+button { width:100%; padding:14px; background:var(--glass); color:white; border:1px solid var(--border); border-radius:12px; font-weight:700; cursor:pointer; font-family: 'Syne'; }
+.btn-main { background:var(--teal); border:none; color: white; }
+.btn-action { width:auto; padding:8px 14px; font-size:0.75em; border-radius: 8px; }
+.btn-wa { background:#25D366; color:white; border:none; margin-right:8px; }
 .btn-ban { background:rgba(239,68,68,0.2); color:#ef4444; border:1px solid #ef4444; }
 
 /* LIST */
 .user-item { 
     display:flex; justify-content:space-between; align-items:center; 
-    padding:15px; border-bottom:1px solid var(--border); 
-    background:rgba(255,255,255,0.02); margin-bottom:8px; border-radius:12px;
+    padding:18px; border-bottom:1px solid var(--border); 
+    background:rgba(255,255,255,0.02); margin-bottom:10px; border-radius:16px;
 }
-.u-main h4 { margin:0; font-family:'Syne'; color:white; }
-.u-main p { margin:2px 0 0; font-size:0.8em; color:#94a3b8; }
-.badge-ban { background:#ef4444; color:white; padding:2px 6px; border-radius:4px; font-size:0.7em; margin-left:5px; }
+.u-main h4 { margin:0; font-family:'Syne'; color:white; font-size: 1.1em; }
+.u-main p { margin:4px 0 0; font-size:0.85em; color:#94a3b8; }
+.badge-ban { background:#ef4444; color:white; padding:2px 8px; border-radius:6px; font-size:0.7em; margin-left:8px; font-weight: bold; }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h2><span>👥 ADMIN OPS</span> <a href="admin_login.html" class="logout">LOGOUT</a></h2>
+    <h2><span>🛠️ ADMIN OPS</span> <a href="admin_login.html" class="logout">LOGOUT</a></h2>
 
     <div class="stats-grid">
         <div class="stat-card"><span class="stat-val" id="stTotal">0</span><span class="stat-lbl">Total Unit</span></div>
-        <div class="stat-card"><span class="stat-val" id="stActive" style="color:#4ade80">0</span><span class="stat-lbl">Aktif</span></div>
+        <div class="stat-card"><span class="stat-val" id="stActive" style="color:#34d399">0</span><span class="stat-lbl">Aktif</span></div>
         <div class="stat-card"><span class="stat-val" id="stBanned" style="color:#ef4444">0</span><span class="stat-lbl">Blokir</span></div>
     </div>
 
@@ -76,17 +77,17 @@ button { width:100%; padding:14px; background:var(--glass); color:white; border:
 
     <div id="sec-1" class="section active">
         <div class="glass-card">
-            <button onclick="exportExcel()" class="btn-gold" style="margin-bottom:15px;">📥 DOWNLOAD EXCEL DATA</button>
-            <input id="searchUser" placeholder="🔍 Cari Plat / Nama..." onkeyup="loadUsers()">
-            <div id="userList">Loading...</div>
+            <button onclick="exportExcel()" class="btn-main" style="margin-bottom:20px;">📥 DOWNLOAD EXCEL DATA</button>
+            <input id="searchUser" placeholder="🔍 Cari Plat Nomor / Nama..." onkeyup="loadUsers()">
+            <div id="userList" style="margin-top: 20px;">Loading...</div>
         </div>
     </div>
 
     <div id="sec-2" class="section">
         <div class="glass-card">
             <label>Nama Part Baru</label><input id="pName">
-            <label>Limit (per 3 thn)</label><input id="pLim" type="number">
-            <button onclick="addPart()" class="btn-gold">SIMPAN PART</button>
+            <label>Limit (Qty per 3 Tahun)</label><input id="pLim" type="number">
+            <button onclick="addPart()" class="btn-main">SIMPAN DATA PART</button>
         </div>
         <div id="partList"></div>
     </div>
@@ -94,13 +95,14 @@ button { width:100%; padding:14px; background:var(--glass); color:white; border:
     <div id="sec-3" class="section">
         <div class="glass-card">
             <label>Judul Notifikasi</label><input id="bTitle">
-            <label>Pesan</label><textarea id="bBody" rows="3"></textarea>
-            <button onclick="broadcast()" class="btn-gold">KIRIM KE SEMUA USER 🚀</button>
+            <label>Isi Pesan</label><textarea id="bBody" rows="4"></textarea>
+            <button onclick="broadcast()" class="btn-main">KIRIM KE SEMUA USER 🚀</button>
         </div>
     </div>
 </div>
 
 <script>
+// CONFIG
 const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
 firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
 
@@ -120,34 +122,34 @@ function loadUsers(){
                 const bg = u.isBanned ? 'opacity:0.5' : '';
                 h += `<div class="user-item" style="${bg}">
                     <div class="u-main">
-                        <h4>${u.nama} ${u.isBanned?'<span class="badge-ban">BAN</span>':''}</h4>
+                        <h4>${u.nama} ${u.isBanned?'<span class="badge-ban">BLOKIR</span>':''}</h4>
                         <p>${u.plat} • ${u.hp}</p>
                     </div>
                     <div>
-                        <button class="btn-action btn-wa" onclick="window.open('https://wa.me/${u.hp}','_blank')">WA</button>
-                        <button class="btn-action btn-ban" onclick="togBan('${u.plat}',${!u.isBanned})">${u.isBanned?'OPEN':'BAN'}</button>
+                        <button class="btn-action btn-wa" onclick="window.open('https://wa.me/${u.hp}','_blank')">WhatsApp</button>
+                        <button class="btn-action btn-ban" onclick="togBan('${u.plat}',${!u.isBanned})">${u.isBanned?'BUKA':'BAN'}</button>
                     </div>
                 </div>`;
             }
         });
-        document.getElementById('userList').innerHTML=h||'<p align="center">Nihil</p>';
+        document.getElementById('userList').innerHTML=h||'<p align="center" style="color:#666">Tidak ditemukan.</p>';
         document.getElementById('stTotal').innerText=allUsers.length;
         document.getElementById('stActive').innerText=act;
         document.getElementById('stBanned').innerText=ban;
     });
 }
-function togBan(p,s){ if(confirm(s?"Blokir user?":"Buka blokir?")) db.collection('users').doc(p).update({isBanned:s}); }
-function exportExcel(){ if(!allUsers.length)return; const ws=XLSX.utils.json_to_sheet(allUsers); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Data"); XLSX.writeFile(wb,"MAKA_Users.xlsx"); }
+function togBan(p,s){ if(confirm(s?"Blokir akses user ini?":"Buka blokir user ini?")) db.collection('users').doc(p).update({isBanned:s}); }
+function exportExcel(){ if(!allUsers.length)return; const ws=XLSX.utils.json_to_sheet(allUsers); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Data_Member"); XLSX.writeFile(wb,"MAKA_Users.xlsx"); }
 
 // 2. PARTS
 function addPart(){ 
     const n=document.getElementById('pName').value, l=document.getElementById('pLim').value;
-    if(n&&l) db.collection('settings').doc('parts').set({[n.toLowerCase().replace(/\s/g,'_')]:{name:n,limit:l}},{merge:true}).then(()=>{alert('Disimpan');loadParts()});
+    if(n&&l) db.collection('settings').doc('parts').set({[n.toLowerCase().replace(/\s/g,'_')]:{name:n,limit:l}},{merge:true}).then(()=>{alert('Part Disimpan!');loadParts()});
 }
 function loadParts(){
     db.collection('settings').doc('parts').onSnapshot(d=>{
         if(d.exists){
-            let h='',dt=d.data(); for(let k in dt){ h+=`<div class="glass-card" style="padding:15px;margin-bottom:10px;"><b>${dt[k].name}</b> - Limit: ${dt[k].limit}</div>`; }
+            let h='',dt=d.data(); for(let k in dt){ h+=`<div class="glass-card" style="padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;"><b>${dt[k].name}</b> <span>Limit: ${dt[k].limit}</span></div>`; }
             document.getElementById('partList').innerHTML=h;
         }
     });
@@ -156,7 +158,7 @@ function loadParts(){
 // 3. BROADCAST
 function broadcast(){
     const t=document.getElementById('bTitle').value, b=document.getElementById('bBody').value;
-    if(t&&b&&confirm("Kirim Notif?")) db.collection('broadcasts').add({title:t,body:b,time:new Date()}).then(()=>alert("Terkirim"));
+    if(t&&b&&confirm("Kirim Notifikasi ke SEMUA member?")) db.collection('broadcasts').add({title:t,body:b,time:new Date()}).then(()=>alert("Pesan Terkirim!"));
 }
 
 loadUsers(); loadParts();
