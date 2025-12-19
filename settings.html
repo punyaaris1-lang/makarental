@@ -3,193 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pengaturan - MAKA</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0a0f18">
+<title>Profil Luxury</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
 <style>
-/* === MAKA MOTORS THEME === */
-:root { 
-    --maka-black: #0f1724; 
-    --maka-white: #ffffff;
-    --maka-yellow: #fbbf24;
-    --bg-page: #f8fafc;
-    --border-color: #e2e8f0;
-    --text-muted: #64748b;
-}
+:root { --bg:#0a0f18; --gold:#D4AF37; --glass:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.08); }
+body { margin:0; font-family:'Inter'; background:var(--bg); color:#fff; padding-bottom:120px; }
+.app-container { max-width:480px; margin:0 auto; padding:20px; }
 
-body { 
-    margin:0; font-family:'Inter', sans-serif; 
-    background: var(--bg-page); color: var(--maka-black); 
-    min-height:100vh; padding-bottom:100px;
-}
-.app-container { max-width:480px; margin:0 auto; padding:20px 24px; }
+.profile-card { text-align:center; padding:30px; background:var(--glass); border-radius:24px; border:1px solid var(--border); margin-bottom:30px; }
+.avatar-ring { width:84px; height:84px; border-radius:50%; background:linear-gradient(45deg, var(--gold), #333); padding:2px; margin:0 auto 15px; }
+.avatar { width:100%; height:100%; background:#111; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne'; font-size:2em; font-weight:800; color:var(--gold); background-size:cover; }
+.name { font-family:'Syne'; font-size:1.4em; font-weight:800; margin:0; }
+.plat { color:var(--gold); font-size:0.9em; margin-top:5px; }
 
-/* HEADER */
-.header-simple { text-align: center; margin-bottom: 30px; }
-.page-title { font-family: 'Syne'; font-weight: 800; font-size: 1.5em; margin: 0; }
+.menu-group { background:var(--glass); border-radius:18px; border:1px solid var(--border); margin-bottom:20px; overflow:hidden; }
+.item { padding:18px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; font-weight:600; cursor:pointer; }
+.item:last-child { border:none; }
+.val { color:#94a3b8; font-weight:400; }
 
-/* PROFILE CARD */
-.profile-card { 
-    background: var(--maka-white); border: 1px solid var(--border-color);
-    border-radius: 20px; padding: 30px 20px; text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.02); margin-bottom: 30px;
-}
-.avatar-box { position:relative; width:80px; height:80px; margin: 0 auto 15px; }
-.avatar { 
-    width:100%; height:100%; border-radius:50%; object-fit:cover; 
-    background: var(--maka-black); color: var(--maka-yellow);
-    display:flex; align-items:center; justify-content:center; 
-    font-size:2em; font-weight:800; font-family: 'Syne';
-}
-.btn-edit-pic { 
-    position:absolute; bottom:0; right:0; 
-    background: var(--maka-white); color: var(--maka-black); border: 1px solid var(--border-color);
-    width:28px; height:28px; border-radius:50%; 
-    display:flex; align-items:center; justify-content:center; cursor:pointer; font-size: 12px;
-}
-.user-name { font-family: 'Syne'; font-size: 1.2em; font-weight: 800; margin: 0; }
-.user-plat { font-size: 0.9em; color: var(--text-muted); font-weight: 500; margin-top: 5px; }
-
-/* MENU LIST */
-.menu-label { font-size: 0.75em; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px; }
-.menu-group { 
-    background: var(--maka-white); border-radius: 16px; 
-    border: 1px solid var(--border-color); overflow: hidden; margin-bottom: 25px;
-}
-.menu-item { 
-    padding: 16px 20px; border-bottom: 1px solid var(--border-color); 
-    display: flex; justify-content: space-between; align-items: center; 
-    font-size: 0.95em; font-weight: 600; cursor: pointer; transition: 0.2s;
-}
-.menu-item:last-child { border-bottom: none; }
-.menu-item:active { background: #f1f5f9; }
-.menu-val { font-weight: 400; color: var(--text-muted); font-size: 0.9em; }
-
-/* MODAL */
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:9999; }
-.modal-box { background:white; padding:25px; border-radius:24px; width:85%; max-width:320px; text-align:center; }
-.modal-title { font-family:'Syne'; font-weight:800; margin:0 0 10px; }
-.btn-logout { background: #ef4444; color: white; border:none; padding:12px; border-radius:12px; width:100%; font-weight:700; cursor:pointer; }
-.btn-cancel { background: #f1f5f9; color: #64748b; border:none; padding:12px; border-radius:12px; width:100%; font-weight:700; cursor:pointer; }
+.btn-logout { width:100%; padding:15px; background:rgba(239, 68, 68, 0.1); color:#ef4444; border:1px solid #ef4444; border-radius:12px; font-weight:bold; cursor:pointer; }
 
 /* NAV */
-footer.bottom-nav {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    background: var(--maka-black); border-radius: 100px; padding: 12px 30px;
-    display: flex; gap: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 999;
-}
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 600; }
-.nav-item span { font-size: 20px; margin-bottom: 2px; }
-.nav-item.active span { color: #fbbf24; }
+footer { position:fixed; bottom:30px; left:50%; transform:translateX(-50%); background:rgba(20,27,45,0.8); backdrop-filter:blur(20px); padding:12px 30px; border-radius:100px; display:flex; gap:30px; border:1px solid var(--border); box-shadow:0 20px 40px rgba(0,0,0,0.5); }
+.nav-item { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#64748b; font-size:9px; font-weight:700; }
+.nav-item span { font-size:20px; margin-bottom:3px; filter:grayscale(100%); }
+.nav-item.active span { filter:grayscale(0%); transform:translateY(-2px); }
 </style>
 </head>
 <body>
-
 <div class="app-container">
-  <div class="header-simple"><h1 class="page-title">Pengaturan</h1></div>
-
-  <div class="profile-card">
-    <div class="avatar-box">
-        <input type="file" id="fileInp" accept="image/*" style="display:none;" onchange="uploadPhoto()">
-        <img id="imgAvatar" class="avatar" src="" style="display:none;">
-        <div id="txtAvatar" class="avatar">U</div>
-        <div class="btn-edit-pic" onclick="document.getElementById('fileInp').click()">📷</div>
-    </div>
-    <h2 id="uName" class="user-name">...</h2>
-    <p id="uPlat" class="user-plat">...</p>
-  </div>
-
-  <div class="menu-label">AKUN</div>
-  <div class="menu-group">
-    <div class="menu-item" style="cursor:default;">
-        <span>Nomor WhatsApp</span> <span class="menu-val" id="dWa">-</span>
-    </div>
-    <div class="menu-item" style="cursor:default;">
-        <span>Bergabung Sejak</span> <span class="menu-val" id="dJoin">-</span>
-    </div>
-  </div>
-
-  <div class="menu-label">BANTUAN</div>
-  <div class="menu-group">
-    <div class="menu-item" onclick="chatAdmin()"><span>💬 Chat Admin</span> <span>›</span></div>
-    <div class="menu-item" onclick="window.location.href='tips_maka.html'"><span>📖 Panduan</span> <span>›</span></div>
-  </div>
-
-  <button onclick="confirmLogout()" style="width:100%; padding:15px; background:#fee2e2; color:#ef4444; border:none; border-radius:16px; font-weight:700; font-family:'Syne'; cursor:pointer;">
-      KELUAR AKUN
-  </button>
-</div>
-
-<div id="logoutModal" class="modal-overlay">
-    <div class="modal-box">
-        <h3 class="modal-title">Keluar Akun?</h3>
-        <p style="color:#64748b; margin-bottom:20px;">Anda harus login ulang untuk masuk kembali.</p>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-cancel" onclick="document.getElementById('logoutModal').style.display='none'">Batal</button>
-            <button class="btn-logout" onclick="processLogout()">Ya, Keluar</button>
+    <div class="profile-card">
+        <div class="avatar-ring">
+            <input type="file" id="file" hidden onchange="up(this)">
+            <div class="avatar" id="av" onclick="document.getElementById('file').click()">U</div>
         </div>
+        <h2 class="name" id="name">...</h2>
+        <p class="plat" id="plat">...</p>
     </div>
+    <div class="menu-group">
+        <div class="item"><span>WhatsApp</span><span class="val" id="hp">-</span></div>
+        <div class="item"><span>Join Date</span><span class="val" id="join">-</span></div>
+    </div>
+    <button class="btn-logout" onclick="localStorage.removeItem('maka_user');window.location.href='index.html'">LOGOUT</button>
 </div>
-
 <footer class="bottom-nav">
     <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
     <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
     <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
 </footer>
-
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
-  authDomain: "rtomaka-e67b5.firebaseapp.com",
-  projectId: "rtomaka-e67b5",
-  storageBucket: "rtomaka-e67b5.firebasestorage.app",
-  messagingSenderId: "472036722228",
-  appId: "1:472036722228:web:11d520f9204db317d02c61"
-};
-try { firebase.initializeApp(firebaseConfig); var db = firebase.firestore(); } catch(e){}
-
-let currentUser = JSON.parse(localStorage.getItem('maka_user'));
-
-document.addEventListener('DOMContentLoaded', () => {
-    if(!currentUser) { window.location.href='index.html'; return; }
-    document.getElementById('uName').innerText = currentUser.nama;
-    document.getElementById('uPlat').innerText = currentUser.plat;
-    document.getElementById('dWa').innerText = currentUser.hp || "-";
-    if(currentUser.joinedAt) {
-        document.getElementById('dJoin').innerText = new Date(currentUser.joinedAt).toLocaleDateString('id-ID');
-    }
-    loadPhoto();
-});
-
-function loadPhoto() {
-    db.collection('users').doc(currentUser.plat).get().then(doc => {
-        if(doc.exists && doc.data().photoUrl) {
-            document.getElementById('imgAvatar').src = doc.data().photoUrl;
-            document.getElementById('imgAvatar').style.display = 'block';
-            document.getElementById('txtAvatar').style.display = 'none';
-        } else {
-            document.getElementById('txtAvatar').innerText = currentUser.nama.charAt(0).toUpperCase();
-        }
-    });
+const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
+try{firebase.initializeApp(firebaseConfig); var db=firebase.firestore();}catch(e){}
+let u=JSON.parse(localStorage.getItem('maka_user'));
+if(u){
+    document.getElementById('name').innerText=u.nama;
+    document.getElementById('plat').innerText=u.plat;
+    document.getElementById('hp').innerText=u.hp;
+    document.getElementById('join').innerText=u.joinedAt.split('T')[0];
+    db.collection('users').doc(u.plat).get().then(d=>{ if(d.data().photoUrl) { document.getElementById('av').innerText=''; document.getElementById('av').style.backgroundImage=`url('${d.data().photoUrl}')`; } });
 }
-
-function uploadPhoto() {
-    const file = document.getElementById('fileInp').files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        // Simple compress logic (skip for brevity, direct upload)
-        db.collection('users').doc(currentUser.plat).set({ photoUrl: e.target.result }, { merge: true })
-        .then(() => { loadPhoto(); alert("Foto berhasil diganti!"); });
-    }
-    reader.readAsDataURL(file);
+function up(i){
+    let r=new FileReader(); r.readAsDataURL(i.files[0]);
+    r.onload=function(e){ db.collection('users').doc(u.plat).update({photoUrl:e.target.result}); location.reload(); }
 }
-
-function chatAdmin() { window.open('https://wa.me/6281234567890', '_blank'); }
-function confirmLogout() { document.getElementById('logoutModal').style.display = 'flex'; }
-function processLogout() { localStorage.removeItem('maka_user'); window.location.href='index.html'; }
 </script>
 </body>
 </html>

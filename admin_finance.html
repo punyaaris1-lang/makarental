@@ -3,288 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Finance - MAKA</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Syne:wght@700&display=swap" rel="stylesheet">
-<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<title>Admin Finance - Luxury</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
 <style>
-:root { --bg-base:#f0f4f8; --accent:#0ea5a6; --text:#0f1724; --success:#10b981; --glass-bg:rgba(255,255,255,0.9); --radius-lg:20px; }
-body{margin:0;padding:20px;font-family:'Inter';background:var(--bg-base);color:var(--text);min-height:100vh;}
-.container{max-width:750px;margin:0 auto;padding-bottom:50px;}
-.glass-card{background:var(--glass-bg);border:1px solid #fff;border-radius:var(--radius-lg);padding:24px;margin-bottom:20px;box-shadow:0 8px 32px rgba(0,0,0,0.05);}
-h2{font-family:'Syne';display:flex;justify-content:space-between;border-bottom:1px solid #ccc;padding-bottom:10px;margin-bottom:20px;}
-.form-row{display:flex;gap:15px;margin-bottom:15px;} .form-col{flex:1;}
-label{display:block;font-size:0.7em;font-weight:700;margin-bottom:6px;color:#64748b;text-transform:uppercase;}
-input{width:100%;padding:12px;border-radius:10px;border:1px solid #cbd5e1;box-sizing:border-box;}
-button{width:100%;padding:12px;background:var(--text);color:white;border:none;border-radius:10px;font-weight:700;cursor:pointer;}
-table{width:100%;border-collapse:collapse;font-size:0.9em;} th,td{padding:10px;text-align:left;border-bottom:1px solid #eee;}
-.status-unpaid{color:red;background:#fee2e2;padding:4px 8px;border-radius:6px;font-size:0.8em;font-weight:bold;}
-.status-paid{color:green;background:#d1fae5;padding:4px 8px;border-radius:6px;font-size:0.8em;font-weight:bold;}
-.btn-lunas{padding:6px 12px;background:var(--success);font-size:0.8em;width:auto;}
+/* THEME */
+:root { --bg:#0a0f18; --gold:#D4AF37; --glass:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.1); --text:#fff; }
+body { margin:0; padding:20px; font-family:'Inter'; background:var(--bg); color:var(--text); min-height:100vh; }
+.container { max-width:800px; margin:0 auto; padding-bottom:50px; }
 
-/* SEARCH RESULTS */
-#searchResult { position:absolute; background:white; width:100%; max-height:150px; overflow-y:auto; border:1px solid #ddd; z-index:10; display:none; }
-.search-item { padding:10px; border-bottom:1px solid #eee; cursor:pointer; }
-.search-item:hover { background:#f0f9ff; }
+h2 { font-family:'Syne'; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:15px; color: var(--gold); }
+.logout { font-size:0.6em; color:#ef4444; text-decoration:none; border:1px solid #ef4444; padding:5px 10px; border-radius:8px; }
 
-/* USER DEBT SUMMARY */
-.debt-card { background:linear-gradient(135deg, #ef4444, #b91c1c); color:white; padding:20px; border-radius:15px; margin-top:15px; display:none; }
-.debt-total { font-family:'Syne'; font-size:2em; font-weight:800; margin:5px 0; }
+.glass-card { background:var(--glass); border:1px solid var(--border); padding:20px; border-radius:20px; margin-bottom:20px; position: relative; }
+h3 { margin-top:0; font-family:'Syne'; color:var(--gold); }
+
+input, button { width:100%; padding:14px; border-radius:12px; border:1px solid var(--border); margin-bottom:10px; font-family:'Inter'; outline:none; }
+input { background:rgba(0,0,0,0.3); color:white; }
+button { font-weight:800; cursor:pointer; }
+.btn-gold { background:var(--gold); color:black; border:none; }
+.btn-check { background:linear-gradient(135deg, #0ea5a6, #06b6d4); color:white; border:none; }
+
+/* DEBT CARD */
+.debt-card { display:none; background:linear-gradient(135deg, #7f1d1d, #450a0a); border:1px solid #ef4444; padding:20px; border-radius:20px; margin-top:15px; text-align:center; }
+.debt-val { font-family:'Syne'; font-size:2.5em; font-weight:800; color:#fca5a5; margin:10px 0; }
+.debt-safe { background:linear-gradient(135deg, #064e3b, #022c22); border:1px solid #10b981; } 
+.debt-safe .debt-val { color:#6ee7b7; }
+
+/* TABLE */
+table { width:100%; border-collapse:collapse; font-size:0.9em; margin-top:10px; }
+th { text-align:left; color:#94a3b8; font-size:0.8em; border-bottom:1px solid var(--border); padding:10px; }
+td { padding:12px 10px; border-bottom:1px solid var(--border); }
+.pill { padding:4px 8px; border-radius:6px; font-size:0.7em; font-weight:bold; }
+.pill.paid { background:rgba(16, 185, 129, 0.2); color:#34d399; }
+.pill.unpaid { background:rgba(239, 68, 68, 0.2); color:#f87171; }
+
+/* SEARCH DROPDOWN */
+.search-res { position:absolute; top:85px; left:20px; right:20px; background:#1e293b; border:1px solid var(--border); z-index:10; max-height:200px; overflow-y:auto; border-radius:12px; display:none; }
+.s-item { padding:12px; border-bottom:1px solid var(--border); cursor:pointer; }
+.s-item:hover { background:var(--gold); color:black; }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h2><span>💰 Admin Finance</span> <a href="admin_login.html" style="font-size:0.6em;color:red;text-decoration:none;">LOGOUT</a></h2>
+    <h2><span>💰 ADMIN FINANCE</span> <a href="admin_login.html" class="logout">LOGOUT</a></h2>
 
-    <div class="glass-card" style="border:2px solid var(--accent);">
-        <h3 style="margin-top:0;">🔍 Cek & Tagih User</h3>
-        <div style="position:relative;">
-            <input id="checkUserInp" placeholder="Ketik Plat Nomor..." onkeyup="searchUserForCheck()" autocomplete="off">
-            <div id="checkResultList" style="position:absolute; background:white; width:100%; z-index:10; border:1px solid #ccc; display:none;"></div>
-        </div>
-
-        <div id="userDebtInfo" class="debt-card">
-            <div style="font-size:0.8em; opacity:0.9;">TOTAL TUNGGAKAN: <span id="debtUserPlat"></span></div>
-            <div id="debtAmount" class="debt-total">Rp 0</div>
-            <div id="debtDates" style="font-size:0.9em; margin-bottom:15px;">Detail Tgl: -</div>
-            <button onclick="payAllDebt()" style="background:white; color:#b91c1c;">✅ LUNASI SEMUA SEKARANG</button>
-        </div>
-    </div>
-
-    <div class="glass-card">
-        <h3>Buat Tagihan Manual</h3>
-        <div class="form-row">
-            <div class="form-col" style="position:relative;">
-                <label>Cari Plat</label>
-                <input id="searchInp" placeholder="Ketik Plat..." onkeyup="searchUser()" autocomplete="off">
-                <div id="searchResult"></div>
-            </div>
-            <div class="form-col"><label>Nama</label><input id="invName" readonly style="background:#eee;"></div>
-        </div>
+    <div class="glass-card" style="border:1px solid var(--gold);">
+        <h3>🔍 Cek Status User</h3>
+        <input id="checkInp" placeholder="Ketik Plat Nomor..." onkeyup="searchCheck()" autocomplete="off">
+        <div id="checkRes" class="search-res"></div>
         
-        <div class="form-row">
-            <div class="form-col"><label>Mulai</label><input type="date" id="startDate"></div>
-            <div class="form-col"><label>Selesai</label><input type="date" id="endDate"></div>
+        <div id="debtBox" class="debt-card">
+            <span style="opacity:0.7">STATUS TAGIHAN: <b id="dPlat"></b></span>
+            <div id="dVal" class="debt-val">Rp 0</div>
+            <div id="dDet" style="font-size:0.9em; margin-bottom:15px; color:#ccc;"></div>
+            <button onclick="lunasin()" style="background:white; color:black;">✅ LUNASI SEMUA (MANUAL)</button>
         </div>
-        <button onclick="sendInvoice()">KIRIM TAGIHAN</button>
     </div>
 
     <div class="glass-card">
-        <h3>Monitoring Transaksi (Terbaru)</h3>
-        <div style="overflow-x:auto;">
+        <h3>Log Pembayaran Terakhir</h3>
+        <div style="overflow-x:auto">
             <table>
-                <thead>
-                    <tr>
-                        <th>Tanggal</th>
-                        <th>User</th>
-                        <th>Jumlah</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="invoiceList">
-                    <tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>
-                </tbody>
+                <thead><tr><th>Tgl</th><th>User</th><th>Jml</th><th>Status</th></tr></thead>
+                <tbody id="txList"><tr><td colspan="4" align="center">Loading...</td></tr></tbody>
             </table>
         </div>
     </div>
 </div>
 
 <script>
-// --- FIREBASE CONFIG (PASTE PUNYA ANDA) ---
-const firebaseConfig = {
-  apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
-  authDomain: "rtomaka-e67b5.firebaseapp.com",
-  projectId: "rtomaka-e67b5",
-  storageBucket: "rtomaka-e67b5.firebasestorage.app",
-  messagingSenderId: "472036722228",
-  appId: "1:472036722228:web:11d520f9204db317d02c61"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
+firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
 
-let selectedUser = null;
-let checkingUser = null; // User yg sedang dicek utangnya
-let pendingInvoices = []; // Simpan ID invoice yg belum lunas user tsb
+let checkUser=null, unpaidDates=[];
 
-// --- 1. LOGIC CEK TUNGGAKAN USER ---
-function searchUserForCheck() {
-    const key = document.getElementById('checkUserInp').value.toUpperCase();
-    if(key.length<2) { document.getElementById('checkResultList').style.display='none'; return; }
+// 1. SEARCH LOGIC
+function searchCheck(){
+    const k=document.getElementById('checkInp').value.toUpperCase();
+    if(k.length<2){document.getElementById('checkRes').style.display='none';return;}
+    db.collection('users').get().then(s=>{
+        let h=''; s.forEach(d=>{ const u=d.data(); if(u.plat.includes(k)) h+=`<div class="s-item" onclick='sel("${u.plat}","${u.nama}", "${u.joinedAt}")'>${u.plat} - ${u.nama}</div>`; });
+        const r=document.getElementById('checkRes'); r.innerHTML=h; r.style.display='block';
+    });
+}
+
+function sel(plat, nama, join){
+    checkUser={plat,nama,join}; document.getElementById('checkInp').value=plat;
+    document.getElementById('checkRes').style.display='none';
+    calcDebt(plat, join);
+}
+
+// 2. HITUNG TUNGGAKAN (SAMA PERSIS DENGAN CLIENT)
+function calcDebt(plat, joinedAt){
+    db.collection('daily_payments').where('plat','==',plat).get().then(s=>{
+        let paid=[]; s.forEach(d=>paid.push(d.data().date));
+        
+        let total=0, days=0, today=new Date(); today.setHours(0,0,0,0);
+        let curr=new Date(joinedAt); curr.setHours(0,0,0,0);
+        unpaidDates=[];
+
+        while(curr<=today){
+            const dStr=curr.toISOString().split('T')[0];
+            // Harga statis 70rb utk admin cek cepat (bisa disesuaikan logika maka+)
+            if(curr.getDate()!==31 && !paid.includes(dStr)){ total+=70000; days++; unpaidDates.push(dStr); }
+            curr.setDate(curr.getDate()+1);
+        }
+
+        const box=document.getElementById('debtBox');
+        const val=document.getElementById('dVal');
+        box.style.display='block';
+        document.getElementById('dPlat').innerText=plat;
+        
+        if(total>0){
+            box.className='debt-card'; // Merah
+            val.innerText="Rp "+total.toLocaleString('id');
+            document.getElementById('dDet').innerText=`${days} Hari Belum Bayar`;
+        } else {
+            box.className='debt-card debt-safe'; // Hijau
+            val.innerText="AMAN";
+            document.getElementById('dDet').innerText="Tidak ada tunggakan.";
+        }
+    });
+}
+
+// 3. PELUNASAN MANUAL
+function lunasin(){
+    if(!checkUser || unpaidDates.length===0) return alert("User ini aman/tidak ada data.");
+    if(!confirm(`Lunasi ${unpaidDates.length} hari tagihan?`)) return;
     
-    db.collection('users').get().then(snap => {
-        let h=''; 
-        snap.forEach(doc=>{ 
-            const u=doc.data(); 
-            if(u.plat.includes(key)||u.nama.toUpperCase().includes(key)) 
-                h+=`<div class="search-item" onclick='selectCheckUser(${JSON.stringify(u)})'>${u.plat} - ${u.nama}</div>`; 
+    const batch=db.batch();
+    unpaidDates.forEach(d=>{
+        const ref=db.collection('daily_payments').doc(checkUser.plat+'_'+d);
+        batch.set(ref,{plat:checkUser.plat, nama:checkUser.nama, date:d, amount:70000, paidAt:new Date()});
+    });
+    batch.commit().then(()=>{alert("LUNAS!"); calcDebt(checkUser.plat, checkUser.join); loadTx();});
+}
+
+// 4. LOAD TRANSAKSI TERAKHIR
+function loadTx(){
+    db.collection('daily_payments').orderBy('paidAt','desc').limit(10).onSnapshot(s=>{
+        let h='';
+        s.forEach(d=>{
+            const x=d.data();
+            h+=`<tr><td>${x.date}</td><td>${x.nama}<br><small style="color:#aaa">${x.plat}</small></td><td>${parseInt(x.amount/1000)}k</td><td><span class="pill paid">LUNAS</span></td></tr>`;
         });
-        const res = document.getElementById('checkResultList');
-        res.innerHTML=h; res.style.display='block';
+        document.getElementById('txList').innerHTML=h;
     });
 }
-
-function selectCheckUser(u) {
-    checkingUser = u;
-    document.getElementById('checkUserInp').value = u.plat;
-    document.getElementById('checkResultList').style.display = 'none';
-    calculateUserDebt(u.plat);
-}
-
-function calculateUserDebt(plat) {
-    db.collection('invoices')
-      .where('plat', '==', plat)
-      .where('status', '==', 'unpaid')
-      .get().then(snap => {
-          let total = 0;
-          let dates = [];
-          pendingInvoices = []; // Reset
-
-          snap.forEach(doc => {
-              const d = doc.data();
-              total += parseInt(d.amount);
-              pendingInvoices.push(doc.id); // Simpan ID utk pelunasan massal
-              
-              // Ambil tanggal
-              const dt = new Date(d.startDate);
-              dates.push(dt.getDate() + "/" + (dt.getMonth()+1));
-          });
-
-          // Tampilkan di Kartu Merah
-          const card = document.getElementById('userDebtInfo');
-          if(total > 0) {
-              card.style.display = "block";
-              card.style.background = "linear-gradient(135deg, #ef4444, #b91c1c)"; // Merah
-              document.getElementById('debtUserPlat').innerText = plat;
-              document.getElementById('debtAmount').innerText = "Rp " + total.toLocaleString('id-ID');
-              document.getElementById('debtDates').innerText = "Tunggakan Tgl: " + dates.join(", ");
-          } else {
-              card.style.display = "block";
-              card.style.background = "linear-gradient(135deg, #10b981, #059669)"; // Hijau
-              document.getElementById('debtUserPlat').innerText = plat;
-              document.getElementById('debtAmount').innerText = "AMAN (LUNAS)";
-              document.getElementById('debtDates').innerText = "Tidak ada tunggakan.";
-          }
-      });
-}
-
-function payAllDebt() {
-    if(pendingInvoices.length === 0) return alert("User ini sudah lunas!");
-    if(!confirm(`Lunasi ${pendingInvoices.length} tagihan untuk user ini?`)) return;
-
-    // Batch Update (Biar sekalian)
-    const batch = db.batch();
-    pendingInvoices.forEach(id => {
-        const ref = db.collection('invoices').doc(id);
-        batch.update(ref, { status: 'paid' });
-    });
-
-    batch.commit().then(() => {
-        alert("✅ Berhasil! Semua tagihan user ini sudah LUNAS.");
-        calculateUserDebt(checkingUser.plat); // Refresh tampilan
-        loadInvoices(); // Refresh tabel bawah
-    });
-}
-
-
-// --- 2. LOGIC MONITORING TABEL ---
-function loadInvoices() {
-    db.collection('invoices').orderBy('createdAt', 'desc').limit(20).onSnapshot(snap => {
-        let html = '';
-        snap.forEach(doc => {
-            const d = doc.data();
-            const date = new Date(d.createdAt.seconds * 1000).toLocaleDateString('id-ID');
-            
-            // Status Badge
-            const statusBadge = d.status === 'paid' 
-                ? `<span class="status-paid">LUNAS</span>` 
-                : `<span class="status-unpaid">BELUM</span>`;
-            
-            // Tombol Aksi
-            const actionBtn = d.status === 'unpaid'
-                ? `<button class="btn-lunas" onclick="markPaid('${doc.id}')">LUNAS ✅</button>`
-                : `<span style="color:#aaa;">-</span>`;
-
-            html += `
-            <tr>
-                <td>${date}</td>
-                <td>${d.nama}<br><small>${d.plat}</small></td>
-                <td>Rp ${parseInt(d.amount).toLocaleString('id-ID')}</td>
-                <td>${statusBadge}</td>
-                <td>${actionBtn}</td>
-            </tr>`;
-        });
-        document.getElementById('invoiceList').innerHTML = html || '<tr><td colspan="5" align="center">Belum ada tagihan.</td></tr>';
-    });
-}
-
-function markPaid(docId) {
-    if(!confirm("Tandai tagihan ini sebagai LUNAS?")) return;
-    db.collection('invoices').doc(docId).update({ status: 'paid' }).then(() => {
-        // Gak perlu alert biar cepet
-    });
-}
-
-
-// --- 3. LOGIC BUAT TAGIHAN (LAMA) ---
-function searchUser() {
-    const key = document.getElementById('searchInp').value.toUpperCase();
-    if(key.length<2) { document.getElementById('searchResult').style.display='none'; return; }
-    
-    db.collection('users').get().then(snap => {
-        let h=''; 
-        snap.forEach(doc=>{ 
-            const u=doc.data(); 
-            if(u.plat.includes(key)||u.nama.toUpperCase().includes(key)) 
-                h+=`<div class="search-item" onclick='selUser(${JSON.stringify(u)})'>${u.plat} - ${u.nama}</div>`; 
-        });
-        const res = document.getElementById('searchResult');
-        res.innerHTML=h; res.style.display='block';
-    });
-}
-function selUser(u){ 
-    selectedUser=u; 
-    document.getElementById('searchInp').value=u.plat; 
-    document.getElementById('invName').value=u.nama; 
-    document.getElementById('searchResult').style.display='none'; 
-}
-
-function sendInvoice(){
-    if(!selectedUser) return alert("Pilih user!");
-    
-    const s=new Date(document.getElementById('startDate').value);
-    const e=new Date(document.getElementById('endDate').value);
-    
-    // Hitung Hari
-    const diffTime = Math.abs(e - s);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; 
-    
-    if(isNaN(diffDays)) return alert("Isi tanggal dengan benar!");
-
-    // Rumus: (70.000 HWB + 10.000 MAKA+) * Hari
-    // Cek apakah user ikut MAKA+ (Asumsi Admin tau atau user data punya flag)
-    // Disini kita default 80rb per hari agar aman
-    const amount = diffDays * 80000; 
-
-    if(!confirm(`Kirim tagihan Rp ${amount.toLocaleString()} (${diffDays} hari) ke ${selectedUser.nama}?`)) return;
-
-    db.collection('invoices').add({
-        plat: selectedUser.plat, nama: selectedUser.nama, amount: amount,
-        startDate: document.getElementById('startDate').value,
-        endDate: document.getElementById('endDate').value,
-        status: 'unpaid', createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(()=>{ 
-        alert("Tagihan Terkirim!"); 
-        document.getElementById('searchInp').value = '';
-        selectedUser = null;
-    });
-}
-
-loadInvoices(); // Jalankan saat load
+loadTx();
 </script>
 </body>
 </html>

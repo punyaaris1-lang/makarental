@@ -3,92 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MAKA+ Charger</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0a0f18">
+<title>MAKA+ Luxury</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="manifest" href="/makarental/manifest.json"> 
   
 <style>
-/* === MAKA MOTORS THEME === */
+/* === MAKA LUXURY THEME === */
 :root {
-  --maka-black: #0f1724;
-  --maka-white: #ffffff;
-  --maka-yellow: #fbbf24;
-  --maka-teal: #0ea5a6;
-  --bg-page: #f8fafc;
-  --border-color: #e2e8f0;
-  --text-muted: #64748b;
+  --bg:#0a0f18; --gold:#D4AF37; --glass:rgba(255, 255, 255, 0.03); --border:rgba(255, 255, 255, 0.08);
 }
-
-body {
-  margin: 0; padding: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-page);
-  color: var(--maka-black);
-  min-height: 100vh;
-  padding-bottom: 100px;
-}
-
-.app-container { max-width: 480px; margin: 0 auto; padding: 20px 24px; }
+body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; min-height: 100vh; padding-bottom: 120px; }
+.app-container { max-width: 480px; margin: 0 auto; padding: 20px; }
 
 /* HEADER */
 .header-simple { text-align: center; margin-bottom: 30px; margin-top: 10px; }
-.page-title {
-    font-family: 'Syne', sans-serif; font-size: 1.8em; font-weight: 800;
-    margin: 0;
-}
-.page-subtitle { color: var(--text-muted); margin-top: 5px; font-size: 0.9em; }
+.page-title { font-family: 'Syne'; font-size: 2em; font-weight: 800; margin: 0; color: var(--gold); }
+.page-subtitle { color: #94a3b8; margin-top: 5px; font-size: 0.9em; letter-spacing: 1px; }
 
 /* PRODUCT CARD */
 .product-card {
-  background: var(--maka-white);
-  border: 1px solid var(--border-color);
-  border-radius: 24px;
-  padding: 30px 24px;
-  text-align: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-  margin-bottom: 24px;
+  background: var(--glass); border: 1px solid var(--border); border-radius: 24px; padding: 30px 24px;
+  text-align: center; backdrop-filter: blur(10px); margin-bottom: 24px;
 }
-
 .prod-icon {
-  width: 80px; height: 80px; border-radius: 50%;
-  background: #f1f5f9; color: var(--maka-black);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 40px; margin: 0 auto 20px;
-  border: 2px solid var(--maka-black);
+  width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(45deg, var(--gold), #333);
+  display: flex; align-items: center; justify-content: center; font-size: 40px; margin: 0 auto 20px;
+  border: 2px solid #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
 }
+.prod-title { font-family: 'Syne'; font-size: 1.5em; font-weight: 800; margin-bottom: 10px; }
 
-.prod-title { font-family: 'Syne'; font-size: 1.4em; font-weight: 800; margin-bottom: 10px; }
-.prod-desc { font-size: 0.9em; color: var(--text-muted); line-height: 1.6; margin-bottom: 30px; }
-
-/* STEPS FLOW */
-.steps-container {
-  text-align: left; 
-  padding: 20px; border-radius: 16px; margin-bottom: 30px;
-  border: 1px dashed var(--border-color); background: #f8fafc;
-}
+/* STEPS */
+.steps-container { text-align: left; padding: 20px; border-radius: 16px; margin-bottom: 30px; border: 1px dashed var(--border); background: rgba(0,0,0,0.2); }
 .step-item { display: flex; gap: 15px; margin-bottom: 20px; }
-.step-item:last-child { margin-bottom: 0; }
-.step-num { 
-  background: var(--maka-black); color: var(--maka-yellow); 
-  width: 24px; height: 24px; border-radius: 50%; 
-  text-align: center; line-height: 24px; font-size: 12px; font-weight: bold; flex-shrink: 0;
-}
-.step-text { font-size: 0.9em; line-height: 1.5; color: #334155; }
-.step-text a { color: var(--maka-teal); font-weight: 700; text-decoration: none; }
+.step-num { background: var(--gold); color: #000; width: 24px; height: 24px; border-radius: 50%; text-align: center; line-height: 24px; font-weight: bold; flex-shrink: 0; }
+.step-text { font-size: 0.9em; line-height: 1.5; color: #cbd5e1; }
+.step-text a { color: var(--gold); font-weight: 700; text-decoration: none; border-bottom: 1px solid var(--gold); }
 
-/* PRICE BOX (DARK THEME) */
+/* PRICE BOX */
 .price-box {
-  background: var(--maka-black);
-  color: white; padding: 20px; border-radius: 16px;
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 25px;
+  background: #141b2d; border: 1px solid var(--gold); color: white; padding: 20px; border-radius: 16px;
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
 }
-.price-lbl { font-size: 0.7em; opacity: 0.7; letter-spacing: 1px; font-weight: 700; }
-.price-val { font-family: 'Syne'; font-size: 1.6em; font-weight: 800; color: var(--maka-yellow); }
+.price-val { font-family: 'Syne'; font-size: 1.6em; font-weight: 800; color: var(--gold); text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
 
 /* STATUS BADGE */
 .status-badge {
-  background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534;
+  background: rgba(16, 185, 129, 0.1); border: 1px solid #059669; color: #34d399;
   padding: 15px; border-radius: 16px; font-size: 0.9em; line-height: 1.5;
   margin-bottom: 20px; display: none; text-align: left;
 }
@@ -96,43 +58,24 @@ body {
 
 /* BUTTON */
 .btn-main {
-  width: 100%; padding: 16px; border: none; border-radius: 14px;
-  background: var(--maka-black); color: white;
-  font-family: 'Syne'; font-size: 1em; font-weight: 800;
-  cursor: pointer; transition: 0.2s;
+  width: 100%; padding: 18px; border: none; border-radius: 14px;
+  background: var(--gold); color: #000; font-family: 'Syne'; font-size: 1em; font-weight: 800;
+  cursor: pointer; box-shadow: 0 0 20px rgba(212, 175, 55, 0.2); transition: 0.2s;
 }
-.btn-main:active { transform: scale(0.98); opacity: 0.9; }
-.btn-main:disabled { background: #cbd5e1; color: #94a3b8; cursor: default; }
+.btn-main:disabled { background: #333; color: #666; cursor: default; box-shadow: none; }
 
-/* MODAL CONFIRM */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
-  display: none; align-items: center; justify-content: center; z-index: 2000;
-}
-.modal-content {
-  background: #fff; width: 85%; max-width: 340px; padding: 30px; border-radius: 24px;
-  text-align: center;
-}
-.modal-title { font-family: 'Syne'; font-size: 1.4em; font-weight: 800; margin: 0 0 10px; }
-.modal-actions { display: flex; gap: 12px; margin-top: 25px; }
-.btn-cancel {
-  flex: 1; padding: 14px; background: #f1f5f9; color: var(--text-muted);
-  border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
-}
-.btn-confirm {
-  flex: 1; padding: 14px; background: var(--maka-black); color: var(--maka-yellow);
-  border: none; border-radius: 12px; font-weight: 700; cursor: pointer;
-}
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+.modal-content { background: #141b2d; width: 85%; max-width: 320px; padding: 30px; border-radius: 24px; text-align: center; border: 1px solid var(--border); }
+.modal-title { font-family: 'Syne'; font-size: 1.4em; font-weight: 800; margin: 0 0 10px; color: var(--gold); }
+.btn-cancel { flex: 1; padding: 14px; background: rgba(255,255,255,0.1); color: #fff; border: none; border-radius: 12px; font-weight: 700; }
+.btn-confirm { flex: 1; padding: 14px; background: var(--gold); color: #000; border: none; border-radius: 12px; font-weight: 700; }
 
 /* NAV */
-footer.bottom-nav {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    background: var(--maka-black); border-radius: 100px; padding: 12px 30px;
-    display: flex; gap: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 999;
-}
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 600; }
-.nav-item span { font-size: 20px; margin-bottom: 2px; }
-.nav-item.active span { color: var(--maka-yellow); }
+footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(20,27,45,0.8); backdrop-filter: blur(20px); padding: 12px 30px; border-radius: 100px; display: flex; gap: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 999; }
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 9px; font-weight: 700; }
+.nav-item span { font-size: 20px; margin-bottom: 3px; filter: grayscale(100%); }
+.nav-item.active span { filter: grayscale(0%); transform: translateY(-2px); }
 </style>
 </head>
 <body>
@@ -144,62 +87,30 @@ footer.bottom-nav {
     </div>
 
     <div class="product-card">
-        <div class="prod-icon">🔌</div>
+        <div class="prod-icon">⚡</div>
         <div class="prod-title">Fast Charger</div>
         
         <div class="steps-container">
-            <div class="step-item">
-                <div class="step-num">1</div>
-                <div class="step-text">
-                    Isi formulir pendaftaran di:<br>
-                    <a href="https://bit.ly/semilchargerplus" target="_blank">🔗 bit.ly/semilchargerplus</a>
-                </div>
-            </div>
-            <div class="step-item">
-                <div class="step-num">2</div>
-                <div class="step-text">
-                    Tunggu persetujuan Admin & pengambilan unit.
-                </div>
-            </div>
-            <div class="step-item">
-                <div class="step-num">3</div>
-                <div class="step-text">
-                    Setelah unit diterima, klik <b>"Aktifkan Cicilan"</b> di bawah.
-                </div>
-            </div>
+            <div class="step-item"><div class="step-num">1</div><div class="step-text">Daftar di:<br><a href="#">🔗 bit.ly/semilchargerplus</a></div></div>
+            <div class="step-item"><div class="step-num">2</div><div class="step-text">Tunggu persetujuan & unit.</div></div>
+            <div class="step-item"><div class="step-num">3</div><div class="step-text">Setelah diterima, klik tombol Aktifkan di bawah.</div></div>
         </div>
 
         <div class="price-box">
-            <div style="text-align:left;">
-                <span class="price-lbl">TAMBAHAN BIAYA</span><br>
-                <span style="font-size:0.7em;">(Selama 365 Hari)</span>
-            </div>
-            <div class="price-val">+10rb<span style="font-size:0.5em;">/hari</span></div>
+            <div style="text-align:left;"><span style="font-size:0.7em; opacity:0.7; letter-spacing:1px; font-weight:700;">TAMBAHAN BIAYA</span><br><span style="font-size:0.6em;">(Selama 365 Hari)</span></div>
+            <div class="price-val">+10rb</div>
         </div>
 
-        <div id="statusArea" class="status-badge">
-            ✅ <b>CICILAN SEDANG BERJALAN</b><br>
-            <small>Aktif Sejak: <span id="lblDate">-</span></small><br>
-            <small>Selesai: <span id="lblEnd">-</span></small>
-        </div>
-
-        <button id="btnAction" class="btn-main" onclick="openModal()">
-            AKTIFKAN CICILAN
-        </button>
+        <div id="statusArea" class="status-badge">✅ <b>CICILAN AKTIF</b><br><small>Selesai: <span id="lblEnd">-</span></small></div>
+        <button id="btnAction" class="btn-main" onclick="openModal()">AKTIFKAN CICILAN</button>
     </div>
 </div>
 
 <div id="modalConfirm" class="modal-overlay">
     <div class="modal-content">
         <h3 class="modal-title">Konfirmasi</h3>
-        <p style="color:#64748b; font-size:0.95em;">
-            Apakah unit Charger sudah diterima?<br><br>
-            Tagihan harian akan bertambah <b>Rp 10.000</b> selama <b>1 TAHUN</b>.
-        </p>
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeModal()">Batal</button>
-            <button class="btn-confirm" onclick="confirmActivation()">Ya, Aktifkan</button>
-        </div>
+        <p style="color:#94a3b8; font-size:0.95em; margin-bottom:20px;">Unit sudah diterima? Tagihan +10rb/hari akan dimulai.</p>
+        <div style="display:flex; gap:10px;"><button class="btn-cancel" onclick="closeModal()">Batal</button><button class="btn-confirm" onclick="act()">Ya, Aktifkan</button></div>
     </div>
 </div>
 
@@ -210,46 +121,24 @@ footer.bottom-nav {
 </footer>
 
 <script>
-    const MAKA_PLUS_KEY = 'maka_plus_data';
-
-    function loadState() {
-        const data = JSON.parse(localStorage.getItem(MAKA_PLUS_KEY));
-        const btn = document.getElementById('btnAction');
-        const badge = document.getElementById('statusArea');
-        
-        if (data && data.active) {
-            const start = new Date(data.activatedAt);
-            const end = new Date(start);
-            end.setDate(start.getDate() + 365);
-
-            document.getElementById('lblDate').textContent = start.toLocaleDateString('id-ID');
-            document.getElementById('lblEnd').textContent = end.toLocaleDateString('id-ID');
-
-            badge.classList.add('active');
-            btn.disabled = true;
-            btn.textContent = "CICILAN AKTIF";
-            btn.style.background = "#e2e8f0"; // Disabled gray
-            btn.style.color = "#94a3b8";
+    const K = 'maka_plus_data';
+    function load() {
+        const d = JSON.parse(localStorage.getItem(K)), b = document.getElementById('btnAction');
+        if (d && d.active) {
+            const e = new Date(d.activatedAt); e.setDate(e.getDate()+365);
+            document.getElementById('lblEnd').textContent = e.toLocaleDateString('id-ID');
+            document.getElementById('statusArea').classList.add('active');
+            b.disabled = true; b.textContent = "CICILAN AKTIF";
         }
     }
-
-    function openModal() {
-        if(!document.getElementById('btnAction').disabled) {
-            document.getElementById('modalConfirm').style.display = 'flex';
-        }
-    }
+    function openModal() { if(!document.getElementById('btnAction').disabled) document.getElementById('modalConfirm').style.display = 'flex'; }
     function closeModal() { document.getElementById('modalConfirm').style.display = 'none'; }
-
-    function confirmActivation() {
-        const today = new Date();
-        today.setHours(0,0,0,0);
-        localStorage.setItem(MAKA_PLUS_KEY, JSON.stringify({ active: true, activatedAt: today.toISOString() }));
-        closeModal();
-        loadState();
-        alert("Aktivasi Berhasil! Tagihan Anda telah diperbarui.");
+    function act() {
+        const t = new Date(); t.setHours(0,0,0,0);
+        localStorage.setItem(K, JSON.stringify({ active: true, activatedAt: t.toISOString() }));
+        closeModal(); load();
     }
-
-    document.addEventListener('DOMContentLoaded', loadState);
+    document.addEventListener('DOMContentLoaded', load);
 </script>
 </body>
 </html>

@@ -3,66 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MAKA Admin Portal</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&family=Syne:wght@700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0a0f18">
+<title>Admin Access - MAKA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
-/* THEME VARIABLES */
-:root { --bg:#f6f8fb; --surface:#ffffff; --accent:#0ea5a6; --text:#0f1724; --radius-lg:24px; --radius-md:14px; }
-* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { margin:0; padding:0; font-family:'Inter', sans-serif; background:linear-gradient(180deg, var(--bg) 0%, #eef3f8 100%); color:var(--text); height:100vh; display:flex; align-items:center; justify-content:center; }
+/* === LUXURY THEME === */
+:root { --bg:#0a0f18; --gold:#D4AF37; --glass:rgba(255,255,255,0.05); --border:rgba(255,255,255,0.1); }
+body { margin:0; padding:0; font-family:'Inter'; background:var(--bg); color:white; height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; }
 
 .login-card {
-  background: var(--surface); width: 90%; max-width: 360px; padding: 32px;
-  border-radius: var(--radius-lg); box-shadow: 0 20px 40px rgba(15,23,42,0.08);
-  text-align: center; border: 1px solid rgba(255,255,255,0.6);
+  background: var(--glass); border: 1px solid var(--border);
+  width: 90%; max-width: 380px; padding: 40px 30px;
+  border-radius: 30px; text-align: center;
+  backdrop-filter: blur(20px); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  position: relative; overflow: hidden;
 }
-h1 { font-family:'Syne'; font-size:1.5em; margin:0 0 5px; color:var(--text); }
-p { color:#6b7280; font-size:0.9em; margin-bottom:24px; }
+
+/* Efek Kilau Emas Bergerak */
+.login-card::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+    transform: rotate(45deg); animation: shine 6s infinite; pointer-events: none;
+}
+@keyframes shine { 0% {top:-150%;left:-150%;} 100% {top:150%;left:150%;} }
+
+h1 { font-family:'Syne'; font-size:2em; margin:0 0 5px; color:var(--gold); text-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+p { color:#64748b; font-size:0.9em; margin-bottom:30px; letter-spacing: 2px; text-transform: uppercase; }
 
 input {
-  width: 100%; padding: 16px; border-radius: var(--radius-md); border: 1px solid #e2e8f0;
-  background: #f8fafc; font-size: 1.2em; text-align: center; letter-spacing: 5px; outline: none; margin-bottom: 16px;
+  width: 100%; padding: 18px; border-radius: 16px; border: 1px solid var(--border);
+  background: rgba(0,0,0,0.3); color: var(--gold);
+  font-family: 'Syne'; font-size: 1.5em; text-align: center; letter-spacing: 8px; 
+  outline: none; margin-bottom: 20px; transition: 0.3s;
 }
-input:focus { border-color: var(--accent); background: #fff; }
+input:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(212, 175, 55, 0.2); }
 
 button {
-  width: 100%; padding: 16px; border: none; border-radius: var(--radius-md);
-  background: var(--text); color: white; font-weight: 800; cursor: pointer;
-  transition: 0.2s;
+  width: 100%; padding: 18px; border: none; border-radius: 16px;
+  background: linear-gradient(135deg, var(--gold), #b8860b); color: #000;
+  font-weight: 800; font-family: 'Syne'; cursor: pointer;
+  transition: 0.2s; letter-spacing: 1px;
 }
-button:active { transform: scale(0.98); }
+button:active { transform: scale(0.98); opacity: 0.9; }
 
-.error { color: #ef4444; font-size: 0.8em; margin-top: 10px; display: none; }
+.error { color: #ef4444; font-size: 0.8em; margin-top: 15px; display: none; font-weight: bold; }
 </style>
 </head>
 <body>
 
 <div class="login-card">
-    <div style="font-size:3em; margin-bottom:10px;">🛡️</div>
-    <h1>Admin Portal</h1>
-    <p>Masukkan PIN Akses</p>
+    <div style="font-size:3.5em; margin-bottom:15px; filter: drop-shadow(0 0 10px rgba(212,175,55,0.4));">🛡️</div>
+    <h1>COMMAND CENTER</h1>
+    <p>Restricted Area</p>
     
-    <input type="tel" id="pin" placeholder="••••" maxlength="4" oninput="checkAutoLogin()">
-    <button onclick="login()">MASUK</button>
-    <div id="error" class="error">PIN Tidak Dikenali</div>
+    <input type="tel" id="pin" placeholder="••••" maxlength="4" autocomplete="off">
+    <button onclick="login()">AUTHENTICATE</button>
+    <div id="error" class="error">⛔ AKSES DITOLAK</div>
 </div>
 
 <script>
+document.getElementById('pin').focus();
 function login(){
     const p = document.getElementById('pin').value;
     const err = document.getElementById('error');
     
     if(p === '1131') {
-        // ADMIN USER (Opsional/Konten)
         localStorage.setItem('maka_admin_role', 'user');
-        window.location.href = 'admin_user.html';
+        window.location.href = 'admin_user.html'; // Masuk ke Ops
     } else if (p === '1132') {
-        // ADMIN FINANCE (Keuangan)
         localStorage.setItem('maka_admin_role', 'finance');
-        window.location.href = 'admin_finance.html';
+        window.location.href = 'admin_finance.html'; // Masuk ke Keuangan
     } else {
         err.style.display = 'block';
         document.getElementById('pin').value = '';
+        document.getElementById('pin').focus();
     }
 }
 </script>

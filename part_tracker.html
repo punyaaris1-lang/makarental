@@ -3,158 +3,115 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Gratisan Part - MAKA</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#0a0f18">
+<title>Gratisan Luxury</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <link rel="manifest" href="/makarental/manifest.json"> 
   
 <style>
-/* === MAKA MOTORS THEME === */
+/* === MAKA LUXURY THEME === */
 :root {
-  --maka-black: #0f1724;
-  --maka-white: #ffffff;
-  --maka-yellow: #fbbf24;
-  --maka-teal: #0ea5a6;
-  --bg-page: #f8fafc;
-  --border-color: #e2e8f0;
-  --text-muted: #64748b;
-  --danger: #ef4444;
+  --bg:#0a0f18; 
+  --gold:#D4AF37; 
+  --glass:rgba(255, 255, 255, 0.03);
+  --border:rgba(255, 255, 255, 0.08);
+  --teal:#0ea5a6; --danger:#ef4444;
 }
 
 body {
-  margin: 0; padding: 0;
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-page);
-  color: var(--maka-black);
-  min-height: 100vh;
-  padding-bottom: 100px;
+  margin: 0; font-family: 'Inter', sans-serif;
+  background: var(--bg); color: #fff;
+  min-height: 100vh; padding-bottom: 120px;
 }
 
-.app-container { max-width: 480px; margin: 0 auto; padding: 20px 24px; }
+.app-container { max-width: 480px; margin: 0 auto; padding: 20px; }
 
 /* HEADER */
 .header-simple { margin-bottom: 24px; padding-top: 10px; }
-.page-title {
-    font-family: 'Syne', sans-serif; font-size: 1.5em; font-weight: 800;
-    margin: 0; letter-spacing: -0.5px;
-}
-.page-subtitle { color: var(--text-muted); font-size: 0.9em; margin-top: 4px; }
+.page-title { font-family: 'Syne'; font-size: 1.8em; font-weight: 800; margin: 0; color: var(--gold); }
+.page-subtitle { color: #94a3b8; font-size: 0.9em; margin-top: 4px; }
 
-/* CARD GRID */
-.part-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px;
-}
+/* CARD GRID (GLASS STYLE) */
+.part-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
 
 .part-card {
-  background: var(--maka-white);
-  border: 1px solid var(--border-color);
-  border-radius: 16px; padding: 16px;
+  background: var(--glass); border: 1px solid var(--border);
+  border-radius: 18px; padding: 16px;
   display: flex; flex-direction: column; justify-content: space-between;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+  backdrop-filter: blur(10px);
 }
 
-.part-name { font-weight: 700; font-size: 0.85em; margin-bottom: 10px; color: var(--text-muted); text-transform: uppercase; }
+.part-name { font-weight: 700; font-size: 0.75em; margin-bottom: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
 .part-info { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
-.part-remain { font-family: 'Syne'; font-size: 2em; font-weight: 800; line-height: 1; }
-.part-total { font-size: 0.8em; color: var(--text-muted); margin-bottom: 3px; }
+.part-remain { font-family: 'Syne'; font-size: 2em; font-weight: 800; line-height: 1; text-shadow: 0 0 10px rgba(255,255,255,0.1); }
+.part-total { font-size: 0.8em; color: #64748b; margin-bottom: 3px; }
 
-/* PROGRESS BAR */
-.progress-track {
-  width: 100%; height: 6px; background: #f1f5f9;
-  border-radius: 10px; overflow: hidden;
-}
-.progress-fill {
-  height: 100%; background: var(--maka-yellow);
-  border-radius: 10px; transition: width 0.5s ease;
-}
-.progress-fill.low { background: var(--danger); }
-.progress-fill.good { background: var(--maka-teal); }
+/* PROGRESS BAR GLOW */
+.progress-track { width: 100%; height: 6px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 10px; transition: width 0.5s ease; box-shadow: 0 0 10px currentColor; }
+.progress-fill.good { background: var(--teal); color: var(--teal); }
+.progress-fill.med { background: var(--gold); color: var(--gold); }
+.progress-fill.low { background: var(--danger); color: var(--danger); }
 
 /* BUTTON ACTION */
 .btn-action {
   width: 100%; padding: 16px; border-radius: 14px;
-  background: var(--maka-black); color: white; border: none; 
-  font-weight: 700; font-family: 'Syne'; font-size: 1em; cursor: pointer;
-  display: flex; justify-content: center; align-items: center; gap: 8px;
-  margin-bottom: 30px; transition: 0.2s;
+  background: linear-gradient(135deg, var(--gold), #b8860b);
+  color: #000; border: none; font-weight: 800; font-family: 'Syne'; 
+  font-size: 1em; cursor: pointer; display: flex; justify-content: center; gap: 8px;
+  margin-bottom: 30px; box-shadow: 0 5px 20px rgba(212, 175, 55, 0.2);
 }
-.btn-action:active { transform: scale(0.98); }
 
 /* LOG HISTORY */
-.log-section h3 { font-family: 'Syne'; font-size: 1.1em; margin-bottom: 15px; }
-.log-list {
-  background: var(--maka-white); border: 1px solid var(--border-color);
-  border-radius: 16px; overflow: hidden;
-}
-.log-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 20px; border-bottom: 1px solid var(--border-color); font-size: 0.9em;
-}
-.log-item:last-child { border-bottom: none; }
-.log-date { font-size: 0.8em; color: var(--text-muted); }
-.log-part { font-weight: 700; }
+.log-section h3 { font-family: 'Syne'; font-size: 1.1em; margin-bottom: 15px; color: #fff; }
+.log-list { background: var(--glass); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.log-item { display: flex; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--border); font-size: 0.9em; }
+.log-item:last-child { border:none; }
+.log-date { font-size: 0.8em; color: #64748b; }
+.log-part { font-weight: 700; color: #fff; }
 
-/* MODAL */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
-  display: none; align-items: center; justify-content: center; z-index: 2000;
-}
-.modal-content {
-  background: white; width: 85%; max-width: 320px; padding: 25px;
-  border-radius: 24px; text-align: center;
-}
-.modal-title { font-family: 'Syne'; font-size: 1.3em; margin: 0 0 10px; font-weight: 800; }
-select {
-  width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);
-  background: #f8fafc; margin-bottom: 20px; font-size: 1em; outline: none; font-family: 'Inter';
-}
+/* MODAL DARK */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+.modal-content { background: #141b2d; width: 85%; max-width: 320px; padding: 25px; border-radius: 24px; text-align: center; border: 1px solid var(--border); }
+.modal-title { font-family: 'Syne'; font-size: 1.3em; margin: 0 0 10px; font-weight: 800; color: var(--gold); }
+select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; margin-bottom: 20px; outline: none; }
 .btn-row { display: flex; gap: 10px; }
-.btn-ok { flex: 1; padding: 12px; background: var(--maka-black); color: white; border: none; border-radius: 12px; font-weight: 700; }
-.btn-cancel { flex: 1; padding: 12px; background: #f1f5f9; color: var(--text-muted); border: none; border-radius: 12px; font-weight: 700; }
+.btn-ok { flex: 1; padding: 12px; background: var(--gold); color: #000; border: none; border-radius: 12px; font-weight: 700; }
+.btn-cancel { flex: 1; padding: 12px; background: rgba(255,255,255,0.1); color: #fff; border: none; border-radius: 12px; font-weight: 700; }
 
-/* NAV */
-footer.bottom-nav {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    background: var(--maka-black); border-radius: 100px; padding: 12px 30px;
-    display: flex; gap: 30px; box-shadow: 0 15px 40px rgba(0,0,0,0.25); z-index: 999;
-}
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 600; }
-.nav-item span { font-size: 20px; margin-bottom: 2px; }
-.nav-item.active span { color: var(--maka-yellow); }
+/* NAV FOOTER GLASS */
+footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(20,27,45,0.8); backdrop-filter: blur(20px); padding: 12px 30px; border-radius: 100px; display: flex; gap: 30px; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.5); z-index: 999; }
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 9px; font-weight: 700; }
+.nav-item span { font-size: 20px; margin-bottom: 3px; filter: grayscale(100%); }
+.nav-item.active span { filter: grayscale(0%); transform: translateY(-2px); }
 </style>
 </head>
 
 <body>
 <div class="app-container">
     <div class="header-simple">
-        <h1 class="page-title">Cek Gratisan</h1>
-        <div class="page-subtitle">Jatah part gratis (3 Tahun)</div>
+        <h1 class="page-title">Gratisan</h1>
+        <div class="page-subtitle">Jatah Part (3 Tahun)</div>
     </div>
 
     <div id="part-tracker" class="part-grid"></div>
 
-    <button class="btn-action" onclick="openModal()">
-        <span>🛠️</span> CATAT PENGGANTIAN
-    </button>
+    <button class="btn-action" onclick="openModal()"><span>🛠️</span> KLAIM PART</button>
     
     <div class="log-section">
         <h3>Riwayat Klaim</h3>
         <div id="log-list" class="log-list">
-            <div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9em;">Belum ada data.</div>
+            <div style="text-align:center; padding:20px; color:#64748b;">Belum ada data.</div>
         </div>
     </div>
 </div>
 
 <div id="modal" class="modal-overlay">
     <div class="modal-content">
-        <h3 class="modal-title">Ganti Apa Hari Ini?</h3>
-        <p style="color:#64748b; font-size:0.9em; margin-bottom:15px;">Pilih part yang baru saja diganti:</p>
-        <select id="partSelect">
-            <option value="">-- Pilih Part --</option>
-        </select>
-        <div class="btn-row">
-            <button class="btn-cancel" onclick="closeModal()">Batal</button>
-            <button class="btn-ok" onclick="saveUsage()">Simpan</button>
-        </div>
+        <h3 class="modal-title">Pilih Part</h3>
+        <p style="color:#94a3b8; font-size:0.9em; margin-bottom:15px;">Apa yang diganti hari ini?</p>
+        <select id="partSelect"><option value="">-- Pilih Part --</option></select>
+        <div class="btn-row"><button class="btn-cancel" onclick="closeModal()">Batal</button><button class="btn-ok" onclick="saveUsage()">Simpan</button></div>
     </div>
 </div>
 
@@ -165,95 +122,35 @@ footer.bottom-nav {
 </footer>
 
 <script>
-// Data Logic (Sama seperti sebelumnya, hanya styling yang berubah)
-let PART_LIMITS = JSON.parse(localStorage.getItem('maka_part_limits')) || {
-    ban_depan: 3, ban_belakang: 3, kampas_depan: 3, kampas_belakang: 3
-};
-let partUsage = JSON.parse(localStorage.getItem('maka_part_usage')) || {
-    ban_depan: 0, ban_belakang: 0, kampas_depan: 0, kampas_belakang: 0, 
-    history: [] 
-};
-
-function getParts() {
-    return [
-        { key: 'ban_depan', name: 'Ban Depan' },
-        { key: 'ban_belakang', name: 'Ban Belakang' },
-        { key: 'kampas_depan', name: 'Kampas Depan' },
-        { key: 'kampas_belakang', name: 'Kampas Belakang' }
-    ];
-}
+let LIMITS = JSON.parse(localStorage.getItem('maka_part_limits')) || { ban_depan: 3, ban_belakang: 3, kampas_depan: 3, kampas_belakang: 3 };
+let usage = JSON.parse(localStorage.getItem('maka_part_usage')) || { ban_depan: 0, ban_belakang: 0, kampas_depan: 0, kampas_belakang: 0, history: [] };
+const PARTS = [{k:'ban_depan',n:'Ban Depan'},{k:'ban_belakang',n:'Ban Belakang'},{k:'kampas_depan',n:'Kampas Depan'},{k:'kampas_belakang',n:'Kampas Belakang'}];
 
 function render() {
-    const container = document.getElementById('part-tracker');
-    const select = document.getElementById('partSelect');
-    container.innerHTML = '';
-    select.innerHTML = '<option value="">-- Pilih Part --</option>';
+    const c = document.getElementById('part-tracker'), s = document.getElementById('partSelect');
+    c.innerHTML = ''; s.innerHTML = '<option value="">-- Pilih Part --</option>';
 
-    getParts().forEach(p => {
-        const limit = PART_LIMITS[p.key] || 3;
-        const used = partUsage[p.key] || 0;
-        const remaining = limit - used;
-        const percent = (used / limit) * 100;
-        
-        let barClass = 'progress-fill good'; // Default Teal
-        let colorText = 'var(--maka-teal)';
-        
-        if (remaining <= 1) { barClass = 'progress-fill low'; colorText = 'var(--danger)'; } // Merah
-        else if (remaining === 2) { barClass = 'progress-fill'; colorText = 'var(--maka-yellow)'; } // Kuning
+    PARTS.forEach(p => {
+        const lim = LIMITS[p.k] || 3, used = usage[p.k] || 0, rem = lim - used, pct = (used/lim)*100;
+        let cls = 'good', clr = 'var(--teal)';
+        if(rem<=1){cls='low';clr='var(--danger)'} else if(rem===2){cls='med';clr='var(--gold)'}
 
-        container.innerHTML += `
-            <div class="part-card">
-                <div class="part-name">${p.name}</div>
-                <div class="part-info">
-                    <span class="part-remain" style="color:${colorText}">${remaining}</span>
-                    <span class="part-total">dari ${limit}</span>
-                </div>
-                <div class="progress-track"><div class="${barClass}" style="width:${percent}%"></div></div>
-            </div>`;
-        
-        if (remaining > 0) {
-            select.innerHTML += `<option value="${p.key}">${p.name}</option>`;
-        }
+        c.innerHTML += `<div class="part-card"><div class="part-name">${p.n}</div><div class="part-info"><span class="part-remain" style="color:${clr}">${rem}</span><span class="part-total">/ ${lim}</span></div><div class="progress-track"><div class="progress-fill ${cls}" style="width:${pct}%"></div></div></div>`;
+        if(rem>0) s.innerHTML += `<option value="${p.k}">${p.n}</option>`;
     });
 
-    // Render Log
-    const logContainer = document.getElementById('log-list');
-    const history = partUsage.history || [];
-    
-    if(history.length === 0) {
-        logContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; font-size:0.9em;">Belum ada data.</div>';
-    } else {
-        logContainer.innerHTML = history.slice().reverse().map(h => {
-            const pName = getParts().find(x => x.key === h.key)?.name || h.key;
-            return `
-            <div class="log-item">
-                <div class="log-part">${pName}</div>
-                <small class="log-date">${h.date}</small>
-            </div>`;
-        }).join('');
-    }
+    const l = document.getElementById('log-list'), h = usage.history || [];
+    l.innerHTML = h.length===0 ? '<div style="text-align:center; padding:20px; color:#64748b;">Belum ada data.</div>' : h.slice().reverse().map(x => `<div class="log-item"><div class="log-part">${PARTS.find(i=>i.k===x.key)?.n||x.key}</div><small class="log-date">${x.date}</small></div>`).join('');
 }
-
-function openModal() { document.getElementById('modal').style.display = 'flex'; }
-function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
-function saveUsage() {
-    const key = document.getElementById('partSelect').value;
-    if (!key) return;
-    
-    partUsage[key] = (partUsage[key] || 0) + 1;
-    const today = new Date().toLocaleDateString('id-ID', {
-        day: 'numeric', month: 'short', year: 'numeric'
-    });
-    
-    if(!partUsage.history) partUsage.history = [];
-    partUsage.history.push({ key: key, date: today });
-    
-    localStorage.setItem('maka_part_usage', JSON.stringify(partUsage));
-    closeModal();
-    render();
+function openModal(){document.getElementById('modal').style.display='flex'}
+function closeModal(){document.getElementById('modal').style.display='none'}
+function saveUsage(){
+    const k=document.getElementById('partSelect').value; if(!k)return;
+    usage[k]=(usage[k]||0)+1; 
+    if(!usage.history) usage.history=[];
+    usage.history.push({key:k, date:new Date().toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})});
+    localStorage.setItem('maka_part_usage',JSON.stringify(usage)); closeModal(); render();
 }
-
 document.addEventListener('DOMContentLoaded', render);
 </script>
 </body>

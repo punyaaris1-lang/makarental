@@ -2,193 +2,237 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MAKA Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0a0f18">
+<title>MAKA Luxury Dashboard</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <link rel="manifest" href="/makarental/manifest.json"> 
     
 <style>
-/* === MAKA MOTORS CORPORATE THEME === */
+/* === MAKA LUXURY THEME === */
 :root { 
-    --maka-black: #0f1724; 
-    --maka-white: #ffffff;
-    --maka-yellow: #fbbf24; /* Kuning Brand */
+    --bg-luxury: #0a0f18; /* Latar Belakang Gelap Premium */
+    --card-dark: #141b2d; /* Warna Kartu Gelap */
+    --maka-gold: #D4AF37; /* Emas Metalik */
     --maka-teal: #0ea5a6;
-    --danger: #ef4444;
-    --bg-page: #f8fafc;     /* Putih Bersih */
-    --text-main: #0f1724;
-    --text-muted: #64748b;
+    --text-light: #ffffff;
+    --text-dim: #94a3b8;
+    --glass-bg: rgba(255, 255, 255, 0.03); /* Efek Kaca Transparan */
+    --glass-border: rgba(255, 255, 255, 0.08); /* Garis Kaca Halus */
+    --glossy-gradient: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.01));
 }
 
 body { 
-    margin:0; font-family:'Inter', sans-serif; 
-    background: var(--bg-page); color:var(--text-main); 
-    min-height:100vh; padding-bottom:120px;
+    margin:0; font-family:'Inter', sans-serif; /* Font standar Inter */
+    background: var(--bg-luxury); 
+    color: var(--text-light);
+    min-height:100vh; padding-bottom:130px;
+    -webkit-font-smoothing: antialiased;
 }
+
+/* Font Syne untuk Judul agar berkarakter */
+h1, h2, h3, .font-syne { font-family: 'Syne', sans-serif; letter-spacing: -0.5px; }
 
 .app-container { max-width:480px; margin:0 auto; padding:20px 24px; }
 
-/* HEADER USER */
+/* HEADER USER (LUXURY) */
 .header-user {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 24px; padding-top: 10px;
+    margin-bottom: 30px; padding-top: 15px;
 }
 .user-greeting h1 {
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8em;
-    margin: 0; letter-spacing: -0.5px; color: var(--maka-black);
+    font-weight: 800; font-size: 1.8em; margin: 0;
+    background: linear-gradient(to right, #fff, #ccc); /* Teks gradasi halus */
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
 }
 .user-greeting p {
-    font-size: 0.9em; color: var(--text-muted); margin: 4px 0 0; font-weight: 600;
+    font-size: 0.9em; color: var(--text-dim); margin: 5px 0 0; font-weight: 500;
+}
+.user-avatar-ring {
+    padding: 3px; border-radius: 50%;
+    background: linear-gradient(to bottom right, var(--maka-gold), #333); /* Cincin Emas */
 }
 .user-avatar {
-    width: 50px; height: 50px; border-radius: 50%;
-    background: var(--maka-black); color: var(--maka-yellow);
+    width: 48px; height: 48px; border-radius: 50%;
+    background: var(--card-dark); color: var(--maka-gold);
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-family: 'Syne'; font-size: 1.4em;
-    border: 2px solid #e2e8f0;
+    font-weight: 800; font-family: 'Syne'; font-size: 1.3em;
     background-size: cover; background-position: center;
+    border: 2px solid var(--bg-luxury);
 }
 
-/* === HERO CARD (SELALU HITAM) === */
+/* === HERO CARD (PREMIUM DARK) === */
 .hero-card {
-    background: var(--maka-black); /* TETAP HITAM */
-    color: var(--maka-white);
-    padding: 28px; border-radius: 24px;
-    box-shadow: 0 20px 40px rgba(15, 23, 36, 0.15);
+    background: linear-gradient(160deg, #1a2236, #0f1724); /* Gradasi gelap dalam */
+    padding: 30px; border-radius: 28px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* Bayangan dalam */
     position: relative; overflow: hidden;
-    margin-bottom: 35px;
+    margin-bottom: 40px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+/* Efek Kilau Halus di Kartu Utama */
+.hero-card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:100%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.05), transparent);
+    pointer-events: none;
 }
 
-/* Dekorasi Aksen Maka */
-.hero-card::after {
-    content: "MAKA";
-    position: absolute; right: -20px; bottom: -35px;
-    font-family: 'Syne'; font-size: 110px; font-weight: 900;
-    color: rgba(255,255,255,0.04); pointer-events: none;
-    letter-spacing: -5px;
-}
+.hero-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; position:relative; z-index:2; }
+.hero-label { font-size: 0.7em; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; color: var(--text-dim); }
 
-.hero-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; }
-
-.hero-label { 
-    font-size: 0.75em; letter-spacing: 1.5px; text-transform: uppercase; 
-    font-weight: 700; opacity: 0.7; font-family: 'Inter';
-}
-
-/* Status Pill */
 .status-pill {
-    padding: 6px 14px; border-radius: 20px;
-    font-size: 0.7em; font-weight: 800; letter-spacing: 0.5px;
-    text-transform: uppercase;
-    background: rgba(255,255,255,0.15); color: var(--maka-white);
+    padding: 8px 16px; border-radius: 30px;
+    font-size: 0.7em; font-weight: 800; letter-spacing: 1px; text-transform: uppercase;
+    background: rgba(255,255,255,0.1); color: #fff;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.2);
+    backdrop-filter: blur(5px);
 }
-.status-pill.warning { background: var(--danger); color: white; } /* Merah hanya di badge */
-.status-pill.safe { background: var(--maka-teal); color: white; }
+.status-pill.warning { background: linear-gradient(to right, #ef4444, #b91c1c); box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3); }
+.status-pill.safe { background: linear-gradient(to right, #0ea5a6, #065f60); box-shadow: 0 5px 15px rgba(14, 165, 166, 0.3); }
 
 .hero-amount { 
-    font-family: 'Syne'; font-size: 3.2em; font-weight: 800; 
-    margin: 0 0 10px; line-height: 1; letter-spacing: -1.5px;
+    font-family: 'Syne'; font-size: 3.5em; font-weight: 800; 
+    margin: 0 0 10px; line-height: 1; letter-spacing: -1px;
+    color: var(--maka-gold); /* Angka Emas */
+    text-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+    position:relative; z-index:2;
 }
-.hero-desc { font-size: 0.95em; opacity: 0.8; font-weight: 500; margin-bottom: 30px; }
+.hero-desc { font-size: 1em; color: var(--text-dim); margin-bottom: 35px; position:relative; z-index:2; }
 
-/* Progress Bar */
-.progress-section { border-top: 1px solid rgba(255,255,255,0.15); padding-top: 20px; }
-.prog-labels { display: flex; justify-content: space-between; font-size: 0.75em; font-weight: 700; margin-bottom: 10px; opacity: 0.9; letter-spacing: 0.5px;}
+/* Progress Bar Luxury */
+.progress-section { position:relative; z-index:2; }
+.prog-labels { display: flex; justify-content: space-between; font-size: 0.75em; font-weight: 700; margin-bottom: 12px; color: var(--text-dim); letter-spacing:0.5px;}
 .prog-track { 
-    width: 100%; height: 8px; background: rgba(255,255,255,0.1); 
-    border-radius: 10px; overflow: hidden; 
+    width: 100%; height: 10px; background: rgba(0,0,0,0.3); 
+    border-radius: 20px; overflow: hidden; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
 }
 .prog-fill { 
-    height: 100%; background: var(--maka-yellow); 
-    width: 0%; transition: width 1s ease-out; 
-    box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+    height: 100%; background: linear-gradient(to right, var(--maka-gold), #fbb600);
+    width: 0%; transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1); 
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.6); border-radius: 20px;
 }
 
-/* === MENU GRID === */
+/* === MENU GRID (GLASS & GLOSSY) === */
 .section-title { 
-    font-family: 'Syne'; font-size: 1.2em; font-weight: 800; 
-    margin: 0 0 20px; color: var(--maka-black); display: flex; align-items: center; gap: 10px;
+    font-size: 1.1em; font-weight: 700; margin: 0 0 20px; 
+    color: var(--text-light); display: flex; align-items: center; gap: 12px;
+    opacity: 0.9;
 }
-.section-title::before {
-    content: ""; display: block; width: 5px; height: 24px; 
-    background: var(--maka-teal); border-radius: 4px;
-}
+.section-title::before { content: ""; display: block; width: 4px; height: 20px; background: var(--maka-gold); border-radius: 4px; }
 
-.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
+/* KARTU KACA (GLASSMOPHISM) */
 .menu-card {
-    background: var(--maka-white);
-    border: 1px solid #f1f5f9;
-    border-radius: 20px; padding: 20px 10px;
-    text-align: center; text-decoration: none; color: var(--text-main);
-    transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    /* Efek Kaca */
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    
+    border-radius: 24px; padding: 24px 15px;
+    text-align: center; text-decoration: none; 
     display: flex; flex-direction: column; align-items: center;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative; overflow: hidden;
 }
-.menu-card:active { transform: scale(0.95); background: #f8fafc; }
-.menu-icon { font-size: 28px; margin-bottom: 10px; filter: grayscale(100%); transition: 0.2s; }
-.menu-card:active .menu-icon { filter: grayscale(0%); transform: scale(1.1); }
-.menu-text { font-size: 0.8em; font-weight: 700; color: var(--maka-black); }
+/* Efek pantulan cahaya saat ditekan */
+.menu-card::after {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.3), transparent, transparent);
+    transform: rotate(45deg); transition: 0.5s; opacity: 0; pointer-events: none;
+}
+.menu-card:active { transform: scale(0.96); background: rgba(255,255,255,0.07); }
+.menu-card:active::after { opacity: 1; top: -100%; left: -100%; }
 
-/* Tombol Khusus */
-.btn-sos { background: #fee2e2; border-color: #fecaca; }
-.btn-sos .menu-text { color: #dc2626; }
-.btn-plus { background: #f0fdf4; border-color: #bbf7d0; }
-.btn-plus .menu-text { color: #166534; }
+/* WADAH IKON MENGKILAP (GLOSSY CONTAINER) */
+.menu-icon-box {
+    width: 54px; height: 54px;
+    /* Latar belakang glossy */
+    background: var(--glossy-gradient);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: inset 0 2px 5px rgba(255,255,255,0.05), 0 5px 15px rgba(0,0,0,0.2);
+    
+    border-radius: 18px; display: flex; align-items: center; justify-content: center;
+    margin-bottom: 14px; font-size: 26px;
+    /* MEMBUAT SEMUA IKON SERAGAM (GRAYSCALE) */
+    filter: grayscale(100%) brightness(1.2); 
+    transition: all 0.3s ease;
+}
+.menu-text { font-size: 0.75em; font-weight: 600; color: var(--text-light); letter-spacing: 0.5px; }
 
-/* LOADING */
+/* Efek Hover/Active pada Ikon */
+.menu-card:active .menu-icon-box {
+    filter: grayscale(0%); /* Kembalikan warna asli saat ditekan */
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); /* Glow Emas */
+    border-color: var(--maka-gold);
+}
+/* Khusus SOS saat ditekan, glownya merah */
+.btn-sos:active .menu-icon-box { box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); border-color: #ef4444; }
+
+
+/* LOADING SCREEN */
 #loading-overlay {
-    position: fixed; inset: 0; background: var(--bg-page); 
+    position: fixed; inset: 0; background: var(--bg-luxury); 
     display: flex; align-items: center; justify-content: center; 
     flex-direction: column; z-index: 2000;
 }
 .spinner-brand {
-    width: 50px; height: 50px; border: 5px solid #e2e8f0;
-    border-top: 5px solid var(--maka-teal); border-radius: 50%;
-    animation: spin 1s linear infinite; margin-bottom: 20px;
+    width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1);
+    border-top: 3px solid var(--maka-gold); border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin-bottom: 20px;
 }
 @keyframes spin { 0% {transform:rotate(0deg);} 100% {transform:rotate(360deg);} }
 .hidden-content { display: none !important; }
 
-/* FOOTER NAV */
+/* FOOTER NAV (FLOATING GLASS) */
 footer.bottom-nav {
     position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    width: auto; min-width: 280px; 
-    background: var(--maka-black);
-    border-radius: 100px; padding: 14px 35px; 
-    display: flex; justify-content: space-between; align-items: center; gap: 40px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.3); z-index: 999;
+    width: auto; min-width: 260px;
+    /* Efek Kaca Gelap */
+    background: rgba(20, 27, 45, 0.8); 
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.1);
+    
+    border-radius: 100px; padding: 12px 30px; 
+    display: flex; justify-content: space-between; align-items: center; gap: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4); z-index: 999;
 }
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 700; transition:0.3s; }
-.nav-item span { font-size: 22px; margin-bottom: 3px; }
-.nav-item.active { color: var(--maka-white); }
-.nav-item.active span { color: var(--maka-yellow); transform: translateY(-3px); }
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 9px; font-weight: 700; transition:0.3s; letter-spacing: 1px; }
+.nav-item span { font-size: 20px; margin-bottom: 4px; filter: grayscale(100%); opacity: 0.7; transition: 0.3s; }
+.nav-item.active { color: var(--text-light); }
+.nav-item.active span { color: var(--maka-gold); filter: grayscale(0%); opacity: 1; transform: translateY(-2px); text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
 </style>
 </head>
 <body>
 
 <div id="loading-overlay">
     <div class="spinner-brand"></div>
-    <div style="font-family:'Syne'; font-weight:800; font-size:1.2em;">MAKA MOTORS</div>
+    <div class="font-syne" style="font-weight:800; font-size:1.2em; color:var(--maka-gold); letter-spacing: 2px;">MAKA</div>
 </div>
 
 <div class="app-container">
     <div id="main-content" class="hidden-content">
         <div class="header-user">
             <div class="user-greeting">
-                <h1 id="user-name-display">Halo...</h1>
-                <p>Unit: <span id="user-plate-display">Loading...</span></p>
+                <h1 id="user-name-display" class="font-syne">Halo...</h1>
+                <p>Unit: <span id="user-plate-display" style="color:var(--maka-gold);">Loading...</span></p>
             </div>
-            <div class="user-avatar" id="user-avatar">U</div>
+            <div class="user-avatar-ring">
+                <div class="user-avatar" id="user-avatar">U</div>
+            </div>
         </div>
 
         <div id="heroCard" class="hero-card">
             <div class="hero-top">
-                <div class="hero-label">STATUS TAGIHAN</div>
+                <div class="hero-label font-syne">STATUS KEPEMILIKAN</div>
                 <div class="status-pill" id="status-pill">CHECKING</div>
             </div>
             
@@ -196,44 +240,53 @@ footer.bottom-nav {
             <div id="hero-desc" class="hero-desc">Memuat data...</div>
             
             <div class="progress-section">
-                <div class="prog-labels">
-                    <span>KEPEMILIKAN</span>
-                    <span id="rto-days">0 / 1009 Hari</span>
+                <div class="prog-labels font-syne">
+                    <span>PROGRESS</span>
+                    <span id="rto-days" style="color:var(--maka-gold)">0 / 1009 Hari</span>
                 </div>
                 <div class="prog-track"><div id="rto-bar" class="prog-fill"></div></div>
             </div>
         </div>
 
-        <h2 class="section-title">Menu Utama</h2>
+        <h2 class="section-title font-syne">Menu Utama</h2>
         <div class="menu-grid">
             <a href="calendar.html" class="menu-card">
-                <span class="menu-icon">📅</span><span class="menu-text">Bayar</span>
+                <div class="menu-icon-box">📅</div>
+                <span class="menu-text">Bayar</span>
             </a>
             <a href="history.html" class="menu-card">
-                <span class="menu-icon">🧾</span><span class="menu-text">Riwayat</span>
+                <div class="menu-icon-box">🧾</div>
+                <span class="menu-text">Riwayat</span>
             </a>
             <a href="part_tracker.html" class="menu-card">
-                <span class="menu-icon">🎁</span><span class="menu-text">Gratisan</span>
+                <div class="menu-icon-box">🎁</div>
+                <span class="menu-text">Gratisan</span>
             </a>
             
             <a href="settings.html" class="menu-card">
-                <span class="menu-icon">⚙️</span><span class="menu-text">Setting</span>
+                <div class="menu-icon-box">⚙️</div>
+                <span class="menu-text">Setting</span>
             </a>
             <a href="info_mlu.html" class="menu-card">
-                <span class="menu-icon">💡</span><span class="menu-text">Info MLU</span>
+                <div class="menu-icon-box">💡</div>
+                <span class="menu-text">Info MLU</span>
             </a>
             <a href="tips_maka.html" class="menu-card">
-                <span class="menu-icon">📖</span><span class="menu-text">Panduan</span>
+                <div class="menu-icon-box">📖</div>
+                <span class="menu-text">Panduan</span>
             </a>
             
-            <a href="maka_plus.html" class="menu-card btn-plus">
-                <span class="menu-icon">✨</span><span class="menu-text">MAKA+</span>
+            <a href="maka_plus.html" class="menu-card">
+                <div class="menu-icon-box">✨</div>
+                <span class="menu-text">MAKA+</span>
             </a>
             <button onclick="triggerWaSOS()" class="menu-card btn-sos">
-                <span class="menu-icon">💬</span><span class="menu-text">CS WA</span>
+                <div class="menu-icon-box">💬</div>
+                <span class="menu-text">CS WA</span>
             </button>
             <button onclick="triggerSOS()" class="menu-card btn-sos">
-                <span class="menu-icon">🚨</span><span class="menu-text">Darurat</span>
+                <div class="menu-icon-box">🚨</div>
+                <span class="menu-text">Darurat</span>
             </button>
         </div>
     </div>
@@ -250,7 +303,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.se
 </script>
 
 <script>
-// CONFIG FIREBASE
+// --- LOGIKA FIREBASE (TIDAK BERUBAH, HANYA TAMPILAN) ---
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -316,24 +369,26 @@ function loadPaymentsAndDebt() {
           const descEl = document.getElementById('hero-desc');
           const pillEl = document.getElementById('status-pill');
 
-          // UPDATE TAMPILAN
           amountEl.innerText = "Rp " + totalHutang.toLocaleString('id-ID');
           
           if(totalHutang > 0) {
-              // Jika Nunggak: Kartu Tetap Hitam, Tapi Badge Merah
               pillEl.innerText = "TUNGGAKAN"; 
               pillEl.className = "status-pill warning"; 
-              descEl.innerText = `Anda belum membayar ${daysLate} hari.`;
-              descEl.style.color = "#fca5a5"; // Text agak merah dikit
+              descEl.innerText = `Perhatian: Ada ${daysLate} hari belum dibayar.`;
+              descEl.style.color = "#fca5a5";
           } else {
-              pillEl.innerText = "LUNAS"; 
+              pillEl.innerText = "LUNAS / AMAN"; 
               pillEl.className = "status-pill safe";
-              descEl.innerText = "Terima kasih, pembayaran Anda lancar.";
+              descEl.innerText = "Status kepemilikan Anda aman.";
               descEl.style.color = "#d1fae5";
           }
           
           document.getElementById('rto-days').innerText = `${currentDay} / 1009 Hari`;
-          document.getElementById('rto-bar').style.width = (currentDay / 1009) * 100 + "%";
+          // Animasi progress bar lebih halus
+          setTimeout(() => {
+               document.getElementById('rto-bar').style.width = (currentDay / 1009) * 100 + "%";
+          }, 100);
+         
           
           document.getElementById('loading-overlay').style.display = 'none';
           document.getElementById('main-content').classList.remove('hidden-content');
@@ -341,7 +396,7 @@ function loadPaymentsAndDebt() {
 }
 
 function triggerSOS() { window.location.href = 'daftar_antrian.html?mode=SOS'; }
-function triggerWaSOS() { window.open(`https://wa.me/6281234567890?text=Halo`, '_blank'); }
+function triggerWaSOS() { window.open(`https://wa.me/6281234567890?text=Halo CS`, '_blank'); }
 </script>
 </body>
 </html>
