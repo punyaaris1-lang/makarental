@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MAKA Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -11,188 +13,171 @@
 <link rel="manifest" href="/makarental/manifest.json"> 
     
 <style>
-/* ================= THEME MAKA MOTORS ================= */
+/* === MAKA MOTORS CORPORATE THEME === */
 :root { 
     --maka-black: #0f1724; 
     --maka-white: #ffffff;
-    --maka-yellow: #fbbf24; /* Aksen Kuning Khas */
-    --maka-teal: #0ea5a6;   /* Aksen Teal */
-    --bg-page: #f8fafc;     /* Abu-abu sangat muda bersih */
+    --maka-yellow: #fbbf24; /* Kuning Brand */
+    --maka-teal: #0ea5a6;
+    --danger: #ef4444;
+    --bg-page: #f8fafc;     /* Putih Bersih */
     --text-main: #0f1724;
     --text-muted: #64748b;
-    --border-color: #e2e8f0;
 }
 
 body { 
     margin:0; font-family:'Inter', sans-serif; 
     background: var(--bg-page); color:var(--text-main); 
-    min-height:100vh; padding-bottom:100px;
+    min-height:100vh; padding-bottom:120px;
 }
-
-/* Hapus background gambar lama untuk kesan bersih */
-body::before { display: none; }
 
 .app-container { max-width:480px; margin:0 auto; padding:20px 24px; }
 
-/* === HEADER USER === */
+/* HEADER USER */
 .header-user {
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 24px; padding-top: 10px;
 }
 .user-greeting h1 {
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.5em;
-    margin: 0; letter-spacing: -0.5px;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8em;
+    margin: 0; letter-spacing: -0.5px; color: var(--maka-black);
 }
 .user-greeting p {
-    font-size: 0.85em; color: var(--text-muted); margin: 4px 0 0; font-weight: 500;
+    font-size: 0.9em; color: var(--text-muted); margin: 4px 0 0; font-weight: 600;
 }
 .user-avatar {
-    width: 48px; height: 48px; border-radius: 50%;
+    width: 50px; height: 50px; border-radius: 50%;
     background: var(--maka-black); color: var(--maka-yellow);
     display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-family: 'Syne'; font-size: 1.2em;
-    border: 2px solid var(--border-color);
+    font-weight: 800; font-family: 'Syne'; font-size: 1.4em;
+    border: 2px solid #e2e8f0;
     background-size: cover; background-position: center;
 }
 
-/* === HERO CARD (CAVALRY STYLE) === */
-/* Menggunakan gaya gelap seperti branding motor Cavalry */
+/* === HERO CARD (SELALU HITAM) === */
 .hero-card {
-    background: var(--maka-black);
+    background: var(--maka-black); /* TETAP HITAM */
     color: var(--maka-white);
-    padding: 24px; border-radius: 20px;
+    padding: 28px; border-radius: 24px;
     box-shadow: 0 20px 40px rgba(15, 23, 36, 0.15);
     position: relative; overflow: hidden;
-    margin-bottom: 30px;
+    margin-bottom: 35px;
 }
 
-/* Pattern aksen tipis di background kartu */
+/* Dekorasi Aksen Maka */
 .hero-card::after {
     content: "MAKA";
-    position: absolute; right: -20px; bottom: -30px;
-    font-family: 'Syne'; font-size: 100px; font-weight: 900;
-    color: rgba(255,255,255,0.03); pointer-events: none;
+    position: absolute; right: -20px; bottom: -35px;
+    font-family: 'Syne'; font-size: 110px; font-weight: 900;
+    color: rgba(255,255,255,0.04); pointer-events: none;
     letter-spacing: -5px;
 }
 
-.hero-card.warning {
-    background: #ef4444; /* Merah jika menunggak */
+.hero-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; }
+
+.hero-label { 
+    font-size: 0.75em; letter-spacing: 1.5px; text-transform: uppercase; 
+    font-weight: 700; opacity: 0.7; font-family: 'Inter';
 }
 
-.hero-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-.hero-label { 
-    font-size: 0.7em; letter-spacing: 1px; text-transform: uppercase; 
-    font-weight: 700; opacity: 0.7; 
-}
+/* Status Pill */
 .status-pill {
-    background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 20px;
-    font-size: 0.65em; font-weight: 700; color: var(--maka-yellow);
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 0.7em; font-weight: 800; letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: rgba(255,255,255,0.15); color: var(--maka-white);
 }
+.status-pill.warning { background: var(--danger); color: white; } /* Merah hanya di badge */
+.status-pill.safe { background: var(--maka-teal); color: white; }
 
 .hero-amount { 
-    font-family: 'Syne'; font-size: 2.8em; font-weight: 800; 
-    margin: 0 0 5px; line-height: 1; letter-spacing: -1px;
+    font-family: 'Syne'; font-size: 3.2em; font-weight: 800; 
+    margin: 0 0 10px; line-height: 1; letter-spacing: -1.5px;
 }
-.hero-desc { font-size: 0.9em; opacity: 0.8; font-weight: 400; margin-bottom: 25px; }
+.hero-desc { font-size: 0.95em; opacity: 0.8; font-weight: 500; margin-bottom: 30px; }
 
-/* Progress Bar Style */
-.progress-section { border-top: 1px solid rgba(255,255,255,0.15); padding-top: 15px; }
-.prog-labels { display: flex; justify-content: space-between; font-size: 0.7em; font-weight: 600; margin-bottom: 8px; opacity: 0.9; }
+/* Progress Bar */
+.progress-section { border-top: 1px solid rgba(255,255,255,0.15); padding-top: 20px; }
+.prog-labels { display: flex; justify-content: space-between; font-size: 0.75em; font-weight: 700; margin-bottom: 10px; opacity: 0.9; letter-spacing: 0.5px;}
 .prog-track { 
-    width: 100%; height: 6px; background: rgba(255,255,255,0.1); 
+    width: 100%; height: 8px; background: rgba(255,255,255,0.1); 
     border-radius: 10px; overflow: hidden; 
 }
 .prog-fill { 
     height: 100%; background: var(--maka-yellow); 
     width: 0%; transition: width 1s ease-out; 
-    box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
 }
 
-/* === MENU GRID (CLEAN STYLE) === */
+/* === MENU GRID === */
 .section-title { 
-    font-family: 'Syne'; font-size: 1.1em; font-weight: 800; 
-    margin: 0 0 15px; color: var(--text-main); display: flex; align-items: center; gap: 8px;
+    font-family: 'Syne'; font-size: 1.2em; font-weight: 800; 
+    margin: 0 0 20px; color: var(--maka-black); display: flex; align-items: center; gap: 10px;
 }
 .section-title::before {
-    content: ""; display: block; width: 4px; height: 18px; 
+    content: ""; display: block; width: 5px; height: 24px; 
     background: var(--maka-teal); border-radius: 4px;
 }
 
-.menu-grid { 
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; 
-}
+.menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
 
 .menu-card {
     background: var(--maka-white);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 16px 10px;
+    border: 1px solid #f1f5f9;
+    border-radius: 20px; padding: 20px 10px;
     text-align: center; text-decoration: none; color: var(--text-main);
-    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    display: flex; flex-direction: column; align-items: center;
 }
-.menu-card:active { transform: scale(0.96); background: #f1f5f9; }
-.menu-icon { font-size: 24px; margin-bottom: 8px; filter: grayscale(100%); transition: 0.2s; }
+.menu-card:active { transform: scale(0.95); background: #f8fafc; }
+.menu-icon { font-size: 28px; margin-bottom: 10px; filter: grayscale(100%); transition: 0.2s; }
 .menu-card:active .menu-icon { filter: grayscale(0%); transform: scale(1.1); }
-.menu-text { font-size: 0.75em; font-weight: 700; color: #334155; }
+.menu-text { font-size: 0.8em; font-weight: 700; color: var(--maka-black); }
 
-/* Special Buttons */
+/* Tombol Khusus */
 .btn-sos { background: #fee2e2; border-color: #fecaca; }
 .btn-sos .menu-text { color: #dc2626; }
 .btn-plus { background: #f0fdf4; border-color: #bbf7d0; }
 .btn-plus .menu-text { color: #166534; }
 
-/* === BOTTOM NAVIGATION (FLOATING) === */
-footer.bottom-nav {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    width: auto; min-width: 280px; 
-    background: var(--maka-black); /* Hitam Solid */
-    border-radius: 100px; padding: 12px 30px; 
-    display: flex; justify-content: space-between; align-items: center; gap: 30px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.25); 
-    z-index: 999;
-}
-.nav-item { 
-    display: flex; flex-direction: column; align-items: center; 
-    text-decoration: none; color: #64748b; 
-    font-size: 10px; font-weight: 600; transition: 0.3s; 
-}
-.nav-item span { font-size: 20px; margin-bottom: 2px; color: #94a3b8; }
-.nav-item.active span { color: var(--maka-yellow); transform: translateY(-2px); }
-.nav-item.active { color: var(--maka-white); }
-
-/* LOADING OVERLAY */
+/* LOADING */
 #loading-overlay {
-    position: fixed; inset: 0; background: var(--maka-white); 
+    position: fixed; inset: 0; background: var(--bg-page); 
     display: flex; align-items: center; justify-content: center; 
     flex-direction: column; z-index: 2000;
 }
 .spinner-brand {
-    width: 50px; height: 50px; border: 4px solid #f1f5f9;
-    border-top: 4px solid var(--maka-teal); border-radius: 50%;
-    animation: spin 1s linear infinite; margin-bottom: 15px;
+    width: 50px; height: 50px; border: 5px solid #e2e8f0;
+    border-top: 5px solid var(--maka-teal); border-radius: 50%;
+    animation: spin 1s linear infinite; margin-bottom: 20px;
 }
 @keyframes spin { 0% {transform:rotate(0deg);} 100% {transform:rotate(360deg);} }
 .hidden-content { display: none !important; }
 
-/* Responsive adjustments */
-@media (max-height: 700px) {
-    .hero-card { padding: 20px; margin-bottom: 20px; }
-    .hero-amount { font-size: 2.4em; }
+/* FOOTER NAV */
+footer.bottom-nav {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    width: auto; min-width: 280px; 
+    background: var(--maka-black);
+    border-radius: 100px; padding: 14px 35px; 
+    display: flex; justify-content: space-between; align-items: center; gap: 40px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3); z-index: 999;
 }
+.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 700; transition:0.3s; }
+.nav-item span { font-size: 22px; margin-bottom: 3px; }
+.nav-item.active { color: var(--maka-white); }
+.nav-item.active span { color: var(--maka-yellow); transform: translateY(-3px); }
 </style>
 </head>
 <body>
 
 <div id="loading-overlay">
     <div class="spinner-brand"></div>
-    <p style="font-size:0.8em; font-weight:700; color:#0f1724; letter-spacing:1px;">MAKA MOTORS</p>
+    <div style="font-family:'Syne'; font-weight:800; font-size:1.2em;">MAKA MOTORS</div>
 </div>
 
 <div class="app-container">
     <div id="main-content" class="hidden-content">
-        
         <div class="header-user">
             <div class="user-greeting">
                 <h1 id="user-name-display">Halo...</h1>
@@ -203,12 +188,12 @@ footer.bottom-nav {
 
         <div id="heroCard" class="hero-card">
             <div class="hero-top">
-                <div class="hero-label" id="bill-date">STATUS TAGIHAN</div>
+                <div class="hero-label">STATUS TAGIHAN</div>
                 <div class="status-pill" id="status-pill">CHECKING</div>
             </div>
             
             <div id="hero-amount" class="hero-amount">Rp 0</div>
-            <div id="hero-desc" class="hero-desc">Memuat data tagihan...</div>
+            <div id="hero-desc" class="hero-desc">Memuat data...</div>
             
             <div class="progress-section">
                 <div class="prog-labels">
@@ -265,7 +250,7 @@ if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.se
 </script>
 
 <script>
-// --- FIREBASE CONFIG ---
+// CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
   authDomain: "rtomaka-e67b5.firebaseapp.com",
@@ -278,73 +263,31 @@ const firebaseConfig = {
 let db;
 let currentUser = JSON.parse(localStorage.getItem('maka_user'));
 let plusData = JSON.parse(localStorage.getItem('maka_plus_data')) || { active: false };
-let isInitialized = false;
 
 function initializeApp() {
-    if (!isInitialized) {
-        try {
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.firestore();
-            isInitialized = true;
-        } catch (e) {
-            if (e.code !== 'app/duplicate-app') console.error("Firebase init error:", e);
-        }
-    }
+    try {
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+    } catch (e) { console.error(e); }
     
     currentUser = JSON.parse(localStorage.getItem('maka_user'));
-    if(!currentUser || !currentUser.plat) { 
-        window.location.href='index.html'; 
-        return; 
-    }
+    if(!currentUser || !currentUser.plat) { window.location.href='index.html'; return; }
     
-    // Render Info User
     document.getElementById('user-name-display').innerText = currentUser.nama || 'Pengguna';
     document.getElementById('user-plate-display').innerText = currentUser.plat || 'N/A';
     if(currentUser.photoUrl) {
         const av = document.getElementById('user-avatar');
         av.innerText = ""; av.style.backgroundImage = `url('${currentUser.photoUrl}')`;
     }
-
     loadPaymentsAndDebt();
 }
 
 document.addEventListener("DOMContentLoaded", initializeApp);
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') initializeApp(); });
 
-// Logic Harga (Sama seperti sebelumnya)
 function getDailyPrice(dateObj) {
     if (dateObj.getDate() === 31) return 0;
-    const joinDate = new Date(currentUser.joinedAt);
-    const diffTime = Math.abs(dateObj - joinDate);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-    let price = 70000; 
-    if (plusData.active && diffDays <= 365) price += 10000;
-    return price;
-}
-
-function calculateTotalDebt(paidDates) {
-    const joinDate = new Date(currentUser.joinedAt);
-    const today = new Date();
-    today.setHours(0,0,0,0);
-    
-    let totalHutang = 0;
-    let daysLate = 0;
-    let checkDate = new Date(joinDate);
-    checkDate.setHours(0,0,0,0);
-    const maxDaysContract = 1009;
-    let currentDay = 0;
-    
-    while (checkDate <= today && currentDay < maxDaysContract) {
-        const dateStr = checkDate.toISOString().split('T')[0];
-        const price = getDailyPrice(checkDate);
-        if (price > 0 && !paidDates.includes(dateStr)) {
-            totalHutang += price;
-            daysLate++;
-        }
-        currentDay++;
-        checkDate.setDate(checkDate.getDate() + 1);
-    }
-    return { amount: totalHutang, days: daysLate, currentDay: Math.min(currentDay, maxDaysContract) };
+    const diffDays = Math.ceil(Math.abs(dateObj - new Date(currentUser.joinedAt)) / 86400000); 
+    return (plusData.active && diffDays <= 365) ? 80000 : 70000;
 }
 
 function loadPaymentsAndDebt() {
@@ -355,43 +298,50 @@ function loadPaymentsAndDebt() {
           let paidDates = [];
           snap.forEach(doc => { paidDates.push(doc.data().date); });
           
-          const debt = calculateTotalDebt(paidDates);
-          const card = document.getElementById('heroCard');
+          const today = new Date(); today.setHours(0,0,0,0);
+          const joinDate = new Date(currentUser.joinedAt);
+          let totalHutang = 0; let daysLate = 0; let checkDate = new Date(joinDate); checkDate.setHours(0,0,0,0);
+          let currentDay = 0;
+          
+          while (checkDate <= today && currentDay < 1009) {
+              const dStr = checkDate.toISOString().split('T')[0];
+              const price = getDailyPrice(checkDate);
+              if (price > 0 && !paidDates.includes(dStr)) {
+                  totalHutang += price; daysLate++;
+              }
+              currentDay++; checkDate.setDate(checkDate.getDate() + 1);
+          }
+
           const amountEl = document.getElementById('hero-amount');
           const descEl = document.getElementById('hero-desc');
           const pillEl = document.getElementById('status-pill');
 
-          if(debt.amount > 0) {
-              card.className = "hero-card warning"; 
-              amountEl.innerText = "Rp " + debt.amount.toLocaleString('id-ID');
-              descEl.innerText = `Anda menunggak ${debt.days} hari.`;
-              pillEl.innerText = "TUNGGAKAN"; pillEl.style.color = "#fff";
+          // UPDATE TAMPILAN
+          amountEl.innerText = "Rp " + totalHutang.toLocaleString('id-ID');
+          
+          if(totalHutang > 0) {
+              // Jika Nunggak: Kartu Tetap Hitam, Tapi Badge Merah
+              pillEl.innerText = "TUNGGAKAN"; 
+              pillEl.className = "status-pill warning"; 
+              descEl.innerText = `Anda belum membayar ${daysLate} hari.`;
+              descEl.style.color = "#fca5a5"; // Text agak merah dikit
           } else {
-              card.className = "hero-card"; 
-              amountEl.innerText = "Rp 0";
-              descEl.innerText = "Tidak ada tagihan tertunggak.";
-              pillEl.innerText = "AMAN / LUNAS";
+              pillEl.innerText = "LUNAS"; 
+              pillEl.className = "status-pill safe";
+              descEl.innerText = "Terima kasih, pembayaran Anda lancar.";
+              descEl.style.color = "#d1fae5";
           }
           
-          document.getElementById('rto-days').innerText = `${debt.currentDay} / 1009 Hari`;
-          document.getElementById('rto-bar').style.width = (debt.currentDay / 1009) * 100 + "%";
-
-          document.getElementById('loading-overlay').style.display = 'none';
-          document.getElementById('main-content').classList.remove('hidden-content');
-
-      }, error => {
-          console.error("Firestore Error:", error);
+          document.getElementById('rto-days').innerText = `${currentDay} / 1009 Hari`;
+          document.getElementById('rto-bar').style.width = (currentDay / 1009) * 100 + "%";
+          
           document.getElementById('loading-overlay').style.display = 'none';
           document.getElementById('main-content').classList.remove('hidden-content');
       });
 }
 
 function triggerSOS() { window.location.href = 'daftar_antrian.html?mode=SOS'; }
-function triggerWaSOS() {
-    const csNumber = '6281234567890'; 
-    const message = `Halo CS MAKA. Saya ${currentUser.nama} (${currentUser.plat}) butuh bantuan.`;
-    window.open(`https://wa.me/${csNumber}?text=${encodeURIComponent(message)}`, '_blank');
-}
+function triggerWaSOS() { window.open(`https://wa.me/6281234567890?text=Halo`, '_blank'); }
 </script>
 </body>
 </html>
