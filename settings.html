@@ -3,149 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Profil - MAKA</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
+    <title>Settings - MAKA</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #05080A;
-            --cyan: #00F0FF;
-            --volt: #D9FF00;
-            --red: #FF2A2A;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.12);
-            --text-soft: #CBD5E1; /* Kontras tinggi untuk bg hitam */
-            --font-display: 'Space Grotesk', sans-serif;
-        }
+        :root { --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00; --glass: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.12); }
+        body { margin: 0; padding: 25px; font-family: 'Inter'; background: var(--bg); color: white; padding-bottom: 120px; }
+        .prof-box { text-align: center; margin-bottom: 40px; }
+        .av { width: 100px; height: 100px; border-radius: 50%; background: #000; border: 2px solid var(--cyan); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk'; font-size: 42px; color: var(--cyan); box-shadow: 0 0 20px rgba(0,240,255,0.2); }
+        .card { background: var(--glass); border: 1px solid var(--border); border-radius: 25px; padding: 10px 20px; }
+        .row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+        .row:last-child { border: none; }
+        .lbl { color: #888; font-weight: 600; }
+        .val { font-weight: 700; color: white; }
 
-        body {
-            margin: 0; padding: 25px; font-family: 'Inter', sans-serif;
-            background: var(--bg); color: white; padding-bottom: 120px;
-        }
-
-        h1 { font-family: var(--font-display); font-size: 32px; margin-bottom: 5px; }
-        .sub-h1 { font-size: 11px; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; font-weight: 700; opacity: 0.9; }
-
-        /* Profil Section */
-        .profile-header {
-            text-align: center; margin-bottom: 40px; animation: fadeIn 0.8s ease;
-        }
-        .avatar {
-            width: 100px; height: 100px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--cyan), #008080);
-            margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;
-            font-family: var(--font-display); font-size: 40px; font-weight: 700; color: #000;
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
-            border: 4px solid var(--bg); outline: 2px solid var(--cyan);
-        }
-        .u-name { font-family: var(--font-display); font-size: 24px; font-weight: 700; margin-bottom: 5px; }
-        .u-plat { color: var(--volt); font-size: 14px; font-weight: 800; letter-spacing: 2px; }
-
-        /* Info List */
-        .info-card {
-            background: var(--glass); border: 1px solid var(--border);
-            border-radius: 30px; padding: 10px 5px; margin-bottom: 30px;
-            backdrop-filter: blur(10px);
-        }
-        .itm {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px; border-bottom: 1px solid var(--border);
-        }
-        .itm:last-child { border-bottom: none; }
-        .itm-lbl { font-size: 12px; color: var(--text-soft); font-weight: 600; }
-        .itm-val { font-size: 14px; color: white; font-weight: 700; }
-
-        /* Button Logout */
-        .btn-out {
-            width: 100%; padding: 18px; border-radius: 18px; border: 1px solid var(--red);
-            background: rgba(255, 42, 42, 0.05); color: var(--red);
-            font-family: var(--font-display); font-weight: 700; font-size: 14px;
-            cursor: pointer; transition: 0.3s; margin-top: 10px;
-        }
-        .btn-out:active { background: var(--red); color: white; }
-
-        /* Nav Bawah */
-        .nav-bottom {
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; height: 75px;
-            background: rgba(10, 15, 20, 0.85); backdrop-filter: blur(25px);
-            border: 1px solid var(--border); border-radius: 25px;
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
-        }
-        .nav-item { text-decoration: none; color: #444; font-size: 10px; font-weight: 700; text-align: center; }
-        .nav-item.active { color: var(--cyan); }
-        .nav-item span { display: block; font-size: 24px; margin-bottom: 4px; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-bottom { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; height: 85px; background: rgba(10,15,20,0.85); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 25px; display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { text-decoration: none; color: #444; font-size: 11px; font-weight: 800; text-align: center; }
+        .nav-item span { display: block; font-size: 32px !important; margin-bottom: 6px; }
     </style>
 </head>
 <body>
 
-    <h1>Settings<span>.</span></h1>
-    <div class="sub-h1">Manajemen Akun & Driver</div>
-
-    <div class="profile-header">
-        <div class="avatar" id="avatar">M</div>
-        <div class="u-name" id="nm">--</div>
-        <div class="u-plat" id="pt">--</div>
+    <div class="prof-box">
+        <div class="av" id="av">M</div>
+        <h2 id="nm" style="font-family:'Space Grotesk'; margin:0;">DRIVER</h2>
+        <div id="pt" style="color:var(--volt); font-size:14px; font-weight:800; margin-top:5px;">B ---- XXX</div>
     </div>
 
-    <div class="info-card">
-        <div class="itm">
-            <span class="itm-lbl">Nomor WhatsApp</span>
-            <span class="itm-val" id="hp">-</span>
-        </div>
-        <div class="itm">
-            <span class="itm-lbl">Tipe Sewa</span>
-            <span class="itm-val" id="tp">-</span>
-        </div>
-        <div class="itm">
-            <span class="itm-lbl">Tanggal Bergabung</span>
-            <span class="itm-val" id="jd">-</span>
-        </div>
-        <div class="itm">
-            <span class="itm-lbl">Status Maka+</span>
-            <span class="itm-val" id="mp" style="color:var(--volt)">OFF</span>
-        </div>
+    <div class="card">
+        <div class="row"><span class="lbl">WhatsApp</span><span class="val" id="hp">-</span></div>
+        <div class="row"><span class="lbl">Tipe Sewa</span><span class="val" id="tp">Promo (355)</span></div>
+        <div class="row"><span class="lbl">Tanggal Ambil</span><span class="val" id="jd">-</span></div>
     </div>
-
-    <button class="btn-out" onclick="logout()">KELUAR DARI APLIKASI</button>
 
     <nav class="nav-bottom">
         <a href="dashboard.html" class="nav-item"><span>🏠</span>HOME</a>
         <a href="calendar.html" class="nav-item"><span>📅</span>BAYAR</a>
-        <a href="https://punyaaris1-lang.github.io/antricukk/antrian.html" class="nav-item"><span>⚡</span>ANTRIAN</a>
+        <a href="antrian.html" class="nav-item"><span>⚡</span>ANTRIAN</a>
         <a href="history.html" class="nav-item"><span>📜</span>HISTORY</a>
     </nav>
 
     <script>
-        let u = JSON.parse(localStorage.getItem('maka_user'));
-        
-        if(!u) {
-            location.href = 'index.html';
-        } else {
-            document.getElementById('nm').innerText = u.nama;
-            document.getElementById('pt').innerText = u.plat;
-            document.getElementById('hp').innerText = u.hp;
-            document.getElementById('tp').innerText = u.dpType === "755" ? "Reguler (755)" : "Promo (355)";
-            document.getElementById('jd').innerText = new Date(u.tglAmbil).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
-            document.getElementById('avatar').innerText = u.nama.charAt(0).toUpperCase();
+        const u = JSON.parse(localStorage.getItem('maka_user'));
+        if(u) {
+            document.getElementById('nm').innerText = u.nama || u.name || "DRIVER";
+            document.getElementById('pt').innerText = u.plat || "B ---- XXX";
+            document.getElementById('hp').innerText = u.hp || u.whatsapp || "-";
+            document.getElementById('av').innerText = (u.nama || "M").charAt(0).toUpperCase();
             
-            // Check Maka+ status
-            if(u.makaPlus) {
-                document.getElementById('mp').innerText = "AKTIF";
-                document.getElementById('mp').style.color = "var(--cyan)";
-            }
-        }
-
-        function logout() {
-            if(confirm("Apakah Anda yakin ingin keluar? Anda harus login kembali menggunakan nomor plat.")) {
-                localStorage.clear();
-                location.href = 'index.html';
-            }
+            const d = new Date(u.tglAmbil);
+            document.getElementById('jd').innerText = isNaN(d) ? "-" : d.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
         }
     </script>
 </body>

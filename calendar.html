@@ -3,136 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kalender Sewa - MAKA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <title>Kalender - MAKA</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00; --red: #FF2A2A;
-            --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.12);
-            --font-display: 'Space Grotesk', sans-serif;
-        }
-        body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background: var(--bg); color: white; padding-bottom: 120px; }
+        :root { --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00; --glass: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.12); }
+        body { margin: 0; padding: 25px; font-family: 'Inter'; background: var(--bg); color: white; padding-bottom: 120px; }
+        .h-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .month-name { font-family: 'Space Grotesk'; font-size: 32px; font-weight: 700; margin: 0; }
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .cel { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: var(--glass); border: 1px solid var(--border); font-size: 14px; font-weight: 600; }
+        .cel.ok { background: var(--volt); color: #000; border: none; }
+        .cel.no { border-color: #FF2A2A; color: #FF2A2A; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        h1 { font-family: var(--font-display); font-size: 24px; margin: 0; }
-        
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
-        .day-name { text-align: center; font-size: 10px; color: var(--cyan); font-weight: 800; padding-bottom: 10px; }
-        .cel { 
-            aspect-ratio: 1; display: flex; align-items: center; justify-content: center; 
-            border-radius: 12px; font-size: 14px; font-weight: 600; background: var(--glass); border: 1px solid var(--border);
-        }
-        .cel.ok { background: var(--volt); color: #000; border: none; box-shadow: 0 0 15px rgba(217, 255, 0, 0.3); }
-        .cel.pending { background: #FFB300; color: #000; animation: pulse 2s infinite; border: none; }
-        .cel.no { border: 1px solid var(--red); color: var(--red); }
-        .cel.dis { opacity: 0.2; pointer-events: none; }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-
-        /* Modal */
-        #modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(10px); }
-        .m-box { width: 85%; max-width: 350px; background: #0A0A0A; border: 1px solid var(--border); padding: 30px; border-radius: 30px; text-align: center; }
-        
-        .btn-pay { width: 100%; padding: 15px; background: var(--cyan); color: #000; border: none; border-radius: 12px; font-weight: 800; font-family: var(--font-display); cursor: pointer; margin-top: 15px; }
-        input[type="file"] { display: none; }
-        .file-label { display: block; padding: 15px; border: 2px dashed var(--border); border-radius: 15px; margin: 15px 0; font-size: 12px; color: var(--cyan); cursor: pointer; }
-
-        .nav-bottom { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; height: 70px; background: rgba(10,15,20,0.8); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 20px; display: flex; justify-content: space-around; align-items: center; }
-        .nav-item { text-decoration: none; color: #444; font-size: 10px; font-weight: 700; text-align: center; }
+        .nav-bottom { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; height: 85px; background: rgba(10,15,20,0.85); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 25px; display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { text-decoration: none; color: #444; font-size: 11px; font-weight: 800; text-align: center; }
         .nav-item.active { color: var(--cyan); }
+        .nav-item span { display: block; font-size: 32px !important; margin-bottom: 6px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1 id="monthName">BULAN</h1>
-        <div style="font-size: 10px; font-weight: 800; color: var(--volt)" id="userName">--</div>
+    <div class="h-row">
+        <h1 class="month-name" id="monthName">BULAN</h1>
+        <div id="userName" style="font-size: 12px; color: var(--volt); font-weight: 800;">PLAT</div>
     </div>
 
     <div class="grid" id="grid"></div>
 
-    <div id="modal">
-        <div class="m-box">
-            <div id="selDate" style="font-family: var(--font-display); font-size: 18px; margin-bottom: 10px;">Tanggal</div>
-            <p style="font-size: 12px; color: #888;">Silahkan upload bukti transfer Xendit/Bank untuk verifikasi.</p>
-            
-            <label for="fileInp" class="file-label" id="fileStatus">📸 KLIK UNTUK UPLOAD FOTO</label>
-            <input type="file" id="fileInp" accept="image/*" onchange="preview()">
-            
-            <button class="btn-pay" id="btnConfirm" onclick="upload()">KONFIRMASI BAYAR</button>
-            <p onclick="closeM()" style="margin-top:20px; font-size:12px; color:var(--red); cursor:pointer;">Batal</p>
-        </div>
-    </div>
-
     <nav class="nav-bottom">
-        <a href="dashboard.html" class="nav-item">🏠<br>HOME</a>
-        <a href="calendar.html" class="nav-item active">📅<br>BAYAR</a>
-        <a href="https://punyaaris1-lang.github.io/antricukk/antrian.html" class="nav-item">⚡<br>ANTRIAN</a>
-        <a href="history.html" class="nav-item">📜<br>HISTORY</a>
+        <a href="dashboard.html" class="nav-item"><span>🏠</span>HOME</a>
+        <a href="calendar.html" class="nav-item active"><span>📅</span>BAYAR</a>
+        <a href="antrian.html" class="nav-item"><span>⚡</span>ANTRIAN</a>
+        <a href="history.html" class="nav-item"><span>📜</span>HISTORY</a>
     </nav>
 
     <script>
-        const cfg = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
-        firebase.initializeApp(cfg); const db = firebase.firestore();
-        
-        let u = JSON.parse(localStorage.getItem('maka_user')), Y = new Date().getFullYear(), M = new Date().getMonth(), sd;
-        if(!u) location.href = 'index.html';
-        document.getElementById('userName').innerText = u.plat;
+        const u = JSON.parse(localStorage.getItem('maka_user'));
+        const monthNames = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
 
         function render() {
-            db.collection('daily_payments').where('plat','==',u.plat).onSnapshot(snap1 => {
-                db.collection('payment_proofs').where('plat','==',u.plat).where('status','==','PENDING').onSnapshot(snap2 => {
-                    let paid = [], pending = [];
-                    snap1.forEach(doc => paid.push(doc.data().date));
-                    snap2.forEach(doc => pending.push(doc.data().date));
-
-                    const g = document.getElementById('grid'); g.innerHTML = '';
-                    const days = ['MIN','SEN','SEL','RAB','KAM','JUM','SAB'];
-                    days.forEach(d => g.innerHTML += `<div class="day-name">${d}</div>`);
-
-                    document.getElementById('monthName').innerText = new Date(Y, M).toLocaleDateString('id-ID', {month:'long'}).toUpperCase();
-                    const dim = new Date(Y, M+1, 0).getDate(), fd = new Date(Y, M, 1).getDay();
-
-                    for(let i=0; i<fd; i++) g.innerHTML += '<div></div>';
-                    for(let d=1; d<=dim; d++) {
-                        let k = `${Y}-${(M+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-                        let cl = 'cel', click = `onclick="openM('${k}')"`;
-                        
-                        if(d === 31 || new Date(k) < new Date(u.tglAmbil) || new Date(k) > new Date()) cl += ' dis';
-                        else if(paid.includes(k)) { cl += ' ok'; click = ''; }
-                        else if(pending.includes(k)) { cl += ' pending'; click = ''; }
-                        else { cl += ' no'; }
-                        
-                        g.innerHTML += `<div class="${cl}" ${click}>${d}</div>`;
-                    }
-                });
-            });
+            const now = new Date();
+            document.getElementById('monthName').innerText = monthNames[now.getMonth()];
+            document.getElementById('userName').innerText = (u && u.plat) ? u.plat : "----";
+            
+            const g = document.getElementById('grid');
+            const dim = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            for(let d=1; d<=dim; d++) {
+                g.innerHTML += `<div class="cel">${d}</div>`;
+            }
         }
-
-        function openM(date) { sd = date; document.getElementById('selDate').innerText = date; document.getElementById('modal').style.display = 'flex'; }
-        function closeM() { document.getElementById('modal').style.display = 'none'; }
-        function preview() { document.getElementById('fileStatus').innerText = "✅ FOTO SIAP"; document.getElementById('fileStatus').style.color = "var(--volt)"; }
-
-        function upload() {
-            const file = document.getElementById('fileInp').files[0];
-            if(!file) return alert("Pilih foto bukti!");
-            const btn = document.getElementById('btnConfirm');
-            btn.innerText = "MENGIRIM..."; btn.disabled = true;
-
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function () {
-                db.collection('payment_proofs').add({
-                    plat: u.plat, nama: u.nama, date: sd, img: reader.result, status: 'PENDING', uploadedAt: new Date()
-                }).then(() => {
-                    alert("Bukti terkirim! Admin akan memverifikasi.");
-                    closeM(); btn.innerText = "KONFIRMASI BAYAR"; btn.disabled = false;
-                });
-            };
-        }
-        render();
+        window.onload = render;
     </script>
 </body>
 </html>
