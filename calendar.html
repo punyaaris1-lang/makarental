@@ -3,30 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kalender - MAKA</title>
-    <link rel="manifest" href="manifest.json">
+    <title>Kalender Bayar</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00; --glass: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.12); }
-        body { margin: 0; padding: 25px; font-family: 'Inter'; background: var(--bg); color: white; padding-bottom: 120px; }
-        .h-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .month-name { font-family: 'Space Grotesk'; font-size: 32px; font-weight: 700; margin: 0; }
-        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
-        .cel { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: var(--glass); border: 1px solid var(--border); font-size: 14px; font-weight: 600; }
-        .cel.ok { background: var(--volt); color: #000; border: none; }
-        .cel.no { border-color: #FF2A2A; color: #FF2A2A; }
+        body { margin: 0; padding: 25px; font-family: 'Inter', sans-serif; background: var(--bg); color: white; padding-bottom: 120px; }
         
-        .nav-bottom { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; height: 85px; background: rgba(10,15,20,0.85); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 25px; display: flex; justify-content: space-around; align-items: center; }
-        .nav-item { text-decoration: none; color: #444; font-size: 11px; font-weight: 800; text-align: center; }
+        .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .month-label { font-family: 'Space Grotesk'; font-size: 32px; text-transform: uppercase; margin: 0; }
+        .year-label { font-size: 14px; color: var(--volt); font-weight: 800; letter-spacing: 2px; }
+        
+        .nav-cal { display: flex; gap: 15px; margin-bottom: 25px; }
+        .nav-cal button { flex: 1; background: var(--glass); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 15px; font-weight: 800; font-size: 11px; cursor: pointer; transition: 0.3s; }
+        .nav-cal button:active { background: var(--cyan); color: #000; }
+
+        .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .day-name { text-align: center; font-size: 10px; color: var(--cyan); font-weight: 800; padding-bottom: 10px; }
+        .cel { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: var(--glass); border: 1px solid var(--border); font-size: 14px; font-weight: 600; }
+        .cel.ok { background: var(--volt); color: #000; border: none; box-shadow: 0 0 15px rgba(217,255,0,0.25); }
+        .cel.dis { opacity: 0.2; }
+
+        .nav-bottom { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; height: 85px; background: rgba(10,15,20,0.92); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 25px; display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { text-decoration: none; color: #444; font-size: 10px; font-weight: 800; text-align: center; }
         .nav-item.active { color: var(--cyan); }
-        .nav-item span { display: block; font-size: 32px !important; margin-bottom: 6px; }
+        .nav-item span { display: block; font-size: 32px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
-    <div class="h-row">
-        <h1 class="month-name" id="monthName">BULAN</h1>
-        <div id="userName" style="font-size: 12px; color: var(--volt); font-weight: 800;">PLAT</div>
+    <div class="cal-header">
+        <div>
+            <h1 class="month-label" id="mLabel">BULAN</h1>
+            <div class="year-label" id="yLabel">2024</div>
+        </div>
+        <div style="font-size: 12px; color: var(--cyan); font-weight: 800;" id="userPlat">----</div>
+    </div>
+
+    <div class="nav-cal">
+        <button onclick="changeMonth(-1)">BULAN SEBELUMNYA</button>
+        <button onclick="changeMonth(1)">BULAN BERIKUTNYA</button>
     </div>
 
     <div class="grid" id="grid"></div>
@@ -39,20 +54,31 @@
     </nav>
 
     <script>
+        let curr = new Date();
+        const mNames = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
         const u = JSON.parse(localStorage.getItem('maka_user'));
-        const monthNames = ["JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER"];
 
         function render() {
-            const now = new Date();
-            document.getElementById('monthName').innerText = monthNames[now.getMonth()];
-            document.getElementById('userName').innerText = (u && u.plat) ? u.plat : "----";
+            const g = document.getElementById('grid'); g.innerHTML = '';
+            const m = curr.getMonth(); const y = curr.getFullYear();
             
-            const g = document.getElementById('grid');
-            const dim = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+            document.getElementById('mLabel').innerText = mNames[m];
+            document.getElementById('yLabel').innerText = y;
+            document.getElementById('userPlat').innerText = (u && u.plat) ? u.plat.toUpperCase() : "----";
+
+            const days = ['MIN','SEN','SEL','RAB','KAM','JUM','SAB'];
+            days.forEach(d => g.innerHTML += `<div class="day-name">${d}</div>`);
+
+            const firstDay = new Date(y, m, 1).getDay();
+            const dim = new Date(y, m + 1, 0).getDate();
+
+            for(let i=0; i<firstDay; i++) g.innerHTML += '<div></div>';
             for(let d=1; d<=dim; d++) {
                 g.innerHTML += `<div class="cel">${d}</div>`;
             }
         }
+
+        function changeMonth(v) { curr.setMonth(curr.getMonth() + v); render(); }
         window.onload = render;
     </script>
 </body>

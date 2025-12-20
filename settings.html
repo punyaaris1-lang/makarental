@@ -4,36 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Settings - MAKA</title>
-    <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00; --glass: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.12); }
-        body { margin: 0; padding: 25px; font-family: 'Inter'; background: var(--bg); color: white; padding-bottom: 120px; }
-        .prof-box { text-align: center; margin-bottom: 40px; }
-        .av { width: 100px; height: 100px; border-radius: 50%; background: #000; border: 2px solid var(--cyan); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk'; font-size: 42px; color: var(--cyan); box-shadow: 0 0 20px rgba(0,240,255,0.2); }
+        :root { --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00; --red: #FF2A2A; --glass: rgba(255,255,255,0.03); --border: rgba(255,255,255,0.12); }
+        body { margin: 0; padding: 25px; font-family: 'Inter', sans-serif; background: var(--bg); color: white; padding-bottom: 120px; }
+        
+        .prof-box { text-align: center; margin-bottom: 40px; margin-top: 20px; }
+        .av { width: 100px; height: 100px; border-radius: 50%; background: #000; border: 2px solid var(--cyan); margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk'; font-size: 42px; color: var(--cyan); box-shadow: 0 0 25px rgba(0,240,255,0.25); }
+        
         .card { background: var(--glass); border: 1px solid var(--border); border-radius: 25px; padding: 10px 20px; }
-        .row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+        .row { display: flex; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
         .row:last-child { border: none; }
         .lbl { color: #888; font-weight: 600; }
         .val { font-weight: 700; color: white; }
 
-        .nav-bottom { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; height: 85px; background: rgba(10,15,20,0.85); backdrop-filter: blur(25px); border: 1px solid var(--border); border-radius: 25px; display: flex; justify-content: space-around; align-items: center; }
-        .nav-item { text-decoration: none; color: #444; font-size: 11px; font-weight: 800; text-align: center; }
-        .nav-item span { display: block; font-size: 32px !important; margin-bottom: 6px; }
+        .btn-logout { width: 100%; padding: 18px; background: rgba(255,42,42,0.1); border: 1px solid var(--red); border-radius: 18px; color: var(--red); font-weight: 800; font-size: 14px; margin-top: 30px; cursor: pointer; }
+
+        /* MODAL MEWAH */
+        #modalLogout { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-box { width: 80%; background: #0A0A0A; border: 1px solid var(--border); border-radius: 30px; padding: 30px; text-align: center; }
+        .modal-box h3 { font-family: 'Space Grotesk'; font-size: 20px; margin: 0 0 10px; }
+        .modal-box p { color: #888; font-size: 13px; line-height: 1.5; margin-bottom: 25px; }
+        .m-btns { display: flex; gap: 10px; }
+        .m-btn { flex: 1; padding: 15px; border-radius: 12px; border: none; font-weight: 800; font-size: 12px; cursor: pointer; }
+        .m-confirm { background: var(--red); color: white; }
+        .m-cancel { background: var(--glass); border: 1px solid var(--border); color: white; }
+
+        .nav-bottom { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; height: 85px; background: rgba(10,15,20,0.92); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 25px; display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { text-decoration: none; color: #444; font-size: 10px; font-weight: 800; text-align: center; }
+        .nav-item span { display: block; font-size: 32px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
 
     <div class="prof-box">
         <div class="av" id="av">M</div>
-        <h2 id="nm" style="font-family:'Space Grotesk'; margin:0;">DRIVER</h2>
+        <h2 id="nm" style="font-family:'Space Grotesk'; margin:0; text-transform: uppercase;">DRIVER</h2>
         <div id="pt" style="color:var(--volt); font-size:14px; font-weight:800; margin-top:5px;">B ---- XXX</div>
     </div>
 
     <div class="card">
         <div class="row"><span class="lbl">WhatsApp</span><span class="val" id="hp">-</span></div>
-        <div class="row"><span class="lbl">Tipe Sewa</span><span class="val" id="tp">Promo (355)</span></div>
+        <div class="row"><span class="lbl">Tipe Sewa</span><span class="val" id="tp">-</span></div>
         <div class="row"><span class="lbl">Tanggal Ambil</span><span class="val" id="jd">-</span></div>
+        <div class="row"><span class="lbl">Status Maka+</span><span class="val" style="color:var(--volt)">OFF</span></div>
+    </div>
+
+    <button class="btn-logout" onclick="showModal()">KELUAR DARI APLIKASI</button>
+
+    <div id="modalLogout">
+        <div class="modal-box">
+            <h3>Konfirmasi Keluar</h3>
+            <p>Apakah Anda yakin ingin keluar? Anda harus login kembali menggunakan nomor plat.</p>
+            <div class="m-btns">
+                <button class="m-btn m-cancel" onclick="hideModal()">BATAL</button>
+                <button class="m-btn m-confirm" onclick="logout()">YA, KELUAR</button>
+            </div>
+        </div>
     </div>
 
     <nav class="nav-bottom">
@@ -49,11 +76,16 @@
             document.getElementById('nm').innerText = u.nama || u.name || "DRIVER";
             document.getElementById('pt').innerText = u.plat || "B ---- XXX";
             document.getElementById('hp').innerText = u.hp || u.whatsapp || "-";
+            document.getElementById('tp').innerText = u.dpType === "755" ? "Reguler (755)" : "Promo (355)";
             document.getElementById('av').innerText = (u.nama || "M").charAt(0).toUpperCase();
             
             const d = new Date(u.tglAmbil);
             document.getElementById('jd').innerText = isNaN(d) ? "-" : d.toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
         }
+
+        function showModal() { document.getElementById('modalLogout').style.display = 'flex'; }
+        function hideModal() { document.getElementById('modalLogout').style.display = 'none'; }
+        function logout() { localStorage.removeItem('maka_user'); window.location.href = 'index.html'; }
     </script>
 </body>
 </html>
