@@ -1,99 +1,77 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#0a0f18">
-<title>MAKA Command Center</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<style>
-/* === MAKA LUXURY THEME === */
-:root { 
-    --bg:#0a0f18; 
-    --teal:#0ea5a6; /* Warna Khas Maka */
-    --gold:#D4AF37; 
-    --glass:rgba(255,255,255,0.05); 
-    --border:rgba(255,255,255,0.1); 
-}
-body { 
-    margin:0; padding:0; font-family:'Inter', sans-serif; 
-    background:var(--bg); color:white; height:100vh; 
-    display:flex; align-items:center; justify-content:center; overflow:hidden; 
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Login - MAKA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05080A;
+            --cyan: #00F0FF;
+            --border: rgba(255, 255, 255, 0.1);
+            --font-display: 'Space Grotesk', sans-serif;
+        }
 
-.login-card {
-  background: var(--glass); border: 1px solid var(--border);
-  width: 90%; max-width: 380px; padding: 40px 30px;
-  border-radius: 30px; text-align: center;
-  backdrop-filter: blur(20px); 
-  box-shadow: 0 0 50px rgba(14, 165, 166, 0.15); /* Glow Teal Halus */
-  position: relative; overflow: hidden;
-}
+        body {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background: var(--bg); color: white;
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
 
-/* Efek Kilau */
-.login-card::before {
-    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.03), transparent);
-    transform: rotate(45deg); animation: shine 6s infinite; pointer-events: none;
-}
-@keyframes shine { 0% {top:-150%;left:-150%;} 100% {top:150%;left:150%;} }
+        .login-card {
+            width: 85%; max-width: 350px; text-align: center;
+            padding: 40px 25px; background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border); border-radius: 35px;
+            backdrop-filter: blur(20px);
+        }
 
-h1 { 
-    font-family:'Syne'; font-size:2em; margin:0 0 5px; 
-    background: linear-gradient(to right, #fff, var(--teal));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-}
-p { color:#64748b; font-size:0.8em; margin-bottom:30px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+        .icon { font-size: 50px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--cyan)); }
+        h1 { font-family: var(--font-display); font-size: 24px; margin-bottom: 5px; }
+        p { font-size: 11px; color: #555; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; font-weight: 700; }
 
-input {
-  width: 100%; padding: 18px; border-radius: 16px; border: 1px solid var(--border);
-  background: rgba(0,0,0,0.3); color: var(--teal);
-  font-family: 'Syne'; font-size: 2em; text-align: center; letter-spacing: 10px; 
-  outline: none; margin-bottom: 25px; transition: 0.3s;
-}
-input:focus { border-color: var(--teal); box-shadow: 0 0 20px rgba(14, 165, 166, 0.2); }
+        input {
+            width: 100%; padding: 18px; background: #000; border: 1px solid var(--border);
+            border-radius: 15px; color: white; font-family: var(--font-display);
+            font-size: 24px; text-align: center; letter-spacing: 15px; margin-bottom: 20px;
+            box-sizing: border-box; outline: none;
+        }
+        input:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
 
-button {
-  width: 100%; padding: 18px; border: none; border-radius: 16px;
-  background: linear-gradient(135deg, var(--teal), #087f80); color: #fff;
-  font-weight: 800; font-family: 'Syne'; cursor: pointer;
-  transition: 0.2s; letter-spacing: 1px;
-}
-button:active { transform: scale(0.98); opacity: 0.9; }
+        button {
+            width: 100%; padding: 18px; border: none; border-radius: 15px;
+            background: var(--cyan); color: #000; font-family: var(--font-display);
+            font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.3s;
+        }
+        button:active { transform: scale(0.97); }
 
-.error { color: #ef4444; font-size: 0.8em; margin-top: 15px; display: none; font-weight: bold; }
-</style>
+        .error { color: #FF2A2A; font-size: 11px; margin-top: 15px; display: none; font-weight: 700; }
+    </style>
 </head>
 <body>
 
-<div class="login-card">
-    <div style="font-size:3em; margin-bottom:15px; filter: grayscale(100%);">🛡️</div>
-    <h1>MAKA ADMIN</h1>
-    <p>Secure Access Portal</p>
-    
-    <input type="tel" id="pin" placeholder="••••" maxlength="4" autocomplete="off">
-    <button onclick="login()">MASUK SYSTEM</button>
-    <div id="error" class="error">PIN SALAH / AKSES DITOLAK</div>
-</div>
+    <div class="login-card">
+        <div class="icon">🛡️</div>
+        <h1>COMMAND CENTER</h1>
+        <p>Restricted Access Only</p>
+        
+        <input type="password" id="pin" placeholder="••••" maxlength="4">
+        <button onclick="login()">AUTHORIZE ACCESS</button>
+        <div id="err" class="error">INVALID ACCESS PIN</div>
+    </div>
 
-<script>
-document.getElementById('pin').focus();
-function login(){
-    const p = document.getElementById('pin').value;
-    const err = document.getElementById('error');
-    
-    if(p === '1131') {
-        localStorage.setItem('maka_admin_role', 'user');
-        window.location.href = 'admin_user.html'; // OPS
-    } else if (p === '1132') {
-        localStorage.setItem('maka_admin_role', 'finance');
-        window.location.href = 'admin_finance.html'; // KEUANGAN
-    } else {
-        err.style.display = 'block';
-        document.getElementById('pin').value = '';
-        document.getElementById('pin').focus();
-    }
-}
-</script>
+    <script>
+        function login() {
+            const p = document.getElementById('pin').value;
+            // Gunakan PIN sesuai data Anda (misal: 1212)
+            if(p === '1212') {
+                sessionStorage.setItem('admin_auth', 'true');
+                location.href = 'admin_user.html';
+            } else {
+                document.getElementById('err').style.display = 'block';
+                document.getElementById('pin').value = '';
+            }
+        }
+    </script>
 </body>
 </html>

@@ -1,168 +1,124 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Finance - Luxury</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Finance - MAKA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00; --red: #FF2A2A;
+            --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.1);
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+        body { margin: 0; padding: 20px; background: var(--bg); color: white; font-family: 'Inter'; padding-bottom: 100px; }
+        .container { max-width: 900px; margin: 0 auto; }
+        
+        h1 { font-family: var(--font-display); font-size: 24px; color: var(--volt); }
 
-<style>
-/* === MAKA LUXURY THEME === */
-:root { --bg:#0a0f18; --teal:#0ea5a6; --glass:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.1); --text:#fff; }
-body { margin:0; padding:20px; font-family:'Inter'; background:var(--bg); color:var(--text); min-height:100vh; }
-.container { max-width:800px; margin:0 auto; padding-bottom:50px; }
+        .sec-title { font-family: var(--font-display); font-size: 14px; color: var(--cyan); margin: 30px 0 15px; display: flex; justify-content: space-between; align-items: center; }
+        .pill { background: var(--red); color: white; padding: 2px 8px; border-radius: 5px; font-size: 10px; }
 
-h2 { font-family:'Syne'; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:15px; color: var(--teal); }
-.logout { font-size:0.6em; color:#ef4444; text-decoration:none; border:1px solid #ef4444; padding:5px 12px; border-radius:10px; font-weight:700; }
+        /* Grid Verifikasi */
+        .verify-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .v-card { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 15px; }
+        .v-img { width: 100%; height: 120px; object-fit: cover; border-radius: 12px; cursor: pointer; background: #000; }
+        .v-info { margin-top: 10px; font-size: 11px; }
+        .btn-appr { width: 100%; padding: 10px; background: var(--volt); border: none; border-radius: 8px; font-weight: 800; font-size: 10px; margin-top: 10px; cursor: pointer; }
 
-.glass-card { background:var(--glass); border:1px solid var(--border); padding:25px; border-radius:24px; margin-bottom:20px; position: relative; }
-h3 { margin-top:0; font-family:'Syne'; color:var(--teal); margin-bottom: 20px; }
+        /* Table Log */
+        .log-box { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { background: rgba(255,255,255,0.05); text-align: left; padding: 12px; color: #555; }
+        td { padding: 12px; border-bottom: 1px solid var(--border); }
 
-input, button { width:100%; padding:14px; border-radius:12px; border:1px solid var(--border); margin-bottom:10px; font-family:'Inter'; outline:none; }
-input { background:rgba(0,0,0,0.3); color:white; font-size: 1em; }
-button { font-weight:800; cursor:pointer; font-family: 'Syne'; }
-.btn-main { background:var(--teal); color:white; border:none; }
-
-/* DEBT CARD */
-.debt-card { display:none; background:linear-gradient(135deg, #7f1d1d, #450a0a); border:1px solid #ef4444; padding:25px; border-radius:24px; margin-top:20px; text-align:center; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2); }
-.debt-val { font-family:'Syne'; font-size:3em; font-weight:800; color:#fca5a5; margin:10px 0; line-height: 1; }
-.debt-safe { background:linear-gradient(135deg, #064e3b, #022c22); border:1px solid #10b981; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2); } 
-.debt-safe .debt-val { color:#6ee7b7; }
-
-/* TABLE */
-table { width:100%; border-collapse:collapse; font-size:0.9em; margin-top:10px; }
-th { text-align:left; color:#94a3b8; font-size:0.8em; border-bottom:1px solid var(--border); padding:12px; font-family: 'Syne'; }
-td { padding:14px 12px; border-bottom:1px solid var(--border); }
-.pill { padding:4px 10px; border-radius:8px; font-size:0.7em; font-weight:800; letter-spacing: 0.5px; }
-.pill.paid { background:rgba(16, 185, 129, 0.2); color:#34d399; }
-
-/* SEARCH DROPDOWN */
-.search-res { position:absolute; top:90px; left:25px; right:25px; background:#1e293b; border:1px solid var(--border); z-index:10; max-height:250px; overflow-y:auto; border-radius:16px; display:none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-.s-item { padding:15px; border-bottom:1px solid var(--border); cursor:pointer; }
-.s-item:hover { background:var(--teal); color:white; }
-</style>
+        .adm-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #000; border: 1px solid var(--border); padding: 8px; border-radius: 20px; display: flex; gap: 5px; z-index: 1000; }
+        .adm-nav a { text-decoration: none; color: white; padding: 10px 20px; font-size: 11px; font-weight: 700; border-radius: 15px; }
+        .adm-nav a.active { background: var(--cyan); color: #000; }
+    </style>
 </head>
 <body>
 
 <div class="container">
-    <h2><span>💰 ADMIN FINANCE</span> <a href="admin_login.html" class="logout">LOGOUT</a></h2>
+    <h1>FINANCE COMMAND<span>.</span></h1>
 
-    <div class="glass-card" style="border:1px solid var(--teal);">
-        <h3>🔍 Cek Status Pembayaran User</h3>
-        <input id="checkInp" placeholder="Ketik Plat Nomor..." onkeyup="searchCheck()" autocomplete="off">
-        <div id="checkRes" class="search-res"></div>
-        
-        <div id="debtBox" class="debt-card">
-            <span style="opacity:0.7; font-weight:700; letter-spacing:1px; font-size:0.8em;">STATUS TAGIHAN: <b id="dPlat"></b></span>
-            <div id="dVal" class="debt-val">Rp 0</div>
-            <div id="dDet" style="font-size:0.9em; margin-bottom:20px; color:#ccc;"></div>
-            <button onclick="lunasin()" style="background:white; color:black;">✅ LUNASI SEMUA (MANUAL)</button>
+    <div class="sec-title">PERLU VERIFIKASI <span class="pill" id="count">0</span></div>
+    <div class="verify-grid" id="vList">
         </div>
-    </div>
 
-    <div class="glass-card">
-        <h3>Log Transaksi Terbaru</h3>
-        <div style="overflow-x:auto">
-            <table>
-                <thead><tr><th>TANGGAL</th><th>USER</th><th>JUMLAH</th><th>STATUS</th></tr></thead>
-                <tbody id="txList"><tr><td colspan="4" align="center" style="color:#666; padding:20px;">Memuat data...</td></tr></tbody>
-            </table>
-        </div>
+    <div class="sec-title">LOG TRANSAKSI TERAKHIR</div>
+    <div class="log-box">
+        <table>
+            <thead><tr><th>TANGGAL</th><th>PLAT</th><th>METODE</th><th>AKSI</th></tr></thead>
+            <tbody id="txList"></tbody>
+        </table>
     </div>
 </div>
 
+<div class="adm-nav">
+    <a href="admin_user.html">OPERATIONAL</a>
+    <a href="admin_finance.html" class="active">FINANCE</a>
+</div>
+
 <script>
-// CONFIG
-const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
-firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
+    const cfg = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
+    firebase.initializeApp(cfg); const db = firebase.firestore();
 
-let checkUser=null, unpaidDates=[];
-
-// 1. SEARCH LOGIC
-function searchCheck(){
-    const k=document.getElementById('checkInp').value.toUpperCase();
-    if(k.length<2){document.getElementById('checkRes').style.display='none';return;}
-    db.collection('users').get().then(s=>{
-        let h=''; s.forEach(d=>{ const u=d.data(); if(u.plat.includes(k)) h+=`<div class="s-item" onclick='sel("${u.plat}","${u.nama}", "${u.joinedAt}")'><b>${u.plat}</b> - ${u.nama}</div>`; });
-        const r=document.getElementById('checkRes'); r.innerHTML=h; r.style.display='block';
-    });
-}
-
-function sel(plat, nama, join){
-    checkUser={plat,nama,join}; document.getElementById('checkInp').value=plat;
-    document.getElementById('checkRes').style.display='none';
-    calcDebt(plat, join);
-}
-
-// 2. HITUNG TUNGGAKAN (SAMA PERSIS DENGAN APLIKASI USER)
-function calcDebt(plat, joinedAt){
-    db.collection('daily_payments').where('plat','==',plat).get().then(s=>{
-        let paid=[]; s.forEach(d=>paid.push(d.data().date));
-        
-        let total=0, days=0, today=new Date(); today.setHours(0,0,0,0);
-        let curr=new Date(joinedAt); curr.setHours(0,0,0,0);
-        unpaidDates=[];
-
-        while(curr<=today){
-            const dStr=curr.toISOString().split('T')[0];
-            // Harga statis 70rb (Default) - Bisa disesuaikan
-            if(curr.getDate()!==31 && !paid.includes(dStr)){ total+=70000; days++; unpaidDates.push(dStr); }
-            curr.setDate(curr.getDate()+1);
-        }
-
-        const box=document.getElementById('debtBox');
-        const val=document.getElementById('dVal');
-        box.style.display='block';
-        document.getElementById('dPlat').innerText=plat;
-        
-        if(total>0){
-            box.className='debt-card'; // Merah
-            val.innerText="Rp "+total.toLocaleString('id');
-            document.getElementById('dDet').innerText=`${days} Hari Belum Dibayar`;
-        } else {
-            box.className='debt-card debt-safe'; // Hijau
-            val.innerText="LUNAS";
-            document.getElementById('dDet').innerText="User ini tidak memiliki tunggakan.";
-        }
-    });
-}
-
-// 3. PELUNASAN MANUAL
-function lunasin(){
-    if(!checkUser || unpaidDates.length===0) return alert("User ini aman (tidak ada tagihan).");
-    if(!confirm(`Lunasi tagihan ${unpaidDates.length} hari secara manual?`)) return;
-    
-    const batch=db.batch();
-    unpaidDates.forEach(d=>{
-        const ref=db.collection('daily_payments').doc(checkUser.plat+'_'+d);
-        batch.set(ref,{plat:checkUser.plat, nama:checkUser.nama, date:d, amount:70000, paidAt:new Date()}); // Harga default
-    });
-    batch.commit().then(()=>{alert("Data Pelunasan Tersimpan!"); calcDebt(checkUser.plat, checkUser.join); loadTx();});
-}
-
-// 4. LOAD LOG TRANSAKSI
-function loadTx(){
-    db.collection('daily_payments').limit(15).onSnapshot(s=>{
-        let d = [];
-        s.forEach(doc=>d.push(doc.data()));
-        // Sort manual by date (client side) to avoid index error
-        d.sort((a,b)=> (b.paidAt?.seconds || 0) - (a.paidAt?.seconds || 0));
-
-        let h='';
-        d.forEach(x=>{
-            // Format tanggal bayar (bukan tanggal sewa)
-            let payTime = '-';
-            if(x.paidAt && x.paidAt.seconds) {
-                payTime = new Date(x.paidAt.seconds * 1000).toLocaleDateString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-            }
-            h+=`<tr><td>${payTime}</td><td><b style="color:white">${x.nama}</b><br><small style="color:#aaa">${x.plat}</small></td><td>Rp ${parseInt(x.amount).toLocaleString('id')}</td><td><span class="pill paid">LUNAS</span></td></tr>`;
+    function loadVerify() {
+        db.collection('payment_proofs').where('status','==','PENDING').onSnapshot(snap => {
+            const list = document.getElementById('vList');
+            document.getElementById('count').innerText = snap.size;
+            list.innerHTML = snap.empty ? '<div style="color:#444; font-size:12px;">Tidak ada bukti bayar masuk.</div>' : '';
+            
+            snap.forEach(doc => {
+                const d = doc.data();
+                list.innerHTML += `
+                    <div class="v-card">
+                        <img src="${d.img}" class="v-img" onclick="window.open(this.src)">
+                        <div class="v-info">
+                            <b>${d.plat}</b><br>
+                            Sewa: ${d.date}
+                        </div>
+                        <button class="btn-appr" onclick="approve('${doc.id}', '${d.plat}', '${d.date}', '${d.nama}')">APPROVE</button>
+                    </div>`;
+            });
         });
-        document.getElementById('txList').innerHTML=h;
-    });
-}
-loadTx();
+    }
+
+    function approve(id, plat, tgl, nama) {
+        if(!confirm("Setujui pembayaran " + plat + " untuk tanggal " + tgl + "?")) return;
+        
+        const batch = db.batch();
+        const payRef = db.collection('daily_payments').doc(plat+'_'+tgl);
+        const proofRef = db.collection('payment_proofs').doc(id);
+
+        batch.set(payRef, { plat, nama, date: tgl, amount: 70000, paidAt: new Date(), type: 'TRANSFER_VERIFIED' });
+        batch.update(proofRef, { status: 'APPROVED' });
+
+        batch.commit().then(() => alert("Berhasil diverifikasi!"));
+    }
+
+    function loadTx() {
+        db.collection('daily_payments').orderBy('paidAt','desc').limit(15).onSnapshot(snap => {
+            const list = document.getElementById('txList');
+            list.innerHTML = '';
+            snap.forEach(doc => {
+                const d = doc.data();
+                list.innerHTML += `<tr>
+                    <td>${d.date}</td>
+                    <td><b>${d.plat}</b></td>
+                    <td>${d.type || 'N/A'}</td>
+                    <td><button style="background:none; border:none; color:var(--red); font-size:10px;" onclick="hapusTx('${doc.id}')">Hapus</button></td>
+                </tr>`;
+            });
+        });
+    }
+
+    function hapusTx(id) { if(confirm("Batalkan pelunasan ini?")) db.collection('daily_payments').doc(id).delete(); }
+
+    loadVerify(); loadTx();
 </script>
 </body>
 </html>

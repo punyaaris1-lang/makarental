@@ -1,54 +1,169 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Masuk - MAKA</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<style>
-:root { --primary:#0f1724; --accent:#0ea5a6; --bg:#f8fafc; --text:#0f1724; --muted:#64748b; }
-body { margin:0; font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); height:100vh; display:flex; align-items:center; justify-content:center; }
-.box { width:90%; max-width:400px; padding:30px; background:#fff; border-radius:24px; box-shadow:0 10px 40px rgba(0,0,0,0.05); text-align:center; }
-h1 { font-family:'Syne'; font-size:2.5em; margin:0; letter-spacing:-1px; }
-p { color:var(--muted); font-size:0.9em; margin-bottom:30px; }
-input, select { width:100%; padding:16px; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:15px; font-family:'Inter'; outline:none; font-size:1em; box-sizing:border-box; }
-input:focus { border-color:var(--primary); }
-button { width:100%; padding:16px; background:var(--primary); color:#fff; border:none; border-radius:12px; font-weight:800; font-family:'Syne'; cursor:pointer; }
-.tabs { display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid #eee; }
-.tab { flex:1; padding:10px; background:none; border:none; font-weight:700; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; }
-.tab.active { color:var(--primary); border-color:var(--primary); }
-.hide { display:none; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#05080A">
+    <title>MAKA - Rent to Own</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --bg: #05080A;
+            --cyan: #00F0FF;
+            --volt: #D9FF00;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background: var(--bg); color: white;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh; overflow: hidden;
+        }
+
+        /* Dekorasi Background */
+        .glow-bg {
+            position: fixed; width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.1) 0%, transparent 70%);
+            z-index: -1; top: -100px; right: -100px;
+        }
+
+        .login-card {
+            width: 90%; max-width: 400px; padding: 40px 30px;
+            background: var(--glass); backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: 35px;
+            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        h1 { font-family: 'Syne'; font-size: 42px; margin: 0; letter-spacing: -2px; }
+        h1 span { color: var(--volt); }
+        p { color: #666; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; }
+
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 15px; }
+        .tab { flex: 1; padding: 12px; border: none; background: none; color: #555; font-weight: 700; cursor: pointer; border-radius: 10px; transition: 0.3s; }
+        .tab.active { background: var(--border); color: var(--cyan); }
+
+        input, select {
+            width: 100%; padding: 16px; margin-bottom: 15px;
+            background: rgba(0,0,0,0.5); border: 1px solid var(--border);
+            border-radius: 15px; color: white; font-family: 'Inter';
+            font-size: 14px; outline: none; box-sizing: border-box; transition: 0.3s;
+        }
+        input:focus { border-color: var(--cyan); box-shadow: 0 0 15px rgba(0, 240, 255, 0.1); }
+
+        .btn-main {
+            width: 100%; padding: 18px; border: none; border-radius: 15px;
+            background: linear-gradient(135deg, var(--cyan), #00A3FF);
+            color: #000; font-family: 'Syne'; font-weight: 800; font-size: 16px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-main:active { transform: scale(0.98); }
+
+        .hide { display: none; }
+        label { display: block; text-align: left; font-size: 10px; color: var(--cyan); margin-bottom: 5px; padding-left: 10px; font-weight: 700; }
+    </style>
 </head>
 <body>
-<div class="box">
-    <h1>MAKA</h1><p>RTO System</p>
-    <div class="tabs"><button class="tab active" onclick="sw('l')">MASUK</button><button class="tab" onclick="sw('r')">DAFTAR</button></div>
-    <div id="l">
-        <input id="lp" placeholder="Plat Nomor (B xxxx XXX)" style="text-transform:uppercase;text-align:center;font-weight:700;letter-spacing:1px;">
-        <button onclick="login()">MASUK</button>
+    <div class="glow-bg"></div>
+
+    <div class="login-card">
+        <h1>MAKA<span>.</span></h1>
+        <p>Electric Ownership</p>
+
+        <div class="tabs">
+            <button class="tab active" onclick="sw('l')">MASUK</button>
+            <button class="tab" onclick="sw('r')">DAFTAR</button>
+        </div>
+
+        <div id="l">
+            <input id="lp" placeholder="PLAT NOMOR (B XXXX XXX)" style="text-transform:uppercase; text-align:center; font-weight:800; font-size: 18px; letter-spacing: 2px;">
+            <button class="btn-main" onclick="login()">MASUK SISTEM</button>
+        </div>
+
+        <div id="r" class="hide">
+            <input id="rn" placeholder="Nama Lengkap">
+            <input id="rh" type="tel" placeholder="No. WhatsApp">
+            <input id="rp" placeholder="Plat Nomor" style="text-transform:uppercase;">
+            
+            <label>TANGGAL AMBIL MOTOR</label>
+            <input id="rt" type="date">
+            
+            <label>TIPE DP (DOWN PAYMENT)</label>
+            <select id="rd">
+                <option value="755">DP 755 (Lunas - Libur 14,28,31)</option>
+                <option value="355">DP 355 (Cicil - No Libur 3 Bln)</option>
+            </select>
+            <button class="btn-main" onclick="reg()">MULAI KONTRAK</button>
+        </div>
     </div>
-    <div id="r" class="hide">
-        <input id="rn" placeholder="Nama Lengkap"><input id="rh" type="tel" placeholder="WhatsApp">
-        <input id="rp" placeholder="Plat Nomor" style="text-transform:uppercase;"><input id="rt" type="date">
-        <select id="rd"><option value="355">DP 355 (Cicil)</option><option value="755">DP 755 (Lunas)</option></select>
-        <button onclick="reg()">DAFTAR</button>
-    </div>
-</div>
-<script>
-const cfg={apiKey:"AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",authDomain:"rtomaka-e67b5.firebaseapp.com",projectId:"rtomaka-e67b5",storageBucket:"rtomaka-e67b5.firebasestorage.app",messagingSenderId:"472036722228",appId:"1:472036722228:web:11d520f9204db317d02c61"};
-try{firebase.initializeApp(cfg);var db=firebase.firestore();}catch(e){}
-function sw(x){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));event.target.classList.add('active');document.getElementById('l').classList.add('hide');document.getElementById('r').classList.add('hide');document.getElementById(x).classList.remove('hide');}
-function login(){
-    const p=document.getElementById('lp').value.trim().toUpperCase(); if(!p)return alert("Isi Plat");
-    db.collection('users').doc(p).get().then(d=>{ if(d.exists&&!d.data().isBanned){localStorage.setItem('maka_user',JSON.stringify(d.data()));location.href='dashboard.html'}else alert("Gagal/Diblokir"); });
-}
-function reg(){
-    const d={nama:document.getElementById('rn').value,hp:document.getElementById('rh').value,plat:document.getElementById('rp').value.toUpperCase(),tglAmbil:document.getElementById('rt').value,dp:document.getElementById('rd').value,joinedAt:new Date().toISOString(),isBanned:false};
-    if(!d.nama||!d.plat)return alert("Lengkapi Data");
-    db.collection('users').doc(d.plat).set(d).then(()=>{localStorage.setItem('maka_user',JSON.stringify(d));location.href='dashboard.html'});
-}
-</script>
-</body></html>
+
+    <script>
+        const cfg = {
+            apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",
+            authDomain: "rtomaka-e67b5.firebaseapp.com",
+            projectId: "rtomaka-e67b5",
+            storageBucket: "rtomaka-e67b5.firebasestorage.app",
+            messagingSenderId: "472036722228",
+            appId: "1:472036722228:web:11d520f9204db317d02c61"
+        };
+        firebase.initializeApp(cfg);
+        const db = firebase.firestore();
+
+        function sw(x) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('l').classList.add('hide');
+            document.getElementById('r').classList.add('hide');
+            document.getElementById(x).classList.remove('hide');
+        }
+
+        function login() {
+            const p = document.getElementById('lp').value.trim().toUpperCase();
+            if(!p) return alert("Masukkan Plat Nomor");
+            
+            db.collection('users').doc(p).get().then(d => {
+                if(d.exists && !d.data().isBanned) {
+                    localStorage.setItem('maka_user', JSON.stringify(d.data()));
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert("Akses Gagal. Akun tidak ditemukan atau diblokir.");
+                }
+            });
+        }
+
+        function reg() {
+            const d = {
+                nama: document.getElementById('rn').value,
+                hp: document.getElementById('rh').value,
+                plat: document.getElementById('rp').value.toUpperCase().replace(/\s/g,''),
+                tglAmbil: document.getElementById('rt').value,
+                dpType: document.getElementById('rd').value,
+                joinedAt: new Date().toISOString(),
+                isBanned: false,
+                makaPlus: false
+            };
+
+            if(!d.nama || !d.plat || !d.tglAmbil) return alert("Mohon lengkapi data kontrak.");
+
+            db.collection('users').doc(d.plat).set(d).then(() => {
+                localStorage.setItem('maka_user', JSON.stringify(d));
+                window.location.href = 'dashboard.html';
+            });
+        }
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(() => console.log("PWA Active"));
+        }
+    </script>
+</body>
+</html>

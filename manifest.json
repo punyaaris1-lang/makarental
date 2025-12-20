@@ -1,0 +1,24 @@
+{
+  "short_name": "MAKA",
+  "name": "MAKA Rental - Fleet Management",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3106/3106001.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3106/3106001.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/index.html",
+  "background_color": "#05080A",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#00F0FF",
+  "description": "Aplikasi Manajemen Armada Rental MAKA - Antrian & Pembayaran"
+}

@@ -1,94 +1,199 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<style>
-:root { --pri:#0f1724; --acc:#0ea5a6; --yel:#fbbf24; --bg:#f8fafc; }
-body { margin:0; font-family:'Inter'; background:var(--bg); color:var(--pri); padding-bottom:100px; }
-.con { max-width:480px; margin:0 auto; padding:20px; }
-.head { display:flex; justify-content:space-between; margin-bottom:20px; align-items:center; }
-h1 { font-family:'Syne'; margin:0; font-size:1.5em; }
-.sub { color:#64748b; font-size:0.9em; }
-.av { width:45px; height:45px; background:var(--pri); color:var(--yel); border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Syne'; font-weight:800; background-size:cover; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard - MAKA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-/* HERO CARD HITAM */
-.hero { background:var(--pri); color:#fff; padding:25px; border-radius:24px; position:relative; overflow:hidden; box-shadow:0 15px 40px rgba(15,23,36,0.2); margin-bottom:30px; }
-.hero::after { content:'MAKA'; position:absolute; bottom:-20px; right:-10px; font-family:'Syne'; font-size:4em; font-weight:900; color:rgba(255,255,255,0.05); }
-.lbl { font-size:0.7em; font-weight:700; opacity:0.7; letter-spacing:1px; }
-.val { font-family:'Syne'; font-size:2.5em; font-weight:800; margin:5px 0; line-height:1; }
-.pill { float:right; background:rgba(255,255,255,0.2); padding:5px 10px; border-radius:20px; font-size:0.7em; font-weight:800; }
-.pill.red { background:#ef4444; color:#fff; }
-.bar-bg { background:rgba(255,255,255,0.1); height:6px; border-radius:10px; margin-top:20px; overflow:hidden; }
-.bar-fill { background:var(--yel); height:100%; width:0%; transition:1s; }
+    <style>
+        :root {
+            --bg: #05080A;
+            --cyan: #00F0FF;
+            --volt: #D9FF00;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --font-main: 'Inter', sans-serif;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
 
-/* MENU */
-.grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-.card { background:#fff; border:1px solid #e2e8f0; padding:15px; border-radius:16px; text-align:center; text-decoration:none; color:var(--pri); display:flex; flex-direction:column; align-items:center; transition:0.2s; }
-.card:active { transform:scale(0.95); background:#f1f5f9; }
-.ico { font-size:24px; margin-bottom:5px; filter:grayscale(100%); }
-.card:active .ico { filter:grayscale(0%); }
-.txt { font-size:0.75em; font-weight:700; }
+        body {
+            margin: 0; padding: 20px; font-family: var(--font-main);
+            background: var(--bg); color: white; padding-bottom: 120px;
+            -webkit-font-smoothing: antialiased;
+        }
 
-/* NAV */
-footer { position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--pri); padding:12px 30px; border-radius:50px; display:flex; gap:30px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:99; }
-.nav-i { display:flex; flex-direction:column; align-items:center; text-decoration:none; color:#94a3b8; font-size:9px; font-weight:700; }
-.nav-i span { font-size:20px; margin-bottom:2px; }
-.nav-i.act { color:#fff; } .nav-i.act span { color:var(--yel); }
-</style>
+        /* Navigasi Melayang Modern */
+        .nav-bottom {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; height: 75px;
+            background: rgba(10, 15, 20, 0.85); backdrop-filter: blur(25px);
+            border: 1px solid var(--border); border-radius: 25px;
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .nav-item { text-decoration: none; color: #444; font-size: 10px; font-weight: 700; text-align: center; transition: 0.3s; }
+        .nav-item.active { color: var(--cyan); }
+        .nav-item span { display: block; font-size: 24px; margin-bottom: 4px; filter: grayscale(1); transition: 0.3s; }
+        .nav-item.active span { filter: grayscale(0) drop-shadow(0 0 8px var(--cyan)); }
+
+        /* Header Profile */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; margin-top: 10px; }
+        .profile { display: flex; align-items: center; gap: 15px; }
+        .avatar { 
+            width: 50px; height: 50px; border-radius: 50%; 
+            background: linear-gradient(135deg, var(--cyan), #0066FF);
+            border: 2px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+        }
+        #uName { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+        #uPlat { font-size: 12px; color: var(--cyan); letter-spacing: 2px; font-weight: 600; opacity: 0.8; }
+
+        /* Progress Ownership Card */
+        .progress-box {
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: 35px; padding: 40px 20px; text-align: center; margin-bottom: 25px;
+            position: relative;
+        }
+        .progress-label { font-size: 11px; color: #666; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 25px; }
+        
+        .circle-wrap {
+            width: 180px; height: 180px; border-radius: 50%;
+            margin: 0 auto 25px; border: 2px solid #111;
+            display: flex; flex-direction: column; justify-content: center;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.03) 0%, transparent 75%);
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+        .pct { font-family: var(--font-display); font-size: 48px; color: var(--volt); margin: 0; font-weight: 700; letter-spacing: -2px; }
+        .days-left { font-size: 12px; color: #555; font-weight: 600; margin-top: -5px; }
+
+        .status-tag {
+            padding: 8px 20px; border-radius: 12px; font-size: 11px; font-weight: 800;
+            display: inline-block; font-family: var(--font-display); letter-spacing: 1px;
+        }
+        .tag-ok { background: rgba(217, 255, 0, 0.05); color: var(--volt); border: 1px solid rgba(217, 255, 0, 0.3); }
+        .tag-no { background: rgba(255, 42, 42, 0.05); color: #FF2A2A; border: 1px solid rgba(255, 42, 42, 0.3); }
+
+        /* Grid Widgets */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .card { 
+            background: var(--glass); border: 1px solid var(--border); 
+            padding: 22px; border-radius: 25px; transition: 0.3s;
+        }
+        .card:active { transform: scale(0.96); background: rgba(255,255,255,0.05); }
+        .card-title { font-size: 10px; color: #555; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+        .val { font-family: var(--font-display); font-size: 18px; color: white; font-weight: 700; }
+        
+        /* Location Widget */
+        .loc-card {
+            margin-top: 15px; background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), transparent);
+            border: 1px solid rgba(0, 240, 255, 0.2); padding: 25px; border-radius: 25px;
+        }
+        .loc-name { font-family: var(--font-display); color: var(--cyan); font-size: 16px; font-weight: 700; margin-top: 5px; }
+        .loc-dist { font-size: 12px; color: #666; margin-top: 4px; font-weight: 600; }
+
+    </style>
 </head>
 <body>
-<div class="con">
-    <div class="head"><div><h1>Halo...</h1><p class="sub" id="pl">Loading...</p></div><div class="av" id="av">U</div></div>
-    <div class="hero">
-        <span class="pill" id="st">...</span><span class="lbl">TAGIHAN</span>
-        <div class="val" id="rp">Rp 0</div>
-        <p style="font-size:0.9em; opacity:0.8; margin:0 0 10px 0;" id="ds">...</p>
-        <div style="font-size:0.7em; display:flex; justify-content:space-between;"><span>PROGRESS</span><span id="dy">0/1009</span></div>
-        <div class="bar-bg"><div class="bar-fill" id="bf"></div></div>
-    </div>
-    <h3 style="font-family:'Syne'; border-left:4px solid var(--acc); padding-left:10px;">Menu Utama</h3>
-    <div class="grid">
-        <a href="calendar.html" class="card"><div class="ico">📅</div><span class="txt">Bayar</span></a>
-        <a href="history.html" class="card"><div class="ico">🧾</div><span class="txt">Riwayat</span></a>
-        <a href="part_tracker.html" class="card"><div class="ico">🎁</div><span class="txt">Gratisan</span></a>
-        <a href="settings.html" class="card"><div class="ico">⚙️</div><span class="txt">Setting</span></a>
-        <a href="info_mlu.html" class="card"><div class="ico">💡</div><span class="txt">Info MLU</span></a>
-        <a href="tips_maka.html" class="card"><div class="ico">📖</div><span class="txt">Panduan</span></a>
-        <a href="maka_plus.html" class="card"><div class="ico">✨</div><span class="txt">MAKA+</span></a>
-        <button onclick="window.open('https://wa.me/6281234567890','_blank')" class="card"><div class="ico">💬</div><span class="txt">CS WA</span></button>
-        <button onclick="location.href='daftar_antrian.html?mode=SOS'" class="card" style="background:#fee2e2; border-color:#fecaca"><div class="ico">🚨</div><span class="txt" style="color:#dc2626">Darurat</span></button>
-    </div>
-</div>
-<footer>
-    <a href="lokasi_fc.html" class="nav-i"><span>⚡</span>Lokasi</a>
-    <a href="dashboard.html" class="nav-i act"><span>🏠</span>Home</a>
-    <a href="daftar_antrian.html" class="nav-i"><span>🎫</span>Antrian</a>
-</footer>
-<script>
-const c={apiKey:"AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0",authDomain:"rtomaka-e67b5.firebaseapp.com",projectId:"rtomaka-e67b5",storageBucket:"rtomaka-e67b5.firebasestorage.app",messagingSenderId:"472036722228",appId:"1:472036722228:web:11d520f9204db317d02c61"};
-try{if(!firebase.apps.length)firebase.initializeApp(c);var db=firebase.firestore();}catch(e){}
-let u=JSON.parse(localStorage.getItem('maka_user')), p=JSON.parse(localStorage.getItem('maka_plus_data'))||{active:false};
-if(!u)location.href='index.html';
-document.querySelector('h1').innerText=u.nama; document.getElementById('pl').innerText=u.plat;
-if(u.photoUrl)document.getElementById('av').style.backgroundImage=`url('${u.photoUrl}')`,document.getElementById('av').innerText='';
 
-db.collection('daily_payments').where('plat','==',u.plat).onSnapshot(s=>{
-    let pd=[], tot=0, cur=new Date(u.joinedAt), now=new Date(), lt=0, dc=0; now.setHours(0,0,0,0); cur.setHours(0,0,0,0);
-    s.forEach(d=>pd.push(d.data().date));
-    while(cur<=now && dc<1009){
-        let d=cur.toISOString().split('T')[0], pr=(cur.getDate()===31)?0:(p.active&&Math.ceil(Math.abs(cur-new Date(u.joinedAt))/864e5)<=365)?80000:70000;
-        if(pr>0 && !pd.includes(d)){ tot+=pr; lt++; }
-        cur.setDate(cur.getDate()+1); dc++;
-    }
-    document.getElementById('rp').innerText="Rp "+tot.toLocaleString('id');
-    document.getElementById('dy').innerText=dc+"/1009"; document.getElementById('bf').style.width=(dc/1009)*100+"%";
-    if(tot>0){ document.getElementById('st').innerText="TUNGGAKAN"; document.getElementById('st').className="pill red"; document.getElementById('ds').innerText=lt+" Hari Belum Bayar"; }
-    else { document.getElementById('st').innerText="AMAN"; document.getElementById('st').className="pill"; document.getElementById('ds').innerText="Tidak ada tagihan."; }
-});
-</script>
-</body></html>
+    <div class="header">
+        <div class="profile">
+            <div class="avatar" id="userPhoto"></div>
+            <div>
+                <div id="uName">MEMUAT...</div>
+                <div id="uPlat">B ---- XXX</div>
+            </div>
+        </div>
+        <div onclick="location.href='settings.html'" style="opacity: 0.5;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </div>
+    </div>
+
+    <div class="progress-box">
+        <div class="progress-label">Status Kepemilikan</div>
+        <div class="circle-wrap">
+            <p class="pct" id="uPct">0%</p>
+            <p class="days-left" id="uTenor">-- / 1009</p>
+        </div>
+        <div id="uStatus" class="status-tag">MENGHITUNG DATA...</div>
+    </div>
+
+    <div class="grid">
+        <div class="card" onclick="location.href='part_tracker.html'">
+            <div class="card-title">Maintenace</div>
+            <div class="val">Sparepart</div>
+        </div>
+        <div class="card" onclick="location.href='maka_plus.html'">
+            <div class="card-title">Subscription</div>
+            <div class="val" id="uMakaLabel">MAKA+</div>
+        </div>
+    </div>
+
+    <div class="card loc-card" onclick="location.href='lokasi_fc.html'">
+        <div class="card-title">Fast Charging Terdekat</div>
+        <div id="uLoc" class="loc-name">Mencari GPS...</div>
+        <div id="uDist" class="loc-dist">Menghitung jarak dari posisi Anda</div>
+    </div>
+
+    <nav class="nav-bottom">
+        <a href="dashboard.html" class="nav-item active"><span>🏠</span>HOME</a>
+        <a href="calendar.html" class="nav-item"><span>📅</span>BAYAR</a>
+        <a href="https://punyaaris1-lang.github.io/antricukk/antrian.html" class="nav-item"><span>⚡</span>ANTRIAN</a>
+        <a href="history.html" class="nav-item"><span>📜</span>HISTORY</a>
+    </nav>
+
+    <script>
+        const u = JSON.parse(localStorage.getItem('maka_user'));
+        if(!u) location.href = 'index.html';
+
+        // Update UI Dasar
+        document.getElementById('uName').innerText = u.nama.toUpperCase();
+        document.getElementById('uPlat').innerText = u.plat;
+
+        // 1. Logika Perhitungan Tenor (1009 Hari)
+        const tglAmbil = new Date(u.tglAmbil);
+        const hariIni = new Date();
+        const diffInMs = Math.abs(hariIni - tglAmbil);
+        const hariBerjalan = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+        const pct = Math.min(Math.round((hariBerjalan / 1009) * 100), 100);
+
+        document.getElementById('uPct').innerText = pct + '%';
+        document.getElementById('uTenor').innerText = `${hariBerjalan} / 1009 HARI`;
+
+        // 2. Logika Libur & Pembayaran DP
+        const tgl = hariIni.getDate();
+        const blnKe = Math.floor(hariBerjalan / 30);
+        let isLibur = false;
+        let msg = "Wajib Bayar Hari Ini";
+
+        if(tgl === 31) isLibur = true;
+        if(u.dpType == "755" && (tgl === 14 || tgl === 28)) isLibur = true;
+        if(u.dpType == "355") {
+            if(blnKe >= 3 && (tgl === 14 || tgl === 28)) isLibur = true;
+            else if(blnKe < 3 && (tgl === 14 || tgl === 28)) msg = "Cicilan DP Aktif";
+        }
+
+        const statEl = document.getElementById('uStatus');
+        if(isLibur) {
+            statEl.innerText = "LIBUR BAYAR HARI INI";
+            statEl.className = "status-tag tag-ok";
+        } else {
+            statEl.innerText = msg.toUpperCase();
+            statEl.className = "status-tag tag-no";
+        }
+
+        // MAKA+ Status
+        if(u.makaPlus) document.getElementById('uMakaLabel').style.color = "var(--volt)";
+
+        // 3. Simulasi Lokasi (Integrasi GPS di file lokasi_fc.html)
+        setTimeout(() => {
+            document.getElementById('uLoc').innerText = "FC KELAPA GADING";
+            document.getElementById('uDist').innerText = "0.8 km dari posisi Anda";
+        }, 1200);
+    </script>
+</body>
+</html>

@@ -1,128 +1,173 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Lokasi FC Clean</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="manifest" href="/makarental/manifest.json"> 
-<style>
-/* === MAKA CLEAN THEME === */
-:root { --maka-black: #0f1724; --maka-white: #ffffff; --maka-yellow: #fbbf24; --maka-teal: #0ea5a6; --bg-page: #f8fafc; --border: #e2e8f0; --text-muted: #64748b; }
-body { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg-page); color: var(--maka-black); min-height: 100vh; overflow-x: hidden; }
-.app-container { max-width: 520px; margin: 0 auto; padding: 20px; padding-bottom: 120px; display: flex; flex-direction: column; min-height: 100vh; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Map Station - MAKA</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-/* HEADER */
-.header { margin-bottom: 25px; margin-top: 10px; }
-.h-title { font-family: 'Syne'; font-size: 1.8em; font-weight: 800; margin: 0; line-height: 1; color: var(--maka-black); }
-.h-sub { font-size: 0.75em; color: var(--text-muted); font-weight: 700; letter-spacing: 2px; margin-top: 5px; }
+    <style>
+        :root {
+            --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00;
+            --glass: rgba(10, 15, 20, 0.9); --border: rgba(255, 255, 255, 0.15);
+            --font-display: 'Space Grotesk', sans-serif;
+        }
 
-/* HERO CARD (BLACK LIKE DASHBOARD) */
-.hero-card {
-  background: var(--maka-black); border-radius: 24px; padding: 24px; color: white;
-  box-shadow: 0 10px 30px rgba(15, 23, 36, 0.15); margin-bottom: 30px;
-  position: relative; overflow: hidden;
-}
-.hero-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
+        body { margin: 0; padding: 0; background: var(--bg); font-family: 'Inter', sans-serif; color: white; overflow: hidden; }
+        #map { width: 100vw; height: 100vh; z-index: 1; }
 
-.radar-status { display: flex; align-items: center; gap: 8px; font-size: 0.7em; font-weight: 800; background: rgba(255,255,255,0.15); padding: 5px 12px; border-radius: 99px; width: fit-content; margin-bottom: 15px; color: var(--maka-yellow); }
-.gps-dot { width: 8px; height: 8px; background: var(--maka-yellow); border-radius: 50%; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0% {opacity:1} 50% {opacity:0.4} 100% {opacity:1} }
+        .overlay-header {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            width: 90%; z-index: 1000; pointer-events: none;
+        }
+        .search-container {
+            background: var(--glass); backdrop-filter: blur(15px);
+            border: 1px solid var(--border); border-radius: 20px;
+            padding: 15px 20px; pointer-events: auto; text-align: center;
+        }
+        .search-container h1 { 
+            font-family: var(--font-display); font-size: 18px; margin: 0; color: white;
+        }
+        #statusGPS { font-size: 10px; color: var(--cyan); margin-top: 5px; font-weight: 700; }
 
-.hero-dist { position: absolute; top: 24px; right: 24px; font-family: 'Syne'; font-weight: 800; font-size: 1.4em; color: var(--maka-teal); }
-.hero-name { font-family: 'Syne'; font-size: 1.6em; font-weight: 800; margin: 0 0 10px 0; }
-.hero-info { font-size: 0.9em; opacity: 0.8; margin-bottom: 20px; line-height: 1.5; }
-.btn-nav-hero { background: white; color: var(--maka-black); border: none; padding: 14px 20px; border-radius: 14px; font-weight: 800; cursor: pointer; width: 100%; font-family: 'Syne'; transition: 0.2s; }
+        #infoCard {
+            position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
+            width: 85%; background: var(--glass); backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: 25px;
+            padding: 20px; z-index: 1000; display: none;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+            animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { bottom: -100px; } to { bottom: 110px; } }
 
-/* LIST */
-.city-group { margin-bottom: 30px; }
-.city-header { display: flex; align-items: center; margin-bottom: 15px; gap: 12px; }
-.city-title { font-family: 'Syne'; font-weight: 800; font-size: 1em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-.city-line { flex: 1; height: 1px; background: var(--border); }
+        .btn-go {
+            width: 100%; padding: 16px; background: var(--cyan); border: none;
+            border-radius: 12px; font-family: var(--font-display); font-weight: 800;
+            color: #000; margin-top: 15px; cursor: pointer;
+        }
 
-/* HORIZONTAL SCROLL (FIXED) */
-.h-scroll { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; /* snap removed for smoothness */ }
-.h-scroll::-webkit-scrollbar { display: none; }
+        .user-marker { background: white; border: 3px solid var(--cyan); border-radius: 50%; box-shadow: 0 0 15px var(--cyan); }
+        .fc-marker { background: var(--volt); border: 2px solid black; border-radius: 50%; box-shadow: 0 0 10px var(--volt); }
 
-/* MINI CARDS (WHITE CLEAN) */
-.mini-card {
-  min-width: 170px; width: 170px; height: 210px; background: #fff; border: 1px solid var(--border);
-  border-radius: 20px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between;
-  cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-  transition: transform 0.2s;
-}
-.mini-card:active { transform: scale(0.96); background: #f1f5f9; }
-.mini-top h3 { margin: 0; font-size: 1em; font-weight: 800; line-height: 1.3; color: var(--maka-black); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.mini-info { font-size: 0.8em; color: var(--text-muted); margin-top: 8px; line-height: 1.4; }
-.mini-dist { text-align: right; font-weight: 800; color: var(--maka-teal); font-size: 0.9em; background: #f0fdfa; padding: 5px 10px; border-radius: 8px; align-self: flex-end; border: 1px solid rgba(14, 165, 166, 0.1); }
-
-/* NAV */
-footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--maka-black); border-radius: 100px; padding: 14px 35px; display: flex; gap: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); z-index: 999; }
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 700; }
-.nav-item span { font-size: 22px; margin-bottom: 3px; }
-.nav-item.active span { color: var(--maka-yellow); }
-</style>
+        .nav-bottom {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 400px; height: 70px;
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
+            border: 1px solid var(--border); border-radius: 25px;
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+        }
+        .nav-item { text-decoration: none; color: #444; font-size: 9px; text-align: center; font-weight: 700; }
+        .nav-item.active { color: var(--cyan); }
+    </style>
 </head>
 <body>
-  <div class="app-container">
-    <div class="header"><h1 class="h-title">FAST CHARGING</h1><div class="h-sub">MAKA LINTAS UTARA</div></div>
-    <main id="view-list">
-      <div id="scanState" class="hero-card" style="text-align:center; border:1px dashed #444; background:transparent; box-shadow:none; color:var(--text-muted);">
-        <div style="margin-bottom:15px; font-size:2.5em;">📡</div><h2 style="font-size:1.1em; font-family:'Syne'; margin:0;">Mencari Sinyal GPS...</h2>
-      </div>
-      <div id="foundState" class="hero-card" style="display:none;">
-        <div class="radar-status"><div class="gps-dot"></div> TERDEKAT</div><div class="hero-dist" id="heroDist">-- KM</div>
-        <h2 class="hero-name" id="heroName">Nama Lokasi</h2><div class="hero-info" id="heroInfo">Loading...</div>
-        <button id="btnHeroNav" class="btn-nav-hero">NAVIGASI SEKARANG ↗</button>
-      </div>
-      <div id="mainListContainer"></div>
-    </main>
-  </div>
-  <footer class="bottom-nav">
-    <a href="lokasi_fc.html" class="nav-item active"><span>⚡</span>Lokasi</a>
-    <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
-    <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
-  </footer>
-  <script>
-    const URL_LOKASI = "https://docs.google.com/spreadsheets/d/1EJOTMMfGpBMFPqR0LzbMbh7tZUcTCZld4x387OO9aJM/export?format=csv";
-    let chargers = [], userLat = null, userLng = null;
-    async function loadData() {
-      try {
-        const txt = await fetch(URL_LOKASI).then(r=>r.text());
-        chargers = txt.split('\n').slice(1).map((r,i) => {
-          const c = r.split(','); let lat=parseFloat(c[4]?.replace(',','.')), lng=parseFloat(c[5]?.replace(',','.'));
-          if(c.length<5 || isNaN(lat) || isNaN(lng)) return null;
-          return { id:i, name:c[0].replace(/"/g,''), city:c[1], type:c[2], status:c[3], lat:lat, lng:lng, link:c[6]||'', nozzle:c[7]||'-', cost:c[8]||'-' };
-        }).filter(i=>i);
-        renderList();
-        if(navigator.geolocation) navigator.geolocation.watchPosition(p=>{ userLat=p.coords.latitude; userLng=p.coords.longitude; processData(); }, e=>{console.log("GPS Err")}, {enableHighAccuracy:true});
-      } catch(e) { console.error(e); }
-    }
-    function getDist(lat1, lon1, lat2, lon2) {
-      const R=6371, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
-      const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-      return (R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))).toFixed(1);
-    }
-    function processData() {
-      if(userLat) { chargers.forEach(c => c.dist = parseFloat(getDist(userLat, userLng, c.lat, c.lng))); chargers.sort((a,b) => a.dist - b.dist); }
-      if(chargers.length>0) {
-        const n=chargers[0]; document.getElementById('scanState').style.display='none'; document.getElementById('foundState').style.display='block';
-        document.getElementById('heroName').innerText=n.name; document.getElementById('heroDist').innerText=n.dist?n.dist+' KM':'';
-        document.getElementById('heroInfo').innerText=`${n.city} • ${n.type}\n${n.nozzle} Nozzle • ${n.cost}`;
-        document.getElementById('btnHeroNav').onclick=()=>window.open(n.link && n.link.length>5 ? n.link : `http://maps.google.com/?q=${n.lat},${n.lng}`, '_blank');
-        renderList();
-      }
-    }
-    function renderList() {
-      const c = document.getElementById('mainListContainer'); c.innerHTML=''; const grp = {};
-      chargers.forEach(i => { const k=i.city||'Lainnya'; if(!grp[k])grp[k]=[]; grp[k].push(i); });
-      Object.keys(grp).forEach(k => {
-        let h = `<div class="city-group"><div class="city-header"><div class="city-title">${k}</div><div class="city-line"></div></div><div class="h-scroll">`;
-        grp[k].forEach(i => { h += `<div onclick='window.open("${i.link||"#"}", "_blank")' class="mini-card"><div style="font-size:2em;margin-bottom:10px;">⚡</div><div class="mini-top"><h3>${i.name}</h3><div class="mini-info">${i.type}<br>${i.cost}</div></div><div class="mini-dist">${i.dist?i.dist+' KM':''}</div></div>`; });
-        h += `</div></div>`; c.innerHTML += h;
-      });
-    }
-    document.addEventListener('DOMContentLoaded', loadData);
-  </script>
+
+    <div class="overlay-header">
+        <div class="search-container">
+            <h1>STASIUN CHARGING RIIL</h1>
+            <div id="statusGPS">MENCARI POSISI ANDA...</div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <div id="infoCard">
+        <div id="cardTitle" style="font-family: var(--font-display); font-size: 18px; font-weight: 700; color: white;">Nama Lokasi</div>
+        <div id="cardAddr" style="font-size: 12px; color: #ccc; margin: 8px 0;">Alamat lengkap...</div>
+        <button class="btn-go" id="btnNav">MULAI NAVIGASI (MAPS)</button>
+        <p onclick="this.parentElement.style.display='none'" style="text-align:center; font-size:11px; color:#555; margin-top:10px; cursor:pointer;">Tutup</p>
+    </div>
+
+    <nav class="nav-bottom">
+        <a href="dashboard.html" class="nav-item">🏠<br>HOME</a>
+        <a href="calendar.html" class="nav-item">📅<br>BAYAR</a>
+        <a href="lokasi_fc.html" class="nav-item active">🎫<br>LOKASI</a>
+        <a href="history.html" class="nav-item">📜<br>HISTORY</a>
+    </nav>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // 1. Inisialisasi Firebase (Gunakan config Anda)
+        const firebaseConfig = { 
+            apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", 
+            authDomain: "rtomaka-e67b5.firebaseapp.com", 
+            projectId: "rtomaka-e67b5", 
+            storageBucket: "rtomaka-e67b5.firebasestorage.app", 
+            messagingSenderId: "472036722228", 
+            appId: "1:472036722228:web:11d520f9204db317d02c61" 
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // 2. Inisialisasi Peta
+        const map = L.map('map', { zoomControl: false }).setView([-6.200, 106.816], 12);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© MAKA Fleet'
+        }).addTo(map);
+
+        const fcIcon = L.divIcon({ className: 'fc-marker', iconSize: [14, 14] });
+
+        // 3. Load Data dari Firestore (Ganti 'locations' sesuai nama koleksi di Firebase Anda)
+        function loadLocations() {
+            db.collection('locations').onSnapshot(snap => {
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (d.lat && d.lng) {
+                        const marker = L.marker([d.lat, d.lng], { icon: fcIcon }).addTo(map);
+                        marker.on('click', () => {
+                            document.getElementById('infoCard').style.display = 'block';
+                            document.getElementById('cardTitle').innerText = d.name || "Stasiun FC";
+                            document.getElementById('cardAddr').innerText = d.address || d.addr || "";
+                            document.getElementById('btnNav').onclick = () => {
+                                window.open(`https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}`);
+                            };
+                        });
+                    }
+                });
+            });
+        }
+
+        // 4. Deteksi GPS Real-Time
+        function initGPS() {
+            if (!navigator.geolocation) {
+                document.getElementById('statusGPS').innerText = "GPS TIDAK DIDUKUNG";
+                return;
+            }
+
+            navigator.geolocation.watchPosition(
+                (pos) => {
+                    const { latitude, longitude } = pos.coords;
+                    const userPos = [latitude, longitude];
+                    
+                    document.getElementById('statusGPS').innerText = "GPS AKTIF (POSISI ANDA TERDETEKSI)";
+                    document.getElementById('statusGPS').style.color = "var(--volt)";
+
+                    if (!window.userMarker) {
+                        const userIcon = L.divIcon({ className: 'user-marker', iconSize: [18, 18] });
+                        window.userMarker = L.marker(userPos, { icon: userIcon }).addTo(map)
+                            .bindPopup("Posisi Anda").openPopup();
+                        map.setView(userPos, 14); 
+                    } else {
+                        window.userMarker.setLatLng(userPos);
+                    }
+                },
+                (err) => {
+                    let msg = "GPS MATI / IZIN DITOLAK";
+                    if(err.code === 1) msg = "IZIN LOKASI DIBLOKIR BROWSER";
+                    document.getElementById('statusGPS').innerText = msg;
+                    document.getElementById('statusGPS').style.color = "var(--red)";
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+
+        loadLocations();
+        initGPS();
+    </script>
 </body>
 </html>

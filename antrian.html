@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Antrian - MAKA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00; --red: #FF2A2A;
+            --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.12);
+            --font-display: 'Space Grotesk', sans-serif;
+        }
+        body { margin: 0; padding: 25px; font-family: 'Inter', sans-serif; background: var(--bg); color: white; padding-bottom: 120px; }
+        h1 { font-family: var(--font-display); font-size: 28px; margin: 0; text-align: center; }
+        .sub-h1 { font-size: 10px; color: var(--cyan); letter-spacing: 2px; text-align: center; margin-bottom: 25px; font-weight: 700; }
+
+        .ticket-card {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.05), transparent);
+            border: 1px solid var(--border); border-radius: 30px;
+            padding: 25px; text-align: center; margin-bottom: 25px;
+        }
+        .ticket-num { font-family: var(--font-display); font-size: 58px; font-weight: 700; margin: 10px 0; }
+        
+        .btn-daftar {
+            width: 100%; padding: 16px; background: var(--volt); color: #000;
+            border: none; border-radius: 15px; font-weight: 800; font-family: var(--font-display);
+            cursor: pointer; display: none; margin-top: 10px;
+        }
+        .gps-status { font-size: 11px; margin-top: 10px; color: #666; }
+
+        .q-card {
+            background: var(--glass); border: 1px solid var(--border);
+            padding: 15px 20px; border-radius: 15px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .q-card.mine { border-color: var(--cyan); background: rgba(0, 240, 255, 0.05); }
+        .q-info b { font-family: var(--font-display); font-size: 18px; }
+
+        .nav-bottom { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; height: 70px; background: rgba(10,15,20,0.8); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 20px; display: flex; justify-content: space-around; align-items: center; }
+        .nav-item { text-decoration: none; color: #444; font-size: 10px; font-weight: 700; text-align: center; }
+        .nav-item.active { color: var(--cyan); }
+    </style>
+</head>
+<body>
+
+    <h1>Antrian FC<span>.</span></h1>
+    <p class="sub-h1">LIVE MONITORING & REGISTRATION</p>
+
+    <div class="ticket-card">
+        <div style="font-size: 10px; color: var(--cyan); font-weight: 800;">NOMOR ANDA</div>
+        <div class="ticket-num" id="myNum">--</div>
+        
+        <button id="btnDaftar" class="btn-daftar" onclick="submitAntrian()">DAFTAR ANTRIAN</button>
+        <div id="statusMsg" class="gps-status">Mengecek Lokasi GPS...</div>
+    </div>
+
+    <div id="qList"></div>
+
+    <nav class="nav-bottom">
+        <a href="dashboard.html" class="nav-item">🏠<br>HOME</a>
+        <a href="calendar.html" class="nav-item">📅<br>BAYAR</a>
+        <a href="lokasi_fc.html" class="nav-item active">🎫<br>LOKASI</a>
+        <a href="history.html" class="nav-item">📜<br>HISTORY</a>
+    </nav>
+
+    <script>
+        const cfg = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
+        firebase.initializeApp(cfg); const db = firebase.firestore();
+        const u = JSON.parse(localStorage.getItem('maka_user'));
+
+        // Titik Koordinat Hub (Sesuaikan dengan script asli Anda)
+        const HUB_LAT = -6.1783; 
+        const HUB_LNG = 106.8322;
+        const MAX_DIST = 0.5; // Jarak maksimal 500 meter
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; const dLat = (lat2-lat1)*Math.PI/180; const dLon = (lon2-lon1)*Math.PI/180;
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+            return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+        }
+
+        function checkGPS() {
+            navigator.geolocation.getCurrentPosition(pos => {
+                const dist = getDistance(pos.coords.latitude, pos.coords.longitude, HUB_LAT, HUB_LNG);
+                const btn = document.getElementById('btnDaftar');
+                const msg = document.getElementById('statusMsg');
+
+                if (dist <= MAX_DIST) {
+                    msg.innerHTML = "📍 Lokasi Terverifikasi (Di Area Hub)";
+                    msg.style.color = "var(--volt)";
+                    checkInQueue(); // Cek apakah sudah terdaftar
+                } else {
+                    msg.innerHTML = "❌ Anda berada di luar area Hub (Jarak: "+dist.toFixed(2)+"km)";
+                    msg.style.color = "var(--red)";
+                    btn.style.display = 'none';
+                }
+            }, () => {
+                document.getElementById('statusMsg').innerText = "Gagal akses GPS. Aktifkan lokasi!";
+            }, { enableHighAccuracy: true });
+        }
+
+        function checkInQueue() {
+            db.collection('antrian_fc').doc(u.plat).onSnapshot(doc => {
+                const btn = document.getElementById('btnDaftar');
+                if (doc.exists) {
+                    btn.style.display = 'none';
+                } else {
+                    btn.style.display = 'block';
+                }
+            });
+        }
+
+        async function submitAntrian() {
+            const snap = await db.collection('antrian_fc').orderBy('nomor', 'desc').limit(1).get();
+            let nextNum = 1;
+            if (!snap.empty) nextNum = snap.docs[0].data().nomor + 1;
+
+            await db.collection('antrian_fc').doc(u.plat).set({
+                plat: u.plat, nomor: nextNum, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            alert("Berhasil mendaftar! Nomor: " + nextNum);
+        }
+
+        function renderQueue() {
+            db.collection('antrian_fc').orderBy('nomor', 'asc').onSnapshot(snap => {
+                const list = document.getElementById('qList');
+                list.innerHTML = '';
+                snap.forEach((doc, i) => {
+                    const d = doc.data();
+                    const isMine = d.plat === u.plat;
+                    if(isMine) document.getElementById('myNum').innerText = d.nomor;
+                    
+                    list.innerHTML += `
+                        <div class="q-card ${isMine ? 'mine' : ''}">
+                            <div class="q-info"><b>#${d.nomor}</b><br><small>${d.plat}</small></div>
+                            <div style="font-size:10px; font-weight:800; color:var(--cyan)">${i === 0 ? 'DILAYANI' : 'MENUNGGU'}</div>
+                        </div>`;
+                });
+            });
+        }
+
+        renderQueue();
+        checkGPS();
+    </script>
+</body>
+</html>

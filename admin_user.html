@@ -1,167 +1,134 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Admin Ops - MAKA</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Ops - MAKA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --bg: #05080A;
+            --cyan: #00F0FF;
+            --volt: #D9FF00;
+            --red: #FF2A2A;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-soft: #A0AEC0;
+            --font-display: 'Space Grotesk', sans-serif;
+        }
 
-<style>
-/* === MAKA LUXURY THEME === */
-:root { --bg:#0a0f18; --teal:#0ea5a6; --glass:rgba(255,255,255,0.03); --border:rgba(255,255,255,0.1); --text:#fff; }
-body { margin:0; padding:20px; font-family:'Inter'; background:var(--bg); color:var(--text); min-height:100vh; padding-bottom: 80px; }
-.container { max-width:800px; margin:0 auto; }
+        body { margin: 0; padding: 20px; background: var(--bg); color: white; font-family: 'Inter'; padding-bottom: 80px; }
+        .container { max-width: 900px; margin: 0 auto; }
 
-/* HEADER */
-h2 { font-family:'Syne'; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:15px; color: var(--teal); margin-top: 0; }
-.logout { font-size:0.6em; color:#ef4444; text-decoration:none; border:1px solid #ef4444; padding:5px 12px; border-radius:10px; font-weight: 700; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        h1 { font-family: var(--font-display); font-size: 22px; margin: 0; }
+        
+        /* Stats Box */
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 30px; }
+        .stat-card { background: var(--glass); border: 1px solid var(--border); padding: 15px; border-radius: 15px; text-align: center; }
+        .stat-card small { font-size: 9px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-card div { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-top: 5px; }
 
-/* STATS DASHBOARD (NEW) */
-.stats-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:30px; }
-.stat-card { background:var(--glass); border:1px solid var(--border); padding:20px; border-radius:20px; text-align:center; }
-.stat-val { font-family:'Syne'; font-size:2em; font-weight:800; color:#fff; display:block; line-height: 1; margin-bottom: 5px;}
-.stat-lbl { font-size:0.7em; color:#94a3b8; text-transform:uppercase; letter-spacing:1px; font-weight: 700; }
+        /* Section Styling */
+        .sec-title { font-family: var(--font-display); font-size: 14px; color: var(--cyan); margin-bottom: 15px; display: flex; justify-content: space-between; }
+        
+        /* Table / List */
+        .user-item { 
+            background: var(--glass); border: 1px solid var(--border); border-radius: 20px; 
+            padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .u-info b { display: block; font-size: 14px; margin-bottom: 2px; }
+        .u-info span { font-size: 11px; color: var(--text-soft); font-weight: 600; }
+        
+        .u-actions { display: flex; gap: 8px; }
+        .btn-sm { padding: 8px 12px; border-radius: 10px; border: none; font-size: 10px; font-weight: 800; cursor: pointer; }
+        .btn-ban { background: rgba(255, 42, 42, 0.1); color: var(--red); border: 1px solid var(--red); }
+        .btn-unban { background: var(--volt); color: #000; }
 
-/* TABS */
-.tabs { display:flex; gap:10px; margin-bottom:25px; }
-.tab-btn { flex:1; padding:14px; background:transparent; border:1px solid var(--border); color:#64748b; border-radius:14px; cursor:pointer; font-weight:700; transition:0.3s; font-family: 'Syne'; }
-.tab-btn.active { background:var(--teal); color:#fff; border-color:var(--teal); box-shadow: 0 0 20px rgba(14, 165, 166, 0.3); }
-
-/* CONTENT */
-.section { display:none; } .section.active { display:block; }
-.glass-card { background:var(--glass); border:1px solid var(--border); padding:25px; border-radius:24px; margin-bottom:20px; }
-
-input, select, textarea { 
-    width:100%; padding:14px; background:rgba(0,0,0,0.3); border:1px solid var(--border); 
-    color:white; border-radius:12px; margin-bottom:15px; outline:none; font-family:'Inter';
-}
-label { display:block; font-size:0.75em; color:var(--teal); margin-bottom:8px; font-weight:700; letter-spacing: 0.5px; }
-
-/* BUTTONS */
-button { width:100%; padding:14px; background:var(--glass); color:white; border:1px solid var(--border); border-radius:12px; font-weight:700; cursor:pointer; font-family: 'Syne'; }
-.btn-main { background:var(--teal); border:none; color: white; }
-.btn-action { width:auto; padding:8px 14px; font-size:0.75em; border-radius: 8px; }
-.btn-wa { background:#25D366; color:white; border:none; margin-right:8px; }
-.btn-ban { background:rgba(239,68,68,0.2); color:#ef4444; border:1px solid #ef4444; }
-
-/* LIST */
-.user-item { 
-    display:flex; justify-content:space-between; align-items:center; 
-    padding:18px; border-bottom:1px solid var(--border); 
-    background:rgba(255,255,255,0.02); margin-bottom:10px; border-radius:16px;
-}
-.u-main h4 { margin:0; font-family:'Syne'; color:white; font-size: 1.1em; }
-.u-main p { margin:4px 0 0; font-size:0.85em; color:#94a3b8; }
-.badge-ban { background:#ef4444; color:white; padding:2px 8px; border-radius:6px; font-size:0.7em; margin-left:8px; font-weight: bold; }
-</style>
+        /* Floating Nav */
+        .adm-nav {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: #000; border: 1px solid var(--border); padding: 8px;
+            border-radius: 20px; display: flex; gap: 5px;
+        }
+        .adm-nav a { 
+            text-decoration: none; color: white; padding: 10px 20px; 
+            font-size: 11px; font-weight: 700; border-radius: 15px;
+        }
+        .adm-nav a.active { background: var(--cyan); color: #000; }
+    </style>
 </head>
 <body>
 
 <div class="container">
-    <h2><span>🛠️ ADMIN OPS</span> <a href="admin_login.html" class="logout">LOGOUT</a></h2>
+    <header>
+        <h1>OPS CENTER<span>.</span></h1>
+        <button onclick="location.reload()" style="background:none; border:none; color:var(--cyan); font-weight:700; font-size:12px;">REFRESH</button>
+    </header>
 
-    <div class="stats-grid">
-        <div class="stat-card"><span class="stat-val" id="stTotal">0</span><span class="stat-lbl">Total Unit</span></div>
-        <div class="stat-card"><span class="stat-val" id="stActive" style="color:#34d399">0</span><span class="stat-lbl">Aktif</span></div>
-        <div class="stat-card"><span class="stat-val" id="stBanned" style="color:#ef4444">0</span><span class="stat-lbl">Blokir</span></div>
+    <div class="stat-grid">
+        <div class="stat-card"><small>TOTAL DRIVER</small><div id="stTotal">0</div></div>
+        <div class="stat-card"><small>ACTIVE</small><div id="stActive" style="color:var(--volt)">0</div></div>
+        <div class="stat-card"><small>BANNED</small><div id="stBanned" style="color:var(--red)">0</div></div>
     </div>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="sw(1)">Database</button>
-        <button class="tab-btn" onclick="sw(2)">Sparepart</button>
-        <button class="tab-btn" onclick="sw(3)">Broadcast</button>
-    </div>
-
-    <div id="sec-1" class="section active">
-        <div class="glass-card">
-            <button onclick="exportExcel()" class="btn-main" style="margin-bottom:20px;">📥 DOWNLOAD EXCEL DATA</button>
-            <input id="searchUser" placeholder="🔍 Cari Plat Nomor / Nama..." onkeyup="loadUsers()">
-            <div id="userList" style="margin-top: 20px;">Loading...</div>
+    <div class="sec-title">DATABAS MEMBER <span style="font-size:10px; color:var(--text-soft)">RECENTLY JOINED</span></div>
+    <div id="userList">
         </div>
-    </div>
+</div>
 
-    <div id="sec-2" class="section">
-        <div class="glass-card">
-            <label>Nama Part Baru</label><input id="pName">
-            <label>Limit (Qty per 3 Tahun)</label><input id="pLim" type="number">
-            <button onclick="addPart()" class="btn-main">SIMPAN DATA PART</button>
-        </div>
-        <div id="partList"></div>
-    </div>
-
-    <div id="sec-3" class="section">
-        <div class="glass-card">
-            <label>Judul Notifikasi</label><input id="bTitle">
-            <label>Isi Pesan</label><textarea id="bBody" rows="4"></textarea>
-            <button onclick="broadcast()" class="btn-main">KIRIM KE SEMUA USER 🚀</button>
-        </div>
-    </div>
+<div class="adm-nav">
+    <a href="admin_user.html" class="active">OPERATIONAL</a>
+    <a href="admin_finance.html">FINANCE</a>
 </div>
 
 <script>
-// CONFIG
-const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
-firebase.initializeApp(firebaseConfig); const db=firebase.firestore();
+    const cfg = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
+    firebase.initializeApp(cfg);
+    const db = firebase.firestore();
 
-function sw(id){ document.querySelectorAll('.section').forEach(x=>x.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active')); document.getElementById('sec-'+id).classList.add('active'); event.target.classList.add('active'); }
+    if(!sessionStorage.getItem('admin_auth')) location.href = 'admin_login.html';
 
-// 1. USER LOGIC
-let allUsers=[];
-function loadUsers(){
-    const k=document.getElementById('searchUser').value.toUpperCase();
-    db.collection('users').onSnapshot(s=>{
-        allUsers=[]; let h='', act=0, ban=0;
-        s.forEach(d=>{
-            const u=d.data(); allUsers.push(u);
-            if(u.isBanned) ban++; else act++;
-            
-            if(u.plat.includes(k) || u.nama.toUpperCase().includes(k)){
-                const bg = u.isBanned ? 'opacity:0.5' : '';
-                h += `<div class="user-item" style="${bg}">
-                    <div class="u-main">
-                        <h4>${u.nama} ${u.isBanned?'<span class="badge-ban">BLOKIR</span>':''}</h4>
-                        <p>${u.plat} • ${u.hp}</p>
+    function loadUsers() {
+        db.collection('users').onSnapshot(snap => {
+            const list = document.getElementById('userList');
+            let total = 0, active = 0, banned = 0;
+            list.innerHTML = '';
+
+            snap.forEach(doc => {
+                const u = doc.data();
+                total++;
+                u.isBanned ? banned++ : active++;
+
+                list.innerHTML += `
+                    <div class="user-item">
+                        <div class="u-info">
+                            <b>${u.nama}</b>
+                            <span>${u.plat} • ${u.dpType === "755" ? "Reguler" : "Promo"}</span>
+                        </div>
+                        <div class="u-actions">
+                            ${u.isBanned ? 
+                                `<button class="btn-sm btn-unban" onclick="togBan('${u.plat}', false)">UNBLOCK</button>` : 
+                                `<button class="btn-sm btn-ban" onclick="togBan('${u.plat}', true)">BLOCK</button>`}
+                        </div>
                     </div>
-                    <div>
-                        <button class="btn-action btn-wa" onclick="window.open('https://wa.me/${u.hp}','_blank')">WhatsApp</button>
-                        <button class="btn-action btn-ban" onclick="togBan('${u.plat}',${!u.isBanned})">${u.isBanned?'BUKA':'BAN'}</button>
-                    </div>
-                </div>`;
-            }
+                `;
+            });
+            document.getElementById('stTotal').innerText = total;
+            document.getElementById('stActive').innerText = active;
+            document.getElementById('stBanned').innerText = banned;
         });
-        document.getElementById('userList').innerHTML=h||'<p align="center" style="color:#666">Tidak ditemukan.</p>';
-        document.getElementById('stTotal').innerText=allUsers.length;
-        document.getElementById('stActive').innerText=act;
-        document.getElementById('stBanned').innerText=ban;
-    });
-}
-function togBan(p,s){ if(confirm(s?"Blokir akses user ini?":"Buka blokir user ini?")) db.collection('users').doc(p).update({isBanned:s}); }
-function exportExcel(){ if(!allUsers.length)return; const ws=XLSX.utils.json_to_sheet(allUsers); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Data_Member"); XLSX.writeFile(wb,"MAKA_Users.xlsx"); }
+    }
 
-// 2. PARTS
-function addPart(){ 
-    const n=document.getElementById('pName').value, l=document.getElementById('pLim').value;
-    if(n&&l) db.collection('settings').doc('parts').set({[n.toLowerCase().replace(/\s/g,'_')]:{name:n,limit:l}},{merge:true}).then(()=>{alert('Part Disimpan!');loadParts()});
-}
-function loadParts(){
-    db.collection('settings').doc('parts').onSnapshot(d=>{
-        if(d.exists){
-            let h='',dt=d.data(); for(let k in dt){ h+=`<div class="glass-card" style="padding:15px;margin-bottom:10px;display:flex;justify-content:space-between;"><b>${dt[k].name}</b> <span>Limit: ${dt[k].limit}</span></div>`; }
-            document.getElementById('partList').innerHTML=h;
+    function togBan(p, s) {
+        if(confirm(s ? "Blokir akses driver ini?" : "Buka blokir driver ini?")) {
+            db.collection('users').doc(p).update({isBanned: s});
         }
-    });
-}
+    }
 
-// 3. BROADCAST
-function broadcast(){
-    const t=document.getElementById('bTitle').value, b=document.getElementById('bBody').value;
-    if(t&&b&&confirm("Kirim Notifikasi ke SEMUA member?")) db.collection('broadcasts').add({title:t,body:b,time:new Date()}).then(()=>alert("Pesan Terkirim!"));
-}
-
-loadUsers(); loadParts();
+    loadUsers();
 </script>
 </body>
 </html>

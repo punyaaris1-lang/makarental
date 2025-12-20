@@ -1,54 +1,113 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Info MLU - MAKA</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-<link rel="manifest" href="/makarental/manifest.json"> 
-<style>
-/* === MAKA CLEAN THEME === */
-:root { --maka-black: #0f1724; --maka-white: #ffffff; --maka-teal: #0ea5a6; --bg-page: #f8fafc; --border: #e2e8f0; --text-muted: #64748b; }
-body { margin:0; font-family:'Inter', sans-serif; background:var(--bg-page); color:var(--maka-black); padding-bottom:120px; }
-.app-container { max-width:480px; margin:0 auto; padding:20px 24px; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tips & Info - MAKA</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-.header-simple { margin-bottom: 25px; padding-top: 10px; text-align: center; }
-.page-title { font-family: 'Syne'; font-size: 1.6em; font-weight: 800; margin: 0; }
-.page-subtitle { color: var(--text-muted); font-size: 0.9em; margin-top: 4px; }
+    <style>
+        :root {
+            --bg: #05080A;
+            --cyan: #00F0FF;
+            --volt: #D9FF00;
+            --glass: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.12);
+            --text-soft: #CBD5E1; /* Kontras tinggi untuk teks isi */
+            --font-display: 'Space Grotesk', sans-serif;
+        }
 
-.list { display: flex; flex-direction: column; gap: 20px; }
-.card { background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-.c-title { font-family: 'Syne'; font-size: 1.2em; font-weight: 700; margin: 0 0 10px 0; }
-.c-meta { display: inline-block; font-size: 0.7em; color: var(--maka-teal); background: #f0fdfa; padding: 4px 10px; border-radius: 6px; margin-bottom: 15px; font-weight: 700; border: 1px solid rgba(14,165,166,0.2); }
-.c-img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 15px; background: #e2e8f0; }
-.c-text { font-size: 0.95em; line-height: 1.6; color: #475569; white-space: pre-line; margin: 0; }
-.empty { text-align: center; padding: 40px; color: var(--text-muted); }
+        body {
+            margin: 0; padding: 25px; font-family: 'Inter', sans-serif;
+            background: var(--bg); color: white; padding-bottom: 120px;
+        }
 
-/* NAV */
-footer.bottom-nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--maka-black); border-radius: 100px; padding: 14px 35px; display: flex; gap: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); z-index: 999; }
-.nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #64748b; font-size: 10px; font-weight: 700; }
-.nav-item span { font-size: 22px; margin-bottom: 3px; }
-.nav-item.active span { color: var(--maka-yellow); }
-</style>
+        h1 { font-family: var(--font-display); font-size: 32px; margin-bottom: 5px; letter-spacing: -1px; }
+        .sub-h1 { font-size: 11px; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; font-weight: 700; opacity: 0.9; }
+
+        /* Feed List */
+        .feed-list { display: flex; flex-direction: column; gap: 20px; }
+        .feed-card {
+            background: var(--glass); border: 1px solid var(--border);
+            border-radius: 30px; padding: 25px; backdrop-filter: blur(10px);
+            animation: fadeIn 0.6s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .c-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin: 0 0 10px 0; color: white; }
+        .c-meta { display: inline-block; font-size: 10px; color: var(--volt); background: rgba(217, 255, 0, 0.05); padding: 5px 12px; border-radius: 8px; margin-bottom: 20px; font-weight: 800; border: 1px solid rgba(217, 255, 0, 0.2); }
+        .c-img { width: 100%; height: 200px; object-fit: cover; border-radius: 20px; margin-bottom: 20px; background: #111; border: 1px solid var(--border); }
+        .c-text { font-size: 14px; line-height: 1.6; color: var(--text-soft); white-space: pre-line; margin: 0; }
+        .empty { text-align: center; padding: 50px; color: #444; font-weight: 600; }
+
+        /* Nav Bawah */
+        .nav-bottom {
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 400px; height: 75px;
+            background: rgba(10, 15, 20, 0.85); backdrop-filter: blur(25px);
+            border: 1px solid var(--border); border-radius: 25px;
+            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+        }
+        .nav-item { text-decoration: none; color: #444; font-size: 10px; font-weight: 700; text-align: center; }
+        .nav-item.active { color: var(--cyan); }
+        .nav-item span { display: block; font-size: 24px; margin-bottom: 4px; }
+    </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="header-simple"><h1 class="page-title">Info MLU</h1><p class="page-subtitle">Berita Komunitas</p></div>
-        <div class="list" id="list"><div class="empty">Memuat info...</div></div>
+
+    <h1 id="pageTitle">Feed<span>.</span></h1>
+    <div class="sub-h1" id="pageSubtitle">Pusat Informasi Driver</div>
+
+    <div class="feed-list" id="list">
+        <div class="empty">Menghubungkan ke sistem...</div>
     </div>
-    <footer class="bottom-nav">
-        <a href="lokasi_fc.html" class="nav-item"><span>⚡</span>Lokasi</a>
-        <a href="dashboard.html" class="nav-item"><span>🏠</span>Home</a>
-        <a href="daftar_antrian.html" class="nav-item"><span>🎫</span>Antrian</a>
-    </footer>
+
+    <nav class="nav-bottom">
+        <a href="dashboard.html" class="nav-item"><span>🏠</span>HOME</a>
+        <a href="calendar.html" class="nav-item"><span>📅</span>BAYAR</a>
+        <a href="https://punyaaris1-lang.github.io/antricukk/antrian.html" class="nav-item"><span>⚡</span>ANTRIAN</a>
+        <a href="history.html" class="nav-item"><span>📜</span>HISTORY</a>
+    </nav>
+
     <script>
+        // Konfigurasi Firebase dari file Anda
         const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
-        try{firebase.initializeApp(firebaseConfig); var db=firebase.firestore();}catch(e){}
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Tentukan koleksi berdasarkan nama file saat ini
+        const isTips = window.location.pathname.includes('tips');
+        const collectionName = isTips ? 'tips_maka' : 'info_mlu';
+        
+        // Update Judul UI
+        document.getElementById('pageTitle').innerHTML = isTips ? 'Tips<span>.</span>' : 'Info<span>.</span>';
+        document.getElementById('pageSubtitle').innerText = isTips ? 'Panduan Perawatan Unit' : 'Berita Komunitas Driver';
+
         function load() {
-            db.collection('info_mlu').orderBy('timestamp', 'desc').limit(20).get().then(snap => {
-                const c = document.getElementById('list'); c.innerHTML = '';
-                if (snap.empty) { c.innerHTML = '<div class="empty">Belum ada info.</div>'; return; }
-                snap.forEach(doc => { const d = doc.data(); let img = d.photos && d.photos.length > 0 ? `<img src="${d.photos[0]}" class="c-img" onerror="this.style.display='none'">` : ''; c.innerHTML += `<div class="card"><h3 class="c-title">${d.title}</h3><span class="c-meta">${d.date}</span>${img}<p class="c-text">${d.content}</p></div>`; });
+            db.collection(collectionName).orderBy('timestamp', 'desc').limit(20).get().then(snap => {
+                const c = document.getElementById('list'); 
+                c.innerHTML = '';
+                
+                if (snap.empty) { 
+                    c.innerHTML = '<div class="empty">Belum ada pembaruan saat ini.</div>'; 
+                    return; 
+                }
+
+                snap.forEach(doc => { 
+                    const d = doc.data(); 
+                    let img = d.photos && d.photos.length > 0 ? `<img src="${d.photos[0]}" class="c-img" onerror="this.style.display='none'">` : ''; 
+                    
+                    c.innerHTML += `
+                        <div class="feed-card">
+                            <h3 class="c-title">${d.title}</h3>
+                            <span class="c-meta">${d.date}</span>
+                            ${img}
+                            <p class="c-text">${d.content}</p>
+                        </div>`; 
+                });
             });
         }
         document.addEventListener('DOMContentLoaded', load);
