@@ -6,22 +6,27 @@
     <title>MAKA • MONOLITH LIVE</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
+    
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
         :root { --neon: #D9FF00; --dark: #050505; --err: #FF003C; --cyan: #00F0FF; }
         body { margin: 0; padding: 0; background: var(--dark); color: white; font-family: 'Space Grotesk', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; position: relative; }
 
-        /* AMBIENT GLOW */
+        /* VISUAL EFFECTS */
         .glow-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; background: #333; opacity: 0.15; filter: blur(120px); border-radius: 50%; z-index: 0; transition: 1s; }
 
-        /* HEADER CLEAN (Hanya Slot Dots) */
+        /* HEADER */
         .top-bar { display: flex; justify-content: space-between; padding: 30px; z-index: 10; align-items: center; }
         .slot-pill { display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: 0.3s; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
-        .dot.charging { background: var(--neon); box-shadow: 0 0 10px var(--neon); }
+        .dot.charging { background: var(--neon); box-shadow: 0 0 10px var(--neon); transform: scale(1.2); }
         .slot-label { font-size: 9px; font-weight: 700; color: #888; letter-spacing: 2px; margin-left: 5px; }
 
-        /* CENTER MONOLITH */
+        /* MONOLITH (ANGKA TENGAH) */
         .monolith { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; text-align: center; position: relative; }
         .mono-label { font-family: 'Syncopate', sans-serif; font-size: 10px; letter-spacing: 4px; color: #555; margin-bottom: 20px; text-transform: uppercase; transition: 0.3s; }
         
@@ -32,28 +37,30 @@
         .sub-stat { margin-top: 25px; font-size: 11px; color: var(--cyan); letter-spacing: 1px; background: rgba(0, 240, 255, 0.1); padding: 8px 20px; border-radius: 30px; opacity: 0; transform: translateY(10px); transition: 0.5s; }
         .sub-stat.show { opacity: 1; transform: translateY(0); }
 
-        /* BOTTOM DECK */
+        /* BOTTOM CONTROLS */
         .control-deck { padding: 0 30px 40px; z-index: 10; display: flex; flex-direction: column; gap: 15px; }
-        
-        /* Global Queue pindah ke sini (Kecil & Rapi) */
         .system-info { text-align: center; font-size: 9px; color: #444; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
         .system-info b { color: #888; }
 
+        /* TOMBOL FINGERPRINT */
         .hold-btn { position: relative; width: 80px; height: 80px; margin: 0 auto; border-radius: 50%; border: 1px solid #333; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; overflow: hidden; -webkit-tap-highlight-color: transparent; }
         .hold-btn::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--neon); opacity: 0; transform: scale(0); transition: 0.2s; }
         .hold-btn:active::before { opacity: 0.2; transform: scale(1); }
+        
         .hold-btn.locked { border-color: #222; cursor: not-allowed; opacity: 0.4; }
         .hold-btn.unlocked { border-color: var(--neon); box-shadow: 0 0 25px rgba(217, 255, 0, 0.15); }
+        
         .finger-icon { font-size: 30px; z-index: 2; color: #444; transition: 0.3s; }
         .hold-btn.unlocked .finger-icon { color: var(--neon); }
 
         .btn-text { text-align: center; font-size: 10px; color: #555; letter-spacing: 2px; font-weight: 700; margin-top: 10px; }
 
-        /* NAV FLOAT */
+        /* NAVIGASI BAWAH */
         .nav-float { background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(20px); border-radius: 30px; padding: 12px 30px; display: flex; justify-content: space-between; border: 1px solid rgba(255,255,255,0.08); margin-top: 10px; }
         .nav-icon { text-decoration: none; font-size: 24px; filter: grayscale(1); opacity: 0.5; transition: 0.3s; }
         .nav-icon.active { filter: grayscale(0); opacity: 1; transform: scale(1.1); text-shadow: 0 0 15px var(--neon); }
         
+        /* OVERLAY LOADING */
         #scanner { position: fixed; inset: 0; background: #000; z-index: 100; display: none; align-items: center; justify-content: center; flex-direction: column; }
         .scan-beam { width: 100%; height: 2px; background: var(--neon); box-shadow: 0 0 20px var(--neon); animation: beam 1s infinite; }
         @keyframes beam { 0% {transform: translateY(-50vh);} 100% {transform: translateY(50vh);} }
@@ -74,22 +81,21 @@
     </div>
 
     <div class="monolith">
-        <div class="mono-label" id="statusLabel">CONNECTING...</div>
+        <div class="mono-label" id="statusLabel">INITIALIZING...</div>
         <div class="mono-num" id="mainDisplay">--<span>%</span></div>
         <div class="sub-stat" id="subInfo">DATA FETCHING</div>
     </div>
 
     <div class="control-deck">
-        
         <div class="system-info">
             TOTAL ANTRIAN: <b id="totalQ">--</b> | EST: <b id="estTime">--</b>
         </div>
 
         <div id="btnWrapper">
-            <button id="btnHold" class="hold-btn locked">
+            <button id="btnHold" class="hold-btn locked" onclick="processQueue()">
                 <div class="finger-icon">⏻</div>
             </button>
-            <div class="btn-text" id="gpsText">SEARCHING GPS...</div>
+            <div class="btn-text" id="gpsText">WAITING GPS...</div>
         </div>
 
         <div class="nav-float">
@@ -105,120 +111,68 @@
         <div class="scan-beam"></div>
     </div>
 
-    <script type="module">
-        // --- 1. IMPORT MODULAR (SESUAI SCRIPT ANDA) ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script>
+        // --- 1. CONFIG FIREBASE ANDA (COMPAT VERSION) ---
+        const firebaseConfig = { 
+            apiKey: "AIzaSyALIlkIDALIk83K8s1htalvW6rmNNw02Go", 
+            authDomain: "sistem-antrian-b1c39.firebaseapp.com", 
+            projectId: "sistem-antrian-b1c39", 
+            storageBucket: "sistem-antrian-b1c39.firebasestorage.app", 
+            messagingSenderId: "454124587608", 
+            appId: "1:454124587608:web:34fbb0f5211067a67f982d" 
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-        // --- 2. CONFIG ASLI ANDA ---
-        const firebaseConfig = { apiKey: "AIzaSyALIlkIDALIk83K8s1htalvW6rmNNw02Go", authDomain: "sistem-antrian-b1c39.firebaseapp.com", projectId: "sistem-antrian-b1c39", storageBucket: "sistem-antrian-b1c39.firebasestorage.app", messagingSenderId: "454124587608", appId: "1:454124587608:web:34fbb0f5211067a67f982d" };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        
-        // --- 3. TARGET DB & GPS ASLI ---
-        // Ini kuncinya! Kita tembak dokumen "antrian/utama"
-        const ref = doc(db, "antrian", "utama"); 
-        
-        // Koordinat Asli dari script Anda
+        // --- 2. SETTING LOKASI ---
         const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
         const MAX_DIST_KM = 0.2; // 200 Meter
-        
+        let isGpsReady = false;
+
+        // --- 3. CEK USER ---
         let currentUser = null;
         try { currentUser = JSON.parse(localStorage.getItem('maka_user')); } catch (e) {}
-
-        // --- UPDATE UI LOGIC ---
-        function updateUI(myData, totalWaiting, activeChargers) {
-            const display = document.getElementById('mainDisplay');
-            const label = document.getElementById('statusLabel');
-            const sub = document.getElementById('subInfo');
-            const bg = document.getElementById('bgGlow');
-            
-            // Update Global Info
-            document.getElementById('totalQ').innerText = totalWaiting;
-            document.getElementById('estTime').innerText = (totalWaiting * 30) + " MIN";
-
-            // Update Dots Slot
-            for(let i=1; i<=3; i++) {
-                let d = document.getElementById('dot'+i);
-                if (i <= activeChargers) {
-                    d.className = "dot charging"; // Nyalakan Neon
-                } else {
-                    d.className = "dot"; // Matikan
-                }
-            }
-
-            // Monolith Context Switching
-            if (myData) {
-                const st = (myData.status || "").toLowerCase();
-                // Deteksi status charging
-                if (st.includes('charg') || st.includes('isi') || st.includes('penuh')) {
-                    
-                    let bat = myData.baterai || 0; 
-                    display.innerHTML = bat + "<span>%</span>";
-                    display.classList.add('charging');
-                    display.style.color = "var(--neon)";
-                    label.innerText = "CHARGING...";
-                    label.style.color = "var(--neon)";
-                    
-                    sub.innerText = "ESTIMASI PENUH: " + (myData.estimasi || "CALCULATING");
-                    sub.classList.add('show');
-                    bg.style.background = "var(--neon)";
-                } else {
-                    display.innerHTML = myData.no || myData.nomor || "#";
-                    display.classList.remove('charging');
-                    display.style.color = "var(--cyan)";
-                    label.innerText = "ANTRIAN ANDA";
-                    label.style.color = "var(--cyan)";
-                    sub.innerText = "MOHON MENUNGGU";
-                    sub.classList.add('show');
-                    bg.style.background = "var(--cyan)";
-                }
-            } else {
-                display.innerHTML = "--";
-                display.classList.remove('charging');
-                display.style.color = "white";
-                label.innerText = "SILAHKAN DAFTAR";
-                label.style.color = "#555";
-                sub.classList.remove('show');
-                bg.style.background = "#222";
-            }
+        
+        if (!currentUser || !currentUser.plat) {
+            document.getElementById('statusLabel').innerText = "BELUM LOGIN";
+            // Jangan stop script, biarkan user lihat antrian meski belum login
         }
 
-        // --- REAL TIME LISTENER (TARGET KE 'antrian/utama') ---
-        onSnapshot(ref, (snap) => {
-            if(snap.exists()) {
-                const data = snap.data();
-                // Script asli Anda mungkin menyimpan array di dalam field 'list' atau 'antrian'
-                // Kita coba ambil array-nya
-                const queueList = data.list || data.antrian || []; 
-                
-                let myData = null;
-                let totalWaiting = 0;
-                let activeChargers = 0;
+        // --- 4. GPS LOGIC (DENGAN ERROR HANDLING) ---
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(
+                (pos) => {
+                    // SUKSES DAPAT GPS
+                    const dist = getDist(pos.coords.latitude, pos.coords.longitude, STATION_LOC.lat, STATION_LOC.lng);
+                    const btn = document.getElementById('btnHold');
+                    const txt = document.getElementById('gpsText');
 
-                queueList.forEach(item => {
-                    const st = (item.status || "").toLowerCase();
-                    // Hitung Slot Charging
-                    if(st.includes('charg') || st.includes('isi') || st.includes('penuh')) {
-                        activeChargers++;
+                    if (dist <= MAX_DIST_KM) {
+                        isGpsReady = true;
+                        btn.className = "hold-btn unlocked";
+                        txt.innerText = "TAP TO QUEUE";
+                        txt.style.color = "var(--neon)";
                     } else {
-                        totalWaiting++;
+                        isGpsReady = false;
+                        btn.className = "hold-btn locked";
+                        txt.innerText = "TOO FAR (" + (dist * 1000).toFixed(0) + "m)";
+                        txt.style.color = "#555";
                     }
+                },
+                (err) => {
+                    // GAGAL DAPAT GPS
+                    console.error(err);
+                    document.getElementById('gpsText').innerText = "GPS BLOCKED/ERROR";
+                    document.getElementById('gpsText').style.color = "var(--err)";
+                    alert("Gagal mengakses lokasi. Pastikan GPS aktif dan izin diberikan.");
+                },
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        } else {
+            document.getElementById('gpsText').innerText = "NO GPS SUPPORT";
+        }
 
-                    // Cari User
-                    if(currentUser && item.plat === currentUser.plat) {
-                        myData = item;
-                    }
-                });
-
-                updateUI(myData, totalWaiting, activeChargers);
-            } else {
-                console.log("Database Offline/Empty");
-                document.getElementById('statusLabel').innerText = "OFFLINE";
-            }
-        });
-
-        // --- GPS LOGIC ---
         function getDist(lat1, lon1, lat2, lon2) {
             const R = 6371; 
             const dLat = (lat2-lat1) * Math.PI/180;
@@ -227,67 +181,151 @@
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
-        if(navigator.geolocation) {
-            navigator.geolocation.watchPosition(pos => {
-                const dist = getDist(pos.coords.latitude, pos.coords.longitude, STATION_LOC.lat, STATION_LOC.lng);
-                const btn = document.getElementById('btnHold');
-                const txt = document.getElementById('gpsText');
+        // --- 5. REAL-TIME DB LISTENER ---
+        // Target: antrian/utama
+        db.collection("antrian").doc("utama").onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                // Cek nama field array: 'list' atau 'antrian'
+                const queueList = data.list || data.antrian || []; 
+                
+                let myData = null;
+                let totalWaiting = 0;
+                let activeChargers = 0;
 
-                if(dist <= MAX_DIST_KM) {
-                    btn.className = "hold-btn unlocked";
-                    txt.innerText = "TAP TO QUEUE";
-                    txt.style.color = "var(--neon)";
-                    // Attach event listener manual karena module scope
-                    btn.onclick = () => processQueue();
+                queueList.forEach(item => {
+                    const st = (item.status || "").toLowerCase();
+                    // Deteksi charging (include: charge, isi, penuh)
+                    if (st.includes('charg') || st.includes('isi') || st.includes('penuh')) {
+                        activeChargers++;
+                    } else {
+                        totalWaiting++;
+                    }
+
+                    if (currentUser && item.plat === currentUser.plat) {
+                        myData = item;
+                    }
+                });
+
+                updateUI(myData, totalWaiting, activeChargers);
+            } else {
+                document.getElementById('statusLabel').innerText = "DB EMPTY";
+            }
+        }, (error) => {
+            console.error("DB Error:", error);
+            document.getElementById('statusLabel').innerText = "DB ERROR";
+        });
+
+        // --- 6. UPDATE UI ---
+        function updateUI(myData, totalWaiting, activeChargers) {
+            const display = document.getElementById('mainDisplay');
+            const label = document.getElementById('statusLabel');
+            const sub = document.getElementById('subInfo');
+            const bg = document.getElementById('bgGlow');
+            
+            // Stats Bawah
+            document.getElementById('totalQ').innerText = totalWaiting;
+            document.getElementById('estTime').innerText = (totalWaiting * 30) + " MIN";
+
+            // Slot Dots Atas
+            for(let i=1; i<=3; i++) {
+                let d = document.getElementById('dot'+i);
+                d.className = (i <= activeChargers) ? "dot charging" : "dot";
+            }
+
+            // Monolith Tengah
+            if (myData) {
+                const st = (myData.status || "").toLowerCase();
+                if (st.includes('charg') || st.includes('isi') || st.includes('penuh')) {
+                    // MODE CHARGING
+                    let bat = myData.baterai || 0; 
+                    display.innerHTML = bat + "<span>%</span>";
+                    display.className = "mono-num charging";
+                    display.style.color = "var(--neon)";
+                    
+                    label.innerText = "CHARGING...";
+                    label.style.color = "var(--neon)";
+                    
+                    sub.innerText = "FULL IN: " + (myData.estimasi || "15 MIN");
+                    sub.className = "sub-stat show";
+                    bg.style.background = "var(--neon)";
                 } else {
-                    btn.className = "hold-btn locked";
-                    txt.innerText = "TOO FAR (" + (dist*1000).toFixed(0) + "m)";
-                    txt.style.color = "#555";
-                    btn.onclick = null;
+                    // MODE MENUNGGU
+                    display.innerHTML = myData.no || myData.nomor || "#";
+                    display.className = "mono-num";
+                    display.style.color = "var(--cyan)";
+                    
+                    label.innerText = "ANTRIAN ANDA";
+                    label.style.color = "var(--cyan)";
+                    
+                    sub.innerText = "MOHON MENUNGGU";
+                    sub.className = "sub-stat show";
+                    bg.style.background = "var(--cyan)";
                 }
-            }, (err) => {
-                document.getElementById('gpsText').innerText = "GPS ERROR";
-            }, { enableHighAccuracy: true });
-        } else {
-            document.getElementById('gpsText').innerText = "NO GPS";
+            } else {
+                // BELUM DAFTAR
+                display.innerHTML = "--";
+                display.className = "mono-num";
+                display.style.color = "white";
+                
+                label.innerText = "SILAHKAN DAFTAR";
+                label.style.color = "#555";
+                
+                sub.className = "sub-stat"; // Sembunyikan sub info
+                bg.style.background = "#222";
+            }
         }
 
-        // --- FUNGSI DAFTAR (WRITE TO 'antrian/utama') ---
-        async function processQueue() {
-            if(!currentUser) return alert("Login Error");
+        // --- 7. FUNGSI DAFTAR (ARRAY UNION) ---
+        function processQueue() {
+            if (!isGpsReady) return; // Cegah klik jika GPS belum lock
+            if (!currentUser) return alert("Anda belum login (data localStorage kosong).");
+
             const sc = document.getElementById('scanner');
-            sc.style.display = 'flex';
-            
-            try {
-                const snap = await getDoc(ref);
-                let currentList = [];
-                if(snap.exists()) currentList = snap.data().list || snap.data().antrian || [];
-                
-                // Cek duplikasi
-                const isExist = currentList.find(x => x.plat === currentUser.plat);
-                if(isExist) {
-                    sc.style.display = 'none';
-                    alert("Anda sudah terdaftar!");
-                    return;
-                }
+            sc.style.display = 'flex'; // Tampilkan animasi loading
 
-                // Cari max nomor
-                let maxNo = 0;
-                currentList.forEach(item => { if(item.no > maxNo) maxNo = item.no; });
-                let nextNo = maxNo + 1;
+            const docRef = db.collection("antrian").doc("utama");
 
-                // Update menggunakan arrayUnion (Sesuai metode database Anda)
-                await updateDoc(ref, {
-                    list: arrayUnion({
+            // Transaction untuk keamanan data (biar nomor urut gak ganda)
+            db.runTransaction((transaction) => {
+                return transaction.get(docRef).then((sfDoc) => {
+                    if (!sfDoc.exists) { throw "Document does not exist!"; }
+
+                    const data = sfDoc.data();
+                    const list = data.list || data.antrian || [];
+
+                    // Cek duplikasi
+                    const exists = list.find(x => x.plat === currentUser.plat);
+                    if (exists) throw "Anda sudah terdaftar!";
+
+                    // Cari nomor max
+                    let maxNo = 0;
+                    list.forEach(item => { if(item.no > maxNo) maxNo = item.no; });
+                    const nextNo = maxNo + 1;
+
+                    // Data Baru
+                    const newItem = {
                         plat: currentUser.plat,
                         no: nextNo,
                         status: 'waiting',
                         waktu: new Date().toLocaleTimeString('id-ID'),
-                        baterai: 0 
-                    })
-                });
+                        baterai: 0
+                    };
 
+                    // Update Array
+                    transaction.update(docRef, {
+                        list: firebase.firestore.FieldValue.arrayUnion(newItem)
+                    });
+                    
+                    return nextNo;
+                });
+            }).then((newNo) => {
                 setTimeout(() => { sc.style.display = 'none'; }, 500);
-            } catch(e) {
+            }).catch((err) => {
                 sc.style.display = 'none';
-                alert("Gagal: " +
+                if(err !== "Anda sudah terdaftar!") alert("Gagal: " + err);
+            });
+        }
+    </script>
+</body>
+</html>
