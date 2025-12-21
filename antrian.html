@@ -3,192 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAKA • TACTICAL HUD</title>
+    <title>Monolith Queue - MAKA</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#05080A">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#000000">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <style>
         :root { 
-            --bg: #030507; --cyan: #00F0FF; --volt: #D9FF00; --red: #FF2A2A; 
-            --glass: rgba(0, 240, 255, 0.02); --border: rgba(0, 240, 255, 0.1); 
-            --font-main: 'Space Grotesk', sans-serif;
+            --neon: #D9FF00; --dark: #050505; --err: #FF003C; 
+            --glass: rgba(255, 255, 255, 0.05);
         }
         body { 
-            margin: 0; padding: 20px; font-family: var(--font-main); background: var(--bg); color: white; 
-            overflow: hidden; height: 100vh; display: flex; flex-direction: column;
-            background-image: radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.05) 0%, transparent 70%);
+            margin: 0; padding: 0; background: var(--dark); color: white; 
+            font-family: 'Space Grotesk', sans-serif; height: 100vh; overflow: hidden;
+            display: flex; flex-direction: column; position: relative;
         }
 
-        /* Scanline Effect */
-        body::before {
-            content: ""; position: fixed; inset: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 1000; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        /* AMBIENT BACKGROUND */
+        .glow-bg {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 300px; height: 300px; background: var(--neon); opacity: 0.15;
+            filter: blur(100px); border-radius: 50%; z-index: 0;
+            animation: breathe 4s infinite ease-in-out;
         }
+        @keyframes breathe { 0%, 100% { opacity: 0.1; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.2; transform: translate(-50%, -50%) scale(1.2); } }
 
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .system-id { font-size: 10px; color: var(--cyan); letter-spacing: 3px; font-weight: 700; opacity: 0.8; }
-        .back-link { text-decoration: none; color: white; font-size: 10px; border: 1px solid var(--border); padding: 5px 12px; border-radius: 4px; }
+        /* TOP STATUS BAR (SLOTS) */
+        .top-bar {
+            display: flex; justify-content: space-between; padding: 25px; z-index: 10;
+            align-items: center;
+        }
+        .slot-pill {
+            display: flex; gap: 5px; align-items: center;
+        }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: 0.3s; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .dot.active { background: var(--neon); box-shadow: 0 0 10px var(--neon); }
+        .slot-label { font-size: 10px; font-weight: 700; color: #666; letter-spacing: 2px; }
 
-        /* Tactical Slot Monitor */
-        .hud-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 30px; }
-        .hud-slot { position: relative; text-align: center; padding: 15px 5px; border-left: 1px solid var(--border); }
-        .hud-slot.active { border-left: 2px solid var(--volt); background: linear-gradient(90deg, rgba(217, 255, 0, 0.05), transparent); }
+        .back-icon { text-decoration: none; font-size: 24px; color: white; opacity: 0.5; }
+
+        /* CENTER MONOLITH (QUEUE NUMBER) */
+        .monolith {
+            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10; text-align: center;
+        }
+        .mono-label {
+            font-family: 'Syncopate', sans-serif; font-size: 12px; letter-spacing: 4px; color: #888; margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .mono-num {
+            font-size: 140px; line-height: 0.8; font-weight: 700; color: white;
+            text-shadow: 0 0 40px rgba(255,255,255,0.1);
+            position: relative;
+        }
+        .mono-num::after {
+            content: attr(data-val); position: absolute; left:0; top:0; color: var(--neon);
+            opacity: 0.5; filter: blur(15px); z-index: -1;
+        }
         
-        /* Circular Energy Gauge */
-        .gauge { width: 60px; height: 60px; margin: 0 auto 10px; position: relative; }
-        .gauge svg { transform: rotate(-90deg); }
-        .gauge circle { fill: none; stroke-width: 3; }
-        .gauge .track { stroke: rgba(255,255,255,0.05); }
-        .gauge .fill { stroke: var(--volt); stroke-dasharray: 126; stroke-dashoffset: 40; filter: drop-shadow(0 0 5px var(--volt)); transition: 1s; }
-        
-        .slot-val { font-size: 12px; font-weight: 700; display: block; margin-top: 5px; }
-        .slot-label { font-size: 8px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* Queue Core Box */
-        .core-display { 
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border: 1px solid var(--border); border-radius: 40px; margin-bottom: 30px; position: relative;
+        .gps-status {
+            margin-top: 30px; padding: 8px 16px; border: 1px solid #333; border-radius: 20px;
+            font-size: 10px; letter-spacing: 1px; color: #555; display: flex; align-items: center; gap: 8px;
         }
-        .core-display::after { content: "LIVE TELEMETRY"; position: absolute; top: 15px; font-size: 8px; color: var(--cyan); letter-spacing: 4px; }
-        
-        .main-q-num { font-size: 100px; font-weight: 300; color: white; line-height: 1; letter-spacing: -5px; }
-        .main-q-label { font-size: 10px; color: var(--volt); font-weight: 700; letter-spacing: 5px; margin-top: 10px; }
+        .gps-status.live { border-color: var(--neon); color: var(--neon); background: rgba(217, 255, 0, 0.05); }
+        .gps-status.bad { border-color: var(--err); color: var(--err); }
 
-        /* Action Panel */
-        .action-panel { padding-bottom: 30px; }
-        .gps-lock { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; font-size: 10px; font-weight: 700; color: var(--red); }
-        .gps-lock.verified { color: var(--volt); }
-        .gps-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; animation: pulse 1s infinite; }
-
-        .btn-command { 
-            width: 100%; padding: 25px; border-radius: 15px; border: 1px solid var(--border);
-            font-family: var(--font-main); font-weight: 700; font-size: 14px; letter-spacing: 2px;
-            background: transparent; color: #333; transition: 0.5s; cursor: not-allowed;
+        /* BOTTOM INTERACTION AREA */
+        .control-deck {
+            padding: 0 30px 40px; z-index: 10; display: flex; flex-direction: column; gap: 20px;
         }
-        .btn-command.ready { background: var(--cyan); color: #000; cursor: pointer; border: none; box-shadow: 0 0 30px rgba(0, 240, 255, 0.3); }
 
-        /* Nav Bottom (Revised Size) */
-        .nav-bottom { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; height: 85px; background: rgba(0,0,0,0.9); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
-        .nav-item { text-decoration: none; color: #444; font-size: 10px; font-weight: 800; text-align: center; }
-        .nav-item.active { color: var(--cyan); }
-        .nav-item span { display: block; font-size: 32px !important; margin-bottom: 4px; }
+        /* HOLD BUTTON (FINGERPRINT CONCEPT) */
+        .hold-btn {
+            position: relative; width: 80px; height: 80px; margin: 0 auto;
+            border-radius: 50%; border: 2px solid #333; background: transparent;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s; overflow: hidden; -webkit-tap-highlight-color: transparent;
+        }
+        .hold-btn::before {
+            content: ''; position: absolute; inset: 0; border-radius: 50%;
+            background: var(--neon); opacity: 0; transform: scale(0); transition: 0.2s;
+        }
+        .hold-btn:active::before { opacity: 0.2; transform: scale(1); }
+        
+        .hold-btn.locked { border-color: #333; cursor: not-allowed; opacity: 0.5; }
+        .hold-btn.unlocked { border-color: var(--neon); box-shadow: 0 0 20px rgba(217, 255, 0, 0.2); }
+        
+        .finger-icon { font-size: 32px; z-index: 2; transition: 0.3s; }
+        .hold-btn.unlocked .finger-icon { color: var(--neon); }
 
-        @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+        .btn-text { text-align: center; font-size: 11px; color: #666; letter-spacing: 2px; font-weight: 700; height: 20px; }
+
+        /* FLOATING NAV */
+        .nav-float {
+            background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(15px);
+            border-radius: 40px; padding: 15px 30px; display: flex; justify-content: space-between;
+            margin-top: 20px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .nav-icon { text-decoration: none; font-size: 24px; filter: grayscale(1); transition: 0.3s; }
+        .nav-icon.active { filter: grayscale(0); transform: scale(1.1); text-shadow: 0 0 10px var(--neon); }
+
+        /* LOADING OVERLAY */
+        #scanner {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100;
+            display: none; align-items: center; justify-content: center; flex-direction: column;
+        }
+        .scan-line {
+            width: 100%; height: 2px; background: var(--neon);
+            box-shadow: 0 0 10px var(--neon); animation: scan 1.5s infinite;
+        }
+        @keyframes scan { 0% {transform: translateY(-50vh);} 100% {transform: translateY(50vh);} }
+
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div class="system-id">MK-FLEET // SYS_ACTV</div>
-        <a href="dashboard.html" class="back-link">ABORT</a>
+    <div class="glow-bg"></div>
+
+    <div class="top-bar">
+        <div class="slot-pill">
+            <span class="slot-label">SLOTS</span>
+            <div id="s1" class="dot"></div>
+            <div id="s2" class="dot active"></div> <div id="s3" class="dot"></div>
+        </div>
+        <a href="dashboard.html" class="back-icon">✕</a>
     </div>
 
-    <div class="hud-grid">
-        <div class="hud-slot">
-            <span class="slot-label">SLOT 01</span>
-            <div class="gauge">
-                <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="20"></circle></svg>
-            </div>
-            <span class="slot-val">OFFLINE</span>
-        </div>
-        <div class="hud-slot active">
-            <span class="slot-label">SLOT 02</span>
-            <div class="gauge">
-                <svg width="60" height="60">
-                    <circle class="track" cx="30" cy="30" r="20"></circle>
-                    <circle class="fill" cx="30" cy="30" r="20"></circle>
-                </svg>
-            </div>
-            <span class="slot-val">B 6666 MA</span>
-        </div>
-        <div class="hud-slot">
-            <span class="slot-label">SLOT 03</span>
-            <div class="gauge">
-                <svg width="60" height="60"><circle class="track" cx="30" cy="30" r="20"></circle></svg>
-            </div>
-            <span class="slot-val">OFFLINE</span>
+    <div class="monolith">
+        <div class="mono-label">LIVE QUEUE</div>
+        <div class="mono-num" id="currentQ" data-val="--">--</div>
+        
+        <div id="gpsBox" class="gps-status">
+            <span id="gpsIcon">●</span> 
+            <span id="gpsText">SEARCHING SATELLITE...</span>
         </div>
     </div>
 
-    <div class="core-display">
-        <div class="main-q-num" id="currentNum">--</div>
-        <div class="main-q-label">NOW SERVING</div>
-    </div>
-
-    <div class="action-panel">
-        <div id="gpsStatus" class="gps-lock">
-            <div class="gps-dot"></div>
-            <span id="gpsText">GPS SIGNAL SEARCHING...</span>
+    <div class="control-deck">
+        <div id="btnContainer" style="text-align:center;">
+            <button id="btnHold" class="hold-btn locked">
+                <div class="finger-icon">☝</div>
+            </button>
+            <div class="btn-text" id="btnLabel">LOCKED</div>
         </div>
-        <button id="btnAction" class="btn-command" disabled>LOCKED</button>
+
+        <div class="nav-float">
+            <a href="dashboard.html" class="nav-icon">🏠</a>
+            <a href="calendar.html" class="nav-icon">📅</a>
+            <a href="antrian.html" class="nav-icon active">⚡</a>
+            <a href="history.html" class="nav-icon">📜</a>
+        </div>
     </div>
 
-    <nav class="nav-bottom">
-        <a href="dashboard.html" class="nav-item"><span>🏠</span>HOME</a>
-        <a href="calendar.html" class="nav-item"><span>📅</span>BAYAR</a>
-        <a href="antrian.html" class="nav-item active"><span>⚡</span>ANTRIAN</a>
-        <a href="history.html" class="nav-item"><span>📜</span>HISTORY</a>
-    </nav>
+    <div id="scanner">
+        <div style="color:var(--neon); font-family:'Syncopate'; font-size:20px; margin-bottom:20px;">ACCESSING HUB</div>
+        <div class="scan-line"></div>
+    </div>
 
     <script>
         const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const u = JSON.parse(localStorage.getItem('maka_user'));
+        const HUB = { lat: -6.1625, lng: 106.9011 }; 
 
         function getDist(lat1, lon1, lat2, lon2) {
-            const R = 6371e3;
-            const dLat = (lat2-lat1) * Math.PI/180;
-            const dLon = (lon2-lon1) * Math.PI/180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            const R = 6371e3; const dLat = (lat2-lat1)*Math.PI/180; const dLon = (lon2-lon1)*Math.PI/180;
+            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
-        function monitorSystem() {
-            // Live Queue from Firestore
-            db.collection('antrian_fc').orderBy('nomor', 'asc').limit(1).onSnapshot(snap => {
-                if(!snap.empty) document.getElementById('currentNum').innerText = snap.docs[0].data().nomor;
+        function initSystem() {
+            // Live Number
+            db.collection('antrian_fc').orderBy('nomor', 'asc').limit(1).onSnapshot(s => {
+                const val = s.empty ? "0" : s.docs[0].data().nomor;
+                document.getElementById('currentQ').innerText = val;
+                document.getElementById('currentQ').setAttribute('data-val', val);
             });
 
-            // GPS Tactical Lock
-            if (navigator.geolocation) {
+            // GPS Logic
+            if(navigator.geolocation) {
                 navigator.geolocation.watchPosition(pos => {
-                    const dist = getDist(pos.coords.latitude, pos.coords.longitude, -6.1625, 106.9011);
-                    const btn = document.getElementById('btnAction');
-                    const status = document.getElementById('gpsStatus');
-                    const text = document.getElementById('gpsText');
+                    const dist = getDist(pos.coords.latitude, pos.coords.longitude, HUB.lat, HUB.lng);
+                    const btn = document.getElementById('btnHold');
+                    const lbl = document.getElementById('btnLabel');
+                    const gpsBox = document.getElementById('gpsBox');
+                    const gpsTxt = document.getElementById('gpsText');
 
-                    if (dist <= 150) {
-                        status.className = "gps-lock verified";
-                        text.innerText = "GPS LOCK: VERIFIED";
-                        btn.disabled = false;
-                        btn.className = "btn-command ready";
-                        btn.innerText = "EXECUTE QUEUE";
+                    if(dist <= 150) {
+                        gpsBox.className = "gps-status live";
+                        gpsTxt.innerText = "LOCATION VERIFIED";
+                        btn.className = "hold-btn unlocked";
+                        lbl.innerText = "TAP TO QUEUE";
+                        lbl.style.color = "var(--neon)";
+                        btn.onclick = processQueue;
                     } else {
-                        status.className = "gps-lock";
-                        text.innerText = `RANGE ERROR: ${Math.round(dist)}M`;
-                        btn.disabled = true;
-                        btn.className = "btn-command";
-                        btn.innerText = "LOCKED";
+                        gpsBox.className = "gps-status bad";
+                        gpsTxt.innerText = `TOO FAR (${Math.round(dist)}m)`;
+                        btn.className = "hold-btn locked";
+                        lbl.innerText = "APPROACH HUB";
+                        lbl.style.color = "#666";
+                        btn.onclick = null;
                     }
                 }, null, { enableHighAccuracy: true });
             }
         }
 
-        document.getElementById('btnAction').onclick = async function() {
-            this.innerText = "PROCESSING...";
+        async function processQueue() {
+            const sc = document.getElementById('scanner');
+            sc.style.display = 'flex'; // Show scanning animation
+            
             try {
-                const snap = await db.collection('antrian_fc').orderBy('nomor', 'desc').limit(1).get();
-                let next = 1; if(!snap.empty) next = snap.docs[0].data().nomor + 1;
-                await db.collection('antrian_fc').doc(u.plat).set({ plat: u.plat, nomor: next, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-                alert("COMMAND EXECUTED. ANTRIAN #" + next);
-            } catch (e) { alert("SYSTEM FAILURE: " + e.message); }
-            this.innerText = "EXECUTE QUEUE";
-        };
+                const s = await db.collection('antrian_fc').orderBy('nomor', 'desc').limit(1).get();
+                let n = 1; if(!s.empty) n = s.docs[0].data().nomor + 1;
+                
+                await db.collection('antrian_fc').doc(u.plat).set({
+                    plat: u.plat, nomor: n, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                setTimeout(() => {
+                    sc.style.display = 'none';
+                    alert(`ACCESS GRANTED. TICKET #${n}`);
+                }, 2000); // Fake delay for dramatic effect
+            } catch(e) {
+                sc.style.display = 'none';
+                alert("ERROR");
+            }
+        }
 
-        window.onload = monitorSystem;
+        window.onload = initSystem;
     </script>
 </body>
 </html>
