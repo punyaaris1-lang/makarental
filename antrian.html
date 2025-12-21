@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAKA • MONOLITH V2</title>
+    <title>MAKA • MONOLITH LIVE</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
@@ -106,31 +106,25 @@
     </div>
 
     <script type="module">
+        // --- 1. IMPORT MODULAR (SESUAI SCRIPT ANDA) ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // --- 2. CONFIG ASLI ANDA ---
         const firebaseConfig = { apiKey: "AIzaSyALIlkIDALIk83K8s1htalvW6rmNNw02Go", authDomain: "sistem-antrian-b1c39.firebaseapp.com", projectId: "sistem-antrian-b1c39", storageBucket: "sistem-antrian-b1c39.firebasestorage.app", messagingSenderId: "454124587608", appId: "1:454124587608:web:34fbb0f5211067a67f982d" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         
+        // --- 3. TARGET DB & GPS ASLI ---
+        // Ini kuncinya! Kita tembak dokumen "antrian/utama"
         const ref = doc(db, "antrian", "utama"); 
+        
+        // Koordinat Asli dari script Anda
         const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
         const MAX_DIST_KM = 0.2; // 200 Meter
         
         let currentUser = null;
-
-        // --- AMBIL USER DARI LOCALSTORAGE ---
-        try {
-            currentUser = JSON.parse(localStorage.getItem('maka_user'));
-        } catch (e) {
-            console.error("User data error");
-        }
-
-        if (!currentUser || !currentUser.plat) {
-            // Jika tidak ada user, redirect atau minta login
-            // Untuk tes, kita biarkan tapi tombol akan mati
-            document.getElementById('statusLabel').innerText = "BELUM LOGIN";
-        }
+        try { currentUser = JSON.parse(localStorage.getItem('maka_user')); } catch (e) {}
 
         // --- UPDATE UI LOGIC ---
         function updateUI(myData, totalWaiting, activeChargers) {
@@ -139,40 +133,37 @@
             const sub = document.getElementById('subInfo');
             const bg = document.getElementById('bgGlow');
             
-            // 1. Update Global Queue (Bawah)
+            // Update Global Info
             document.getElementById('totalQ').innerText = totalWaiting;
             document.getElementById('estTime').innerText = (totalWaiting * 30) + " MIN";
 
-            // 2. Update Dots Slot (Atas)
+            // Update Dots Slot
             for(let i=1; i<=3; i++) {
                 let d = document.getElementById('dot'+i);
                 if (i <= activeChargers) {
-                    d.className = "dot charging";
+                    d.className = "dot charging"; // Nyalakan Neon
                 } else {
-                    d.className = "dot";
+                    d.className = "dot"; // Matikan
                 }
             }
 
-            // 3. Monolith Context Switching
+            // Monolith Context Switching
             if (myData) {
-                // Periksa Status (Case Insensitive untuk jaga-jaga)
-                const status = (myData.status || "").toLowerCase();
-
-                if (status === 'charging' || status === 'charge') {
-                    // FASE CHARGING
-                    let bat = myData.baterai || 0; // Baca field baterai, default 0
+                const st = (myData.status || "").toLowerCase();
+                // Deteksi status charging
+                if (st.includes('charg') || st.includes('isi') || st.includes('penuh')) {
+                    
+                    let bat = myData.baterai || 0; 
                     display.innerHTML = bat + "<span>%</span>";
                     display.classList.add('charging');
                     display.style.color = "var(--neon)";
                     label.innerText = "CHARGING...";
                     label.style.color = "var(--neon)";
                     
-                    sub.innerText = "ESTIMASI PENUH: " + (myData.estimasi || "15 MIN");
+                    sub.innerText = "ESTIMASI PENUH: " + (myData.estimasi || "CALCULATING");
                     sub.classList.add('show');
                     bg.style.background = "var(--neon)";
-
                 } else {
-                    // FASE MENUNGGU
                     display.innerHTML = myData.no || myData.nomor || "#";
                     display.classList.remove('charging');
                     display.style.color = "var(--cyan)";
@@ -183,7 +174,6 @@
                     bg.style.background = "var(--cyan)";
                 }
             } else {
-                // IDLE
                 display.innerHTML = "--";
                 display.classList.remove('charging');
                 display.style.color = "white";
@@ -194,11 +184,12 @@
             }
         }
 
-        // --- REAL TIME LISTENER ---
+        // --- REAL TIME LISTENER (TARGET KE 'antrian/utama') ---
         onSnapshot(ref, (snap) => {
             if(snap.exists()) {
                 const data = snap.data();
-                // Deteksi nama array. Coba 'list' dulu, lalu 'antrian'
+                // Script asli Anda mungkin menyimpan array di dalam field 'list' atau 'antrian'
+                // Kita coba ambil array-nya
                 const queueList = data.list || data.antrian || []; 
                 
                 let myData = null;
@@ -208,7 +199,7 @@
                 queueList.forEach(item => {
                     const st = (item.status || "").toLowerCase();
                     // Hitung Slot Charging
-                    if(st === 'charging' || st === 'charge') {
+                    if(st.includes('charg') || st.includes('isi') || st.includes('penuh')) {
                         activeChargers++;
                     } else {
                         totalWaiting++;
@@ -222,7 +213,7 @@
 
                 updateUI(myData, totalWaiting, activeChargers);
             } else {
-                console.log("No Data Found");
+                console.log("Database Offline/Empty");
                 document.getElementById('statusLabel').innerText = "OFFLINE";
             }
         });
@@ -242,12 +233,11 @@
                 const btn = document.getElementById('btnHold');
                 const txt = document.getElementById('gpsText');
 
-                // Logic Tombol
                 if(dist <= MAX_DIST_KM) {
                     btn.className = "hold-btn unlocked";
                     txt.innerText = "TAP TO QUEUE";
                     txt.style.color = "var(--neon)";
-                    // Kita attach function daftarAntrian disini
+                    // Attach event listener manual karena module scope
                     btn.onclick = () => processQueue();
                 } else {
                     btn.className = "hold-btn locked";
@@ -259,22 +249,19 @@
                 document.getElementById('gpsText').innerText = "GPS ERROR";
             }, { enableHighAccuracy: true });
         } else {
-            document.getElementById('gpsText').innerText = "NO GPS SUPPORT";
+            document.getElementById('gpsText').innerText = "NO GPS";
         }
 
-        // --- FUNGSI DAFTAR ---
+        // --- FUNGSI DAFTAR (WRITE TO 'antrian/utama') ---
         async function processQueue() {
             if(!currentUser) return alert("Login Error");
-
             const sc = document.getElementById('scanner');
             sc.style.display = 'flex';
             
             try {
                 const snap = await getDoc(ref);
                 let currentList = [];
-                if(snap.exists()) {
-                    currentList = snap.data().list || snap.data().antrian || [];
-                }
+                if(snap.exists()) currentList = snap.data().list || snap.data().antrian || [];
                 
                 // Cek duplikasi
                 const isExist = currentList.find(x => x.plat === currentUser.plat);
@@ -289,7 +276,7 @@
                 currentList.forEach(item => { if(item.no > maxNo) maxNo = item.no; });
                 let nextNo = maxNo + 1;
 
-                // Kirim Data
+                // Update menggunakan arrayUnion (Sesuai metode database Anda)
                 await updateDoc(ref, {
                     list: arrayUnion({
                         plat: currentUser.plat,
@@ -303,9 +290,4 @@
                 setTimeout(() => { sc.style.display = 'none'; }, 500);
             } catch(e) {
                 sc.style.display = 'none';
-                alert("Gagal: " + e.message);
-            }
-        }
-    </script>
-</body>
-</html>
+                alert("Gagal: " +
