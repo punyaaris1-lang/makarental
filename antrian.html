@@ -3,149 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Monolith Queue - MAKA</title>
+    <title>MAKA • MONOLITH LIVE</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <style>
-        :root { 
-            --neon: #D9FF00; --dark: #050505; --err: #FF003C; 
-            --glass: rgba(255, 255, 255, 0.05);
-        }
-        body { 
-            margin: 0; padding: 0; background: var(--dark); color: white; 
-            font-family: 'Space Grotesk', sans-serif; height: 100vh; overflow: hidden;
-            display: flex; flex-direction: column; position: relative;
-        }
+        :root { --neon: #D9FF00; --dark: #050505; --err: #FF003C; --cyan: #00F0FF; --glass: rgba(255, 255, 255, 0.05); }
+        body { margin: 0; padding: 0; background: var(--dark); color: white; font-family: 'Space Grotesk', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; position: relative; }
 
-        /* AMBIENT BACKGROUND */
-        .glow-bg {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 300px; height: 300px; background: var(--neon); opacity: 0.15;
-            filter: blur(100px); border-radius: 50%; z-index: 0;
-            animation: breathe 4s infinite ease-in-out;
-        }
-        @keyframes breathe { 0%, 100% { opacity: 0.1; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.2; transform: translate(-50%, -50%) scale(1.2); } }
+        /* AMBIENT GLOW */
+        .glow-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; background: #333; opacity: 0.15; filter: blur(120px); border-radius: 50%; z-index: 0; transition: 1s; }
 
-        /* TOP STATUS BAR (SLOTS) */
-        .top-bar {
-            display: flex; justify-content: space-between; padding: 25px; z-index: 10;
-            align-items: center;
-        }
-        .slot-pill {
-            display: flex; gap: 5px; align-items: center;
-        }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: 0.3s; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
-        .dot.active { background: var(--neon); box-shadow: 0 0 10px var(--neon); }
-        .slot-label { font-size: 10px; font-weight: 700; color: #666; letter-spacing: 2px; }
+        /* HEADER */
+        .top-bar { display: flex; justify-content: space-between; padding: 25px; z-index: 10; align-items: flex-start; }
+        .slot-pill { display: flex; flex-direction: column; gap: 5px; }
+        .slot-dots { display: flex; gap: 6px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #222; transition: 0.3s; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .dot.charging { background: var(--neon); box-shadow: 0 0 10px var(--neon); }
+        .slot-label { font-size: 9px; font-weight: 700; color: #555; letter-spacing: 2px; }
 
-        .back-icon { text-decoration: none; font-size: 24px; color: white; opacity: 0.5; }
+        .global-q { text-align: right; }
+        .gq-val { font-family: 'Syncopate'; font-size: 18px; color: white; font-weight: 700; }
+        .gq-lbl { font-size: 8px; color: #666; letter-spacing: 1px; }
 
-        /* CENTER MONOLITH (QUEUE NUMBER) */
-        .monolith {
-            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 10; text-align: center;
-        }
-        .mono-label {
-            font-family: 'Syncopate', sans-serif; font-size: 12px; letter-spacing: 4px; color: #888; margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-        .mono-num {
-            font-size: 140px; line-height: 0.8; font-weight: 700; color: white;
-            text-shadow: 0 0 40px rgba(255,255,255,0.1);
-            position: relative;
-        }
-        .mono-num::after {
-            content: attr(data-val); position: absolute; left:0; top:0; color: var(--neon);
-            opacity: 0.5; filter: blur(15px); z-index: -1;
-        }
+        /* CENTER MONOLITH */
+        .monolith { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; text-align: center; position: relative; }
+        .mono-label { font-family: 'Syncopate', sans-serif; font-size: 11px; letter-spacing: 3px; color: #888; margin-bottom: 10px; text-transform: uppercase; transition: 0.3s; }
         
-        .gps-status {
-            margin-top: 30px; padding: 8px 16px; border: 1px solid #333; border-radius: 20px;
-            font-size: 10px; letter-spacing: 1px; color: #555; display: flex; align-items: center; gap: 8px;
-        }
-        .gps-status.live { border-color: var(--neon); color: var(--neon); background: rgba(217, 255, 0, 0.05); }
-        .gps-status.bad { border-color: var(--err); color: var(--err); }
+        .mono-num { font-size: 130px; line-height: 0.8; font-weight: 700; color: white; text-shadow: 0 0 50px rgba(255,255,255,0.05); position: relative; transition: 0.5s; }
+        .mono-num span { font-size: 30px; vertical-align: super; color: #666; opacity: 0; transition: 0.3s; }
+        .mono-num.charging span { opacity: 1; color: var(--neon); }
+        
+        .sub-stat { margin-top: 20px; font-size: 12px; color: var(--cyan); letter-spacing: 1px; background: rgba(0, 240, 255, 0.1); padding: 5px 15px; border-radius: 20px; opacity: 0; transform: translateY(10px); transition: 0.5s; }
+        .sub-stat.show { opacity: 1; transform: translateY(0); }
 
-        /* BOTTOM INTERACTION AREA */
-        .control-deck {
-            padding: 0 30px 40px; z-index: 10; display: flex; flex-direction: column; gap: 20px;
-        }
-
-        /* HOLD BUTTON (FINGERPRINT CONCEPT) */
-        .hold-btn {
-            position: relative; width: 80px; height: 80px; margin: 0 auto;
-            border-radius: 50%; border: 2px solid #333; background: transparent;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s; overflow: hidden; -webkit-tap-highlight-color: transparent;
-        }
-        .hold-btn::before {
-            content: ''; position: absolute; inset: 0; border-radius: 50%;
-            background: var(--neon); opacity: 0; transform: scale(0); transition: 0.2s;
-        }
+        /* BOTTOM DECK */
+        .control-deck { padding: 0 30px 40px; z-index: 10; display: flex; flex-direction: column; gap: 20px; }
+        
+        .hold-btn { position: relative; width: 80px; height: 80px; margin: 0 auto; border-radius: 50%; border: 1px solid #333; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; overflow: hidden; }
+        .hold-btn::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--neon); opacity: 0; transform: scale(0); transition: 0.2s; }
         .hold-btn:active::before { opacity: 0.2; transform: scale(1); }
-        
-        .hold-btn.locked { border-color: #333; cursor: not-allowed; opacity: 0.5; }
-        .hold-btn.unlocked { border-color: var(--neon); box-shadow: 0 0 20px rgba(217, 255, 0, 0.2); }
-        
-        .finger-icon { font-size: 32px; z-index: 2; transition: 0.3s; }
+        .hold-btn.locked { border-color: #222; cursor: not-allowed; opacity: 0.4; }
+        .hold-btn.unlocked { border-color: var(--neon); box-shadow: 0 0 25px rgba(217, 255, 0, 0.15); }
+        .finger-icon { font-size: 30px; z-index: 2; color: #444; transition: 0.3s; }
         .hold-btn.unlocked .finger-icon { color: var(--neon); }
 
-        .btn-text { text-align: center; font-size: 11px; color: #666; letter-spacing: 2px; font-weight: 700; height: 20px; }
+        .btn-text { text-align: center; font-size: 10px; color: #555; letter-spacing: 2px; font-weight: 700; margin-top: 10px; }
 
-        /* FLOATING NAV */
-        .nav-float {
-            background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(15px);
-            border-radius: 40px; padding: 15px 30px; display: flex; justify-content: space-between;
-            margin-top: 20px; border: 1px solid rgba(255,255,255,0.1);
-        }
-        .nav-icon { text-decoration: none; font-size: 24px; filter: grayscale(1); transition: 0.3s; }
-        .nav-icon.active { filter: grayscale(0); transform: scale(1.1); text-shadow: 0 0 10px var(--neon); }
-
-        /* LOADING OVERLAY */
-        #scanner {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100;
-            display: none; align-items: center; justify-content: center; flex-direction: column;
-        }
-        .scan-line {
-            width: 100%; height: 2px; background: var(--neon);
-            box-shadow: 0 0 10px var(--neon); animation: scan 1.5s infinite;
-        }
-        @keyframes scan { 0% {transform: translateY(-50vh);} 100% {transform: translateY(50vh);} }
-
+        /* NAV FLOAT */
+        .nav-float { background: rgba(10, 10, 10, 0.8); backdrop-filter: blur(20px); border-radius: 30px; padding: 12px 30px; display: flex; justify-content: space-between; border: 1px solid rgba(255,255,255,0.08); }
+        .nav-icon { text-decoration: none; font-size: 24px; filter: grayscale(1); opacity: 0.5; transition: 0.3s; }
+        .nav-icon.active { filter: grayscale(0); opacity: 1; transform: scale(1.1); text-shadow: 0 0 15px var(--neon); }
+        
+        /* SCAN OVERLAY */
+        #scanner { position: fixed; inset: 0; background: #000; z-index: 100; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .scan-beam { width: 100%; height: 2px; background: var(--neon); box-shadow: 0 0 20px var(--neon); animation: beam 1s infinite; }
+        @keyframes beam { 0% {transform: translateY(-50vh);} 100% {transform: translateY(50vh);} }
     </style>
 </head>
 <body>
 
-    <div class="glow-bg"></div>
+    <div class="glow-bg" id="bgGlow"></div>
 
     <div class="top-bar">
         <div class="slot-pill">
-            <span class="slot-label">SLOTS</span>
-            <div id="s1" class="dot"></div>
-            <div id="s2" class="dot active"></div> <div id="s3" class="dot"></div>
+            <div class="slot-dots" id="slotContainer">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+            <span class="slot-label">CHARGING SLOTS</span>
         </div>
-        <a href="dashboard.html" class="back-icon">✕</a>
+        <div class="global-q">
+            <div class="gq-val" id="totalQ">--</div>
+            <div class="gq-lbl">ANTRIAN GLOBAL</div>
+        </div>
     </div>
 
     <div class="monolith">
-        <div class="mono-label">LIVE QUEUE</div>
-        <div class="mono-num" id="currentQ" data-val="--">--</div>
-        
-        <div id="gpsBox" class="gps-status">
-            <span id="gpsIcon">●</span> 
-            <span id="gpsText">SEARCHING SATELLITE...</span>
-        </div>
+        <div class="mono-label" id="statusLabel">SYNCING...</div>
+        <div class="mono-num" id="mainDisplay">--<span>%</span></div>
+        <div class="sub-stat" id="subInfo">DATA FETCHING</div>
     </div>
 
     <div class="control-deck">
-        <div id="btnContainer" style="text-align:center;">
+        <div id="btnWrapper">
             <button id="btnHold" class="hold-btn locked">
-                <div class="finger-icon">☝</div>
+                <div class="finger-icon">⏻</div>
             </button>
-            <div class="btn-text" id="btnLabel">LOCKED</div>
+            <div class="btn-text" id="gpsText">GPS SEARCHING...</div>
         </div>
 
         <div class="nav-float">
@@ -157,82 +101,193 @@
     </div>
 
     <div id="scanner">
-        <div style="color:var(--neon); font-family:'Syncopate'; font-size:20px; margin-bottom:20px;">ACCESSING HUB</div>
-        <div class="scan-line"></div>
+        <div style="color:var(--neon); font-family:'Syncopate'; font-size:14px; letter-spacing:3px;">CONNECTING</div>
+        <div class="scan-beam"></div>
     </div>
 
-    <script>
-        const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const u = JSON.parse(localStorage.getItem('maka_user'));
-        const HUB = { lat: -6.1625, lng: 106.9011 }; 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, onSnapshot, updateDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // --- KONFIGURASI SESUAI KODE YANG ANDA KIRIM ---
+        const firebaseConfig = { apiKey: "AIzaSyALIlkIDALIk83K8s1htalvW6rmNNw02Go", authDomain: "sistem-antrian-b1c39.firebaseapp.com", projectId: "sistem-antrian-b1c39", storageBucket: "sistem-antrian-b1c39.firebasestorage.app", messagingSenderId: "454124587608", appId: "1:454124587608:web:34fbb0f5211067a67f982d" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // TARGET DOKUMEN SESUAI KODE ANDA
+        const ref = doc(db, "antrian", "utama"); 
+        
+        // TARGET LOKASI SESUAI KODE ANDA
+        const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
+        const MAX_DIST_KM = 0.2; // 200 meter
+        
+        const u = JSON.parse(localStorage.getItem('maka_user'));
+
+        // --- LOGIKA JARAK ---
         function getDist(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; const dLat = (lat2-lat1)*Math.PI/180; const dLon = (lon2-lon1)*Math.PI/180;
-            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
+            const R = 6371; 
+            const dLat = (lat2-lat1) * Math.PI/180;
+            const dLon = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
-        function initSystem() {
-            // Live Number
-            db.collection('antrian_fc').orderBy('nomor', 'asc').limit(1).onSnapshot(s => {
-                const val = s.empty ? "0" : s.docs[0].data().nomor;
-                document.getElementById('currentQ').innerText = val;
-                document.getElementById('currentQ').setAttribute('data-val', val);
+        // --- UPDATE UI MONOLITH (TAMPILAN KEREN) ---
+        function updateUI(myData, totalWaiting, activeChargers) {
+            const display = document.getElementById('mainDisplay');
+            const label = document.getElementById('statusLabel');
+            const sub = document.getElementById('subInfo');
+            const bg = document.getElementById('bgGlow');
+            
+            // 1. Update Global Queue
+            document.getElementById('totalQ').innerText = totalWaiting;
+
+            // 2. Update Dots
+            const slotContainer = document.getElementById('slotContainer');
+            slotContainer.innerHTML = '';
+            for(let i=0; i<3; i++) {
+                let dotClass = (i < activeChargers) ? "dot charging" : "dot";
+                slotContainer.innerHTML += `<div class="${dotClass}"></div>`;
+            }
+
+            // 3. Monolith Context Switching
+            if (myData) {
+                // Jika Status CHARGING
+                if (myData.status === 'charging' || myData.status === 'charge') {
+                    // Gunakan data baterai jika ada, default 0
+                    let bat = myData.baterai || 80; 
+                    display.innerHTML = bat + "<span>%</span>";
+                    display.classList.add('charging');
+                    display.style.color = "var(--neon)";
+                    label.innerText = "CHARGING...";
+                    label.style.color = "var(--neon)";
+                    sub.innerText = "ESTIMASI PENUH: 15 MIN";
+                    sub.classList.add('show');
+                    bg.style.background = "var(--neon)";
+
+                } else {
+                    // Jika Status WAITING
+                    display.innerHTML = myData.no || myData.nomor;
+                    display.classList.remove('charging');
+                    display.style.color = "var(--cyan)";
+                    label.innerText = "ANTRIAN ANDA";
+                    label.style.color = "var(--cyan)";
+                    sub.innerText = "MOHON MENUNGGU";
+                    sub.classList.add('show');
+                    bg.style.background = "var(--cyan)";
+                }
+            } else {
+                // BELUM DAFTAR
+                display.innerHTML = "--";
+                display.classList.remove('charging');
+                display.style.color = "white";
+                label.innerText = "SILAHKAN DAFTAR";
+                label.style.color = "#888";
+                sub.classList.remove('show');
+                bg.style.background = "#333";
+            }
+        }
+
+        function init() {
+            if(!u) { alert("Silahkan login dulu"); window.location.href='index.html'; return; }
+
+            // --- REAL TIME LISTENER KE DATABASE ANDA ---
+            onSnapshot(ref, (snap) => {
+                if(snap.exists()) {
+                    const data = snap.data();
+                    
+                    // Asumsi struktur data Anda adalah array di dalam field 'list' atau 'antrian'
+                    // Sesuaikan 'list' jika nama field array Anda berbeda (misal: 'queue')
+                    const queueList = data.list || data.antrian || []; 
+                    
+                    let myData = null;
+                    let totalWaiting = 0;
+                    let activeChargers = 0;
+
+                    queueList.forEach(item => {
+                        // Hitung Slot Terpakai
+                        if(item.status === 'charging' || item.status === 'charge') {
+                            activeChargers++;
+                        } else {
+                            totalWaiting++;
+                        }
+
+                        // Cari data user sendiri
+                        if(item.plat === u.plat) {
+                            myData = item;
+                        }
+                    });
+
+                    updateUI(myData, totalWaiting, activeChargers);
+                }
             });
 
-            // GPS Logic
+            // --- GPS LOGIC (KUNCI LOKASI) ---
             if(navigator.geolocation) {
                 navigator.geolocation.watchPosition(pos => {
-                    const dist = getDist(pos.coords.latitude, pos.coords.longitude, HUB.lat, HUB.lng);
+                    const dist = getDist(pos.coords.latitude, pos.coords.longitude, STATION_LOC.lat, STATION_LOC.lng);
                     const btn = document.getElementById('btnHold');
-                    const lbl = document.getElementById('btnLabel');
-                    const gpsBox = document.getElementById('gpsBox');
-                    const gpsTxt = document.getElementById('gpsText');
+                    const txt = document.getElementById('gpsText');
 
-                    if(dist <= 150) {
-                        gpsBox.className = "gps-status live";
-                        gpsTxt.innerText = "LOCATION VERIFIED";
+                    if(dist <= MAX_DIST_KM) { // 0.2 KM
                         btn.className = "hold-btn unlocked";
-                        lbl.innerText = "TAP TO QUEUE";
-                        lbl.style.color = "var(--neon)";
-                        btn.onclick = processQueue;
+                        txt.innerText = "TAP TO QUEUE";
+                        txt.style.color = "var(--neon)";
+                        
+                        // Attach Event Listener Manual agar scope module terbaca
+                        btn.onclick = () => daftarAntrian(); 
                     } else {
-                        gpsBox.className = "gps-status bad";
-                        gpsTxt.innerText = `TOO FAR (${Math.round(dist)}m)`;
                         btn.className = "hold-btn locked";
-                        lbl.innerText = "APPROACH HUB";
-                        lbl.style.color = "#666";
+                        txt.innerText = "TOO FAR (" + (dist*1000).toFixed(0) + "m)";
+                        txt.style.color = "#555";
                         btn.onclick = null;
                     }
                 }, null, { enableHighAccuracy: true });
+            } else {
+                document.getElementById('gpsText').innerText = "GPS OFF";
             }
         }
 
-        async function processQueue() {
+        // --- FUNGSI DAFTAR (WRITE TO DB) ---
+        async function daftarAntrian() {
             const sc = document.getElementById('scanner');
-            sc.style.display = 'flex'; // Show scanning animation
+            sc.style.display = 'flex';
             
             try {
-                const s = await db.collection('antrian_fc').orderBy('nomor', 'desc').limit(1).get();
-                let n = 1; if(!s.empty) n = s.docs[0].data().nomor + 1;
+                // Ambil data dulu untuk tahu nomor terakhir
+                const snap = await getDoc(ref);
+                let currentList = [];
+                if(snap.exists()) {
+                    currentList = snap.data().list || snap.data().antrian || [];
+                }
                 
-                await db.collection('antrian_fc').doc(u.plat).set({
-                    plat: u.plat, nomor: n, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                // Cari nomor tertinggi di array untuk auto-increment
+                let maxNo = 0;
+                currentList.forEach(item => {
+                    if(item.no > maxNo) maxNo = item.no;
                 });
-                
-                setTimeout(() => {
-                    sc.style.display = 'none';
-                    alert(`ACCESS GRANTED. TICKET #${n}`);
-                }, 2000); // Fake delay for dramatic effect
+                let nextNo = maxNo + 1;
+
+                // Push ke Array menggunakan arrayUnion
+                await updateDoc(ref, {
+                    // Sesuaikan 'list' dengan nama field array di database Anda
+                    list: arrayUnion({
+                        plat: u.plat,
+                        no: nextNo,
+                        status: 'waiting',
+                        waktu: new Date().toLocaleTimeString('id-ID')
+                    })
+                });
+
+                setTimeout(() => { sc.style.display = 'none'; }, 1000);
             } catch(e) {
                 sc.style.display = 'none';
-                alert("ERROR");
+                console.error(e);
+                alert("Gagal: " + e.message);
             }
         }
 
-        window.onload = initSystem;
+        init();
     </script>
 </body>
 </html>
