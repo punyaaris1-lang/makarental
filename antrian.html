@@ -1,782 +1,312 @@
 <!DOCTYPE html>
-<html lang="id" data-theme="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FC Kelapa Gading - Smart Charging</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>MAKA • MONOLITH V2</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
-        :root { --volt-green: #D9FF00; --cyber-blue: #00F0FF; --bg-black: #050505; --text-main: #FFFFFF; --danger: #FF2A2A; --term-bg: #0d0d0d; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg-black); color: var(--text-main); min-height: 100vh; overflow-x: hidden; padding-bottom: 150px; }
-        body::before { content: ''; position: fixed; inset: 0; background: url('1763947427555.jpg') center/cover; opacity: 0.25; z-index: -1; filter: grayscale(100%) contrast(1.2); }
-        .container { max-width: 480px; margin: 0 auto; padding: 20px; }
-        .header-top { position: sticky; top: 0; z-index: 50; background: linear-gradient(180deg, var(--bg-black) 80%, transparent); padding: 20px 0 15px; }
-        .header-row { display: flex; justify-content: space-between; align-items: center; }
-        h1 { font-family: 'Syne', sans-serif; font-size: 22px; margin: 0; color: var(--text-main); font-weight: 800; text-transform: uppercase; text-shadow: 0 0 10px rgba(0, 240, 255, 0.3); }
-        h1 span { color: var(--volt-green); }
-        .subtitle { font-family: 'Inter'; color: var(--cyber-blue); font-size: 10px; letter-spacing: 3px; font-weight: 700; margin-top: 5px; text-transform: uppercase; }
-        .btn-home { padding: 8px 16px; background: rgba(0,0,0,0.8); border: 1px solid var(--cyber-blue); color: var(--cyber-blue); border-radius: 4px; text-decoration: none; font-size: 10px; font-weight: 700; }
-        .glass-card { background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px); border: 1px solid var(--cyber-blue); border-radius: 8px; padding: 25px; margin-bottom: 25px; box-shadow: 0 0 15px rgba(0, 240, 255, 0.1); }
-        label { display: block; font-size: 10px; color: var(--cyber-blue); margin-bottom: 8px; font-weight: 700; letter-spacing: 1px; }
-        input.field { width: 100%; background: #000; border: 1px solid #333; color: #fff; padding: 14px; border-radius: 4px; font-family: 'Inter'; font-size: 16px; font-weight: 700; text-align: center; margin-bottom: 15px; outline: none; }
-        input.field:focus { border-color: var(--volt-green); box-shadow: 0 0 10px rgba(217, 255, 0, 0.3); }
-        .btn-cyan { width: 100%; background: var(--volt-green); border: none; padding: 16px; border-radius: 4px; color: #000; font-weight: 900; font-size: 14px; cursor: pointer; text-transform: uppercase; }
-        .btn-outline { width: 100%; padding: 15px; background: transparent; border: 1px dashed var(--cyber-blue); color: var(--cyber-blue); border-radius: 4px; cursor: pointer; font-weight: 700; font-size: 11px; margin-top: 10px; }
-        #quickStatusSummary { padding: 15px; background: #000; border: 1px solid var(--volt-green); border-radius: 6px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .qs-value { color: var(--volt-green); font-size: 16px; margin-left: 5px; font-weight: 900; }
-        .player-wrapper { position: relative; margin-bottom: 25px; border: 1px solid var(--cyber-blue); border-radius: 6px; overflow: hidden; height: 70px; transition: height 0.3s ease; background: #000; }
-        .player-wrapper.expanded { height: 300px; }
-        #mp3PlayerFrame { width: 100%; height: 100%; border: none; }
-        .player-toggle { position: absolute; bottom: 0; left: 0; right: 0; background: var(--cyber-blue); color: #000; text-align: center; font-size: 10px; padding: 4px; cursor: pointer; font-weight: 800; }
-        .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 30px; }
-        .slot-box { background: rgba(20, 20, 20, 0.95); border: 1px solid #444; border-radius: 6px; padding: 10px 5px; text-align: center; min-height: 350px; display: flex; flex-direction: column; justify-content: flex-start; position: relative; }
-        .slot-box.active { border: 1px solid var(--cyber-blue); box-shadow: 0 0 10px rgba(0, 240, 255, 0.1); }
-        .bat-icon { width: 55px; height: 90px; border: 2px solid #fff; border-radius: 6px; margin: 15px auto 10px; position: relative; display: flex; align-items: flex-end; padding: 3px; z-index: 1; }
-        .bat-icon::before { content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 20px; height: 4px; background: #fff; border-radius: 2px 2px 0 0; }
-        .bat-fill { width: 100%; background: var(--volt-green); border-radius: 3px; transition: height 0.5s; box-shadow: 0 0 15px var(--volt-green); }
-        .bat-bolt { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 32px; color: #fff; z-index: 10; text-shadow: 0 2px 5px #000; }
-        .pulsating-fill { animation: pulse 1s infinite alternate; }
-        @keyframes pulse { from { filter: brightness(1); } to { filter: brightness(1.3); box-shadow: 0 0 20px var(--volt-green); } }
-        .bat-stats { font-size: 11px; text-align: center; margin-top: auto; margin-bottom: 10px; font-weight: 700; background: #000; border: 1px solid #333; border-radius: 4px; padding: 5px 0; }
-        .stat-row { display: flex; justify-content: space-between; padding: 0 6px; }
-        .c-start { color: #888; }
-        .c-target { color: #fff; }
-        .c-now { color: var(--volt-green); font-weight: 900; font-size: 12px; }
-        .btn-slot { width: 100%; padding: 10px 0; border: none; font-weight: 800; font-size: 10px; cursor: pointer; border-radius: 4px; margin-top: 5px; text-transform: uppercase; }
-        .btn-edit { background: #222; border: 1px solid var(--cyber-blue); color: var(--cyber-blue); }
-        .btn-stop { background: rgba(255, 42, 42, 0.1); border: 1px solid var(--danger); color: var(--danger); }
-        .btn-start { background: var(--volt-green); color: #000; }
-        #queueList { max-height: 250px; overflow-y: auto; padding-right: 5px; }
-        .queue-item-display { display: flex; justify-content: space-between; background: #111; padding: 12px; margin-bottom: 8px; border-radius: 6px; border-left: 3px solid #333; align-items: center; }
-        .queue-item-display.is-mine { border-left: 3px solid var(--volt-green); background: #1a1a1a; border-top: 1px solid #333; border-right: 1px solid #333; border-bottom: 1px solid #333; }
+        :root { --neon: #D9FF00; --dark: #050505; --err: #FF003C; --cyan: #00F0FF; }
+        body { margin: 0; padding: 0; background: var(--dark); color: white; font-family: 'Space Grotesk', sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; position: relative; }
+
+        /* VISUAL EFFECTS */
+        .glow-bg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 300px; height: 300px; background: #333; opacity: 0.15; filter: blur(120px); border-radius: 50%; z-index: 0; transition: 1s; }
+
+        /* HEADER */
+        .top-bar { display: flex; justify-content: space-between; padding: 30px; z-index: 10; align-items: center; }
+        .slot-pill { display: flex; gap: 8px; align-items: center; background: rgba(255,255,255,0.05); padding: 8px 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: #333; transition: 0.3s; box-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .dot.charging { background: var(--neon); box-shadow: 0 0 10px var(--neon); transform: scale(1.2); }
+        .slot-label { font-size: 9px; font-weight: 700; color: #888; letter-spacing: 2px; margin-left: 5px; }
+
+        /* MONOLITH (ANGKA TENGAH) */
+        .monolith { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 10; text-align: center; position: relative; }
+        .mono-label { font-family: 'Syncopate', sans-serif; font-size: 10px; letter-spacing: 4px; color: #555; margin-bottom: 20px; text-transform: uppercase; transition: 0.3s; }
         
-        /* MINI DASHBOARD ADMIN */
-        .mini-dashboard { display: none; background: transparent; margin-top: 20px; }
-        .admin-card { background: #000; border: 1px solid #333; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
-        .admin-card.highlight { border: 1px solid var(--cyber-blue); background: #0a0a0a; } 
-        .admin-card.danger { border: 1px solid #500; }
-        .ac-header { font-size: 12px; font-weight: 900; color: #fff; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-        .ac-header span { color: var(--volt-green); }
-        .mini-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .mini-btn { flex: 1; padding: 14px; border-radius: 6px; border: none; font-weight: 700; cursor: pointer; font-size: 11px; color: #fff; background: #222; border: 1px solid #444; transition: 0.2s; }
-        .mini-btn:active { transform: scale(0.98); }
-        .mini-inp { flex: 1; background: #1a1a1a; border: 1px solid #444; color: #fff; padding: 12px; border-radius: 6px; font-size: 12px; width: 100%; outline: none; }
-        .mini-inp:focus { border-color: var(--cyber-blue); background: #000; }
-        .btn-blue { background: rgba(0, 240, 255, 0.1); border-color: var(--cyber-blue); color: var(--cyber-blue); }
-        .btn-green { background: var(--volt-green); border-color: var(--volt-green); color: #000; font-weight: 900; }
-        .btn-red { background: rgba(255, 42, 42, 0.1); border-color: var(--danger); color: var(--danger); }
+        .mono-num { font-size: 120px; line-height: 0.8; font-weight: 700; color: white; text-shadow: 0 0 50px rgba(255,255,255,0.05); position: relative; transition: 0.5s; }
+        .mono-num span { font-size: 30px; vertical-align: super; color: #666; opacity: 0; transition: 0.3s; }
+        .mono-num.charging span { opacity: 1; color: var(--neon); }
         
-        /* LOG TERMUX STYLE */
-        #logModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 99999; justify-content: center; align-items: flex-start; padding-top: 20px; }
-        .log-box { background: var(--term-bg); border: 1px solid #333; width: 95%; max-width: 600px; height: 90vh; display:flex; flex-direction: column; border-radius: 4px; box-shadow: 0 0 20px rgba(0,255,0,0.1); font-family: 'JetBrains Mono', monospace; }
-        .log-header { background: #111; padding: 10px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; color: #fff; font-size: 12px; font-weight: bold; }
-        .log-content { flex: 1; overflow-y: auto; padding: 15px; font-size: 10px; color: #ccc; line-height: 1.4; }
-        .log-line { margin-bottom: 5px; border-bottom: 1px solid #222; padding-bottom: 2px; }
-        .l-ts { color: #555; margin-right: 5px; }
-        .l-err { color: #ff3333; font-weight: bold; }
-        .l-succ { color: #00ff41; font-weight: bold; }
-        .l-warn { color: #ffcc00; }
-        .l-info { color: #00ccff; }
+        .sub-stat { margin-top: 25px; font-size: 11px; color: var(--cyan); letter-spacing: 1px; background: rgba(0, 240, 255, 0.1); padding: 8px 20px; border-radius: 30px; opacity: 0; transform: translateY(10px); transition: 0.5s; }
+        .sub-stat.show { opacity: 1; transform: translateY(0); }
+
+        /* BOTTOM CONTROLS */
+        .control-deck { padding: 0 30px 40px; z-index: 10; display: flex; flex-direction: column; gap: 15px; }
+        .system-info { text-align: center; font-size: 9px; color: #444; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+        .system-info b { color: #888; }
+
+        /* TOMBOL FINGERPRINT */
+        .hold-btn { position: relative; width: 80px; height: 80px; margin: 0 auto; border-radius: 50%; border: 1px solid #333; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; overflow: hidden; -webkit-tap-highlight-color: transparent; }
+        .hold-btn::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--neon); opacity: 0; transform: scale(0); transition: 0.2s; }
+        .hold-btn:active::before { opacity: 0.2; transform: scale(1); }
         
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; }
-        .modal-box { background: #111; border: 1px solid var(--cyber-blue); padding: 25px; border-radius: 8px; width: 85%; max-width: 320px; text-align: center; }
-        #choiceModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 99999; justify-content: center; align-items: center; }
-        .choice-box { background: #050505; border: 1px solid var(--volt-green); padding: 40px 30px; border-radius: 12px; text-align: center; width: 85%; max-width: 350px; }
-        .choice-btn { display: block; width: 100%; padding: 16px; margin-top: 15px; border-radius: 6px; font-weight: 800; cursor: pointer; border: none; font-size: 13px; }
+        .hold-btn.locked { border-color: #222; cursor: not-allowed; opacity: 0.4; }
+        .hold-btn.unlocked { border-color: var(--neon); box-shadow: 0 0 25px rgba(217, 255, 0, 0.15); }
+        
+        .finger-icon { font-size: 30px; z-index: 2; color: #444; transition: 0.3s; }
+        .hold-btn.unlocked .finger-icon { color: var(--neon); }
+
+        .btn-text { text-align: center; font-size: 10px; color: #555; letter-spacing: 2px; font-weight: 700; margin-top: 10px; }
+
+        /* NAVIGASI BAWAH */
+        .nav-float { background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(20px); border-radius: 30px; padding: 12px 30px; display: flex; justify-content: space-between; border: 1px solid rgba(255,255,255,0.08); margin-top: 10px; }
+        .nav-icon { text-decoration: none; font-size: 24px; filter: grayscale(1); opacity: 0.5; transition: 0.3s; }
+        .nav-icon.active { filter: grayscale(0); opacity: 1; transform: scale(1.1); text-shadow: 0 0 15px var(--neon); }
+        
+        /* OVERLAY LOADING */
+        #scanner { position: fixed; inset: 0; background: #000; z-index: 100; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .scan-beam { width: 100%; height: 2px; background: var(--neon); box-shadow: 0 0 20px var(--neon); animation: beam 1s infinite; }
+        @keyframes beam { 0% {transform: translateY(-50vh);} 100% {transform: translateY(50vh);} }
     </style>
 </head>
 <body>
-    <div id="loadingScreen" style="position:fixed;inset:0;background:#000;z-index:99999;display:flex;justify-content:center;align-items:center;color:var(--volt-green);font-family:'Inter';font-weight:900;letter-spacing:2px;font-size:12px;">LOADING SYSTEM...</div>
-    
-    <div id="logModal">
-        <div class="log-box">
-            <div class="log-header">
-                <span>root@system:~/logs# tail -f activity.log</span>
-                <span onclick="document.getElementById('logModal').style.display='none'" style="cursor:pointer;color:var(--danger);">[X] CLOSE</span>
-            </div>
-            <div id="logContent" class="log-content">Loading...</div>
+
+    <div class="glow-bg" id="bgGlow"></div>
+
+    <div class="top-bar">
+        <div class="slot-pill">
+            <div class="dot" id="dot1"></div>
+            <div class="dot" id="dot2"></div>
+            <div class="dot" id="dot3"></div>
+            <span class="slot-label">SLOTS</span>
+        </div>
+        <div style="font-size:18px; color:#333; cursor:pointer;" onclick="location.reload()">↻</div>
+    </div>
+
+    <div class="monolith">
+        <div class="mono-label" id="statusLabel">INITIALIZING...</div>
+        <div class="mono-num" id="mainDisplay">--<span>%</span></div>
+        <div class="sub-stat" id="subInfo">DATA FETCHING</div>
+    </div>
+
+    <div class="control-deck">
+        <div class="system-info">
+            TOTAL ANTRIAN: <b id="totalQ">--</b> | EST: <b id="estTime">--</b>
+        </div>
+
+        <div id="btnWrapper">
+            <button id="btnHold" class="hold-btn locked" onclick="processQueue()">
+                <div class="finger-icon">⏻</div>
+            </button>
+            <div class="btn-text" id="gpsText">WAITING GPS...</div>
+        </div>
+
+        <div class="nav-float">
+            <a href="dashboard.html" class="nav-icon">🏠</a>
+            <a href="calendar.html" class="nav-icon">📅</a>
+            <a href="antrian.html" class="nav-icon active">⚡</a>
+            <a href="history.html" class="nav-icon">📜</a>
         </div>
     </div>
 
-    <div id="choiceModal">
-        <div class="choice-box">
-            <h2 style="color:#fff;margin-top:0;">SELAMAT DATANG</h2>
-            <p style="color:#666;font-size:12px;">Silakan pilih menu:</p>
-            <button onclick="window.location.href='tutorial.html'" class="choice-btn" style="background:#222;color:#fff;border:1px solid #333;">PANDUAN TUTORIAL</button>
-            <button onclick="closeChoiceModal()" class="choice-btn" style="background:var(--volt-green);color:#000;">LANGSUNG DAFTAR</button>
-        </div>
+    <div id="scanner">
+        <div style="color:var(--neon); font-family:'Syncopate'; font-size:14px; letter-spacing:3px;">CONNECTING</div>
+        <div class="scan-beam"></div>
     </div>
 
-    <div id="masterModal" class="modal">
-        <div id="modalBox" class="modal-box">
-            <h3 id="mTitle" style="color:#fff;margin-top:0;font-size:16px;">INFO</h3>
-            <p id="mMsg" style="color:#aaa;font-size:13px;line-height:1.5;"></p>
-            <input id="mInputDuration" type="number" placeholder="Menit" style="display:none;width:100%;padding:12px;background:#222;border:1px solid #333;color:#fff;text-align:center;margin-bottom:15px;border-radius:4px;">
-            <div style="display:flex;gap:10px;justify-content:center;margin-top:20px;">
-                <button id="mBtnCancel" class="btn-slot btn-stop" style="display:none;width:100px;">BATAL</button>
-                <button id="mBtnOk" class="btn-slot btn-start" style="width:100px;">OK</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="header-top">
-            <div class="header-row">
-                <h1>FC <span>KELAPA GADING</span></h1>
-                <a href="admin.html" class="btn-home">ADMIN</a>
-            </div>
-            <div class="subtitle">HOME OF MLU</div>
-        </div>
-        
-        <div id="registrationArea"> 
-            <div class="glass-card">
-                <label>PLAT NOMOR KENDARAAN</label>
-                <input id="userPlat" class="field" style="text-transform:uppercase;" placeholder="CONTOH: B 1234 ABC">
-                <label>NAMA PENGENDARA</label>
-                <input id="userName" class="field" placeholder="Nama Panggilan">
-                <label>NOMOR WHATSAPP</label>
-                <input id="userWA" type="tel" class="field" placeholder="08xxxxxxxxxx">
-                <label>SISA BATERAI SAAT INI (%)</label>
-                <input id="userBattery" type="number" class="field" placeholder="0-99">
-                <button id="btnDaftar" class="btn-cyan">DAFTAR ANTRIAN</button>
-            </div>
-            <button onclick="monitorMode()" class="btn-outline">PANTAU STATUS (TANPA DAFTAR)</button>
-        </div>
-        
-        <div id="quickStatusSummary">
-            <div id="qsContent">
-                <div>ANTRIAN <span id="qsQueueCountValue" class="qs-value">0</span></div>
-                <div>MAX CAS <span id="qsMaxTargetValue" class="qs-value">100%</span></div>
-            </div>
-        </div>
-        
-        <div class="player-wrapper" id="pWrap">
-            <iframe id="mp3PlayerFrame" src="https://punyaaris1-lang.github.io/music/" title="MLU Player" loading="lazy"></iframe>
-            <div class="player-toggle" onclick="document.getElementById('pWrap').classList.toggle('expanded')">▼ BUKA / TUTUP LIST LAGU ▼</div>
-        </div>
-        
-        <div id="statusArea" style="display:none;"> 
-            <div style="margin-bottom:15px;font-size:10px;font-weight:700;color:var(--cyber-blue);letter-spacing:1px;text-transform:uppercase;">STATUS CHARGING STATION</div>
-            <div class="slots-grid" id="slotsContainer"></div>
-            <div class="glass-card" style="padding:20px;min-height:100px;">
-                <div style="margin-bottom:15px;border-bottom:1px solid #333;padding-bottom:10px;font-size:12px;font-weight:700;display:flex;justify-content:space-between;color:#fff;">
-                    <span>DAFTAR TUNGGU</span><span id="qCount" style="color:var(--volt-green)">(0)</span>
-                </div>
-                <div id="queueList"></div>
-            </div>
-        </div>
-
-        <div id="miniAdminPanel" class="mini-dashboard">
-            <div style="text-align:center; color:#666; font-size:10px; margin-bottom:10px; letter-spacing:2px;">PANEL ADMIN</div>
-            <div class="admin-card highlight">
-                <div class="ac-header">📝 <span>DAFTAR ANTRIAN BARU</span></div>
-                <div class="mini-row">
-                    <input id="miniQPlat" placeholder="PLAT NOMOR" class="mini-inp" style="flex:2">
-                    <input id="miniQBat" type="number" placeholder="%" class="mini-inp" style="flex:1; text-align:center;">
-                </div>
-                <div class="mini-row">
-                    <input id="miniQName" placeholder="NAMA" class="mini-inp">
-                    <input id="miniQWA" placeholder="WHATSAPP (08xx)" class="mini-inp">
-                </div>
-                <button onclick="miniRegQ()" class="mini-btn btn-blue" style="width:100%">+ TAMBAH KE ANTRIAN</button>
-            </div>
-            
-            <button onclick="viewLogs()" class="mini-btn" style="width:100%;margin-bottom:20px;border:1px solid var(--volt-green);color:var(--volt-green);font-family:'JetBrains Mono';font-weight:bold;">>_ CEK SYSTEM LOGS</button>
-
-            <div class="admin-card">
-                <div class="ac-header">🚀 <span>PENGATURAN ARUS</span></div>
-                <div style="margin-bottom:15px;">
-                    <label style="margin-bottom:5px; display:block;">PINDAHKAN ANTRIAN KE SLOT</label>
-                    <div class="mini-row">
-                        <select id="miniQIdx" class="mini-inp" style="flex:2"></select>
-                        <span style="color:#444;align-self:center;">➜</span>
-                        <select id="miniQTarget" class="mini-inp" style="flex:1"></select>
-                    </div>
-                    <button onclick="miniMoveQ()" class="mini-btn btn-green" style="width:100%">PINDAHKAN SEKARANG</button>
-                </div>
-                <div style="border-top:1px dashed #333; padding-top:15px;">
-                    <label style="margin-bottom:5px; display:block;">TUKAR URUTAN ANTRIAN</label>
-                    <div class="mini-row">
-                        <select id="miniQSwap1" class="mini-inp"></select>
-                        <span style="color:#444;align-self:center;">⇄</span>
-                        <select id="miniQSwap2" class="mini-inp"></select>
-                    </div>
-                    <button onclick="miniSwapQueuePositions()" class="mini-btn" style="width:100%">TUKAR POSISI</button>
-                </div>
-            </div>
-            <div class="admin-card">
-                <div class="ac-header">⚡ <span>KONTROL SLOT (MANUAL)</span></div>
-                <div class="mini-row">
-                    <select id="miniSlotSelect" class="mini-inp"></select>
-                    <input id="miniPlatInput" placeholder="PLAT" class="mini-inp">
-                    <input id="miniBatInput" placeholder="%" type="number" class="mini-inp" style="width:50px;">
-                </div>
-                <div class="mini-row">
-                    <button onclick="miniManualAssign()" class="mini-btn btn-green">ISI TANPA ANTRI</button>
-                    <button onclick="miniClearSlot()" class="mini-btn btn-red">KOSONGKAN PAKSA</button>
-                </div>
-            </div>
-            <div class="admin-card danger">
-                <div class="ac-header">🛡️ <span>SYSTEM & DARURAT</span></div>
-                <div class="mini-row">
-                    <select id="miniSwap1" class="mini-inp"></select>
-                    <select id="miniSwap2" class="mini-inp"></select>
-                    <button onclick="miniSwap()" class="mini-btn">SWAP SLOT</button>
-                </div>
-                <div class="mini-row">
-                    <input id="miniBlockPlat" placeholder="PLAT BLOKIR" class="mini-inp">
-                    <button onclick="miniBlock()" class="mini-btn btn-red">BLOK</button>
-                    <button onclick="miniUnblock()" class="mini-btn">BUKA</button>
-                </div>
-                <div class="mini-row" style="margin-top:10px;">
-                    <button onclick="miniStopAll()" class="mini-btn btn-red">STOP ALL (DARURAT)</button>
-                    <button onclick="miniReset()" class="mini-btn btn-red">RESET DATABASE</button>
-                </div>
-                <button onclick="logoutUser()" class="mini-btn" style="width:100%; margin-top:15px; border:1px solid #333;">KELUAR MODE ADMIN</button>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, onSnapshot, runTransaction, setDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = { apiKey: "AIzaSyALIlkIDALIk83K8s1htalvW6rmNNw02Go", authDomain: "sistem-antrian-b1c39.firebaseapp.com", projectId: "sistem-antrian-b1c39", storageBucket: "sistem-antrian-b1c39.firebasestorage.app", messagingSenderId: "454124587608", appId: "1:454124587608:web:34fbb0f5211067a67f982d" };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const ref = doc(db, "antrian", "utama");
-        const logRef = collection(db, "activityLog");
-
-        const FONTE_TOKEN = "MuR8CucXAsYd2YvWBxVo"; 
-        const WA_SIGNATURE = "\n\n- Admin FC Kelapa Gading";
-        const WA_TEMPLATES = [
-            "Halo {name}, motor {plat} sudah selesai charging. Mohon segera dipindahkan agar teman lain bisa pakai.",
-            "Charging selesai untuk {plat}. Terima kasih {name}, jangan lupa cabut kabel ya.",
-            "Waktu habis! Motor {plat} milik {name} sudah 100%. Giliran teman lain."
-        ];
-
-        const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
-        const MAX_DIST_KM = 0.2; 
-
-        let latestSlots = [null, null, null]; 
-        let latestQueue = [];
-        let isGpsBypassEnabled = localStorage.getItem('gpsBypass') === 'true';
-        let isProcessing = false;
-        
-        // --- FIX ERROR: VARIABLE DECLARED HERE ---
-        let isClearing = {}; 
-
-        setTimeout(() => {
-            const ls = document.getElementById('loadingScreen');
-            if(ls) ls.style.display = 'none';
-        }, 5000);
-
-        function checkIsAdmin() { return localStorage.getItem('superAdminAuth') === 'true'; }
-
-        function log(action, plat, det) { 
-            const userType = checkIsAdmin() ? 'ADMIN' : 'USER/SYSTEM';
-            addDoc(logRef, {
-                timestamp: new Date(),
-                action: action, 
-                plat: plat, 
-                user: userType, 
-                details: det
-            }).catch(e => console.error("Log Error:", e)); 
-        }
-
-        window.viewLogs = async () => {
-            document.getElementById('logModal').style.display = 'flex';
-            const logDiv = document.getElementById('logContent');
-            logDiv.innerHTML = '<span style="color:#0f0;">> Fetching logs from db...</span>';
-            try {
-                const q = query(logRef, orderBy("timestamp", "desc"), limit(50));
-                const querySnapshot = await getDocs(q);
-                let html = '';
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const time = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString() : '00:00:00';
-                    const act = data.action || 'UNKNOWN';
-                    let colorClass = 'l-info';
-                    if(act.includes('ERROR') || act.includes('FAILED') || act.includes('REJECTED')) colorClass = 'l-err';
-                    else if(act.includes('SUCCESS') || act.includes('FINISH')) colorClass = 'l-succ';
-                    else if(act.includes('MANUAL') || act.includes('EDIT')) colorClass = 'l-warn';
-                    const detailStr = JSON.stringify(data.details || {}).replace(/"/g,'');
-                    html += `<div class="log-line"><span class="l-ts">[${time}]</span><span class="${colorClass}">${act}</span><span style="color:#444;">::</span><span style="color:#fff;">${data.plat || '-'}</span><span style="color:#666;">${detailStr}</span></div>`;
-                });
-                logDiv.innerHTML = html || '<span style="color:#666;">> No logs found.</span>';
-            } catch (e) {
-                logDiv.innerHTML = `<span class="l-err">> FATAL ERROR: ${e.message}</span>`;
-            }
+    <script>
+        // --- 1. CONFIG FIREBASE ANDA ---
+        const firebaseConfig = { 
+            apiKey: "AIzaSyALIlkIDALIk83K8s1htalvW6rmNNw02Go", 
+            authDomain: "sistem-antrian-b1c39.firebaseapp.com", 
+            projectId: "sistem-antrian-b1c39", 
+            storageBucket: "sistem-antrian-b1c39.firebasestorage.app", 
+            messagingSenderId: "454124587608", 
+            appId: "1:454124587608:web:34fbb0f5211067a67f982d" 
         };
-
-        function formatWA(num) {
-            let n = num.replace(/\D/g,'');
-            if(n.startsWith('0')) n = '62' + n.substring(1);
-            if(!n.startsWith('62')) n = '62' + n;
-            return n;
-        }
-
-        // --- FIX ERROR: FUNCTION DEFINED ---
-        function formatTime(m) { 
-            const s = Math.round(m * 60); 
-            return `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`; 
-        }
-
-        async function sendFonnteNotif(targetWA, plat, name) {
-            if(!targetWA || targetWA.length < 5 || targetWA === '-') return;
-            const formattedWA = formatWA(targetWA);
-            const finalMsg = WA_TEMPLATES[Math.floor(Math.random() * WA_TEMPLATES.length)].replace("{name}", name).replace("{plat}", plat) + WA_SIGNATURE;
-            try {
-                const formData = new FormData();
-                formData.append('target', formattedWA);
-                formData.append('message', finalMsg);
-                await fetch('https://api.fonnte.com/send', { method: 'POST', headers: { 'Authorization': FONTE_TOKEN }, body: formData });
-                log('WA_SENT_SUCCESS', plat, {to: formattedWA});
-            } catch(e) { console.error("WA Error", e); log('WA_SENT_FAILED', plat, {err: e.message}); }
-        }
-
-        const CHARGING_CURVE = [
-            [100,0], [99,1], [95,4], 
-            [90,17], [89,18], [85,22], [81,25], [72,33], 
-            [61,45], [50,50], [20,68], [0,86]
-        ];
-
-        function getBatteryFromRemTime(rem) {
-            if (rem <= 0) return 100;
-            for (let i=0; i<CHARGING_CURVE.length-1; i++) {
-                const [p1, t1] = CHARGING_CURVE[i]; const [p2, t2] = CHARGING_CURVE[i+1];
-                if (rem >= t1 && rem <= t2) return Math.round(p1 - ((rem - t1) / (t2 - t1)) * (p1 - p2));
-            }
-            return 0;
-        }
         
-        function calculateDuration(start, target) {
-            if (start >= target) return 5;
-            let timeStart=90, timeTarget=0;
-            for(let i=0; i<CHARGING_CURVE.length-1; i++){ 
-                if(start<=CHARGING_CURVE[i][0] && start>=CHARGING_CURVE[i+1][0]) { 
-                    const r=(CHARGING_CURVE[i][0]-start)/(CHARGING_CURVE[i][0]-CHARGING_CURVE[i+1][0]); 
-                    timeStart=CHARGING_CURVE[i][1]+r*(CHARGING_CURVE[i+1][1]-CHARGING_CURVE[i][1]); 
-                    break; 
-                }
-            }
-            for(let i=0; i<CHARGING_CURVE.length-1; i++){ 
-                if(target<=CHARGING_CURVE[i][0] && target>=CHARGING_CURVE[i+1][0]) { 
-                    const r=(CHARGING_CURVE[i][0]-target)/(CHARGING_CURVE[i][0]-CHARGING_CURVE[i+1][0]); 
-                    timeTarget=CHARGING_CURVE[i][1]+r*(CHARGING_CURVE[i+1][1]-CHARGING_CURVE[i][1]); 
-                    break; 
-                }
-            }
-            return Math.max(1, Math.ceil(timeStart - timeTarget));
-        }
-        
-        function calculateTargetLimit(len) { if(len >= 11) return 85; if(len >= 6) return 90; if(len >= 3) return 95; return 100; }
-        function parseDate(ts) { if(!ts) return null; if(ts.toDate) return ts.toDate(); if(ts instanceof Date) return ts; return new Date(ts); }
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-        function renderSlots(slots) {
-            const c = document.getElementById('slotsContainer'); c.innerHTML='';
-            const isAdmin = checkIsAdmin();
-            const myPlat = localStorage.getItem('myPlat');
-            const qLen = latestQueue.length;
+        // --- 2. SETTING LOKASI ---
+        const STATION_LOC = { lat: -6.171583, lng: 106.899844 }; 
+        const MAX_DIST_KM = 0.2; // 200 Meter
+        let isGpsReady = false;
 
-            slots.forEach((m, i) => {
-                const box = document.createElement('div'); box.className = 'slot-box';
-                const isMine = myPlat === m?.plat;
-                const canControl = isAdmin || isMine;
-                if(isMine) box.classList.add('active');
-                const globalTarget = calculateTargetLimit(qLen); 
+        // --- 3. AMBIL USER ---
+        let currentUser = null;
+        try { currentUser = JSON.parse(localStorage.getItem('maka_user')); } catch (e) {}
 
-                if(m && m.startTime) {
-                    const st = parseDate(m.startTime);
-                    let durReal = m.isManualTime ? m.durationMinutes : calculateDuration(m.startBattery, globalTarget); 
-                    const end = new Date(st.getTime() + durReal*60000);
-                    const rem = (end - new Date())/60000;
-                    
-                    if(rem <= 0) {
-                        const finishTime = new Date(st.getTime() + durReal*60000);
-                        const diffSeconds = (new Date() - finishTime) / 1000; 
-                        const timeLeftToClear = Math.max(0, Math.ceil(60 - diffSeconds));
-                        const autoClearText = timeLeftToClear > 0 ? `AUTO CLEAR: ${timeLeftToClear}s` : 'CLEARING...';
-                        
-                        box.innerHTML = `<div style="font-weight:900;color:var(--danger);font-size:10px;">SLOT ${i+1}</div><div style="font-size:16px;font-weight:900;margin-top:5px;font-family:'Inter'">${m.plat}</div><div style="font-size:10px;color:#aaa;">${m.userName.split(' ')[0]}</div><div style="font-size:14px;color:var(--danger);font-weight:900;margin-top:5px;">SELESAI</div><div class="bat-icon" style="border-color:var(--volt-green)"><span class="bat-bolt">⚡</span><div class="bat-fill" style="height:100%;background:var(--volt-green)"></div></div><div style="color:var(--volt-green);font-weight:900;font-size:12px;margin-bottom:5px;">FULL 100%</div><div style="color:var(--danger);font-size:10px;font-weight:bold;animation:pulse 1s infinite;">${autoClearText}</div><div style="margin-top:auto">${canControl ? `<button onclick="silentKill(${i},'${m.plat}')" class="btn-slot btn-stop">KOSONGKAN</button>` : ''}</div>`;
+        // --- 4. GPS LOGIC ---
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(
+                (pos) => {
+                    const dist = getDist(pos.coords.latitude, pos.coords.longitude, STATION_LOC.lat, STATION_LOC.lng);
+                    const btn = document.getElementById('btnHold');
+                    const txt = document.getElementById('gpsText');
+
+                    if (dist <= MAX_DIST_KM) {
+                        isGpsReady = true;
+                        btn.className = "hold-btn unlocked";
+                        txt.innerText = "TAP TO QUEUE";
+                        txt.style.color = "var(--neon)";
                     } else {
-                        if(isMine && rem < 5) box.classList.add('pulsating');
-                        let dispBat;
-                        if(m.isManualTime) {
-                            dispBat = getBatteryFromRemTime(rem);
-                        } else {
-                            const timeToTarget = calculateDuration(globalTarget, 100); 
-                            const adjustedRem = rem + timeToTarget; 
-                            dispBat = getBatteryFromRemTime(adjustedRem); 
-                            dispBat = Math.min(Math.max(m.startBattery, dispBat), globalTarget);
-                        }
-                        const targetDisplay = globalTarget + '%'; 
-                        box.innerHTML = `<div style="font-size:9px;font-weight:700;color:var(--volt-green)">SLOT ${i+1}</div><div style="font-size:16px;font-weight:900;margin-top:2px;font-family:'Inter'">${m.plat}</div><div style="font-size:10px;color:#fff;">${m.userName.split(' ')[0]}</div><div style="font-family:'Inter';font-size:22px;font-weight:900;color:var(--volt-green);margin:2px 0;">${formatTime(rem)}</div><div class="bat-icon"><span class="bat-bolt">⚡</span><div class="bat-fill pulsating-fill" style="height:${dispBat}%"></div></div><div class="bat-stats"><div class="stat-row"><span class="c-start">Awal:</span> <span class="c-start">${m.startBattery}%</span></div><div class="stat-row"><span class="c-target">Target:</span> <span class="c-target">${targetDisplay}</span></div><div class="stat-row"><span class="c-now">Kini:</span> <span class="c-now">${dispBat}%</span></div></div><div>${isAdmin ? `<button onclick="editTimer(${i})" class="btn-slot btn-edit">EDIT</button>` : ''} ${canControl ? `<button onclick="act(${i},'stop','${m.plat}')" class="btn-slot btn-stop">STOP</button>` : ''}</div>`;
+                        isGpsReady = false;
+                        btn.className = "hold-btn locked";
+                        txt.innerText = "TOO FAR (" + (dist * 1000).toFixed(0) + "m)";
+                        txt.style.color = "#555";
                     }
-                } else if(m) {
-                    let autoStartMsg = "READY";
-                    if(m.readyTime) {
-                        const readyLimit = 5 * 60 * 1000; 
-                        const elapsed = new Date() - parseDate(m.readyTime);
-                        const remainingReady = readyLimit - elapsed;
-                        if(remainingReady > 0) {
-                            const min = Math.floor(remainingReady / 60000);
-                            const sec = Math.floor((remainingReady % 60000) / 1000);
-                            autoStartMsg = `AUTO START: ${min}:${sec.toString().padStart(2,'0')}`;
-                        } else {
-                            autoStartMsg = "STARTING...";
-                        }
-                    }
-                    box.classList.add('active'); box.style.borderColor='var(--volt-green)';
-                    box.innerHTML = `<div style="color:var(--volt-green);font-weight:700;font-size:10px;">SLOT ${i+1}</div><div style="font-size:16px;font-weight:900;margin-top:5px;font-family:'Inter'">${m.plat}</div><div style="font-size:10px;color:#aaa;">${m.userName.split(' ')[0]}</div><div style="font-family:'Syne';font-size:12px;font-weight:900;color:var(--volt-green);margin:10px 0;">${autoStartMsg}</div><div class="bat-icon" style="border-color:var(--volt-green)"><div class="bat-fill" style="height:${m.startBattery}%;background:var(--volt-green)"></div></div><div style="margin-top:auto">${canControl ? `<button onclick="act(${i},'start')" class="btn-slot btn-start">MULAI</button><button onclick="act(${i},'stop','${m.plat}')" class="btn-slot btn-stop">BATAL</button>` : ''}</div>`;
-                } else {
-                    box.classList.remove('active'); box.style.borderColor='#444';
-                    box.innerHTML = `<div style="color:#444;font-weight:700;font-size:10px;">SLOT ${i+1}</div><div style="color:#444;margin:20px 0;font-weight:700;">KOSONG</div><div style="font-size:24px;color:#222;font-weight:900;">- - -</div><div class="bat-icon" style="border-color:#222"><div class="bat-fill" style="height:0%;"></div></div>`;
-                }
-                c.appendChild(box);
-            });
+                },
+                (err) => {
+                    console.error(err);
+                    document.getElementById('gpsText').innerText = "GPS BLOCKED";
+                    document.getElementById('gpsText').style.color = "var(--err)";
+                },
+                { enableHighAccuracy: true }
+            );
         }
 
-        onSnapshot(ref, (s) => {
-            const d=s.data()||{}; latestSlots=d.chargingSlots||[null,null,null]; latestQueue=d.waitingQueue||[];
-            checkDisplayMode();
-            
-            latestSlots.forEach((m,i)=>{
-                if(m && m.startTime) {
-                    const duration = m.isManualTime ? m.durationMinutes : calculateDuration(m.startBattery, m.targetLimit||100);
-                    const finishTime = new Date(parseDate(m.startTime).getTime() + duration*60000);
-                    if(new Date() > new Date(finishTime.getTime() + 60000)) {
-                        silentKill(i, m.plat); 
-                    }
-                }
-            });
-            
-            const qc = document.getElementById('queueList'); qc.innerHTML = latestQueue.length ? '' : '<div style="text-align:center;color:#444;font-size:12px;margin-top:20px;">Antrian Kosong</div>';
-            const qLen = latestQueue.length;
-            document.getElementById('qsQueueCountValue').innerText = qLen;
-            document.getElementById('qCount').innerText = `(${qLen})`; 
-            document.getElementById('qsMaxTargetValue').innerText = `${calculateTargetLimit(qLen)}%`;
+        function getDist(lat1, lon1, lat2, lon2) {
+            const R = 6371; 
+            const dLat = (lat2-lat1) * Math.PI/180;
+            const dLon = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        }
 
-            latestQueue.forEach((m,i)=>{ 
-                const div=document.createElement('div'); 
-                const isMine = localStorage.getItem('myPlat') === m.plat;
-                div.className='queue-item-display '+(isMine?'is-mine':''); 
-                let btn = '';
-                if(checkIsAdmin()) {
-                    let waLink = `https://wa.me/${formatWA(m.wa)}?text=Halo%20${m.userName},%20pantau%20antrianmu%20di:%20${window.location.href}`;
-                    btn = `<div style="display:flex;gap:5px;"><a href="${waLink}" target="_blank" style="background:#25D366;color:#fff;border-radius:4px;padding:3px 6px;text-decoration:none;font-weight:bold;font-size:10px;">WA</a><button onclick="cancelQ(${i})" style="border:none;background:transparent;color:var(--danger);font-weight:900;cursor:pointer;">&times;</button></div>`;
-                }
-                else if(isMine) btn = `<button onclick="cancelQ(${i})" style="border:none;background:var(--danger);color:#fff;border-radius:4px;padding:3px 6px;font-size:9px;font-weight:bold;cursor:pointer;margin-left:5px;">BATAL</button>`;
-                div.innerHTML=`<div style="display:flex;align-items:center;"><span style="font-family:'Inter';font-weight:900;font-size:16px;width:30px;color:var(--volt-green);">#${i+1}</span><div style="margin-left:5px;font-size:12px;color:#fff;"><b>${m.plat}</b> <span style="color:#aaa;">(${m.userName})</span></div></div><div style="display:flex;align-items:center;"><span style="font-size:12px;color:#fff;font-weight:700;">${m.startBattery}%</span>${btn}</div>`; 
-                qc.appendChild(div); 
-            });
-            renderSlots(latestSlots);
-            
-            if(checkIsAdmin()) {
-                const sOpts = latestSlots.map((_,i)=>`<option value="${i}">Slot ${i+1}</option>`).join('');
-                document.getElementById('miniSlotSelect').innerHTML = sOpts;
-                document.getElementById('miniQTarget').innerHTML = sOpts;
-                document.getElementById('miniSwap1').innerHTML = sOpts;
-                document.getElementById('miniSwap2').innerHTML = sOpts;
-                const qOpts = latestQueue.length ? latestQueue.map((x,i)=>`<option value="${i}">#${i+1} ${x.plat}</option>`).join('') : '<option value="-1">Kosong</option>';
-                document.getElementById('miniQIdx').innerHTML = qOpts;
-                document.getElementById('miniQSwap1').innerHTML = qOpts;
-                document.getElementById('miniQSwap2').innerHTML = qOpts;
+        // --- 5. REAL-TIME LISTENER ---
+        db.collection("antrian").doc("utama").onSnapshot((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                const queueList = data.list || data.antrian || []; 
+                
+                let myData = null;
+                let totalWaiting = 0;
+                let activeChargers = 0;
+
+                queueList.forEach(item => {
+                    // Deteksi Status: Charging/Charge/Isi
+                    const st = (item.status || "").toLowerCase();
+                    if (st.includes('charg') || st.includes('isi') || st.includes('penuh')) {
+                        activeChargers++;
+                    } else {
+                        totalWaiting++;
+                    }
+
+                    if (currentUser && item.plat === currentUser.plat) {
+                        myData = item;
+                    }
+                });
+
+                updateUI(myData, totalWaiting, activeChargers);
+            } else {
+                document.getElementById('statusLabel').innerText = "DB EMPTY";
             }
         });
 
-        // --- FUNGSI ADMIN EXPOSED KE WINDOW (AGAR TOMBOL BISA DIKLIK) ---
-        window.silentKill = function(i, expectedPlat) {
-            if(isClearing[i]) return; 
-            isClearing[i] = true;
-
-            runTransaction(db, async(t)=>{
-                const d = (await t.get(ref)).data();
-                const slotNow = d.chargingSlots[i];
-                if(!slotNow || slotNow.plat !== expectedPlat) return;
-
-                const oldWA = slotNow.wa;
-                const oldName = slotNow.userName;
-
-                d.chargingSlots[i] = null;
-                let pulled = 'None';
-                
-                if(d.waitingQueue.length > 0){
-                    const n = d.waitingQueue.shift();
-                    const tar = calculateTargetLimit(d.waitingQueue.length);
-                    const dur = calculateDuration(n.startBattery, tar);
-                    d.chargingSlots[i] = {...n, startTime:null, readyTime:new Date(), targetLimit:tar, durationMinutes:dur};
-                    pulled = n.plat;
-                }
-                
-                t.update(ref, d);
-                sendFonnteNotif(oldWA, expectedPlat, oldName);
-                log('SYSTEM_SILENT_KILL', expectedPlat, {pulled_next: pulled});
-            })
-            .catch(e => console.log("Silent kill aborted/failed", e))
-            .finally(() => {
-                setTimeout(() => { delete isClearing[i]; }, 2000); 
-            });
-        };
-
-        window.miniRegQ = () => {
-            const p = document.getElementById('miniQPlat').value.toUpperCase().replace(/\s/g,'');
-            const n = document.getElementById('miniQName').value.trim() || 'ADMIN_INPUT';
-            const w = document.getElementById('miniQWA').value.trim() || '-';
-            const b = parseInt(document.getElementById('miniQBat').value);
-            if(!p || isNaN(b)) return alert('Plat dan Baterai Wajib Diisi!');
+        // --- 6. UPDATE UI ---
+        function updateUI(myData, totalWaiting, activeChargers) {
+            const display = document.getElementById('mainDisplay');
+            const label = document.getElementById('statusLabel');
+            const sub = document.getElementById('subInfo');
+            const bg = document.getElementById('bgGlow');
             
-            runTransaction(db, async(t)=>{
-                const d=(await t.get(ref)).data(); const q=d.waitingQueue||[];
-                q.push({plat:p, userName:n, wa:w, startBattery:b, targetLimit:100, durationMinutes:0, startTime:null});
-                t.update(ref,{waitingQueue:q});
-            }).then(() => {
-                log('ADMIN_REGISTER_QUEUE', p, {nama: n, bat: b}); 
-                alert('Berhasil Daftar Antrian');
-            }).catch(e => alert(e));
-        };
+            document.getElementById('totalQ').innerText = totalWaiting;
+            document.getElementById('estTime').innerText = (totalWaiting * 30) + " MIN";
 
-        window.miniManualAssign = () => {
-            const s=document.getElementById('miniSlotSelect').value;
-            const p=document.getElementById('miniPlatInput').value.toUpperCase();
-            const b=parseInt(document.getElementById('miniBatInput').value);
-            if(!p || isNaN(b)) return alert('Lengkapi Data');
-            const target = calculateTargetLimit(latestQueue.length); 
-            const dur = calculateDuration(b, target);
-            runTransaction(db, async(t)=>{
-                const d=(await t.get(ref)).data();
-                if(d.chargingSlots[s]) throw "Slot Penuh";
-                d.chargingSlots[s]={plat:p, userName:'ADMIN', wa:'-', startBattery:b, targetLimit:target, durationMinutes:dur, startTime:null, readyTime: new Date()}; 
-                t.update(ref,{chargingSlots:d.chargingSlots});
-            }).then(() => log('ADMIN_MANUAL_ASSIGN', p, {slot: s, bat: b})).catch(e=>alert(e));
-        };
-        
-        window.miniClearSlot = () => {
-            const s=document.getElementById('miniSlotSelect').value;
-            if(confirm('Clear Paksa?')) {
-                runTransaction(db, async(t)=>{
-                    const d = (await t.get(ref)).data();
-                    const q = d.waitingQueue || [];
-                    const oldP = d.chargingSlots[s]?.plat || 'Unknown';
-                    d.chargingSlots[s] = null;
-                    if(q.length > 0) {
-                        const next = q.shift();
-                        const tar = calculateTargetLimit(q.length); 
-                        const dur = calculateDuration(next.startBattery, tar);
-                        d.chargingSlots[s] = { ...next, startTime: null, readyTime: new Date(), targetLimit: tar, durationMinutes: dur }; 
-                    }
-                    t.update(ref, {chargingSlots:d.chargingSlots, waitingQueue:q});
-                    log('ADMIN_FORCE_CLEAR', oldP, {slot: s}); 
-                });
+            // Slot Dots Logic
+            for(let i=1; i<=3; i++) {
+                let d = document.getElementById('dot'+i);
+                // Nyalakan dot sejumlah activeChargers
+                d.className = (i <= activeChargers) ? "dot charging" : "dot";
             }
-        };
 
-        window.miniMoveQ = () => {
-            const qi=document.getElementById('miniQIdx').value, si=document.getElementById('miniQTarget').value;
-            if(qi<0) return;
-            runTransaction(db, async(t)=>{
-                const d=(await t.get(ref)).data(); const q=d.waitingQueue; const s=d.chargingSlots;
-                if(s[si]) throw "Penuh";
-                const item=q.splice(qi,1)[0]; 
-                item.startTime=null; 
-                item.readyTime = new Date();
-                const tar = calculateTargetLimit(q.length); 
-                const dur = calculateDuration(item.startBattery, tar);
-                item.targetLimit = tar;
-                item.durationMinutes = dur;
-                s[si]=item;
-                t.update(ref,{chargingSlots:s, waitingQueue:q});
-            }).then(() => log('ADMIN_MOVE_QUEUE', 'Queue', {to_slot: si}));
-        };
-
-        window.miniSwapQueuePositions = () => {
-            const i1 = document.getElementById('miniQSwap1').value;
-            const i2 = document.getElementById('miniQSwap2').value;
-            if(i1 == i2 || i1 < 0 || i2 < 0) return alert('Pilih dua antrian berbeda');
-            runTransaction(db, async(t)=>{
-                const d = (await t.get(ref)).data();
-                const q = d.waitingQueue || [];
-                if(!q[i1] || !q[i2]) throw "Data berubah";
-                [q[i1], q[i2]] = [q[i2], q[i1]];
-                t.update(ref, {waitingQueue: q});
-            }).then(()=> {
-                log('ADMIN_SWAP_QUEUE_POS', 'Queue', {pos1: i1, pos2: i2});
-                alert('Posisi Ditukar!');
-            }).catch(e=>alert(e));
-        };
-
-        window.miniSwap = () => {
-            const s1=document.getElementById('miniSwap1').value, s2=document.getElementById('miniSwap2').value;
-            if(s1==s2) return;
-            runTransaction(db, async(t)=>{
-                const d=(await t.get(ref)).data(); const s=d.chargingSlots;
-                [s[s1],s[s2]]=[s[s2],s[s1]]; t.update(ref,{chargingSlots:s});
-            }).then(() => log('ADMIN_SWAP_SLOT', 'Slots', {s1: s1, s2: s2}));
-        };
-
-        window.miniBlock = () => { 
-            const p=document.getElementById('miniBlockPlat').value.toUpperCase(); 
-            if(p) {
-                updateDoc(ref,{blockedList:arrayUnion(p)}); 
-                log('ADMIN_BLOCK_USER', p, null);
-            }
-        };
-
-        window.miniUnblock = () => { 
-            const p=document.getElementById('miniBlockPlat').value.toUpperCase(); 
-            if(p) {
-                updateDoc(ref,{blockedList:arrayRemove(p)}); 
-                log('ADMIN_UNBLOCK_USER', p, null);
-            }
-        };
-
-        window.miniStopAll = () => { 
-            if(confirm('STOP ALL?')) {
-                updateDoc(ref,{chargingSlots:[null,null,null]}); 
-                log('ADMIN_EMERGENCY_STOP', 'ALL', 'Stopped all slots');
-            }
-        };
-
-        window.miniReset = () => { 
-            if(confirm('RESET DB??')) {
-                setDoc(ref,{chargingSlots:[null,null,null],waitingQueue:[],blockedList:[]}); 
-                log('ADMIN_RESET_DB', 'ALL', 'Full Database Reset');
-            }
-        };
-
-        window.act = (i,t,p) => {
-            if(t==='stop') if(confirm('Stop?')) runTransaction(db, async(tr)=>{ 
-                const d=(await tr.get(ref)).data(); 
-                d.chargingSlots[i]=null; 
-                if(d.waitingQueue.length){
-                    const n=d.waitingQueue.shift(); 
-                    d.chargingSlots[i]={...n, startTime:null, durationMinutes:calculateDuration(n.startBattery,100)};
-                } 
-                tr.update(ref,d);
-                const actor = checkIsAdmin() ? 'ADMIN_STOP_SLOT' : 'USER_STOP_MANUAL';
-                log(actor, p, {slot: i+1}); 
-            });
-            if(t==='start') runTransaction(db, async(tr)=>{ 
-                const d=(await tr.get(ref)).data(); 
-                d.chargingSlots[i].startTime=new Date(); 
-                tr.update(ref,d); 
-                const actor = checkIsAdmin() ? 'ADMIN_START_SLOT' : 'USER_START_MANUAL';
-                log(actor, d.chargingSlots[i].plat, {slot: i+1}); 
-            });
-        };
-        
-        window.editTimer = (i) => {
-            const m = prompt("Masukkan SISA WAKTU di Mesin (Menit):");
-            if(m && !isNaN(m)) {
-                runTransaction(db, async(t)=>{ 
-                    const d=(await t.get(ref)).data(); 
-                    const oldDur = d.chargingSlots[i].durationMinutes;
-                    d.chargingSlots[i].startTime = new Date(); 
-                    d.chargingSlots[i].durationMinutes = parseInt(m);
-                    d.chargingSlots[i].isManualTime = true; 
-                    t.update(ref,d); 
-                    log('ADMIN_SYNC_TIME', d.chargingSlots[i].plat, {manual_input: m});
-                });
-            }
-        };
-
-        window.logoutUser = () => { 
-            localStorage.removeItem('myPlat'); 
-            localStorage.removeItem('isAdminLoggedIn'); 
-            localStorage.removeItem('superAdminAuth'); 
-            sessionStorage.removeItem('monitorMode'); 
-            location.reload(); 
-        };
-
-        function checkDisplayMode() {
-            document.getElementById('loadingScreen').style.display='none';
-            const isAdmin = checkIsAdmin();
-            const myPlat = localStorage.getItem('myPlat');
-            const isMonitor = sessionStorage.getItem('monitorMode') === 'true'; 
-
-            if(!myPlat && !isAdmin && !isMonitor && !sessionStorage.getItem('modalClosed')) {
-                document.getElementById('choiceModal').style.display = 'flex';
+            if (myData) {
+                const st = (myData.status || "").toLowerCase();
+                if (st.includes('charg') || st.includes('isi') || st.includes('penuh')) {
+                    // CHARGING
+                    let bat = myData.baterai || 0; 
+                    display.innerHTML = bat + "<span>%</span>";
+                    display.className = "mono-num charging";
+                    display.style.color = "var(--neon)";
+                    label.innerText = "CHARGING...";
+                    label.style.color = "var(--neon)";
+                    sub.innerText = "FULL IN: " + (myData.estimasi || "15 MIN");
+                    sub.className = "sub-stat show";
+                    bg.style.background = "var(--neon)";
+                } else {
+                    // WAITING
+                    display.innerHTML = myData.no || myData.nomor || "#";
+                    display.className = "mono-num";
+                    display.style.color = "var(--cyan)";
+                    label.innerText = "ANTRIAN ANDA";
+                    label.style.color = "var(--cyan)";
+                    sub.innerText = "MOHON MENUNGGU";
+                    sub.className = "sub-stat show";
+                    bg.style.background = "var(--cyan)";
+                }
             } else {
-                document.getElementById('choiceModal').style.display = 'none';
+                // IDLE
+                display.innerHTML = "--";
+                display.className = "mono-num";
+                display.style.color = "white";
+                label.innerText = "SILAHKAN DAFTAR";
+                label.style.color = "#555";
+                sub.className = "sub-stat";
+                bg.style.background = "#222";
             }
-
-            if(myPlat || isAdmin || isMonitor) { 
-                document.getElementById('registrationArea').style.display='none';
-                document.getElementById('statusArea').style.display='block';
-            } else {
-                document.getElementById('registrationArea').style.display='block';
-                document.getElementById('statusArea').style.display='none';
-            }
-            document.getElementById('miniAdminPanel').style.display = isAdmin ? 'block' : 'none';
         }
-        
-        window.monitorMode = () => {
-            sessionStorage.setItem('monitorMode', 'true'); 
-            checkDisplayMode();
-        };
-        
-        window.closeChoiceModal = () => {
-            document.getElementById('choiceModal').style.display = 'none';
-            sessionStorage.setItem('modalClosed', 'true');
-        };
 
-        window.cancelQ = (i) => {
-            if(confirm('Batalkan antrian?')) {
-                runTransaction(db, async(t)=>{
-                    const d = (await t.get(ref)).data();
-                    const cancelledItem = d.waitingQueue[i];
-                    d.waitingQueue.splice(i, 1);
-                    t.update(ref, {waitingQueue: d.waitingQueue});
-                    // LOG
-                    const actor = checkIsAdmin() ? 'ADMIN_CANCEL_QUEUE' : 'USER_BATAL_ANTRI';
-                    log(actor, cancelledItem?.plat || 'Unknown', {queue_index: i});
-                }).then(()=> {
-                    const isAdmin = checkIsAdmin();
-                    if(!isAdmin) {
-                        localStorage.removeItem('myPlat');
-                        location.reload();
-                    }
-                });
-            }
-        };
+        // --- 7. FUNGSI DAFTAR (FIX ERROR UNDEFINED) ---
+        function processQueue() {
+            if (!isGpsReady) return; 
 
-        window.onload = checkDisplayMode;
-        
-        setInterval(()=>{
-            if(latestSlots) {
-                renderSlots(latestSlots);
-                if(isProcessing) return;
-                latestSlots.forEach((m,i)=>{
-                    if(m && !m.startTime && m.readyTime) {
-                        const readyLimit = 5 * 60 * 1000; 
-                        const elapsed = new Date() - parseDate(m.readyTime);
-                        if(elapsed >= readyLimit) {
-                            isProcessing = true;
-                            runTransaction(db, async(t)=>{
-                                const d=(await t.get(ref)).data();
-                                if(d.chargingSlots[i] && !d.chargingSlots[i].startTime) {
-                                    d.chargingSlots[i].startTime = new Date();
-                                    t.update(ref, d);
-                                    log('AUTO_START_TIMER', d.chargingSlots[i].plat, 'User did not click start');
-                                }
-                            }).finally(()=>isProcessing=false);
-                        }
-                    }
-                    if(m && m.startTime && !isClearing[i]) {
-                        const st = parseDate(m.startTime);
-                        const durationToUse = m.isManualTime ? m.durationMinutes : calculateDuration(m.startBattery, m.targetLimit || 100);
-                        const finishTime = new Date(st.getTime() + durationToUse*60000);
-                        const now = new Date();
-                        
-                        // AUTO KILL IF < -1 MINUTE
-                        if(now > new Date(finishTime.getTime() + 60000)) { 
-                            silentKill(i, m.plat); 
-                        }
-                    }
-                });
+            // SAFETY CHECK: Pastikan User ada datanya
+            if (!currentUser || !currentUser.plat) {
+                alert("Error: Data Pengguna tidak ditemukan di memori HP. Silakan Logout dan Login kembali.");
+                return;
             }
-        }, 1000);
+
+            const sc = document.getElementById('scanner');
+            sc.style.display = 'flex'; 
+
+            const docRef = db.collection("antrian").doc("utama");
+
+            db.runTransaction((transaction) => {
+                return transaction.get(docRef).then((sfDoc) => {
+                    if (!sfDoc.exists) { throw "Document database tidak ditemukan!"; }
+
+                    const data = sfDoc.data();
+                    const list = data.list || data.antrian || [];
+
+                    // Cek Duplikasi
+                    const exists = list.find(x => x.plat === currentUser.plat);
+                    if (exists) throw "Anda sudah terdaftar!";
+
+                    // Cari Nomor Terakhir
+                    let maxNo = 0;
+                    list.forEach(item => { if(item.no > maxNo) maxNo = item.no; });
+                    const nextNo = maxNo + 1;
+
+                    // Buat Data Baru (Pastikan tidak ada undefined)
+                    const newItem = {
+                        plat: currentUser.plat,  // Pastikan ini tidak undefined
+                        no: nextNo,
+                        status: 'waiting',
+                        waktu: new Date().toLocaleTimeString('id-ID'),
+                        baterai: 0 
+                    };
+
+                    transaction.update(docRef, {
+                        list: firebase.firestore.FieldValue.arrayUnion(newItem)
+                    });
+                    
+                    return nextNo;
+                });
+            }).then((newNo) => {
+                setTimeout(() => { sc.style.display = 'none'; }, 500);
+            }).catch((err) => {
+                sc.style.display = 'none';
+                if(err !== "Anda sudah terdaftar!") alert("Gagal: " + err);
+            });
+        }
     </script>
 </body>
 </html>
