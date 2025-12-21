@@ -4,93 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MAKA Dashboard</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#05080A">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.12); }
-        body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background: var(--bg); color: white; padding-bottom: 120px; overflow-x: hidden; }
-        
+        body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background: var(--bg); color: white; padding-bottom: 120px; }
         .u-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
-        .u-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #0080FF, var(--cyan)); box-shadow: 0 0 15px rgba(0,240,255,0.3); }
+        .u-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, #0080FF, var(--cyan)); }
         .u-name-box h2 { font-family: 'Space Grotesk'; font-size: 20px; margin: 0; text-transform: uppercase; }
         .u-plat { color: var(--cyan); font-size: 11px; font-weight: 700; letter-spacing: 1px; }
-
-        .prog-card { background: var(--glass); border: 1px solid var(--border); border-radius: 30px; padding: 25px; text-align: center; margin-bottom: 20px; position: relative; }
-        .ring-container { width: 160px; height: 160px; margin: 0 auto 15px; position: relative; display: flex; align-items: center; justify-content: center; }
-        svg { position: absolute; transform: rotate(-90deg); }
-        circle { fill: none; stroke-width: 10; stroke-linecap: round; }
-        .bg-c { stroke: #111; }
-        .fg-c { stroke: var(--volt); stroke-dasharray: 440; stroke-dashoffset: 440; transition: 1.5s ease-out; }
-        .p-pct { font-family: 'Space Grotesk'; font-size: 42px; font-weight: 700; color: var(--volt); }
-
-        .grid-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .tool-btn { background: var(--glass); border: 1px solid var(--border); border-radius: 20px; padding: 18px; text-decoration: none; color: white; display: flex; flex-direction: column; gap: 5px; }
-        .tool-btn small { font-size: 9px; color: #555; font-weight: 800; letter-spacing: 1px; }
-        .tool-btn b { font-size: 14px; color: #eee; }
-
-        .loc-card { background: linear-gradient(to right, rgba(0,240,255,0.05), transparent); border: 1px solid var(--border); border-radius: 20px; padding: 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        .loc-info h4 { margin: 0; font-size: 13px; color: var(--cyan); }
-        .loc-info p { margin: 5px 0 0; font-size: 10px; color: #555; }
-
-        .quick-links { display: flex; gap: 10px; margin-bottom: 20px; }
-        .q-link { flex: 1; background: var(--border); padding: 12px; border-radius: 12px; text-align: center; font-size: 11px; color: white; text-decoration: none; font-weight: 700; }
-
+        .prog-card { background: var(--glass); border: 1px solid var(--border); border-radius: 30px; padding: 25px; text-align: center; margin-bottom: 20px; }
+        
         .nav-bottom { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; height: 85px; background: rgba(10,15,20,0.92); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
         .nav-item { text-decoration: none; color: #444; font-size: 10px; font-weight: 800; text-align: center; }
         .nav-item.active { color: var(--cyan); }
-        .nav-item span { display: block; font-size: 32px; margin-bottom: 4px; transition: 0.3s; }
-        .nav-item.active span { transform: translateY(-5px); color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
+        .nav-item span { display: block; font-size: 32px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
-
     <div class="u-header">
         <div class="u-avatar"></div>
         <div class="u-name-box">
             <h2 id="nm">...</h2>
-            <div class="u-plat" id="pt">B ---- XXX</div>
+            <div class="u-plat" id="pt">...</div>
         </div>
-        <a href="settings.html" style="margin-left: auto; text-decoration: none; font-size: 24px;">⚙️</a>
     </div>
 
     <div class="prog-card">
-        <div style="font-size: 9px; color: #555; letter-spacing: 2px; font-weight: 800; margin-bottom: 15px;">STATUS KEPEMILIKAN</div>
-        <div class="ring-container">
-            <svg width="160" height="160">
-                <circle class="bg-c" cx="80" cy="80" r="70"></circle>
-                <circle class="fg-c" id="circ" cx="80" cy="80" r="70"></circle>
-            </svg>
-            <div>
-                <div class="p-pct" id="progPercent">0%</div>
-                <div style="font-size: 10px; color: #444; font-weight: 700;" id="progDays">-- / 1009</div>
-            </div>
-        </div>
-        <div id="statusLabel" style="font-size: 10px; font-weight: 800; color: #555;">MENGHITUNG DATA...</div>
-    </div>
-
-    <div class="grid-tools">
-        <a href="sparepart.html" class="tool-btn">
-            <small>MAINTENANCE</small>
-            <b>Sparepart</b>
-        </a>
-        <a href="maka_plus.html" class="tool-btn">
-            <small>SUBSCRIPTION</small>
-            <b>MAKA+</b>
-        </a>
-    </div>
-
-    <div class="loc-card">
-        <div class="loc-info">
-            <h4>FAST CHARGING TERDEKAT</h4>
-            <p id="distFC">Menghitung jarak dari posisi Anda...</p>
-        </div>
-        <a href="lokasi_fc.html" style="text-decoration:none; font-size:22px;">📍</a>
-    </div>
-
-    <div class="quick-links">
-        <a href="info_mlu.html" class="q-link">INFO MLU</a>
-        <a href="tips_maka.html" class="q-link">TIPS MAKA</a>
+        <h3 style="margin:0; color:#555;">STATUS SEWA</h3>
+        <h1 style="font-size:40px; margin:10px 0; color:var(--volt);">AKTIF</h1>
     </div>
 
     <nav class="nav-bottom">
@@ -101,40 +42,25 @@
     </nav>
 
     <script>
-        function init() {
-            const data = localStorage.getItem('maka_user');
-            if (!data) { window.location.href = 'index.html'; return; }
+        // --- LOGIKA RESET DATA RUSAK ---
+        const data = localStorage.getItem('maka_user');
+        
+        if (!data) {
+            window.location.href = 'index.html';
+        } else {
             const u = JSON.parse(data);
-
-            // Perbaikan Data Undefined
-            document.getElementById('nm').innerText = (u.nama || u.name || "DRIVER").toUpperCase();
-            document.getElementById('pt').innerText = (u.plat || "B ---- XXX").toUpperCase();
-
-            // Logika Progress 1009 Hari
-            if (u.tglAmbil) {
-                const start = new Date(u.tglAmbil);
-                const today = new Date();
-                const diff = Math.ceil((today - start) / (1000 * 60 * 60 * 24));
-                const pct = Math.min(Math.round((diff / 1009) * 100), 100);
-                
-                document.getElementById('progPercent').innerText = pct + "%";
-                document.getElementById('progDays').innerText = (diff > 0 ? diff : 0) + " / 1009";
-                document.getElementById('statusLabel').innerText = "MENJALANI MASA SEWA";
-                
-                const offset = 440 - (440 * (pct > 0 ? pct : 0) / 100);
-                document.getElementById('circ').style.strokeDashoffset = offset;
+            
+            // Cek apakah data rusak (B ---- XXX atau Undefined)
+            if (!u.plat || u.plat.includes('----') || u.nama === "DRIVER") {
+                alert("⚠️ DATA AKUN KORUP DETEKSI ⚠️\n\nSistem mendeteksi data 'B ---- XXX'. Aplikasi akan mereset data Anda. Silakan Login ulang dengan Plat Nomor yang benar.");
+                localStorage.removeItem('maka_user');
+                window.location.href = 'index.html';
             }
 
-            // GPS Logic
-            if(navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(p => {
-                    document.getElementById('distFC').innerText = "FC KELAPA GADING • TERDETEKSI";
-                }, () => {
-                    document.getElementById('distFC').innerText = "AKTIFKAN GPS UNTUK JARAK RIIL";
-                });
-            }
+            // Jika Data Benar, Tampilkan
+            document.getElementById('nm').innerText = u.nama.toUpperCase();
+            document.getElementById('pt').innerText = u.plat.toUpperCase();
         }
-        window.onload = init;
     </script>
 </body>
 </html>
