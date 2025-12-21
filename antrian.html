@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAKA • MONOLITH LIVE</title>
+    <title>MAKA • MONOLITH V2</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
-    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -34,6 +34,8 @@
         .control-deck { padding: 0 30px 40px; z-index: 10; display: flex; flex-direction: column; gap: 15px; }
         .system-info { text-align: center; font-size: 9px; color: #444; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
         .system-info b { color: #888; }
+        
+        /* TOMBOL UTAMA */
         .hold-btn { position: relative; width: 80px; height: 80px; margin: 0 auto; border-radius: 50%; border: 1px solid #333; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; overflow: hidden; }
         .hold-btn::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: var(--neon); opacity: 0; transform: scale(0); transition: 0.2s; }
         .hold-btn:active::before { opacity: 0.2; transform: scale(1); }
@@ -46,6 +48,15 @@
         .nav-float { background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(20px); border-radius: 30px; padding: 12px 30px; display: flex; justify-content: space-between; border: 1px solid rgba(255,255,255,0.08); margin-top: 10px; }
         .nav-icon { text-decoration: none; font-size: 24px; filter: grayscale(1); opacity: 0.5; transition: 0.3s; }
         .nav-icon.active { filter: grayscale(0); opacity: 1; transform: scale(1.1); text-shadow: 0 0 15px var(--neon); }
+        
+        /* MODAL KEREN (PENGGANTI POPUP) */
+        #repairModal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .cyber-box { width: 80%; background: #0A0A0A; border: 1px solid var(--err); border-radius: 20px; padding: 30px; text-align: center; position: relative; box-shadow: 0 0 30px rgba(255,0,60,0.2); }
+        .cyber-box h2 { font-family: 'Syncopate'; color: var(--err); font-size: 18px; margin: 0 0 15px; }
+        .cyber-box p { font-size: 11px; color: #888; margin-bottom: 25px; line-height: 1.6; }
+        .cyber-input { width: 90%; background: transparent; border: none; border-bottom: 1px solid #333; color: white; font-family: 'Space Grotesk'; font-size: 24px; text-align: center; margin-bottom: 30px; text-transform: uppercase; font-weight: 700; outline: none; padding-bottom: 10px; }
+        .cyber-input:focus { border-color: var(--err); }
+        .cyber-btn { width: 100%; background: var(--err); border: none; padding: 15px; border-radius: 12px; font-weight: 800; color: black; font-family: 'Space Grotesk'; font-size: 14px; cursor: pointer; }
         
         #scanner { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .scan-beam { width: 100%; height: 2px; background: var(--neon); box-shadow: 0 0 20px var(--neon); animation: beam 1s infinite; }
@@ -67,7 +78,7 @@
     </div>
 
     <div class="monolith">
-        <div class="mono-label" id="statusLabel">SYNCING DB...</div>
+        <div class="mono-label" id="statusLabel">CHECKING DATA...</div>
         <div class="mono-num" id="mainDisplay">--<span>%</span></div>
         <div class="sub-stat" id="subInfo">DATA FETCHING</div>
     </div>
@@ -92,13 +103,22 @@
         </div>
     </div>
 
+    <div id="repairModal">
+        <div class="cyber-box">
+            <h2>DATA MISSING</h2>
+            <p>Data sesi login tidak ditemukan atau korup. Masukkan Plat Nomor Anda untuk sinkronisasi ulang.</p>
+            <input type="text" id="platInput" class="cyber-input" placeholder="B 1234 XXX">
+            <button class="cyber-btn" onclick="saveFixedData()">SINKRONISASI DATA</button>
+        </div>
+    </div>
+
     <div id="scanner">
         <div style="color:var(--neon); font-family:'Syncopate'; font-size:14px; letter-spacing:3px;">LOADING</div>
         <div class="scan-beam"></div>
     </div>
 
     <script>
-        // 1. CONFIG
+        // 1. CONFIG FIREBASE
         const firebaseConfig = { 
             apiKey: "AIzaSyALIlkIDALIk83K8s1htalvW6rmNNw02Go", 
             authDomain: "sistem-antrian-b1c39.firebaseapp.com", 
@@ -114,23 +134,52 @@
         const MAX_DIST_KM = 0.2; 
         let isGpsReady = false;
 
-        // 2. CEK USER
+        // 2. CEK & REPAIR DATA
         let currentUser = null;
-        try { currentUser = JSON.parse(localStorage.getItem('maka_user')); } catch (e) {}
+        try { 
+            currentUser = JSON.parse(localStorage.getItem('maka_user')); 
+        } catch (e) {
+            console.error("Data korup");
+        }
 
         if (!currentUser || !currentUser.plat) {
-            alert("Sesi habis. Silakan login ulang.");
-            window.location.href = 'index.html';
+            // Tampilkan Modal Cyber, Hilangkan Loading
+            document.getElementById('scanner').style.display = 'none';
+            document.getElementById('repairModal').style.display = 'flex';
         } else {
+            // Data Aman, lanjut
             setTimeout(() => { document.getElementById('scanner').style.display = 'none'; }, 800);
         }
 
-        // 3. GPS
+        // FUNGSI SIMPAN DARI MODAL
+        function saveFixedData() {
+            const inputVal = document.getElementById('platInput').value;
+            if(inputVal.length < 3) {
+                alert("Masukkan Plat Nomor yang valid!");
+                return;
+            }
+            
+            // Simpan ke memory
+            currentUser = {
+                plat: inputVal.toUpperCase().trim(),
+                nama: "Driver " + inputVal.toUpperCase().trim(),
+                status: "active"
+            };
+            localStorage.setItem('maka_user', JSON.stringify(currentUser));
+            
+            // Tutup Modal & Refresh
+            document.getElementById('repairModal').style.display = 'none';
+            alert("Sinkronisasi Berhasil. Sistem Siap.");
+            location.reload(); 
+        }
+
+        // 3. GPS LOGIC
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition((pos) => {
                 const dist = getDist(pos.coords.latitude, pos.coords.longitude, STATION_LOC.lat, STATION_LOC.lng);
                 const btn = document.getElementById('btnHold');
                 const txt = document.getElementById('gpsText');
+
                 if (dist <= MAX_DIST_KM) {
                     isGpsReady = true;
                     btn.className = "hold-btn unlocked";
@@ -142,8 +191,11 @@
                     txt.innerText = "TOO FAR (" + (dist * 1000).toFixed(0) + "m)";
                     txt.style.color = "#555";
                 }
-            }, (err) => { document.getElementById('gpsText').innerText = "GPS BLOCKED"; }, { enableHighAccuracy: true });
+            }, (err) => {
+                document.getElementById('gpsText').innerText = "GPS BLOCKED";
+            }, { enableHighAccuracy: true });
         }
+
         function getDist(lat1, lon1, lat2, lon2) {
             const R = 6371; 
             const dLat = (lat2-lat1) * Math.PI/180;
@@ -152,11 +204,10 @@
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
-        // 4. REAL-TIME LISTENER (BACA DATA)
+        // 4. REAL-TIME LISTENER
         db.collection("antrian").doc("utama").onSnapshot((doc) => {
             if (doc.exists) {
                 const data = doc.data();
-                // KUNCI PERBAIKAN: Baca dari field 'antrian' terlebih dahulu, baru 'list'
                 const queueList = data.antrian || data.list || []; 
                 
                 let myData = null;
@@ -175,6 +226,8 @@
                     }
                 });
                 updateUI(myData, totalWaiting, activeChargers);
+            } else {
+                document.getElementById('statusLabel').innerText = "DB OFFLINE";
             }
         });
 
@@ -188,12 +241,14 @@
             document.getElementById('estTime').innerText = (totalWaiting * 30) + " MIN";
 
             for(let i=1; i<=3; i++) {
-                document.getElementById('dot'+i).className = (i <= activeChargers) ? "dot charging" : "dot";
+                let d = document.getElementById('dot'+i);
+                d.className = (i <= activeChargers) ? "dot charging" : "dot";
             }
 
             if (myData) {
                 const st = (myData.status || "").toLowerCase();
                 if (st.includes('charg') || st.includes('isi') || st.includes('penuh')) {
+                    // CHARGING
                     let bat = myData.baterai || 0; 
                     display.innerHTML = bat + "<span>%</span>";
                     display.className = "mono-num charging";
@@ -204,6 +259,7 @@
                     sub.className = "sub-stat show";
                     bg.style.background = "var(--neon)";
                 } else {
+                    // WAITING
                     display.innerHTML = myData.no || myData.nomor || "#";
                     display.className = "mono-num";
                     display.style.color = "var(--cyan)";
@@ -214,6 +270,7 @@
                     bg.style.background = "var(--cyan)";
                 }
             } else {
+                // IDLE
                 display.innerHTML = "--";
                 display.className = "mono-num";
                 display.style.color = "white";
@@ -224,9 +281,16 @@
             }
         }
 
-        // 5. FUNGSI DAFTAR (FIX SINKRONISASI)
+        // 5. FUNGSI DAFTAR
         function processQueue() {
             if (!isGpsReady) return; 
+
+            // Final Safety Check
+            if (!currentUser || !currentUser.plat) {
+                document.getElementById('repairModal').style.display = 'flex';
+                return;
+            }
+
             const sc = document.getElementById('scanner');
             sc.style.display = 'flex'; 
 
@@ -234,10 +298,9 @@
 
             db.runTransaction((transaction) => {
                 return transaction.get(docRef).then((sfDoc) => {
-                    if (!sfDoc.exists) throw "DB Error!";
-                    const data = sfDoc.data();
+                    if (!sfDoc.exists) throw "Database Error!";
                     
-                    // KUNCI FIX: Gunakan field 'antrian' sebagai prioritas
+                    const data = sfDoc.data();
                     const list = data.antrian || data.list || [];
 
                     const exists = list.find(x => x.plat === currentUser.plat);
@@ -255,7 +318,6 @@
                         baterai: 0
                     };
 
-                    // PENTING: Tembak ke field 'antrian'
                     transaction.update(docRef, {
                         antrian: firebase.firestore.FieldValue.arrayUnion(newItem)
                     });
@@ -266,31 +328,10 @@
             }).catch((err) => {
                 sc.style.display = 'none';
                 if(err.toString().includes("terdaftar")) {
-                    alert("Anda sudah terdaftar!");
+                    alert("Anda sudah terdaftar dalam antrian.");
                 } else {
-                    // Fallback jika fieldnya ternyata 'list', coba sekali lagi ke 'list'
-                    fallbackQueue('list');
+                    alert("Gagal: " + err);
                 }
-            });
-        }
-
-        function fallbackQueue(fieldName) {
-            // Fungsi cadangan jika field 'antrian' gagal, coba ke 'list'
-            const docRef = db.collection("antrian").doc("utama");
-            const newItem = {
-                plat: currentUser.plat, 
-                status: 'waiting',
-                waktu: new Date().toLocaleTimeString('id-ID'),
-                baterai: 0,
-                // Kita perlu ambil nomor lagi secara manual (simplified here)
-                no: Math.floor(Math.random() * 100) + 10 // Darurat
-            };
-            
-            docRef.update({
-                [fieldName]: firebase.firestore.FieldValue.arrayUnion(newItem)
-            }).then(() => {
-                document.getElementById('scanner').style.display = 'none';
-                alert("Berhasil (Mode Cadangan)");
             });
         }
     </script>
