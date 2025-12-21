@@ -3,122 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Antrian - MAKA</title>
+    <title>FC Command Center - MAKA</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#05080A">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <style>
-        :root { --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.12); }
-        body { margin: 0; padding: 25px; font-family: 'Inter', sans-serif; background: var(--bg); color: white; min-height: 100vh; display: flex; flex-direction: column; }
+        :root { --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00; --red: #FF2A2A; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.12); }
+        body { margin: 0; padding: 20px; font-family: 'Inter', sans-serif; background: var(--bg); color: white; overflow-x: hidden; }
         
-        .top-nav { display: flex; align-items: center; margin-bottom: 30px; }
-        .back-link { color: var(--cyan); text-decoration: none; font-weight: 700; font-size: 13px; letter-spacing: 1px; }
+        /* Header & Navigation */
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .back-btn { color: var(--cyan); text-decoration: none; font-weight: 800; font-size: 12px; letter-spacing: 1px; }
+        .hub-label { font-family: 'Space Grotesk'; font-size: 20px; color: white; margin: 0; }
+        .hub-label span { color: var(--volt); }
 
-        .header h1 { font-family: 'Space Grotesk'; font-size: 32px; margin: 10px 0 5px; }
-        .header p { color: var(--cyan); font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        /* Status Bar (Live Stats) */
+        .live-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .stat-box { flex: 1; background: var(--glass); border: 1px solid var(--border); padding: 12px; border-radius: 15px; text-align: center; }
+        .stat-box small { font-size: 9px; color: #555; display: block; margin-bottom: 4px; font-weight: 800; }
+        .stat-box b { font-family: 'Space Grotesk'; font-size: 16px; color: white; }
 
-        .status-box { background: var(--glass); border: 1px solid var(--border); border-radius: 30px; padding: 40px 20px; text-align: center; margin-top: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        .q-number { font-family: 'Space Grotesk'; font-size: 82px; color: var(--volt); margin: 15px 0; text-shadow: 0 0 30px rgba(217,255,0,0.3); line-height: 1; }
+        /* Main Screen (Slot Monitor) */
+        .slot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .slot-card { background: var(--glass); border: 1px solid var(--border); border-radius: 15px; padding: 15px 10px; text-align: center; position: relative; }
+        .slot-card.active { border-color: var(--volt); background: rgba(217, 255, 0, 0.02); }
+        .slot-card h4 { font-size: 9px; margin: 0 0 10px; color: #555; }
+        .slot-plat { font-family: 'Space Grotesk'; font-size: 14px; font-weight: 700; color: white; display: block; margin-bottom: 5px; }
+        .slot-time { font-size: 16px; font-weight: 800; color: var(--volt); }
         
-        .gps-indicator { font-size: 10px; padding: 10px 20px; border-radius: 25px; display: inline-block; margin-bottom: 25px; font-weight: 800; letter-spacing: 1px; }
-        .gps-in { background: rgba(0,255,100,0.1); color: #00FF64; border: 1px solid rgba(0,255,100,0.2); }
-        .gps-out { background: rgba(255,0,0,0.1); color: #FF2A2A; border: 1px solid rgba(255,0,0,0.2); }
+        /* Battery Visual */
+        .batt { width: 30px; height: 50px; border: 2px solid #333; border-radius: 4px; margin: 10px auto; position: relative; }
+        .batt::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 70%; background: var(--volt); box-shadow: 0 0 10px var(--volt); transition: 0.5s; }
 
-        .btn-daftar { width: 100%; padding: 22px; border-radius: 20px; border: none; font-weight: 800; font-size: 16px; font-family: 'Space Grotesk'; cursor: pointer; transition: 0.4s; margin-top: 30px; }
-        .btn-active { background: var(--volt); color: #000; box-shadow: 0 15px 30px rgba(217,255,0,0.2); }
-        .btn-dis { background: #111; color: #333; cursor: not-allowed; border: 1px solid var(--border); }
+        /* Registration Area (GPS LOCK) */
+        .reg-zone { background: var(--glass); border: 1px solid var(--border); border-radius: 25px; padding: 25px; text-align: center; margin-bottom: 20px; }
+        .gps-tag { font-size: 10px; font-weight: 800; padding: 6px 15px; border-radius: 20px; display: inline-block; margin-bottom: 15px; }
+        .tag-ok { background: rgba(0,255,100,0.1); color: #00FF64; }
+        .tag-no { background: rgba(255,42,42,0.1); color: var(--red); }
+        
+        .btn-reg { width: 100%; padding: 18px; border-radius: 15px; border: none; font-family: 'Space Grotesk'; font-weight: 800; font-size: 14px; transition: 0.3s; cursor: pointer; }
+        .btn-on { background: var(--volt); color: #000; box-shadow: 0 10px 20px rgba(217,255,0,0.2); }
+        .btn-off { background: #111; color: #333; cursor: not-allowed; border: 1px solid var(--border); }
 
-        .info-footer { margin-top: auto; padding: 20px 0; text-align: center; font-size: 11px; color: #444; line-height: 1.6; }
+        /* Music List Placeholder (Asli) */
+        .music-bar { background: var(--cyan); color: #000; padding: 10px; border-radius: 10px; font-size: 10px; font-weight: 800; text-align: center; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div class="top-nav">
-        <a href="dashboard.html" class="back-link">← KEMBALI KE DASHBOARD</a>
+        <a href="dashboard.html" class="back-btn">← DASHBOARD</a>
+        <h2 class="hub-label">KELAPA <span>GADING</span></h2>
     </div>
 
-    <div class="header">
-        <h1>Antrian<span>.</span></h1>
-        <p>Hub Kelapa Gading</p>
+    <div class="live-bar">
+        <div class="stat-box"><small>ANTRIAN</small><b id="qTotal">0</b></div>
+        <div class="stat-box"><small>MAX CAS</small><b>100%</b></div>
+        <div class="stat-box"><small>STATUS</small><b style="color:var(--volt)">ONLINE</b></div>
     </div>
 
-    <div class="status-box">
-        <div id="gpsStatus" class="gps-indicator gps-out">MENGECEK LOKASI GPS...</div>
-        <div style="font-size: 12px; color: #666; font-weight: 700; letter-spacing: 1px;">SEDANG DILAYANI</div>
-        <div class="q-number" id="currentQ">--</div>
-        <p id="infoDist" style="font-size: 11px; color: #444; margin: 0;">Silahkan mendekat ke area Hub untuk mendaftar antrian secara otomatis.</p>
+    <div class="music-bar">▼ BUKA / TUTUP LIST LAGU ▼</div>
+
+    <div class="slot-grid" id="slotDisplay">
+        <div class="slot-card">
+            <h4>SLOT 1</h4>
+            <span class="slot-plat">KOSONG</span>
+            <div class="batt" style="opacity:0.2"></div>
+            <div class="slot-time">--:--</div>
+        </div>
+        <div class="slot-card active">
+            <h4>SLOT 2</h4>
+            <span class="slot-plat" id="activePlat">6666</span>
+            <div class="batt"></div>
+            <div class="slot-time" id="activeTime">20:54</div>
+        </div>
+        <div class="slot-card">
+            <h4>SLOT 3</h4>
+            <span class="slot-plat">KOSONG</span>
+            <div class="batt" style="opacity:0.2"></div>
+            <div class="slot-time">--:--</div>
+        </div>
     </div>
 
-    <button id="btnDaftar" class="btn-daftar btn-dis" disabled>AMBIL NOMOR ANTRIAN</button>
-
-    <div class="info-footer">
-        Sistem ini menggunakan sinkronisasi GPS riil.<br>
-        Pastikan izin lokasi pada browser Anda aktif.
+    <div class="reg-zone">
+        <div id="gpsTag" class="gps-tag tag-no">MENGUNCI GPS...</div>
+        <div id="gpsMsg" style="font-size: 11px; color: #555; margin-bottom: 15px;">Mendeteksi jarak Anda ke Hub...</div>
+        <button id="btnDaftar" class="btn-reg btn-off" disabled>AMBIL ANTRIAN</button>
     </div>
 
     <script>
-        // Gunakan Config Firebase Anda
-        const firebaseConfig = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        const HUB_GADING = { lat: -6.1625, lng: 106.9011 }; // Koordinat Riil Hub
+        const cfg = { apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", authDomain: "rtomaka-e67b5.firebaseapp.com", projectId: "rtomaka-e67b5", storageBucket: "rtomaka-e67b5.firebasestorage.app", messagingSenderId: "472036722228", appId: "1:472036722228:web:11d520f9204db317d02c61" };
+        firebase.initializeApp(cfg); const db = firebase.firestore();
         const u = JSON.parse(localStorage.getItem('maka_user'));
 
-        function getDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; 
-            const φ1 = lat1 * Math.PI/180;
-            const φ2 = lat2 * Math.PI/180;
-            const Δφ = (lat2-lat1) * Math.PI/180;
-            const Δλ = (lon2-lon1) * Math.PI/180;
-            const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ/2) * Math.sin(Δλ/2);
+        const HUB_LOC = { lat: -6.1625, lng: 106.9011 }; // Koordinat Riil
+
+        function getDist(lat1, lon1, lat2, lon2) {
+            const R = 6371e3;
+            const dLat = (lat2-lat1) * Math.PI/180;
+            const dLon = (lon2-lon1) * Math.PI/180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
             return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         }
 
-        function checkLocation() {
+        // Live Monitoring (Roleplay sesuai script asli)
+        function syncLive() {
+            db.collection('antrian_fc').onSnapshot(snap => {
+                document.getElementById('qTotal').innerText = snap.size;
+            });
+            
+            // Logic Slot (Simulasi sinkronisasi dengan mesin asli)
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('activeTime').innerText = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0');
+            }, 1000);
+        }
+
+        function trackGPS() {
             if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(pos => {
-                    const dist = getDistance(pos.coords.latitude, pos.coords.longitude, HUB_GADING.lat, HUB_GADING.lng);
+                    const dist = getDist(pos.coords.latitude, pos.coords.longitude, HUB_LOC.lat, HUB_LOC.lng);
+                    const tag = document.getElementById('gpsTag');
+                    const msg = document.getElementById('gpsMsg');
                     const btn = document.getElementById('btnDaftar');
-                    const stat = document.getElementById('gpsStatus');
 
-                    if (dist <= 100) {
-                        stat.innerText = "📍 ANDA DI AREA HUB (VERIFIED)";
-                        stat.className = "gps-indicator gps-in";
-                        btn.disabled = false;
-                        btn.className = "btn-daftar btn-active";
-                        btn.innerText = "AMBIL NOMOR ANTRIAN";
+                    if (dist <= 100) { // Radius 100 meter
+                        tag.innerText = "LOKASI TERVERIFIKASI"; tag.className = "gps-tag tag-ok";
+                        msg.innerText = "Anda berada di area Hub. Silahkan daftar.";
+                        btn.disabled = false; btn.className = "btn-reg btn-on";
                     } else {
-                        stat.innerText = "DI LUAR RADIUS HUB (" + Math.round(dist) + "m)";
-                        stat.className = "gps-indicator gps-out";
-                        btn.disabled = true;
-                        btn.className = "btn-daftar btn-dis";
-                        btn.innerText = "MASUK KE AREA HUB";
+                        tag.innerText = "JARAK TERLALU JAUH"; tag.className = "gps-tag tag-no";
+                        msg.innerText = "Radius pendaftaran: 100m (Posisi: " + Math.round(dist) + "m)";
+                        btn.disabled = true; btn.className = "btn-reg btn-off";
                     }
-                }, err => {
-                    document.getElementById('gpsStatus').innerText = "IZIN GPS DITOLAK";
-                }, { enableHighAccuracy: true });
+                }, null, { enableHighAccuracy: true });
             }
         }
 
-        // Monitoring antrian live dari Firestore
-        db.collection('antrian_status').doc('current').onSnapshot(doc => {
-            if(doc.exists) document.getElementById('currentQ').innerText = doc.data().number;
-        });
+        async function registerQueue() {
+            const btn = document.getElementById('btnDaftar');
+            btn.innerText = "MEMPROSES..."; btn.disabled = true;
 
-        document.getElementById('btnDaftar').onclick = function() {
-            this.innerText = "MEMPROSES...";
-            this.disabled = true;
-            // Simulasi pendaftaran berhasil
-            setTimeout(() => {
-                alert("Berhasil! Nomor Anda sudah masuk ke sistem Hub.");
-                this.innerText = "ANTRIAN BERHASIL DIAMBIL";
-            }, 1500);
-        };
+            try {
+                const snap = await db.collection('antrian_fc').orderBy('nomor', 'desc').limit(1).get();
+                let next = 1;
+                if(!snap.empty) next = snap.docs[0].data().nomor + 1;
 
-        window.onload = checkLocation;
+                await db.collection('antrian_fc').doc(u.plat).set({
+                    plat: u.plat, nomor: next, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                alert("Berhasil! Nomor Antrian: " + next);
+            } catch (e) { alert("Gagal: " + e.message); }
+            btn.innerText = "AMBIL ANTRIAN"; btn.disabled = false;
+        }
+
+        document.getElementById('btnDaftar').onclick = registerQueue;
+        window.onload = () => { syncLive(); trackGPS(); };
     </script>
 </body>
 </html>
