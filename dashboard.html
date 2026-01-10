@@ -3,73 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAKA - Rent to Own Premium</title>
+    <title>MAKA - Dashboard</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* WARNA ASLI TETAP DIPERTAHANKAN */
             --royal-blue: #0A2259;
-            --royal-dark: #051336; /* Versi lebih gelap untuk gradient */
+            --royal-dark: #051336;
             --electric-blue: #2D63ED;
-            --bg-surface: #F8FAFC; /* Sedikit lebih terang dari sebelumnya agar bersih */
+            --bg-surface: #F8FAFC;
             --text-main: #1A1F36;
             --text-muted: #64748B;
             --white: #FFFFFF;
+            --success: #10B981;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        body {
-            margin: 0;
+        html, body {
+            margin: 0; padding: 0;
             background: var(--bg-surface);
-            font-family: 'Plus Jakarta Sans', sans-serif; /* Font ini lebih modern & premium dibanding Inter standar */
+            font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--text-main);
-            padding-bottom: 110px;
+            width: 100%;
+            overflow-x: hidden; /* Lock horizontal scroll */
+            position: relative;
+            padding-bottom: 110px; /* Space for dock */
         }
 
-        /* --- HEADER: CLEAN & BOLD --- */
+        /* --- HEADER: PROFILE LAYOUT --- */
         .premium-header {
             background: radial-gradient(circle at 100% 0%, #163680 0%, var(--royal-blue) 60%, var(--royal-dark) 100%);
-            padding: 60px 25px 140px 25px; /* Padding bawah ditambah untuk efek floating card */
+            padding: 50px 25px 130px 25px; /* Extra padding bottom for overlap card */
             border-bottom-left-radius: 40px;
             border-bottom-right-radius: 40px;
             color: var(--white);
             position: relative;
-            box-shadow: 0 20px 40px -10px rgba(10, 34, 89, 0.4); /* Shadow biru halus */
+            box-shadow: 0 20px 40px -10px rgba(10, 34, 89, 0.4);
         }
 
-        /* Hiasan background abstrak tipis */
-        .premium-header::before {
-            content: ''; position: absolute; top: -50%; right: -20%; width: 300px; height: 300px;
-            background: rgba(255,255,255,0.03); border-radius: 50%; pointer-events: none;
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .top-row { display: flex; justify-content: space-between; align-items: flex-start; }
+        .user-info { display: flex; flex-direction: column; }
 
-        .header-label {
-            font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
-            text-transform: uppercase; opacity: 0.8; margin-bottom: 5px;
+        .greeting {
+            font-size: 11px; font-weight: 600; letter-spacing: 1px;
+            text-transform: uppercase; opacity: 0.8; margin-bottom: 2px;
         }
 
-        .user-title {
+        .user-name {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 28px; font-weight: 700;
+            font-size: 26px; font-weight: 700;
             margin: 0; letter-spacing: -0.5px;
             text-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        .plat-badge {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 14px; border-radius: 14px;
-            font-size: 12px; font-weight: 700; letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        .plat-number {
+            font-size: 12px; font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px; display: flex; align-items: center; gap: 5px;
+        }
+        .plat-number::before { content: '●'; font-size: 8px; color: var(--electric-blue); }
+
+        /* Profile Pic Circle */
+        .profile-pic-container {
+            width: 55px; height: 55px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        
+        .profile-img {
+            width: 100%; height: 100%; object-fit: cover;
         }
 
-        /* --- BILLING CARD: GLASSMROPHISM WHITE --- */
+        /* --- BILLING CARD: COMPACT & PROGRESS --- */
         .card-overlap {
             padding: 0 25px; margin-top: -90px; position: relative; z-index: 10;
         }
@@ -77,103 +94,93 @@
         .premium-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 35px 30px;
+            border-radius: 24px;
+            padding: 25px;
             position: relative;
             text-decoration: none; display: block;
             border: 1px solid rgba(255, 255, 255, 0.8);
-            /* Shadow "Mahal": Menyebar luas, tidak tajam, warna biru tua transparan */
-            box-shadow: 0 25px 50px -12px rgba(10, 34, 89, 0.18), 
-                        0 0 0 1px rgba(10, 34, 89, 0.02); 
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 25px 50px -12px rgba(10, 34, 89, 0.15);
         }
 
-        .premium-card:active { transform: scale(0.98); }
-
-        .card-tag {
-            font-size: 11px; font-weight: 700; color: var(--text-muted);
-            letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;
-            display: flex; align-items: center; gap: 6px;
+        /* Single Line Billing */
+        .billing-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px;
         }
-        
-        .card-tag::before { content:''; width: 6px; height: 6px; background: #EF4444; border-radius: 50%; display: inline-block; }
-
-        .billing-row { display: flex; justify-content: space-between; align-items: center; }
-
+        .billing-label {
+            font-size: 12px; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 0.5px;
+        }
         .billing-val {
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 42px; font-weight: 700;
+            font-size: 20px; font-weight: 700;
             color: var(--royal-blue); margin: 0;
-            letter-spacing: -1px;
         }
 
-        .btn-arrow {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: var(--royal-blue); color: white;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; box-shadow: 0 8px 20px rgba(10, 34, 89, 0.25);
+        /* Progress Bar */
+        .progress-section { margin-top: 10px; }
+        .progress-labels {
+            display: flex; justify-content: space-between;
+            font-size: 10px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px;
+        }
+        .progress-track {
+            width: 100%; height: 8px; background: #F1F5F9;
+            border-radius: 10px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--royal-blue), var(--electric-blue));
+            border-radius: 10px; width: 0%; transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* --- MENU GRID: CLEAN & AIRY --- */
+        /* --- MENU GRID --- */
         .menu-grid {
             display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 15px; padding: 35px 25px;
+            gap: 15px; padding: 30px 25px;
         }
 
         .menu-btn {
             background: var(--white);
-            padding: 20px 10px; border-radius: 24px;
+            padding: 20px 5px; border-radius: 20px;
             text-align: center; text-decoration: none;
-            /* Border halus untuk definisi */
             border: 1px solid #EFF2F5;
-            box-shadow: 0 10px 20px -5px rgba(148, 163, 184, 0.15);
+            box-shadow: 0 10px 20px -5px rgba(148, 163, 184, 0.1);
             transition: all 0.2s ease;
         }
 
         .menu-btn:active { transform: translateY(2px); background: #F8FAFC; }
 
         .icon-container {
-            width: 50px; height: 50px;
-            background: #F1F5F9; /* Abu sangat muda */
-            border-radius: 18px;
+            width: 48px; height: 48px;
+            background: #F1F5F9;
+            border-radius: 16px;
             display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 12px;
+            margin: 0 auto 10px;
             color: var(--royal-blue);
-            transition: 0.3s;
         }
         
-        /* Icon menjadi biru saat aktif */
-        .menu-btn:active .icon-container { background: var(--royal-blue); color: white; }
-
-        .icon-container svg { width: 24px; height: 24px; fill: currentColor; }
-        
-        /* Spesial untuk Maka+ */
-        .icon-container.special { 
-            background: linear-gradient(135deg, var(--royal-blue) 0%, var(--electric-blue) 100%);
-            box-shadow: 0 8px 15px rgba(45, 99, 237, 0.25);
-        }
+        .icon-container svg { width: 22px; height: 22px; fill: currentColor; }
+        .icon-container.special { background: linear-gradient(135deg, var(--royal-blue) 0%, var(--electric-blue) 100%); color: white; }
         .icon-container.special svg { fill: white; }
 
         .menu-label {
-            font-size: 11px; font-weight: 600; color: var(--text-main);
+            font-size: 11px; font-weight: 700; color: var(--text-main);
             display: block; letter-spacing: -0.2px;
         }
 
-        /* --- NAVIGATION DOCK: FLOATING PILL --- */
+        /* --- NAVIGATION DOCK (LOCKED) --- */
         .dock-container {
             position: fixed; bottom: 30px; left: 0; width: 100%;
-            display: flex; justify-content: center; z-index: 100;
-            pointer-events: none; /* Agar area kiri kanan tidak ngeblock klik */
+            display: flex; justify-content: center; z-index: 999;
+            pointer-events: none; /* Container passes clicks */
         }
 
         .nav-pill {
-            pointer-events: auto;
-            background: rgba(255, 255, 255, 0.9);
+            pointer-events: auto; /* Pill captures clicks */
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             padding: 12px 30px;
-            border-radius: 100px; /* Full pill shape */
+            border-radius: 100px;
             display: flex; gap: 35px;
-            /* Shadow yang mengangkat navigasi */
             box-shadow: 0 20px 50px rgba(10, 34, 89, 0.15), 0 1px 0 rgba(255,255,255,0.5) inset;
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
@@ -188,7 +195,6 @@
         .nav-tab svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 4px; }
         .nav-tab span { font-size: 10px; font-weight: 700; }
         
-        /* Dot indikator aktif */
         .nav-tab.active::after {
             content: ''; position: absolute; bottom: -8px; width: 4px; height: 4px;
             background: var(--royal-blue); border-radius: 50%;
@@ -198,24 +204,34 @@
 <body>
 
     <header class="premium-header">
-        <div class="top-row">
-            <div>
-                <div class="header-label">Maka Rent to Own</div>
-                <h1 class="user-title" id="nm">...</h1>
+        <div class="header-content">
+            <div class="user-info">
+                <div class="greeting">Selamat Datang,</div>
+                <h1 class="user-name" id="nm">...</h1>
+                <div class="plat-number" id="pt">B ---- XXX</div>
             </div>
-            <div class="plat-badge" id="pt">B ----</div>
+            
+            <a href="settings.html" class="profile-pic-container">
+                <img id="profileImg" src="https://via.placeholder.com/150/0A2259/FFFFFF?text=USER" class="profile-img" alt="Profile">
+            </a>
         </div>
     </header>
 
     <div class="card-overlap">
         <a href="calendar.html" class="premium-card">
-            <div class="card-tag">Total Tunggakan</div>
             <div class="billing-row">
-                <h2 class="billing-val" id="billingVal">Rp 0</h2>
-                <div class="btn-arrow">➜</div>
+                <div class="billing-label">Total Tunggakan</div>
+                <div class="billing-val" id="billingVal">Rp 0</div>
             </div>
-            <div style="margin-top:15px; font-size:12px; color:var(--text-muted); font-weight:500;">
-                Jatuh tempo berikutnya: <span style="color:var(--text-main); font-weight:700;">Besok</span>
+            
+            <div class="progress-section">
+                <div class="progress-labels">
+                    <span>KEPEMILIKAN</span>
+                    <span id="progText">0 / 1009 Hari</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="barFill"></div>
+                </div>
             </div>
         </a>
     </div>
@@ -239,17 +255,17 @@
             </div>
             <span class="menu-label" style="font-weight: 700; color:var(--royal-blue);">Maka+</span>
         </a>
-        <a href="#" class="menu-btn">
+        <a href="plan_trip.html" class="menu-btn">
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5zM4 14h16v2H4z"/></svg>
+            </div>
+            <span class="menu-label">Plan Trip</span>
+        </a>
+        <a href="info_mlu.html" class="menu-btn">
             <div class="icon-container">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
             </div>
-            <span class="menu-label">Info MLU</span>
-        </a>
-        <a href="#" class="menu-btn">
-            <div class="icon-container">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 14h-2V9h2v7zm0-9h-2V7h2v1z"/></svg>
-            </div>
-            <span class="menu-label">Tips</span>
+            <span class="menu-label">Info & Tips</span>
         </a>
         <a href="settings.html" class="menu-btn">
             <div class="icon-container">
@@ -281,17 +297,48 @@
     </div>
 
     <script>
-        const uStore = localStorage.getItem('maka_user');
-        if(!uStore) {
-            document.getElementById('nm').innerText = "GUEST USER";
-        } else {
-            const u = JSON.parse(uStore);
-            document.getElementById('nm').innerText = u.nama.toUpperCase();
-            document.getElementById('pt').innerText = (u.plat || "B ---- XXX").toUpperCase();
+        document.addEventListener("DOMContentLoaded", () => {
+            const uStore = localStorage.getItem('maka_user');
             
-            // Logika tagihan dapat dihubungkan ke data real di sini
-            document.getElementById('billingVal').innerText = "Rp 355.000";
-        }
+            // 1. Load User Data
+            if(!uStore) {
+                document.getElementById('nm').innerText = "GUEST USER";
+            } else {
+                const u = JSON.parse(uStore);
+                document.getElementById('nm').innerText = u.nama.toUpperCase();
+                document.getElementById('pt').innerText = (u.plat || "B ---- XXX").toUpperCase();
+                document.getElementById('billingVal').innerText = "Rp 355.000"; // Simulasi data
+
+                // 2. Load Profile Picture (Custom/Default)
+                const savedPic = localStorage.getItem('maka_user_profile_pic');
+                if (savedPic) {
+                    document.getElementById('profileImg').src = savedPic;
+                } else {
+                    // Generate default avatar dengan inisial jika tidak ada foto
+                    const initial = u.nama.charAt(0).toUpperCase();
+                    document.getElementById('profileImg').src = `https://ui-avatars.com/api/?name=${initial}&background=0D8ABC&color=fff&size=150`;
+                }
+
+                // 3. Logic Progress Bar (Simulasi hari ke-X)
+                // Di real app, hitung selisih hari dari u.tglAmbil ke hari ini
+                const startDate = new Date(u.tglAmbil);
+                const today = new Date();
+                const diffTime = Math.abs(today - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                const maxDays = 1009;
+                
+                // Clamp value agar tidak lebih dari 1009
+                const currentDay = diffDays > maxDays ? maxDays : diffDays;
+                const percentage = (currentDay / maxDays) * 100;
+
+                document.getElementById('progText').innerText = `${currentDay} / ${maxDays} Hari`;
+                
+                // Delay sedikit untuk animasi CSS
+                setTimeout(() => {
+                    document.getElementById('barFill').style.width = `${percentage}%`;
+                }, 300);
+            }
+        });
     </script>
 </body>
 </html>
