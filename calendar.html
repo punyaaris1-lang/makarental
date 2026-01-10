@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAKA - Executive History</title>
+    <title>MAKA - Premium Payment</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     
@@ -17,89 +17,137 @@
             --text-muted: #64748B;
             --white: #FFFFFF;
             --success: #10B981;
-            --success-bg: #ECFDF5;
+            --danger: #EF4444;
         }
 
         body {
             margin: 0; background: var(--bg-surface);
             font-family: 'Plus Jakarta Sans', sans-serif;
-            color: var(--text-main); padding-bottom: 120px;
+            color: var(--text-main); padding-bottom: 110px;
         }
 
-        /* --- HEADER: GRADIENT --- */
+        /* --- HEADER: GRADIENT & CLEAN --- */
         .premium-header {
             background: radial-gradient(circle at 100% 0%, #163680 0%, var(--royal-blue) 60%, var(--royal-dark) 100%);
-            padding: 60px 25px 110px 25px;
+            padding: 50px 25px 120px 25px; /* Ruang untuk kartu overlap */
             border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
-            color: var(--white); text-align: center; position: relative;
+            color: var(--white); position: relative;
             box-shadow: 0 20px 40px -10px rgba(10, 34, 89, 0.4);
         }
 
-        .header-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; margin-bottom: 8px; }
-        .header-title { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; margin: 0; letter-spacing: -1px; }
-
-        /* --- TABS: FLOATING GLASS --- */
-        .tabs-container {
-            padding: 0 35px; margin-top: -30px; position: relative; z-index: 10;
-        }
-        .tabs {
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px);
-            padding: 6px; border-radius: 20px; display: flex;
-            box-shadow: 0 15px 35px rgba(10, 34, 89, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-        }
-        .tab-btn {
-            flex: 1; padding: 14px; border: none; background: none;
-            font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 700;
-            color: var(--text-muted); border-radius: 16px; cursor: pointer;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .tab-btn.active { 
-            background: var(--royal-blue); color: white; 
-            box-shadow: 0 4px 12px rgba(10, 34, 89, 0.2); 
-        }
-
-        /* --- LIST CONTAINER --- */
-        .list-container { padding: 30px 20px; }
+        .header-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         
-        .history-card {
-            background: var(--white); border-radius: 24px; padding: 20px; margin-bottom: 15px;
-            display: flex; align-items: center; gap: 15px;
-            border: 1px solid #EFF2F5;
-            box-shadow: 0 10px 25px -5px rgba(148, 163, 184, 0.1);
-            transition: transform 0.2s;
-        }
-        
-        .history-card:active { transform: scale(0.98); }
-
-        .icon-box {
-            width: 48px; height: 48px; background: #F1F5F9; border-radius: 16px;
+        .btn-nav-month {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+            color: white; width: 40px; height: 40px; border-radius: 14px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 20px; color: var(--text-muted);
+            font-size: 18px; cursor: pointer; backdrop-filter: blur(4px);
+            transition: 0.2s;
+        }
+        .btn-nav-month:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
+
+        .month-display { text-align: center; }
+        .month-title { font-family: 'Space Grotesk', sans-serif; font-size: 28px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+        .year-label { font-size: 12px; opacity: 0.7; letter-spacing: 2px; font-weight: 600; }
+
+        /* --- PROGRESS BAR: HALUS --- */
+        .progress-wrapper { margin-top: 15px; }
+        .progress-info { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 8px; opacity: 0.9; }
+        .bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .bar-fill { height: 100%; background: var(--white); border-radius: 10px; box-shadow: 0 0 10px rgba(255,255,255,0.5); transition: 1s cubic-bezier(0.22, 1, 0.36, 1); }
+
+        /* --- OVERLAPPING CARD --- */
+        .card-overlap { padding: 0 25px; margin-top: -80px; position: relative; z-index: 10; }
+        
+        .billing-card {
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px);
+            border-radius: 30px; padding: 30px 25px;
+            box-shadow: 0 25px 50px -12px rgba(10, 34, 89, 0.18), 0 0 0 1px rgba(10, 34, 89, 0.02);
+            text-align: center; border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
-        /* Variasi warna icon box */
-        .history-card[data-type="charge"] .icon-box { background: #EEF2FF; color: var(--electric-blue); }
-        .history-card[data-type="pay"] .icon-box { background: #ECFDF5; color: var(--success); }
-
-        .info { flex: 1; }
-        .title { font-weight: 700; font-size: 14px; color: var(--text-main); margin-bottom: 4px; }
-        .meta { font-size: 11px; color: var(--text-muted); font-weight: 500; }
-
-        .status-pill {
-            font-size: 10px; font-weight: 700; padding: 6px 12px;
-            border-radius: 20px; letter-spacing: 0.5px;
+        .billing-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .billing-val {
+            font-family: 'Space Grotesk', sans-serif; font-size: 40px; font-weight: 700;
+            color: var(--danger); margin: 5px 0; letter-spacing: -1px;
         }
-        .status-success { background: var(--success-bg); color: var(--success); }
+        .rate-info { font-size: 11px; color: var(--text-main); font-weight: 600; background: #F1F5F9; padding: 6px 12px; border-radius: 20px; display: inline-block; margin-top: 5px; }
 
-        /* --- EMPTY STATE --- */
-        #emptyState { text-align: center; padding: 60px 20px; display: none; }
-        .empty-icon { font-size: 48px; margin-bottom: 15px; opacity: 0.3; filter: grayscale(100%); }
+        /* --- CALENDAR GRID --- */
+        .cal-wrapper { padding: 30px 20px; }
+        .grid-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        
+        .day-label { 
+            text-align: center; font-size: 10px; font-weight: 700; 
+            color: var(--text-muted); padding-bottom: 10px; 
+        }
+        
+        .cell {
+            aspect-ratio: 1; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 600; 
+            background: var(--white);
+            border: 1px solid #EFF2F5;
+            color: var(--text-main);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+            cursor: pointer; transition: 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
 
-        /* --- DOCK NAV --- */
-        .dock-container { position: fixed; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 100; pointer-events: none; }
-        .nav-pill { pointer-events: auto; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); padding: 12px 30px; border-radius: 100px; display: flex; gap: 35px; border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 20px 50px rgba(10, 34, 89, 0.15), 0 1px 0 rgba(255,255,255,0.5) inset; }
-        .nav-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #94A3B8; transition: all 0.3s ease; position: relative; }
+        .cell:active { transform: scale(0.9); }
+
+        /* Status Colors */
+        .cell.paid { background: #ECFDF5; color: var(--success); border-color: transparent; }
+        .cell.debt { background: #FEF2F2; color: var(--danger); border-color: transparent; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15); }
+        .cell.off { background: #F8FAFC; color: #CBD5E1; border: 1px dashed #E2E8F0; box-shadow: none; }
+        .cell.today { border: 2px solid var(--royal-blue); }
+
+        /* --- MODAL --- */
+        .modal { position: fixed; inset: 0; background: rgba(10, 34, 89, 0.3); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        
+        .m-box { 
+            width: 85%; max-width: 400px; background: var(--white); 
+            border-radius: 35px; padding: 35px 30px; text-align: center; 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+        }
+        
+        .m-title { font-family: 'Space Grotesk'; font-size: 24px; font-weight: 700; margin: 0 0 20px 0; color: var(--royal-blue); }
+
+        input[type="date"] {
+            width: 100%; padding: 16px; border-radius: 16px; 
+            border: 1px solid #E2E8F0; background: #F8FAFC; 
+            font-family: 'Plus Jakarta Sans'; font-weight: 600; 
+            outline: none; box-sizing: border-box; color: var(--text-main);
+        }
+
+        .upload-area {
+            border: 2px dashed #CBD5E1; border-radius: 20px; padding: 25px; 
+            margin-top: 20px; background: #F8FAFC; cursor: pointer; transition: 0.2s;
+        }
+        .upload-area:active { background: #EFF6FF; border-color: var(--electric-blue); }
+
+        .btn-save {
+            width: 100%; padding: 18px; 
+            background: linear-gradient(135deg, var(--royal-blue) 0%, #15398F 100%);
+            color: white; border: none; border-radius: 20px; 
+            font-weight: 700; font-size: 15px; margin-top: 25px; 
+            box-shadow: 0 10px 20px rgba(10, 34, 89, 0.2);
+        }
+
+        /* --- NAVIGATION DOCK (Copied from Dashboard) --- */
+        .dock-container {
+            position: fixed; bottom: 30px; left: 0; width: 100%;
+            display: flex; justify-content: center; z-index: 100; pointer-events: none;
+        }
+        .nav-pill {
+            pointer-events: auto; background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px); padding: 12px 30px; border-radius: 100px;
+            display: flex; gap: 35px; border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 50px rgba(10, 34, 89, 0.15), 0 1px 0 rgba(255,255,255,0.5) inset;
+        }
+        .nav-tab {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-decoration: none; color: #94A3B8; transition: all 0.3s ease; position: relative;
+        }
         .nav-tab.active { color: var(--royal-blue); transform: translateY(-3px); }
         .nav-tab.active::after { content: ''; position: absolute; bottom: -8px; width: 4px; height: 4px; background: var(--royal-blue); border-radius: 50%; }
         .nav-tab svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 4px; }
@@ -109,115 +157,162 @@
 <body>
 
     <header class="premium-header">
-        <div class="header-label">Maka Rent to Own</div>
-        <h1 class="header-title">Riwayat Aktivitas</h1>
+        <div class="header-controls">
+            <div class="btn-nav-month" onclick="changeMonth(-1)">&#8592;</div>
+            <div class="month-display">
+                <h1 class="month-title" id="mLabel">JANUARI</h1>
+                <div class="year-label" id="yLabel">2026</div>
+            </div>
+            <div class="btn-nav-month" onclick="changeMonth(1)">&#8594;</div>
+        </div>
+        
+        <div class="progress-wrapper">
+            <div class="progress-info">
+                <span>PROGRESS KEPEMILIKAN</span>
+                <span id="progText">0 / 1009 HARI</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" id="barFill" style="width: 0%"></div></div>
+        </div>
     </header>
 
-    <div class="tabs-container">
-        <div class="tabs">
-            <button class="tab-btn active" id="btnCharging" onclick="switchTab('charging')">CHARGING</button>
-            <button class="tab-btn" id="btnPayments" onclick="switchTab('payments')">PAYMENTS</button>
+    <div class="card-overlap">
+        <div class="billing-card">
+            <div class="billing-label">Estimasi Tunggakan</div>
+            <div class="billing-val" id="totalDebt">Rp 0</div>
+            <div class="rate-info" id="rateLabel">RATE: Rp 70.000 / HARI</div>
         </div>
     </div>
 
-    <main class="list-container">
-        <div id="historyList"></div>
-        <div id="emptyState">
-            <div class="empty-icon">📂</div>
-            <div style="font-weight: 700; color: var(--text-main); font-size: 16px;">Belum Ada Data</div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Riwayat transaksi akan muncul di sini.</div>
-        </div>
+    <main class="cal-wrapper">
+        <div class="grid-cal" id="grid"></div>
     </main>
+
+    <div id="modalPay" class="modal">
+        <div class="m-box">
+            <h3 class="m-title" id="mDateTitle">Tanggal</h3>
+            
+            <div style="text-align:left; margin-bottom: 8px;">
+                <label style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Tanggal Bayar</label>
+            </div>
+            <input type="date" id="actualPayDate">
+            
+            <div class="upload-area" onclick="document.getElementById('fileInp').click()">
+                <div id="upInfo" style="font-size:13px; color:var(--text-muted); font-weight: 600;">
+                    <span style="font-size:24px; display:block; margin-bottom:5px;">📷</span>
+                    Upload Bukti Bayar
+                </div>
+                <input type="file" id="fileInp" style="display:none" accept="image/*" onchange="handleFile(this)">
+            </div>
+            
+            <button class="btn-save" onclick="savePayment()">KONFIRMASI BAYAR</button>
+            <p onclick="closeM()" style="margin-top:20px; font-size:13px; color:var(--text-muted); cursor:pointer; font-weight:700;">BATALKAN</p>
+        </div>
+    </div>
 
     <div class="dock-container">
         <nav class="nav-pill">
             <a href="dashboard.html" class="nav-tab"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Home</span></a>
-            <a href="calendar.html" class="nav-tab"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg><span>Bayar</span></a>
+            <a href="calendar.html" class="nav-tab active"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg><span>Bayar</span></a>
             <a href="antrian.html" class="nav-tab"><svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg><span>Antrian</span></a>
-            <a href="history.html" class="nav-tab active"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 7 7 6.93 6.93 0 0 1-5-2.09l-1.41 1.41A8.92 8.92 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg><span>History</span></a>
+            <a href="history.html" class="nav-tab"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 7 7 6.93 6.93 0 0 1-5-2.09l-1.41 1.41A8.92 8.92 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg><span>History</span></a>
         </nav>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script>
+        // --- LOGIC TETAP SAMA (Hanya disesuaikan sedikit untuk ID element) ---
+        const u = JSON.parse(localStorage.getItem('maka_user')) || { plat: "BXXXX", dpType: "755", tglAmbil: "2025-11-01", makaPlus: false };
+        let displayDate = new Date();
+        let selectedDateKey = null;
+        let compressedImageData = null;
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyB666i9lYWIpxOdkwpoX9EvFvHLmHczeq8",
-            authDomain: "fcgadingnew22.firebaseapp.com",
-            projectId: "fcgadingnew22",
-            storageBucket: "fcgadingnew22.firebasestorage.app",
-            messagingSenderId: "537736846678",
-            appId: "1:537736846678:web:53788d71a196423ac08af7"
-        };
+        const RATE = u.makaPlus ? 80000 : 70000;
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const u = JSON.parse(localStorage.getItem('maka_user')) || { plat: "BXXXX" };
-        
-        const historyList = document.getElementById('historyList');
-        const emptyState = document.getElementById('emptyState');
+        async function compressImage(file, quality = 0.6) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800; let width = img.width; let height = img.height;
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                };
+            });
+        }
 
-        window.switchTab = (type) => {
-            document.getElementById('btnCharging').classList.toggle('active', type === 'charging');
-            document.getElementById('btnPayments').classList.toggle('active', type === 'payments');
+        async function handleFile(input) {
+            if (input.files && input.files[0]) {
+                const label = document.getElementById('upInfo');
+                label.innerHTML = "<span style='color:var(--success)'>✅ Foto Siap</span>";
+                compressedImageData = await compressImage(input.files[0]);
+            }
+        }
+
+        function render() {
+            const g = document.getElementById('grid'), today = new Date();
+            const m = displayDate.getMonth(), y = displayDate.getFullYear();
+            const mNames = ["JANUARI","FEBRUARI","MARET","APRIL","MEI","JUNI","JULI","AGUSTUS","SEPTEMBER","OKTOBER","NOVEMBER","DESEMBER"];
             
-            if (type === 'charging') loadChargingHistory();
-            else loadPaymentHistory();
-        };
+            document.getElementById('mLabel').innerText = mNames[m];
+            document.getElementById('yLabel').innerText = y;
+            document.getElementById('rateLabel').innerText = `RATE: Rp ${RATE.toLocaleString('id-ID')} / HARI`;
 
-        function loadChargingHistory() {
-            const q = query(collection(db, "riwayatCharging"), where("plat", "==", u.plat), orderBy("finishTime", "desc"));
-            onSnapshot(q, (snap) => {
-                historyList.innerHTML = '';
-                if (snap.empty) { emptyState.style.display = 'block'; return; }
-                emptyState.style.display = 'none';
+            const days = ['MIN','SEN','SEL','RAB','KAM','JUM','SAB'];
+            g.innerHTML = days.map(d => `<div class="day-label">${d}</div>`).join('');
 
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    const date = d.finishTime?.toDate() || new Date();
-                    const dateStr = date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-                    const timeStr = date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const first = new Date(y, m, 1).getDay(), dim = new Date(y, m + 1, 0).getDate();
+            for(let i=0; i<first; i++) g.innerHTML += '<div></div>';
 
-                    historyList.innerHTML += `
-                        <div class="history-card" data-type="charge">
-                            <div class="icon-box">⚡</div>
-                            <div class="info">
-                                <div class="title">Charging Session</div>
-                                <div class="meta">${dateStr} • ${timeStr} WIB</div>
-                            </div>
-                            <div class="status-pill status-success">SELESAI</div>
-                        </div>
-                    `;
-                });
-            });
-        }
-
-        function loadPaymentHistory() {
             const history = JSON.parse(localStorage.getItem('maka_payments_' + u.plat)) || {};
-            const keys = Object.keys(history).sort((a,b) => new Date(b) - new Date(a));
-            historyList.innerHTML = '';
-            if (keys.length === 0) { emptyState.style.display = 'block'; return; }
-            emptyState.style.display = 'none';
+            const startDate = new Date(u.tglAmbil);
 
-            keys.forEach(dateKey => {
-                const parts = dateKey.split('-');
-                const fmtDate = new Date(parts[0], parts[1]-1, parts[2]).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+            let globalPaid = 0; let monthlyDebt = 0;
+            Object.keys(history).forEach(k => { if(history[k].paid) globalPaid++; });
 
-                historyList.innerHTML += `
-                    <div class="history-card" data-type="pay">
-                        <div class="icon-box">💰</div>
-                        <div class="info">
-                            <div class="title">Pembayaran Sewa</div>
-                            <div class="meta">Tagihan: ${fmtDate}</div>
-                        </div>
-                        <div class="status-pill status-success">LUNAS</div>
-                    </div>
-                `;
-            });
+            for(let d=1; d<=dim; d++) {
+                const dateObj = new Date(y, m, d);
+                const dateKey = `${y}-${m+1}-${d}`;
+                let cls = "";
+                const isHoliday = u.dpType === "755" && (d === 14 || d === 28 || d === 31);
+                
+                if (isHoliday) cls = "off";
+                else if (history[dateKey] && history[dateKey].paid) cls = "paid";
+                else if (dateObj >= startDate && dateObj < today) { cls = "debt"; monthlyDebt += RATE; }
+
+                if(dateObj.toDateString() === today.toDateString()) cls += " today";
+                g.innerHTML += `<div class="cell ${cls}" onclick="openM('${dateKey}', ${d})">${d}</div>`;
+            }
+
+            document.getElementById('totalDebt').innerText = "Rp " + monthlyDebt.toLocaleString('id-ID');
+            document.getElementById('progText').innerText = `${globalPaid} / 1009 HARI`;
+            document.getElementById('barFill').style.width = Math.min((globalPaid / 1009 * 100), 100) + "%";
         }
 
-        window.onload = () => loadChargingHistory();
+        function openM(key, d) {
+            selectedDateKey = key;
+            document.getElementById('mDateTitle').innerText = d + " " + document.getElementById('mLabel').innerText;
+            document.getElementById('modalPay').style.display = 'flex';
+            document.getElementById('upInfo').innerHTML = "<span style='font-size:24px; display:block; margin-bottom:5px;'>📷</span>Upload Bukti Bayar";
+            compressedImageData = null;
+        }
+
+        function savePayment() {
+            const hist = JSON.parse(localStorage.getItem('maka_payments_' + u.plat)) || {};
+            hist[selectedDateKey] = { paid: true, noteDate: document.getElementById('actualPayDate').value, proof: compressedImageData, ts: new Date().toISOString() };
+            localStorage.setItem('maka_payments_' + u.plat, JSON.stringify(hist));
+            closeM(); render();
+        }
+
+        function changeMonth(v) { displayDate.setMonth(displayDate.getMonth() + v); render(); }
+        function closeM() { document.getElementById('modalPay').style.display = 'none'; }
+        window.onload = render;
     </script>
 </body>
 </html>
