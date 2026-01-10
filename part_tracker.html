@@ -3,126 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Maintenance - MAKA</title>
+    <title>MAKA - Unit Maintenance</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg: #05080A;
-            --cyan: #00F0FF;
-            --volt: #D9FF00;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.12);
-            --text-soft: #CBD5E1; /* Putih tulang terang agar kontras di bg hitam */
-            --font-display: 'Space Grotesk', sans-serif;
+            --royal-blue: #0A2259;
+            --royal-dark: #051336;
+            --electric-blue: #2D63ED;
+            --bg-surface: #F8FAFC;
+            --text-main: #1A1F36;
+            --text-muted: #64748B;
+            --white: #FFFFFF;
+            --success: #10B981;
+            --danger: #EF4444;
         }
 
         body {
-            margin: 0; padding: 25px; font-family: 'Inter', sans-serif;
-            background: var(--bg); color: white; padding-bottom: 120px;
+            margin: 0; background: var(--bg-surface);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main); padding-bottom: 120px;
         }
 
-        h1 { font-family: var(--font-display); font-size: 32px; margin-bottom: 5px; letter-spacing: -1px; }
-        .sub-h1 { font-size: 11px; color: var(--cyan); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 30px; font-weight: 700; opacity: 0.9; }
+        /* --- HEADER --- */
+        .premium-header {
+            background: radial-gradient(circle at 100% 0%, #163680 0%, var(--royal-blue) 60%, var(--royal-dark) 100%);
+            padding: 50px 25px 120px 25px;
+            border-bottom-left-radius: 40px; border-bottom-right-radius: 40px;
+            color: var(--white); text-align: center; position: relative;
+            box-shadow: 0 20px 40px -10px rgba(10, 34, 89, 0.4);
+        }
 
-        /* Part Grid */
-        .part-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .header-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; margin-bottom: 8px; }
+        .header-title { font-family: 'Space Grotesk', sans-serif; font-size: 32px; font-weight: 700; margin: 0; letter-spacing: -1px; }
+
+        /* --- MAIN ACTION BUTTON (FLOATING) --- */
+        .action-overlap { padding: 0 25px; margin-top: -70px; position: relative; z-index: 10; }
+        
+        .btn-claim-main {
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px);
+            border-radius: 24px; padding: 25px; width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(10, 34, 89, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            display: flex; align-items: center; justify-content: center; gap: 15px;
+            cursor: pointer; transition: transform 0.2s;
+        }
+        .btn-claim-main:active { transform: scale(0.98); }
+        
+        .icon-circle {
+            width: 46px; height: 46px; background: #EEF2FF; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: var(--electric-blue);
+        }
+        
+        .btn-text-group { text-align: left; }
+        .btn-title { font-family: 'Space Grotesk'; font-size: 16px; font-weight: 700; color: var(--royal-blue); }
+        .btn-sub { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+
+        /* --- PARTS GRID --- */
+        .part-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 30px 25px; }
+        
         .part-card {
-            background: var(--glass); border: 1px solid var(--border);
-            padding: 25px 15px; border-radius: 25px; text-align: center;
-            backdrop-filter: blur(10px);
+            background: var(--white); border-radius: 20px; padding: 20px;
+            box-shadow: 0 10px 20px -5px rgba(148, 163, 184, 0.1);
+            border: 1px solid #EFF2F5; text-align: center;
         }
-        .p-name { font-size: 10px; color: var(--text-soft); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; }
-        .p-val { font-family: var(--font-display); font-size: 36px; font-weight: 700; color: white; margin-bottom: 2px; }
-        .p-label { font-size: 10px; color: var(--cyan); font-weight: 700; margin-bottom: 18px; display: block; opacity: 0.8; }
 
-        /* Progress Bar Neon */
-        .p-bar-bg { width: 100%; height: 6px; background: #111; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
-        .p-bar-fill { height: 100%; border-radius: 10px; transition: 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
-        .fill-cyan { background: var(--cyan); box-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
+        .p-name { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .p-val { font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; color: var(--royal-blue); line-height: 1; letter-spacing: -1px; }
+        .p-label { font-size: 10px; font-weight: 600; color: var(--electric-blue); margin-top: 4px; }
 
-        /* Action Button */
-        .btn-claim {
-            width: 100%; padding: 18px; border-radius: 18px; border: none;
-            background: var(--glass); color: white; font-family: var(--font-display);
-            font-weight: 700; font-size: 14px; border: 1px solid var(--border);
-            cursor: pointer; transition: 0.3s; margin-bottom: 35px;
+        /* Progress Bar Modern */
+        .bar-container { 
+            width: 100%; height: 6px; background: #F1F5F9; 
+            border-radius: 10px; margin-top: 15px; overflow: hidden; 
         }
-        .btn-claim:active { background: var(--cyan); color: #000; border-color: var(--cyan); }
+        .bar-fill { 
+            height: 100%; background: linear-gradient(90deg, var(--royal-blue), var(--electric-blue)); 
+            border-radius: 10px; transition: 1s cubic-bezier(0.22, 1, 0.36, 1); 
+        }
 
-        /* Log History */
-        .log-sec h3 { font-family: var(--font-display); font-size: 16px; color: var(--volt); margin-bottom: 20px; letter-spacing: 0.5px; }
+        /* --- HISTORY LOG --- */
+        .history-section { padding: 0 25px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .section-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
         .log-item {
-            padding: 16px; border-bottom: 1px solid var(--border);
+            background: var(--white); border-radius: 16px; padding: 16px 20px; margin-bottom: 10px;
             display: flex; justify-content: space-between; align-items: center;
-            font-size: 13px; background: rgba(255,255,255,0.01);
+            border: 1px solid #F1F5F9;
         }
-        .log-item b { color: white; }
-        .l-date { font-size: 11px; color: var(--text-soft); font-weight: 600; opacity: 0.7; }
+        .log-left { display: flex; align-items: center; gap: 12px; }
+        .log-icon { width: 32px; height: 32px; background: #ECFDF5; color: var(--success); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .log-part { font-weight: 700; font-size: 13px; color: var(--text-main); }
+        .log-date { font-size: 11px; color: var(--text-muted); font-weight: 500; }
 
-        /* Nav Bawah */
-        .nav-bottom {
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 400px; height: 75px;
-            background: rgba(10, 15, 20, 0.85); backdrop-filter: blur(25px);
-            border: 1px solid var(--border); border-radius: 25px;
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+        /* --- MODAL --- */
+        .modal { position: fixed; inset: 0; background: rgba(10, 34, 89, 0.3); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .m-box { width: 85%; max-width: 400px; background: var(--white); border-radius: 30px; padding: 35px 30px; text-align: center; box-shadow: 0 40px 80px rgba(0,0,0,0.2); }
+        
+        select { 
+            width: 100%; padding: 16px; background: #F8FAFC; border: 1px solid #E2E8F0; 
+            border-radius: 16px; font-family: 'Plus Jakarta Sans'; font-weight: 600; 
+            margin: 20px 0; outline: none; color: var(--text-main);
         }
-        .nav-item { text-decoration: none; color: #444; font-size: 10px; font-weight: 700; text-align: center; }
-        .nav-item.active { color: var(--cyan); }
-        .nav-item span { display: block; font-size: 24px; margin-bottom: 4px; }
+        
+        .btn-confirm { 
+            width: 100%; padding: 18px; background: var(--royal-blue); color: white; 
+            border: none; border-radius: 18px; font-family: 'Space Grotesk'; font-weight: 700; 
+            font-size: 15px; cursor: pointer; box-shadow: 0 10px 20px rgba(10, 34, 89, 0.2); 
+        }
 
-        /* Modal Claim */
-        #modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(10px);
-        }
-        .m-box {
-            width: 85%; max-width: 350px; background: #0A0A0A; border: 1px solid var(--border);
-            padding: 35px 25px; border-radius: 35px; text-align: center;
-        }
-        select {
-            width: 100%; padding: 16px; background: #000; border: 1px solid var(--border);
-            color: white; border-radius: 15px; margin: 25px 0; font-family: 'Inter'; font-size: 14px; outline: none;
-        }
-        .btn-ok { width: 100%; padding: 18px; background: var(--volt); color: #000; border: none; border-radius: 15px; font-weight: 800; font-family: var(--font-display); cursor: pointer; }
+        /* --- DOCK NAV --- */
+        .dock-container { position: fixed; bottom: 30px; left: 0; width: 100%; display: flex; justify-content: center; z-index: 100; pointer-events: none; }
+        .nav-pill { pointer-events: auto; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); padding: 12px 30px; border-radius: 100px; display: flex; gap: 35px; border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: 0 20px 50px rgba(10, 34, 89, 0.15), 0 1px 0 rgba(255,255,255,0.5) inset; }
+        .nav-tab { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #94A3B8; transition: all 0.3s ease; position: relative; }
+        .nav-tab.active { color: var(--royal-blue); transform: translateY(-3px); }
+        .nav-tab.active::after { content: ''; position: absolute; bottom: -8px; width: 4px; height: 4px; background: var(--royal-blue); border-radius: 50%; }
+        .nav-tab svg { width: 24px; height: 24px; fill: currentColor; margin-bottom: 4px; }
+        .nav-tab span { font-size: 10px; font-weight: 700; }
     </style>
 </head>
 <body>
 
-    <h1>Maintenance<span>.</span></h1>
-    <div class="sub-h1">Status Jatah Sparepart Gratis</div>
+    <header class="premium-header">
+        <div class="header-label">Maka Rent to Own</div>
+        <h1 class="header-title">Unit Maintenance</h1>
+    </header>
+
+    <div class="action-overlap">
+        <div class="btn-claim-main" onclick="openM()">
+            <div class="icon-circle">🛠️</div>
+            <div class="btn-text-group">
+                <div class="btn-title">Klaim Penggantian</div>
+                <div class="btn-sub">Ajukan sparepart baru</div>
+            </div>
+            <div style="flex:1; text-align:right; font-size:18px; color:var(--text-muted); opacity:0.5;">➜</div>
+        </div>
+    </div>
 
     <div id="partList" class="part-grid">
         </div>
 
-    <button class="btn-claim" onclick="openM()">🛠️ KLAIM PENGGANTIAN UNIT</button>
-
-    <div class="log-sec">
-        <h3>Riwayat Maintenance</h3>
+    <div class="history-section">
+        <div class="section-header">
+            <span class="section-title">Riwayat Maintenance</span>
+        </div>
         <div id="logList">
-            <div style="color:var(--text-soft); font-size:12px; text-align:center; padding:30px; opacity: 0.5;">Belum ada riwayat klaim part.</div>
+            <div style="text-align:center; padding:30px; color:var(--text-muted); font-size:12px; font-weight:600; opacity:0.5;">Belum ada riwayat klaim.</div>
         </div>
     </div>
 
-    <div id="modal">
+    <div id="modalM" class="modal">
         <div class="m-box">
-            <div style="font-size:10px; color:var(--cyan); letter-spacing:2px; font-weight:700; text-transform:uppercase;">Pilih Part Baru</div>
+            <h3 style="font-family:'Space Grotesk'; margin:0 0 10px 0; color:var(--royal-blue);">Pilih Sparepart</h3>
+            <div style="font-size:12px; color:var(--text-muted);">Pastikan sisa jatah Anda mencukupi.</div>
+            
             <select id="selPart"></select>
-            <button class="btn-ok" onclick="save()">KONFIRMASI PENGGANTIAN</button>
-            <p onclick="closeM()" style="color:var(--text-soft); font-size:12px; margin-top:20px; cursor:pointer; font-weight:700;">Batalkan</p>
+            
+            <button class="btn-confirm" onclick="save()">KONFIRMASI KLAIM</button>
+            <p onclick="closeM()" style="margin-top:20px; font-size:13px; color:var(--text-muted); cursor:pointer; font-weight:700;">BATALKAN</p>
         </div>
     </div>
 
-    <nav class="nav-bottom">
-        <a href="dashboard.html" class="nav-item"><span>🏠</span>HOME</a>
-        <a href="calendar.html" class="nav-item"><span>📅</span>BAYAR</a>
-        <a href="https://punyaaris1-lang.github.io/antricukk/antrian.html" class="nav-item"><span>⚡</span>ANTRIAN</a>
-        <a href="history.html" class="nav-item"><span>📜</span>HISTORY</a>
-    </nav>
+    <div class="dock-container">
+        <nav class="nav-pill">
+            <a href="dashboard.html" class="nav-tab active"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Home</span></a>
+            <a href="calendar.html" class="nav-tab"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg><span>Bayar</span></a>
+            <a href="antrian.html" class="nav-tab"><svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg><span>Antrian</span></a>
+            <a href="history.html" class="nav-tab"><svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 7 7 6.93 6.93 0 0 1-5-2.09l-1.41 1.41A8.92 8.92 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg><span>History</span></a>
+        </nav>
+    </div>
 
     <script>
         let LIMITS = JSON.parse(localStorage.getItem('maka_part_limits')) || { ban_depan: 3, ban_belakang: 3, kampas_depan: 3, kampas_belakang: 3 };
@@ -137,7 +189,7 @@
         function render() {
             const grid = document.getElementById('partList'), sel = document.getElementById('selPart');
             grid.innerHTML = ''; 
-            sel.innerHTML = '<option value="">-- PILIH SPAREPART --</option>';
+            sel.innerHTML = '<option value="">-- PILIH ITEMS --</option>';
 
             PARTS.forEach(p => {
                 const lim = LIMITS[p.k] || 3, used = usage[p.k] || 0, rem = lim - used;
@@ -147,9 +199,9 @@
                     <div class="part-card">
                         <div class="p-name">${p.n}</div>
                         <div class="p-val">${rem}</div>
-                        <span class="p-label">SISA JATAH</span>
-                        <div class="p-bar-bg">
-                            <div class="p-bar-fill fill-cyan" style="width:${pct}%"></div>
+                        <div class="p-label">SISA JATAH</div>
+                        <div class="bar-container">
+                            <div class="bar-fill" style="width:${pct}%"></div>
                         </div>
                     </div>
                 `;
@@ -157,17 +209,21 @@
             });
 
             const lBox = document.getElementById('logList'), h = usage.history || [];
-            lBox.innerHTML = h.length === 0 ? '<div style="color:var(--text-soft); font-size:12px; text-align:center; padding:30px; opacity:0.5;">Belum ada riwayat klaim part.</div>' : 
-                h.slice().reverse().map(x => `
+            if(h.length > 0) {
+                lBox.innerHTML = h.slice().reverse().map(x => `
                     <div class="log-item">
-                        <b>${PARTS.find(i=>i.k===x.key)?.n || x.key}</b>
-                        <span class="l-date">${x.date}</span>
+                        <div class="log-left">
+                            <div class="log-icon">✓</div>
+                            <div class="log-part">${PARTS.find(i=>i.k===x.key)?.n || x.key}</div>
+                        </div>
+                        <div class="log-date">${x.date}</div>
                     </div>
                 `).join('');
+            }
         }
 
-        function openM(){ document.getElementById('modal').style.display='flex'; }
-        function closeM(){ document.getElementById('modal').style.display='none'; }
+        function openM(){ document.getElementById('modalM').style.display='flex'; }
+        function closeM(){ document.getElementById('modalM').style.display='none'; }
         
         function save() {
             const k = document.getElementById('selPart').value;

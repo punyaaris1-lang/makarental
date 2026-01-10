@@ -3,116 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Map Station - MAKA</title>
+    <title>MAKA - Station Locator Premium</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
     <style>
         :root {
-            --bg: #05080A; --cyan: #00F0FF; --volt: #D9FF00;
-            --glass: rgba(10, 15, 20, 0.9); --border: rgba(255, 255, 255, 0.15);
-            --font-display: 'Space Grotesk', sans-serif;
+            --royal-blue: #0A2259;
+            --electric-blue: #2D63ED;
+            --bg-surface: #F4F7FA;
+            --glass-white: rgba(255, 255, 255, 0.9);
+            --text-main: #1A1F36;
+            --text-muted: #697386;
         }
 
-        body { margin: 0; padding: 0; background: var(--bg); font-family: 'Inter', sans-serif; color: white; overflow: hidden; }
+        body { 
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif; 
+            background: var(--bg-surface); overflow: hidden; 
+        }
+
+        /* --- FULLSCREEN MAP --- */
         #map { width: 100vw; height: 100vh; z-index: 1; }
 
-        .overlay-header {
+        /* --- FLOATING HEADER --- */
+        .map-header {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            width: 90%; z-index: 1000; pointer-events: none;
+            width: 90%; max-width: 400px; z-index: 1000;
         }
-        .search-container {
-            background: var(--glass); backdrop-filter: blur(15px);
-            border: 1px solid var(--border); border-radius: 20px;
-            padding: 15px 20px; pointer-events: auto; text-align: center;
+        .status-pill-box {
+            background: var(--glass-white); backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            padding: 15px 20px; border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(10, 34, 89, 0.15);
+            text-align: center;
         }
-        .search-container h1 { 
-            font-family: var(--font-display); font-size: 18px; margin: 0; color: white;
+        .station-title { 
+            font-family: 'Space Grotesk', sans-serif; font-size: 18px; 
+            font-weight: 800; color: var(--royal-blue); margin: 0;
+            letter-spacing: -0.5px;
         }
-        #statusGPS { font-size: 10px; color: var(--cyan); margin-top: 5px; font-weight: 700; }
+        #statusGPS { 
+            font-size: 10px; font-weight: 800; color: var(--electric-blue); 
+            margin-top: 5px; text-transform: uppercase; letter-spacing: 1px;
+        }
 
+        /* --- INFO CARD SLIDE UP --- */
         #infoCard {
-            position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%);
-            width: 85%; background: var(--glass); backdrop-filter: blur(20px);
-            border: 1px solid var(--border); border-radius: 25px;
-            padding: 20px; z-index: 1000; display: none;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-            animation: slideUp 0.3s ease-out;
+            position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 380px; background: white; 
+            border-radius: 30px; padding: 25px; z-index: 1000;
+            box-shadow: 0 20px 50px rgba(10, 34, 89, 0.2);
+            border: 1px solid rgba(230, 235, 241, 0.8);
+            display: none; animation: slideUp 0.4s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        @keyframes slideUp { from { bottom: -100px; } to { bottom: 110px; } }
+        @keyframes slideUp { from { transform: translate(-50%, 100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
 
-        .btn-go {
-            width: 100%; padding: 16px; background: var(--cyan); border: none;
-            border-radius: 12px; font-family: var(--font-display); font-weight: 800;
-            color: #000; margin-top: 15px; cursor: pointer;
+        .btn-nav-map {
+            width: 100%; padding: 18px; background: var(--royal-blue);
+            color: white; border: none; border-radius: 18px;
+            font-family: 'Space Grotesk', sans-serif; font-weight: 800;
+            font-size: 14px; cursor: pointer; margin-top: 15px;
+            box-shadow: 0 8px 20px rgba(10, 34, 89, 0.2);
         }
 
-        .user-marker { background: white; border: 3px solid var(--cyan); border-radius: 50%; box-shadow: 0 0 15px var(--cyan); }
-        .fc-marker { background: var(--volt); border: 2px solid black; border-radius: 50%; box-shadow: 0 0 10px var(--volt); }
-
-        .nav-bottom {
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 400px; height: 70px;
-            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
-            border: 1px solid var(--border); border-radius: 25px;
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+        /* --- CUSTOM MARKERS --- */
+        .user-marker-icon { 
+            background: var(--electric-blue); border: 3px solid white; 
+            border-radius: 50%; box-shadow: 0 0 15px var(--electric-blue); 
         }
-        .nav-item { text-decoration: none; color: #444; font-size: 9px; text-align: center; font-weight: 700; }
-        .nav-item.active { color: var(--cyan); }
+        .fc-marker-icon { 
+            background: white; border: 3px solid var(--royal-blue); 
+            border-radius: 50%; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px; font-weight: 800; color: var(--royal-blue);
+        }
+
+        /* --- NAVIGATION DOCK --- */
+        .dock-container { 
+            position: fixed; bottom: 30px; left: 0; width: 100%; 
+            display: flex; justify-content: center; z-index: 1000; 
+        }
+        .nav-pill { 
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(15px); 
+            padding: 14px 28px; border-radius: 50px; display: flex; gap: 32px; 
+            box-shadow: 0 20px 45px rgba(10, 34, 89, 0.2); border: 1px solid rgba(255, 255, 255, 0.5); 
+        }
+        .nav-tab { 
+            display: flex; flex-direction: column; align-items: center; 
+            text-decoration: none; color: #A0AEC0; transition: 0.3s; 
+        }
+        .nav-tab.active { color: var(--electric-blue); }
+        .nav-tab svg { width: 26px; height: 26px; fill: currentColor; margin-bottom: 4px; }
+        .nav-tab span { font-size: 10px; font-weight: 700; }
     </style>
 </head>
 <body>
 
-    <div class="overlay-header">
-        <div class="search-container">
-            <h1>STASIUN CHARGING RIIL</h1>
-            <div id="statusGPS">MENCARI POSISI ANDA...</div>
+    <div class="map-header">
+        <div class="status-pill-box">
+            <h1 class="station-title">STASIUN CHARGING</h1>
+            <div id="statusGPS">MENGHUBUNGKAN SATELIT...</div>
         </div>
     </div>
 
     <div id="map"></div>
 
     <div id="infoCard">
-        <div id="cardTitle" style="font-family: var(--font-display); font-size: 18px; font-weight: 700; color: white;">Nama Lokasi</div>
-        <div id="cardAddr" style="font-size: 12px; color: #ccc; margin: 8px 0;">Alamat lengkap...</div>
-        <button class="btn-go" id="btnNav">MULAI NAVIGASI (MAPS)</button>
-        <p onclick="this.parentElement.style.display='none'" style="text-align:center; font-size:11px; color:#555; margin-top:10px; cursor:pointer;">Tutup</p>
+        <div style="font-size: 10px; font-weight: 800; color: var(--electric-blue); letter-spacing: 1px; margin-bottom: 5px;">DETAIL LOKASI</div>
+        <div id="cardTitle" style="font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 800; color: var(--royal-blue);">Nama Stasiun</div>
+        <div id="cardAddr" style="font-size: 12px; color: var(--text-muted); margin: 8px 0; line-height: 1.4;">Alamat lengkap...</div>
+        <button class="btn-nav-map" id="btnNav">BUKA PETA NAVIGASI</button>
+        <p onclick="document.getElementById('infoCard').style.display='none'" style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:15px; cursor:pointer; font-weight:700;">TUTUP DETAIL</p>
     </div>
 
-    <nav class="nav-bottom">
-        <a href="dashboard.html" class="nav-item">🏠<br>HOME</a>
-        <a href="calendar.html" class="nav-item">📅<br>BAYAR</a>
-        <a href="lokasi_fc.html" class="nav-item active">🎫<br>LOKASI</a>
-        <a href="history.html" class="nav-item">📜<br>HISTORY</a>
-    </nav>
+    <div class="dock-container">
+        <nav class="nav-pill">
+            <a href="dashboard.html" class="nav-tab">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>Home</span>
+            </a>
+            <a href="calendar.html" class="nav-tab">
+                <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                <span>Bayar</span>
+            </a>
+            <a href="lokasi_fc.html" class="nav-tab active">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></svg>
+                <span>Lokasi</span>
+            </a>
+            <a href="history.html" class="nav-tab">
+                <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6a7 7 0 1 1 7 7 6.93 6.93 0 0 1-5-2.09l-1.41 1.41A8.92 8.92 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                <span>History</span>
+            </a>
+        </nav>
+    </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // 1. Inisialisasi Firebase (Gunakan config Anda)
+        // --- FIREBASE BARU ---
         const firebaseConfig = { 
-            apiKey: "AIzaSyAk3G5aQUBVe_g7_peVu1F6xllP_RejGq0", 
-            authDomain: "rtomaka-e67b5.firebaseapp.com", 
-            projectId: "rtomaka-e67b5", 
-            storageBucket: "rtomaka-e67b5.firebasestorage.app", 
-            messagingSenderId: "472036722228", 
-            appId: "1:472036722228:web:11d520f9204db317d02c61" 
+            apiKey: "AIzaSyB666i9lYWIpxOdkwpoX9EvFvHLmHczeq8", 
+            authDomain: "fcgadingnew22.firebaseapp.com", 
+            projectId: "fcgadingnew22", 
+            storageBucket: "fcgadingnew22.firebasestorage.app", 
+            messagingSenderId: "537736846678", 
+            appId: "1:537736846678:web:53788d71a196423ac08af7" 
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 2. Inisialisasi Peta
-        const map = L.map('map', { zoomControl: false }).setView([-6.200, 106.816], 12);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        // --- PETA PREMIUM (Custom Tint) ---
+        const map = L.map('map', { zoomControl: false }).setView([-6.200, 106.816], 13);
+        
+        // Menggunakan tile yang bersih dan profesional
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '© MAKA Fleet'
         }).addTo(map);
 
-        const fcIcon = L.divIcon({ className: 'fc-marker', iconSize: [14, 14] });
+        const fcIcon = L.divIcon({ className: 'fc-marker-icon', iconSize: [20, 20], html: '⚡' });
 
-        // 3. Load Data dari Firestore (Ganti 'locations' sesuai nama koleksi di Firebase Anda)
+        // --- LOAD DATA ---
         function loadLocations() {
             db.collection('locations').onSnapshot(snap => {
                 snap.forEach(doc => {
@@ -120,9 +173,10 @@
                     if (d.lat && d.lng) {
                         const marker = L.marker([d.lat, d.lng], { icon: fcIcon }).addTo(map);
                         marker.on('click', () => {
-                            document.getElementById('infoCard').style.display = 'block';
-                            document.getElementById('cardTitle').innerText = d.name || "Stasiun FC";
-                            document.getElementById('cardAddr').innerText = d.address || d.addr || "";
+                            const card = document.getElementById('infoCard');
+                            card.style.display = 'block';
+                            document.getElementById('cardTitle').innerText = d.name || "Maka Fast Station";
+                            document.getElementById('cardAddr').innerText = d.address || d.addr || "Lokasi Kelapa Gading";
                             document.getElementById('btnNav').onclick = () => {
                                 window.open(`https://www.google.com/maps/dir/?api=1&destination=${d.lat},${d.lng}`);
                             };
@@ -132,7 +186,7 @@
             });
         }
 
-        // 4. Deteksi GPS Real-Time
+        // --- GPS WATCHER ---
         function initGPS() {
             if (!navigator.geolocation) {
                 document.getElementById('statusGPS').innerText = "GPS TIDAK DIDUKUNG";
@@ -143,24 +197,20 @@
                 (pos) => {
                     const { latitude, longitude } = pos.coords;
                     const userPos = [latitude, longitude];
-                    
-                    document.getElementById('statusGPS').innerText = "GPS AKTIF (POSISI ANDA TERDETEKSI)";
-                    document.getElementById('statusGPS').style.color = "var(--volt)";
+                    document.getElementById('statusGPS').innerText = "SATELIT AKTIF (POSISI ANDA TERKUNCI)";
+                    document.getElementById('statusGPS').style.color = "var(--success)";
 
                     if (!window.userMarker) {
-                        const userIcon = L.divIcon({ className: 'user-marker', iconSize: [18, 18] });
-                        window.userMarker = L.marker(userPos, { icon: userIcon }).addTo(map)
-                            .bindPopup("Posisi Anda").openPopup();
+                        const userIcon = L.divIcon({ className: 'user-marker-icon', iconSize: [18, 18] });
+                        window.userMarker = L.marker(userPos, { icon: userIcon }).addTo(map);
                         map.setView(userPos, 14); 
                     } else {
                         window.userMarker.setLatLng(userPos);
                     }
                 },
                 (err) => {
-                    let msg = "GPS MATI / IZIN DITOLAK";
-                    if(err.code === 1) msg = "IZIN LOKASI DIBLOKIR BROWSER";
-                    document.getElementById('statusGPS').innerText = msg;
-                    document.getElementById('statusGPS').style.color = "var(--red)";
+                    document.getElementById('statusGPS').innerText = "IZIN LOKASI DIBUTUHKAN";
+                    document.getElementById('statusGPS').style.color = "var(--danger)";
                 },
                 { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
